@@ -1,0 +1,1 @@
+SELECT SUM(receipt_amount) FROM view_amount_inv2rec WHERE receipt_status NOT IN('VOID','WAIT')  AND booking_id = @booking_id

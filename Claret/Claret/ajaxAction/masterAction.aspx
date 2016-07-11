@@ -1,0 +1,1 @@
+﻿<%@ Page Language="vb" AutoEventWireup="false" CodeBehind="masterAction.aspx.vb" Inherits="Claret.masterAction" %>

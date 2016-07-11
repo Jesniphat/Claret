@@ -1,0 +1,1 @@
+﻿UPDATE SET @created @expired, @user, @sessionid, @ip, sys_session.login VALUES()

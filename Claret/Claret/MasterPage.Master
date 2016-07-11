@@ -1,0 +1,439 @@
+﻿<%@ Master Language="VB" AutoEventWireup="false" CodeBehind="MasterPage.master.vb" Inherits="Claret.MasterPage" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Claret System : ระบบบริจาคโลหิต</title>
+    <link href="/resources/css/bootstrap.css?ver=20160116" rel="stylesheet" />
+    <link href="/resources/css/bootflat.css?ver=20160116" rel="stylesheet" />
+    <link href="/resources/css/jquery.fs.selecter.css?ver=20160116" rel="stylesheet" />
+    <link href="/resources/jquery-ui/jquery-ui.css?ver=20160116" rel="stylesheet" />
+    <link href="/resources/css/custom.css?ver=20160116" rel="stylesheet" />
+    <link href="/resources/css/table-excel.css" rel="stylesheet" />
+    <script src="../resources/jquery/jquery.js" type="text/javascript"></script>
+    <script src="../resources/jquery-ui/jquery-ui.js" type="text/javascript"></script>
+    <script src="../resources/javascript/jquery-date.js?ver=20160116" type="text/javascript"></script>
+    <script src="../resources/jquery/bootstrap.js" type="text/javascript"></script>
+    <script src="../resources/jquery/jquery.fs.selecter.js" type="text/javascript"></script>
+    <script src="../resources/jquery/combobox.js" type="text/javascript"></script>
+    <script src="../resources/javascript/extension.js?ver=20160116" type="text/javascript"></script>
+    <script src="../resources/jquery/jquery.tablesorter.js" type="text/javascript"></script>
+
+    <style>
+        #leftMenu {
+            background-color: #D7D7D7;
+            padding: 0;
+            border-right: solid 5px #CCCCCC;
+            overflow-y: auto;
+            position: relative;
+            min-height: 1px;
+            float: left;
+            width: 14%;
+            min-width: 191px;
+        }
+
+        #mstContent {
+            background-color: #FFFFFF;
+            padding: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 1px;
+            float: left;
+            width: 86%;
+            min-width: 1174px;
+        }
+
+        .topbar-col1 {
+            position: relative;
+            min-height: 1px;
+            float: left;
+            width: 14%;
+            min-width: 191px;
+        }
+
+        .topbar-col2 {
+            position: relative;
+            min-height: 1px;
+            float: left;
+            width: 20%;
+            min-width: 260px;
+        }
+
+        .topbar-col3 {
+            position: relative;
+            min-height: 1px;
+            float: left;
+            width: 66%;
+            min-width: 900px;
+        }
+
+        #leftMenu .row div {
+            background-color: #D7D7D7;
+            cursor: pointer;
+            font-weight: bold;
+            padding-top: 3px;
+            padding-bottom: 3px;
+            border-bottom: solid 2px #cccccc;
+        }
+
+            #leftMenu .row div:hover, #leftMenu .row div.selected:hover {
+                background-color: white;
+            }
+
+            #leftMenu .row div.selected {
+                background-color: #F7F7F7;
+            }
+
+        #subTopMenu {
+            border-radius: 4px;
+            border: solid 1px #CCCCCC;
+            display: none;
+            background-color: white;
+            width: 250px;
+            position: absolute;
+            z-index: 10;
+        }
+
+            #subTopMenu div.col-md-36 {
+                cursor: pointer;
+            }
+
+                #subTopMenu div.col-md-36:hover {
+                    background-color: #F7F7F7;
+                }
+
+        #topMenu {
+            cursor: pointer;
+            padding-top: 10px;
+            position: relative;
+        }
+        .noti {
+            position:absolute; 
+            left:500px; 
+            top:48px; 
+            z-index:100;
+            padding: 5px 30px;
+            border-radius: 4px;
+            border: solid 2px #808080;
+            background-color:#FFFFFF; 
+            font-weight: bold;
+            -webkit-box-shadow: 3px 3px 3px rgba(0,0,0,.6);
+            -moz-box-shadow: 3px 3px 3px rgba(0,0,0,.6);
+            box-shadow: 3px 3px 3px rgba(0,0,0,.6);
+        }
+        .noti-ok {
+            border: solid 2px #8CC152;
+            background-color: #8CC152;
+            color: #FFF;
+        }
+        .noti-remove {
+            border: solid 2px #E9573F;
+            background-color: #E9573F;
+            color: #FFF;
+        }
+        .noti-info {
+            border: solid 2px #4A89DC;
+            background-color: #4A89DC;
+            color: #FFF;
+        }
+        .noti-question {
+            border: solid 2px #EF8B2C;
+            background-color: #EF8B2C;
+            color: #FFF;
+        }
+        div.page span.glyphicon {
+            padding: 1px 3px;
+            font-size: large;
+        }
+        div.page > button {
+            height: 25px; 
+            vertical-align: sub; 
+            font-size: 17px !important; 
+            border: 0; 
+            background-color: transparent;
+        }
+        div.page > input {
+            width: 35px; 
+            height: 20px; 
+            text-align: center; 
+            margin: 0px 3px;
+        }
+        div.page > button[disabled] {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        table > thead > tr > th > button {
+            height: 25px; 
+            vertical-align: sub; 
+            border: 0; 
+            background-color: transparent;
+        }
+        table > thead > tr > th > button > i {
+            vertical-align: middle;
+            padding-left: 5px;
+            font-size: 15px;
+        }
+        .custom-combobox .custom-combobox {
+            position: relative;
+            display: inline-block;
+        }
+        .custom-combobox .custom-combobox-toggle {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            margin-left: -1px;
+            padding: 0;
+        }
+        .custom-combobox .custom-combobox-input {
+            margin: 0;
+            font-family: THSarabunNew;
+            padding: 0px 0px 0px 5px;
+            font-weight: normal;
+            color: #333333;
+            background: white;
+            border-color: #aab2bd;
+            border-bottom-left-radius: 4px;
+            border-top-left-radius: 4px;
+        }
+        .custom-combobox .custom-combobox-input.required {
+            background: #fff5f5 !important;
+        }
+        .ui-menu .ui-menu-item {
+            font-family: THSarabunNew;
+            padding: 0px 0px 0px 5px;
+        }
+        .ui-menu-item.ui-state-focus {
+            padding: 0px 0px 0px 5px;
+            font-weight: normal;
+        }
+        .ui-menu .ui-state-focus,
+        .ui-menu .ui-state-active {
+	        margin: 0px;
+            border:0;
+            background:#A9B1BB;
+            color: white;
+        }
+        .ui-autocomplete {
+            max-height: 280px;
+            overflow-y: auto;
+            /* prevent horizontal scrollbar */
+            overflow-x: hidden;
+        }
+    </style>
+    <script>
+        $(function () {
+            $(document).click(function () {
+                if ($("#subTopMenu").css('display') != "none" && $("#subTopMenu").H2GAttr('clickselector') == "N") {
+                    $("#subTopMenu").css('display', 'none');
+                } else {
+                    $('#subTopMenu').H2GAttr('ClickSelector', 'N');
+                }
+            });
+
+            $(window).resize(function () { setWorkDesk(); });
+            $("#topMenu").click(function () { toggleTopMenu(); });
+            $("#subTopMenu div.col-md-36").click(function () { topMenuSelected(this, true); });
+            $("#leftMenu .row div").click(function () { leftMenuSelected(this, true); });
+            $("input[type=text]").H2GAttr("autocomplete", "off");
+            setWorkDesk();
+            defaultMenu();
+
+        });
+
+        function setWorkDesk() {
+            var topBarHeight = 48;
+            var windowHeight = parseInt($(window).height());
+            var oldLeftMenuHeight = parseInt($("#leftMenu").height());
+            var leftMenuHeight = windowHeight - topBarHeight;
+            $("#leftMenu").css({ height: parseInt(leftMenuHeight) });
+            $("#mstContent").css({ height: parseInt(leftMenuHeight) });
+        }
+        function toggleTopMenu() {
+            if ($("#subTopMenu").css('display') == "none") {
+                $("#subTopMenu").css('display', 'inline-block');
+                $('#subTopMenu').attr('ClickSelector', 'Y');
+            } else {
+                $("#subTopMenu").css('display', 'none');
+                $('#subTopMenu').H2GAttr('ClickSelector', 'N');
+            }
+        }
+        function leftMenuSelected(xobj, postAction) {
+            $("#leftMenu .row div").removeClass("selected");
+            $(xobj).addClass("selected");
+            if (postAction) {
+                $("#data").H2GAttr("lmenu", $(xobj).H2GAttr("id"));
+                //$('#frmMaster').append(H2G.postedData($("#data"))).H2GAttr("action", $(xobj).H2GAttr("targetUrl")).H2GAttr("method", "post").submit();
+                $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: $(xobj).H2GAttr("targetUrl"), method: "post" }).submit();
+                //if ($("#data").attr("lmenu") != $(xobj).attr("id")) {
+                //}
+            }
+        }
+        function topMenuSelected(xobj, postAction) {
+            $("#contentTopMenu").html($(xobj).children().html());
+            $("#leftMenu>div").hide();
+
+            if (postAction) {
+                console.log(xobj);
+                console.log($(xobj).H2GAttr("id"));
+
+                $("#data").H2GFill({ tmenu: $(xobj).H2GAttr("id"), lmenu: $(xobj).H2GAttr("lmenu") });
+                $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: $(xobj).H2GAttr("targetUrl"), method: "post" }).submit();
+                //if ($("#data").attr("tmenu") != $(xobj).attr("id")) {
+                //}
+            } else {
+                $("#" + $(xobj).H2GAttr("lmenu")).closest(".sub-left-menu").show();
+            }
+        }
+        function defaultMenu() {
+            if ($("#data").H2GAttr("tMenu") != "") {
+                topMenuSelected($("#" + $("#data").H2GAttr("tMenu")));
+            }
+            if ($("#data").H2GAttr("lMenu") != "") {
+                leftMenuSelected($("#" + $("#data").H2GAttr("lMenu")));
+            }
+        }
+        function notiSuccess(value) { showNoti(value, "ok"); }
+        function notiError(value) { showNoti(value, "remove"); }
+        function notiInfo(value) { showNoti(value, "info"); }
+        function notiWarning(value) { showNoti(value, "question"); }
+        function showNoti(value, type) {
+            var windowWidth = parseInt($(window).width());
+            $("#divNoti").find(".noti-message").html(value);
+            $("#divNoti").find(".sign").addClass("glyphicon-" + type + "-sign");
+            $("#divNoti").addClass("noti-" + type).css({ left: parseInt(windowWidth) - ($("#divNoti").outerWidth()+20) })
+                .slideDown(function () {
+                    setTimeout(function () {
+                        $("#divNoti").slideUp(function () {
+                            $(this).removeClass("noti-" + type).find(".sign").removeClass("glyphicon-" + type + "-sign");
+                        });
+                    }, 3000);
+                });
+        }
+    </script>
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <div id="frmMaster" runat="server" style="min-width: 1366px; overflow-y: hidden; overflow-x: auto;">
+        <input id="data" runat="server" style="display: none;" tmenu="" lmenu="" amenu="" />
+        <div id="topBar" style="min-width: 1366px;">
+            <div class="row" style="background-color: gray; background: url(../../image/bg/bg-header-bar.png) repeat-x;">
+                <div class="col-md-5" style="padding: 8px 0px;">
+                    <img src="../image/icon/blood-24x24.png" style="margin-top: -10px;" />
+                    <span>Claret : ระบบบริจาคโลหิต</span>
+                </div>
+                <div id="topMenu" class="col-md-7">
+                    <div class="row">
+                        <div class="col-md-1" style="margin-top: -3px;"><span style="border-left: solid 1px black; padding: 0;">&nbsp;</span></div>
+                        <div class="col-md-35">
+                            <div id="contentTopMenu">
+                                <img src="../image/icon/menu-24x24.png" style="margin-top: -10px;" />
+                                <span>เลือกระบบงาน</span>
+                            </div>
+                            <div id="subTopMenu" class="shadow-box" clickselector="N">
+                                <div class="row">
+                                    <div id="tmenuDonor" class="col-md-36" targeturl="../donor/search.aspx" lmenu="lmenuDonorRegis" style="padding-top: 10px;">
+                                        <div style="border-bottom: dashed 1px #CCCCCC;padding: 0 5px 0 5px;">
+                                            <img src="../image/icon/Donor-24x24.png" style="margin-top: -10px;" />
+                                            <span>ผู้บริจาค</span>
+                                        </div>
+                                    </div>
+                                    <div id="tmenuMobile" class="col-md-36" targeturl="../mobile/main.aspx" lmenu="lmenuMobileMain" style="padding-top: 10px;">
+                                        <div style="border-bottom: dashed 1px #CCCCCC;padding: 0 5px 0 5px;">
+                                            <img src="../image/icon/Bus-24x24.png" style="margin-top: -10px;" />
+                                            <span>ออกหน่วยเคลื่อนที่</span>
+                                        </div>
+                                    </div>
+                                    <div id="tmenuIngredient" class="col-md-36" style="padding-top: 10px;">
+                                        <div style="border-bottom: dashed 1px #CCCCCC;padding: 0 5px 0 5px;">
+                                            <img src="../image/icon/Settings-24x24.png" style="margin-top: -10px;" />
+                                            <span>จัดการส่วนประกอบโลหิต</span>
+                                        </div>
+                                    </div>
+                                    <div id="tmenuQuality" class="col-md-36" style="padding-top: 10px;">
+                                        <div style="border-bottom: dashed 1px #CCCCCC;padding: 0 5px 0 5px;">
+                                            <img src="../image/icon/Check-Blood-24x24.png" style="margin-top: -10px;" />
+                                            <span>ตรวจคุณภาพโลหิต</span>
+                                        </div>
+                                    </div>
+                                    <div id="tmenuDistribute" class="col-md-36" style="padding-top: 10px;">
+                                        <div style="border-bottom: dashed 1px #CCCCCC;padding: 0 5px 0 5px;">
+                                            <img src="../image/icon/take-out-blood-24x24.png" style="margin-top: -10px;" />
+                                            <span>จ่ายโลหิตและส่วนประกอบโลหิต</span>
+                                        </div>
+                                    </div>
+                                    <%--<div id="tmenuLab" class="col-md-36" style="padding-top: 10px;">
+                                        <div style="padding: 0 5px 0 5px;">
+                                            <img src="../image/icon/stem-cell-24x24.png" style="margin-top: -10px;" />
+                                            <span>STEM CELL & CORE BLOOD LAB</span>
+                                        </div>
+                                    </div>--%>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-24">
+                    <div class="row">
+                        <div class="col-md-30 text-right" style="padding-top: 10px;">
+                            <span>ชื่อผู้ใช้งาน : Sittichai Habya(Nippon Sysit)</span>
+                            <img src="../image/icon/user-32x32.png" style="margin-top: -5px;" />
+                        </div>
+                        <div class="col-md-6 text-right" style="margin-top: 5px;padding-right: 8px;">
+                            <span style="border-left: solid 1px black; padding: 0;">&nbsp;</span>
+                            <img src="../image/logo/NBC-logo.png" style="width: 120px;" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div id="leftMenu" style="overflow-x: hidden;">
+                <div id="lmenuDonor" class="sub-left-menu" style="display: none;">
+                    <div class="row">
+                        <%--<div id="lmenuDonorMain" targeturl="../donor/main.aspx" class="col-md-36">
+                            <span>หน้าหลัก</span>
+                        </div>--%>
+                        <div id="lmenuDonorRegis" targeturl="../donor/search.aspx" class="col-md-36">
+                            <span>ลงทะเบียนผู้บริจาค</span>
+                        </div>
+                        <div class="col-md-36">
+                            <span>คัดกรอง</span>
+                        </div>
+                        <div class="col-md-36">
+                            <span>บริจาค</span>
+                        </div>
+                        <div class="col-md-36">
+                            <span>รายงานวันนี้</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="mstContent" style="padding:0px 5px;">
+                <asp:ContentPlaceHolder ID="cphMaster" runat="server">
+                </asp:ContentPlaceHolder>
+            </div>
+        </div>
+    </div>
+    <%--<div class="DialogBackground" style="opacity: 0.06;position: fixed; display: none; top: 0px; left: 0px; width: 0px; height: 0px;z-index:101;"></div>
+    <div class="DialogProcess" style="top: 94px; width: 1326px; border-top-width: 4px; border-top-style: solid; border-top-color: transparent; border-bottom-width: 4px; border-bottom-style: solid; border-bottom-color: transparent; display: block; background-color: #CCCCCC; background-position: 326px 25px; background-repeat: no-repeat; position:absolute;z-index:101;">
+        <center>
+            <div class="DialogTitle">
+                <span id="beforetext"></span>
+                <span id="titletext" style="color: rgb(86, 189, 18);">EXPORT</span>
+                <span id="aftertext"> REPORT VIEWER</span>
+            </div>
+            <div class="DialogDescription">PLEASE WAIT...</div>
+            <div class="DialogAction">
+                <span class="DialogConfirm" style="visibility: hidden;"></span>
+                <span class="DialogCancel" style="visibility: visible;">Close</span>
+            </div>
+        </center>
+    </div>--%>
+    <div id="divNoti" class="noti" style="display:none;">
+        <span class="sign glyphicon"></span><span class="noti-message">กรุณากรอกชื่อผู้บริจาก</span>
+    </div>
+</body>
+</html>

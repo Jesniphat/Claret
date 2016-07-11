@@ -1,0 +1,406 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit http://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <_PublishTargetUrl>D:\#Publish\ClaretSystem</_PublishTargetUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <File Include="!SQLStore/donor/InsertDonationVisit.sql">
+      <publishTime>06/29/2016 17:34:43</publishTime>
+    </File>
+    <File Include="!SQLStore/donor/InsertMasterDonor.sql">
+      <publishTime>07/01/2016 03:30:13</publishTime>
+    </File>
+    <File Include="!SQLStore/donor/SelectMasterDonor.sql">
+      <publishTime>07/07/2016 16:35:26</publishTime>
+    </File>
+    <File Include="!SQLStore/donor/SelectMasterDonorVisit.sql">
+      <publishTime>07/07/2016 16:45:53</publishTime>
+    </File>
+    <File Include="!SQLStore/donor/UpdateMasterDonor.sql">
+      <publishTime>07/01/2016 02:30:10</publishTime>
+    </File>
+    <File Include="ajaxAction/donorAction.aspx">
+      <publishTime>06/15/2016 00:40:35</publishTime>
+    </File>
+    <File Include="ajaxAction/masterAction.aspx">
+      <publishTime>06/15/2016 02:09:50</publishTime>
+    </File>
+    <File Include="ApplicationInsights.config">
+      <publishTime>06/03/2016 10:46:50</publishTime>
+    </File>
+    <File Include="App_Code/donor.vb">
+      <publishTime>06/20/2016 02:34:21</publishTime>
+    </File>
+    <File Include="bin/ApplicationInsights.config">
+      <publishTime>06/03/2016 10:46:50</publishTime>
+    </File>
+    <File Include="bin/Claret.dll">
+      <publishTime>07/07/2016 17:08:01</publishTime>
+    </File>
+    <File Include="bin/Claret.xml">
+      <publishTime>07/07/2016 17:08:01</publishTime>
+    </File>
+    <File Include="bin/commons-logging.dll">
+      <publishTime>01/04/2016 09:31:55</publishTime>
+    </File>
+    <File Include="bin/CrystalDecisions.CrystalReports.Engine.dll">
+      <publishTime>10/14/2007 00:01:52</publishTime>
+    </File>
+    <File Include="bin/CrystalDecisions.Shared.dll">
+      <publishTime>10/14/2007 00:01:48</publishTime>
+    </File>
+    <File Include="bin/fontbox-1.8.4.dll">
+      <publishTime>01/04/2016 09:31:55</publishTime>
+    </File>
+    <File Include="bin/H2GEngine.dll">
+      <publishTime>07/07/2016 17:07:56</publishTime>
+    </File>
+    <File Include="bin/ICSharpCode.SharpZipLib.dll">
+      <publishTime>01/04/2016 09:31:54</publishTime>
+    </File>
+    <File Include="bin/IKVM.OpenJDK.Core.dll">
+      <publishTime>01/04/2016 09:31:55</publishTime>
+    </File>
+    <File Include="bin/IKVM.OpenJDK.SwingAWT.dll">
+      <publishTime>01/04/2016 09:31:55</publishTime>
+    </File>
+    <File Include="bin/IKVM.OpenJDK.Util.dll">
+      <publishTime>01/04/2016 09:31:55</publishTime>
+    </File>
+    <File Include="bin/IKVM.Runtime.dll">
+      <publishTime>01/04/2016 09:31:55</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AI.Agent.Intercept.dll">
+      <publishTime>12/07/2015 19:04:38</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AI.DependencyCollector.dll">
+      <publishTime>03/10/2016 14:26:18</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AI.PerfCounterCollector.dll">
+      <publishTime>03/10/2016 14:26:26</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AI.ServerTelemetryChannel.dll">
+      <publishTime>03/09/2016 12:00:14</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AI.Web.dll">
+      <publishTime>03/10/2016 14:26:26</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AI.WindowsServer.dll">
+      <publishTime>03/10/2016 14:26:26</publishTime>
+    </File>
+    <File Include="bin/Microsoft.ApplicationInsights.dll">
+      <publishTime>03/09/2016 11:57:34</publishTime>
+    </File>
+    <File Include="bin/Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll">
+      <publishTime>06/15/2015 02:06:24</publishTime>
+    </File>
+    <File Include="bin/Oracle.ManagedDataAccess.dll">
+      <publishTime>06/14/2016 13:45:17</publishTime>
+    </File>
+    <File Include="bin/pdfbox-1.8.4.dll">
+      <publishTime>01/04/2016 09:31:55</publishTime>
+    </File>
+    <File Include="bin/roslyn/csc.exe">
+      <publishTime>06/18/2015 20:19:46</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.Build.Tasks.CodeAnalysis.dll">
+      <publishTime>06/18/2015 20:19:46</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.CodeAnalysis.CSharp.dll">
+      <publishTime>06/18/2015 20:19:46</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.CodeAnalysis.dll">
+      <publishTime>06/18/2015 20:19:44</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.CodeAnalysis.VisualBasic.dll">
+      <publishTime>06/18/2015 20:19:46</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.CSharp.Core.targets">
+      <publishTime>06/18/2015 20:19:46</publishTime>
+    </File>
+    <File Include="bin/roslyn/Microsoft.VisualBasic.Core.targets">
+      <publishTime>06/18/2015 20:19:46</publishTime>
+    </File>
+    <File Include="bin/roslyn/System.Collections.Immutable.dll">
+      <publishTime>06/18/2015 20:19:46</publishTime>
+    </File>
+    <File Include="bin/roslyn/System.Reflection.Metadata.dll">
+      <publishTime>06/18/2015 20:19:46</publishTime>
+    </File>
+    <File Include="bin/roslyn/vbc.exe">
+      <publishTime>06/18/2015 20:19:46</publishTime>
+    </File>
+    <File Include="bin/roslyn/VBCSCompiler.exe">
+      <publishTime>06/18/2015 20:19:46</publishTime>
+    </File>
+    <File Include="bin/roslyn/VBCSCompiler.exe.config">
+      <publishTime>06/18/2015 20:19:46</publishTime>
+    </File>
+    <File Include="bin/stdole.dll">
+      <publishTime>07/26/2012 19:08:06</publishTime>
+    </File>
+    <File Include="Default.aspx">
+      <publishTime>06/17/2016 12:26:09</publishTime>
+    </File>
+    <File Include="donor/main.aspx">
+      <publishTime>06/09/2016 13:29:29</publishTime>
+    </File>
+    <File Include="donor/register.aspx">
+      <publishTime>07/07/2016 17:06:25</publishTime>
+    </File>
+    <File Include="donor/search.aspx">
+      <publishTime>07/07/2016 14:21:35</publishTime>
+    </File>
+    <File Include="image/bg/bg-header-bar.png">
+      <publishTime>06/06/2016 15:19:25</publishTime>
+    </File>
+    <File Include="image/icon/Blood-24x24.png">
+      <publishTime>06/22/2016 11:41:41</publishTime>
+    </File>
+    <File Include="image/icon/Blood-32x32.png">
+      <publishTime>06/22/2016 11:41:41</publishTime>
+    </File>
+    <File Include="image/icon/Blood-48x48.png">
+      <publishTime>06/22/2016 11:41:41</publishTime>
+    </File>
+    <File Include="image/icon/blood-donation-24x24.png">
+      <publishTime>06/10/2016 14:19:56</publishTime>
+    </File>
+    <File Include="image/icon/blood-donation-32x32.png">
+      <publishTime>06/10/2016 14:19:57</publishTime>
+    </File>
+    <File Include="image/icon/blood-donation-48x48.png">
+      <publishTime>06/10/2016 14:19:57</publishTime>
+    </File>
+    <File Include="image/icon/Bus-24x24.png">
+      <publishTime>06/22/2016 11:41:41</publishTime>
+    </File>
+    <File Include="image/icon/Bus-32x32.png">
+      <publishTime>06/22/2016 11:41:41</publishTime>
+    </File>
+    <File Include="image/icon/Bus-48x48.png">
+      <publishTime>06/22/2016 11:41:41</publishTime>
+    </File>
+    <File Include="image/icon/Check-Blood-24x24.png">
+      <publishTime>06/22/2016 11:41:41</publishTime>
+    </File>
+    <File Include="image/icon/Check-Blood-32x32.png">
+      <publishTime>06/22/2016 11:41:41</publishTime>
+    </File>
+    <File Include="image/icon/Check-blood-48x48.png">
+      <publishTime>06/22/2016 11:41:41</publishTime>
+    </File>
+    <File Include="image/icon/checkbox.png">
+      <publishTime>06/13/2016 14:35:30</publishTime>
+    </File>
+    <File Include="image/icon/Donor-24x24.png">
+      <publishTime>06/22/2016 11:41:41</publishTime>
+    </File>
+    <File Include="image/icon/Donor-32x32.png">
+      <publishTime>06/22/2016 11:41:41</publishTime>
+    </File>
+    <File Include="image/icon/Donor-48x48.png">
+      <publishTime>06/22/2016 11:41:41</publishTime>
+    </File>
+    <File Include="image/icon/menu-24x24.png">
+      <publishTime>06/07/2016 16:02:16</publishTime>
+    </File>
+    <File Include="image/icon/Settings-24x24.png">
+      <publishTime>06/22/2016 11:41:41</publishTime>
+    </File>
+    <File Include="image/icon/Settings-32x32.png">
+      <publishTime>06/22/2016 11:41:41</publishTime>
+    </File>
+    <File Include="image/icon/Settings-48x48.png">
+      <publishTime>06/22/2016 11:41:41</publishTime>
+    </File>
+    <File Include="image/icon/stem-cell-24x24.png">
+      <publishTime>06/30/2016 18:17:55</publishTime>
+    </File>
+    <File Include="image/icon/stem-cell-32x32.png">
+      <publishTime>06/30/2016 18:17:55</publishTime>
+    </File>
+    <File Include="image/icon/stem-cell-48x48.png">
+      <publishTime>06/30/2016 18:17:55</publishTime>
+    </File>
+    <File Include="image/icon/take-out-blood-24x24.png">
+      <publishTime>06/30/2016 18:17:55</publishTime>
+    </File>
+    <File Include="image/icon/take-out-blood-32x32.png">
+      <publishTime>06/30/2016 18:17:55</publishTime>
+    </File>
+    <File Include="image/icon/take-out-blood-48x48.png">
+      <publishTime>06/30/2016 18:17:55</publishTime>
+    </File>
+    <File Include="image/icon/user-32x32.png">
+      <publishTime>06/07/2016 09:16:11</publishTime>
+    </File>
+    <File Include="image/logo/NBC-logo.png">
+      <publishTime>06/22/2016 18:24:41</publishTime>
+    </File>
+    <File Include="Login.aspx">
+      <publishTime>07/07/2016 17:09:11</publishTime>
+    </File>
+    <File Include="main.aspx">
+      <publishTime>06/17/2016 15:34:36</publishTime>
+    </File>
+    <File Include="MasterPage.Master">
+      <publishTime>07/07/2016 17:09:10</publishTime>
+    </File>
+    <File Include="mobile/main.aspx">
+      <publishTime>06/09/2016 14:35:19</publishTime>
+    </File>
+    <File Include="packages.config">
+      <publishTime>06/17/2016 13:00:30</publishTime>
+    </File>
+    <File Include="resources/css/bootflat.css">
+      <publishTime>06/15/2016 03:34:12</publishTime>
+    </File>
+    <File Include="resources/css/bootstrap.css">
+      <publishTime>06/15/2016 03:34:45</publishTime>
+    </File>
+    <File Include="resources/css/bootstrap.css.map">
+      <publishTime>06/12/2016 17:17:53</publishTime>
+    </File>
+    <File Include="resources/css/checkbox.css">
+      <publishTime>06/13/2016 14:44:22</publishTime>
+    </File>
+    <File Include="resources/css/custom.css">
+      <publishTime>07/06/2016 00:56:41</publishTime>
+    </File>
+    <File Include="resources/css/jquery.fs.selecter.css">
+      <publishTime>06/15/2016 18:27:27</publishTime>
+    </File>
+    <File Include="resources/fonts/glyphicons-halflings-regular.eot">
+      <publishTime>06/03/2016 17:29:47</publishTime>
+    </File>
+    <File Include="resources/fonts/glyphicons-halflings-regular.svg">
+      <publishTime>06/03/2016 17:29:47</publishTime>
+    </File>
+    <File Include="resources/fonts/glyphicons-halflings-regular.ttf">
+      <publishTime>06/03/2016 17:29:47</publishTime>
+    </File>
+    <File Include="resources/fonts/glyphicons-halflings-regular.woff">
+      <publishTime>06/03/2016 17:29:47</publishTime>
+    </File>
+    <File Include="resources/fonts/glyphicons-halflings-regular.woff2">
+      <publishTime>06/08/2016 10:26:56</publishTime>
+    </File>
+    <File Include="resources/fonts/THSarabunNew/THSarabunNew.ttf">
+      <publishTime>06/03/2016 14:04:31</publishTime>
+    </File>
+    <File Include="resources/fonts/THSarabunNew/THSarabunNew_Bold.ttf">
+      <publishTime>06/03/2016 14:04:31</publishTime>
+    </File>
+    <File Include="resources/fonts/THSarabunNew/THSarabunNew_BoldItalic.ttf">
+      <publishTime>06/03/2016 14:04:31</publishTime>
+    </File>
+    <File Include="resources/fonts/THSarabunNew/THSarabunNew_Italic.ttf">
+      <publishTime>06/03/2016 14:04:31</publishTime>
+    </File>
+    <File Include="resources/javascript/extension.js">
+      <publishTime>07/07/2016 13:03:44</publishTime>
+    </File>
+    <File Include="resources/javascript/jquery-date.js">
+      <publishTime>06/29/2016 15:37:06</publishTime>
+    </File>
+    <File Include="resources/javascript/MBOS-Initialize.js">
+      <publishTime>07/01/2016 02:01:51</publishTime>
+    </File>
+    <File Include="resources/javascript/MBOS-UI.js">
+      <publishTime>06/08/2016 15:48:59</publishTime>
+    </File>
+    <File Include="resources/jquery-ui/external/jquery/jquery.js">
+      <publishTime>06/03/2016 11:44:35</publishTime>
+    </File>
+    <File Include="resources/jquery-ui/images/ui-bg_diagonals-thick_75_f3d8d8_40x40.png">
+      <publishTime>06/03/2016 11:44:35</publishTime>
+    </File>
+    <File Include="resources/jquery-ui/images/ui-bg_dots-small_65_a6a6a6_2x2.png">
+      <publishTime>06/03/2016 11:44:35</publishTime>
+    </File>
+    <File Include="resources/jquery-ui/images/ui-bg_glass_55_fbf8ee_1x400.png">
+      <publishTime>06/03/2016 11:44:35</publishTime>
+    </File>
+    <File Include="resources/jquery-ui/images/ui-bg_highlight-hard_100_eeeeee_1x100.png">
+      <publishTime>06/03/2016 11:44:35</publishTime>
+    </File>
+    <File Include="resources/jquery-ui/images/ui-bg_highlight-hard_100_f6f6f6_1x100.png">
+      <publishTime>06/03/2016 11:44:35</publishTime>
+    </File>
+    <File Include="resources/jquery-ui/images/ui-bg_highlight-soft_15_cc0000_1x100.png">
+      <publishTime>06/03/2016 11:44:35</publishTime>
+    </File>
+    <File Include="resources/jquery-ui/images/ui-icons_004276_256x240.png">
+      <publishTime>06/03/2016 11:44:35</publishTime>
+    </File>
+    <File Include="resources/jquery-ui/images/ui-icons_cc0000_256x240.png">
+      <publishTime>06/03/2016 11:44:35</publishTime>
+    </File>
+    <File Include="resources/jquery-ui/images/ui-icons_ffffff_256x240.png">
+      <publishTime>06/03/2016 11:44:35</publishTime>
+    </File>
+    <File Include="resources/jquery-ui/index.html">
+      <publishTime>06/03/2016 11:44:35</publishTime>
+    </File>
+    <File Include="resources/jquery-ui/jquery-ui.css">
+      <publishTime>06/15/2016 03:33:46</publishTime>
+    </File>
+    <File Include="resources/jquery-ui/jquery-ui.js">
+      <publishTime>06/17/2016 15:01:20</publishTime>
+    </File>
+    <File Include="resources/jquery-ui/jquery-ui.min.css">
+      <publishTime>06/03/2016 11:44:35</publishTime>
+    </File>
+    <File Include="resources/jquery-ui/jquery-ui.min.js">
+      <publishTime>06/03/2016 11:44:35</publishTime>
+    </File>
+    <File Include="resources/jquery-ui/jquery-ui.structure.css">
+      <publishTime>06/03/2016 11:44:35</publishTime>
+    </File>
+    <File Include="resources/jquery-ui/jquery-ui.structure.min.css">
+      <publishTime>06/03/2016 11:44:35</publishTime>
+    </File>
+    <File Include="resources/jquery-ui/jquery-ui.theme.css">
+      <publishTime>06/03/2016 11:44:35</publishTime>
+    </File>
+    <File Include="resources/jquery-ui/jquery-ui.theme.min.css">
+      <publishTime>06/03/2016 11:44:35</publishTime>
+    </File>
+    <File Include="resources/jquery/bootstrap.min.js">
+      <publishTime>06/06/2016 17:01:39</publishTime>
+    </File>
+    <File Include="resources/jquery/checkbox.js">
+      <publishTime>06/13/2016 14:13:42</publishTime>
+    </File>
+    <File Include="resources/jquery/jquery.fs.selecter.js">
+      <publishTime>06/06/2016 22:23:30</publishTime>
+    </File>
+    <File Include="resources/jquery/jquery.js">
+      <publishTime>06/03/2016 14:56:23</publishTime>
+    </File>
+    <File Include="resources/jquery/jquery.slimscroll.min.js">
+      <publishTime>06/13/2016 11:12:55</publishTime>
+    </File>
+    <File Include="resources/jquery/tabable.js">
+      <publishTime>07/04/2016 10:37:48</publishTime>
+    </File>
+    <File Include="scripts/ai.0.22.9-build00167.js">
+      <publishTime>06/03/2016 10:46:51</publishTime>
+    </File>
+    <File Include="scripts/ai.0.22.9-build00167.min.js">
+      <publishTime>06/03/2016 10:46:51</publishTime>
+    </File>
+    <File Include="Web.config">
+      <publishTime>07/06/2016 18:11:58</publishTime>
+    </File>
+    <File Include="WebForm1.aspx">
+      <publishTime>07/07/2016 17:09:07</publishTime>
+    </File>
+  </ItemGroup>
+</Project>

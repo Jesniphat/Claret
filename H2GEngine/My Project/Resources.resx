@@ -1,0 +1,238 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ConnectionExcel" xml:space="preserve">
+    <value>Provider=Microsoft.ACE.OLEDB.12.0; Data Source='{0}'; Extended Properties='Excel 12.0;HDR=Yes;IMEX=1'</value>
+    <comment>Connection String for Excel </comment>
+  </data>
+  <data name="ConnectionMBOS" xml:space="preserve">
+    <value>server=db3.ns.co.th;database={0};uid={1};pwd={2};</value>
+    <comment>Connection String for SQL Server</comment>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="DefaultCustomerEmail" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\DefaultCustomerEmail.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-874</value>
+  </data>
+  <data name="DefaultCustomerSMS" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\DefaultCustomerSMS.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-874</value>
+  </data>
+  <data name="INSERT_err_message" xml:space="preserve">
+    <value>INSERT INTO /*[GLOBAL]*/err_message (system_date, company_code, err_msg, err_page) VALUES(GETDATE(), @company_code, @err_msg, @err_page)</value>
+    <comment>SQL Insert err_message Table on global</comment>
+  </data>
+  <data name="INSERT_login_history" xml:space="preserve">
+    <value>INSERT INTO /*[GLOBAL]*/login_history ([system_date],[comp_code],[user_code],[ip],[mac],[browser],[os],[status],[user_agent]) VALUES(GETDATE(),@com_code,@user_code,@ip,@mac,@browser,@os,@status,@user_agent)</value>
+    <comment>SQL Insert login_history Table on global</comment>
+  </data>
+  <data name="SELECT_InitialSMS" xml:space="preserve">
+    <value>SELECT TOP 1 sms_user_id, sms_user, sms_password, sms_default_number FROM /*[GLOBAL]*/initial</value>
+    <comment>SQL SMS Initial Table</comment>
+  </data>
+  <data name="SELECT_permission" xml:space="preserve">
+    <value>SELECT '#' + CONVERT(VARCHAR,ISNULL(permission_id,'')) FROM staff_permission WHERE staff_id=@staff_id  FOR XML PATH('')</value>
+  </data>
+  <data name="SELECT_permission_id" xml:space="preserve">
+    <value>SELECT id FROM /*[GLOBAL]*/permission WHERE index_name='{0}'</value>
+    <comment>By index_name</comment>
+  </data>
+  <data name="SELECT_SiteCustomer" xml:space="preserve">
+    <value>SELECT code, database_name FROM travox_global.travoxmos.site_customer WHERE [status]='ACTIVE' OR status_hotel='ACTIVE'</value>
+  </data>
+  <data name="ITEM_BeginNo" xml:space="preserve">
+    <value>SELECT TOP 1 {0} FROM start_number WHERE [year]='{1}' AND ([month]='' OR [month]='{2}') ORDER BY [month] DESC</value>
+    <comment>SQL Get Begin No on start_number Table</comment>
+  </data>
+  <data name="ITEM_GetLastInvoiceNo" xml:space="preserve">
+    <value>SELECT TOP 1 invoice_no FROM invoice WHERE invoice_no LIKE '{0}%' and invoice_type ='{1}' ORDER BY invoice_no DESC</value>
+    <comment>SQL Get Last Invoice No</comment>
+  </data>
+  <data name="ITEM_GetLastPaymentNo" xml:space="preserve">
+    <value>SELECT TOP 1 payment_no FROM payment WHERE payment_no LIKE '{0}%' ORDER BY payment_no DESC</value>
+    <comment>SQL Get Last Payment No</comment>
+  </data>
+  <data name="ITEM_GetLastReceiptNo" xml:space="preserve">
+    <value>SELECT TOP 1 receipt_no FROM receipt WHERE receipt_no LIKE '{0}%' and receipt_type ='{1}' ORDER BY receipt_no DESC</value>
+    <comment>SQL Get Last Receipt No</comment>
+  </data>
+  <data name="ITEM_GetLastTaxNo" xml:space="preserve">
+    <value>SELECT TOP 1 tax_no FROM tax WHERE tax_no LIKE '{0}%' ORDER BY tax_no DESC</value>
+    <comment>SQL Get Last Tax No</comment>
+  </data>
+  <data name="Billable_BookingTotalStatus" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Billable_BookingTotalStatus.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-874</value>
+  </data>
+  <data name="Billable_PaymentDetailCost" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Billable_PaymentDetailCost.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-874</value>
+  </data>
+  <data name="Booking_TotalCostTotalPrice" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Booking_TotalCostTotalPrice.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-874</value>
+  </data>
+  <data name="Booking_TotalPayment" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Booking_TotalPayment.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-874</value>
+  </data>
+  <data name="Invoice_ListUpdateCost" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Invoice_ListUpdateCost.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-874</value>
+  </data>
+  <data name="SELECT_BillableTotalCost" xml:space="preserve">
+    <value>SELECT (cost*currency_rate) AS cost FROM booking_billable_detail {0} AND status NOT IN('CANCEL')</value>
+    <comment>By Product_id</comment>
+  </data>
+  <data name="UPDATE_InvoiceDetail" xml:space="preserve">
+    <value>UPDATE invoice_detail SET cost=@cost,price=@price,display_price=@price WHERE id=@id</value>
+    <comment>By ID</comment>
+  </data>
+  <data name="UPDATE_ReceiptDetail" xml:space="preserve">
+    <value>UPDATE receipt_detail SET cost=@cost,price=@price,receipt_amt=@price,receipt_amt1=@price WHERE id=@id</value>
+  </data>
+  <data name="Booking_BillableNameAddress" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Booking_BillableNameAddress.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-874</value>
+  </data>
+  <data name="SELECT_UI_AutoComplate" xml:space="preserve">
+    <value>WITH LimitRow AS ( SELECT ROW_NUMBER() OVER(ORDER BY tb./*_NAME_*/ /*_ORDER_*/) AS row, * FROM (/*_SQL_QUERY_*/) tb ) 
+SELECT * FROM LimitRow WHERE row BETWEEN @start AND @finish ORDER BY row ASC</value>
+    <comment>Limit Row In AutoComplate</comment>
+  </data>
+  <data name="SELECT_BillableDetail" xml:space="preserve">
+    <value>SELECT bd.id FROM booking_billable_detail bd 
+INNER JOIN booking_billable bb ON bb.id = bd.booking_billable_id
+WHERE bd.{0}</value>
+  </data>
+  <data name="ConnectionB2B" xml:space="preserve">
+    <value>server=db2.ns.co.th;database={0};uid={1};pwd={2};</value>
+    <comment>Connection String for SQL Server</comment>
+  </data>
+  <data name="ITEM_GetLastTaxAirlineNo" xml:space="preserve">
+    <value>SELECT TOP 1 tax_no FROM tax_airline WHERE tax_no LIKE '{0}%' ORDER BY tax_no DESC</value>
+    <comment>SQL Get Last Tax Airline No</comment>
+  </data>
+  <data name="Receipt_TotalPrice" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Receipt_TotalPrice.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-874</value>
+  </data>
+  <data name="SysSession_Login" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\SysSession_Login.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ConnectionNEW" xml:space="preserve">
+    <value>Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SID = HIIGTEST))); User Id={2};Password={3};</value>
+    <comment>Connection String for Oracle</comment>
+  </data>
+  <data name="ConnectionOLD" xml:space="preserve">
+    <value>provider=sqloledb; data source={0}; initial catalog={1}; user id={2}; password={3} connect timeout=30;</value>
+    <comment>Connection String for Old Oracle</comment>
+  </data>
+</root>

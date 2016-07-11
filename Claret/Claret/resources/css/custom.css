@@ -1,0 +1,183 @@
+﻿@font-face {
+	font-family: 'THSarabunNew';
+    src: url('../fonts/THSarabunNew/THSarabunNew.ttf');
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'THSarabunNewBold';
+    src: url('../fonts/THSarabunNew/THSarabunNew_Bold.ttf');
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'THSarabunNewItalic';
+    src: url('../resources/fonts/THSarabunNew/THSarabunNew_Italic.ttf');
+	font-weight: normal;
+	font-style: normal;
+}
+html {
+    overflow:hidden;
+}
+body {
+    font-family: THSarabunNew; 
+    font-size: 20px;
+    color: #595959;/*89,89,89*/
+}
+span {
+    padding: 1px 5px;
+    display: inline-block;
+}
+span.glyphicon {
+    padding: 1px 0;
+    vertical-align: sub;
+}
+.form-control {
+    font-family: THSarabunNew !important; 
+    font-size: 20px !important;
+    height: 30px;
+    padding: 0px 5px;
+    color: #595959;/*89,89,89*/
+}
+.required {
+    background-color:#fff5f5;
+}
+.color-127 {
+    color: #7F7F7F;/*127,127,127*/
+}
+.color-yellow {
+    background-color:#FAFDD7;
+}
+.btn {
+    font-size: 20px !important; /* 1 */
+    padding: 0px 5px;
+    color: #595959;/*89,89,89*/
+    border: solid 1px #7F7F7F;
+}
+.btn:hover{
+    border: solid 1px #7F7F7F;
+}
+.shadow-box {
+    -webkit-box-shadow: 0 0 8px rgba(0,0,0,.6);
+    -moz-box-shadow: 0 0 8px rgba(0,0,0,.6);
+    box-shadow: 0 0 8px rgba(0,0,0,.6);
+}
+.claret-page-header {
+    font-size: larger;
+    font-weight: bold;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+a {
+    cursor:pointer;
+}
+.table {
+    margin-bottom: 0px;
+}
+.table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td {
+    padding:0 5px;
+    border-bottom: 1px solid #ddd;
+    border-top: 0;
+}
+.table > thead > tr > th {
+    padding:0 5px;
+    border-bottom: 2px solid #ddd;
+    border-top: 0;
+}
+.table > tfoot > tr > td {
+    padding:0 5px;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+.selecter .selecter-selected {
+    padding: 0px 20px 0px 5px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.selecter .selecter-item {
+    padding: 0px 5px;
+}
+.border-box {
+    background: #FFFFFF;
+    border: solid 1px #CCCCCC;
+    float: left;
+    width: 100%;
+    padding: 5px 5px;
+}
+.col-shift-left {
+    padding-left: 0px;
+}
+.col-shift-right {
+    padding-right: 0px;
+}
+.row.outpadding {
+    margin-right: 0;
+    margin-left: 0;
+}
+/*Adjust jquery ui tab*/
+.ui-datepicker {
+    font-size:12px;
+    font-family: Arial,sans-serif !important;
+}
+.ui-datepicker select.ui-datepicker-month, .ui-datepicker select.ui-datepicker-year {
+    color: #595959;
+    font-weight: normal;
+}
+    .ui-datepicker select.ui-datepicker-year {
+        height:19px;
+        vertical-align:top;
+    }
+    .ui-datepicker td span, .ui-datepicker td a {
+        padding: .2em .2em .2em .6em;
+    }
+.ui-tabs {
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+    .ui-tabs .ui-tabs-nav li {
+        border-bottom-width: 1px;
+    }
+    .ui-tabs > div {
+        padding: 0 !important;
+    }
+
+    .ui-tabs > ul {
+        background: none;
+        border-color: #CDD5DA;
+        border-top: 0;
+        border-left: 0;
+        border-right: 0;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+        .ui-tabs > ul > li > a {
+            color: #595959 !important;
+            padding: 0px 25px !important;
+            font-weight: normal;
+        }
+
+    .ui-tabs > .ui-tabs-panel > .border-box {
+        border-top: 0;
+        margin-top: 0px;
+        background-color: #F2F2F2;
+    }
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+    border-bottom: 1px solid #eeeeee;
+    border-top: 1px solid #d8dcdf;
+    border-left: 1px solid #d8dcdf;
+    border-right: 1px solid #d8dcdf;
+}
+.ui-widget-content {
+    font-family: THSarabunNew;
+}
+.ui-menu .ui-menu-item {
+    padding: 0px 0px 0px 5px;
+}
+.ui-autocomplete {
+    max-height: 150px;
+    overflow-y: auto;
+    /* prevent horizontal scrollbar */
+    overflow-x: hidden;
+}
