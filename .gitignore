@@ -1,3 +1,7 @@
 H2GEngine/obj/
 Claret/Claret/obj/
 H2GEngine/Backup/
+packages/
+Claret/Claret/bin/
+.vs/config/
+H2GEngine/bin/
