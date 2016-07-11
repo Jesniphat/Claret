@@ -18,7 +18,6 @@
     <script src="../resources/jquery/jquery.fs.selecter.js" type="text/javascript"></script>--%>
     <script src="../resources/jquery/combobox.js" type="text/javascript"></script>
     <script src="../resources/javascript/extension.js?ver=20160116" type="text/javascript"></script>
-    <script src="../resources/angular/angular.js" type="text/javascript"></script>
     <script>
         $(function () {
             $("#btnTest").button();
