@@ -1275,11 +1275,11 @@
                                     <p><label>&nbsp;&nbsp; Doner No.</label> <label id="doner-label-no">123456789</label> <label id="doner-label-name">test</label></p>
                                     <table class="col-md-36" id="label-set-1">
                                         <tr>
-                                            <td class="col-md-5">Exams</td>
-                                            <td class="col-md-9">Result</td>
-                                            <td class="col-md-3">No.</td>
-                                            <td class="col-md-9">Date of first det.</td>
-                                            <td class="col-md-9">Date of last det.</td>
+                                            <td class="col-md-5" style="padding-left: 27px">Exams</td>
+                                            <td class="col-md-9" style="padding-left: 27px">Result</td>
+                                            <td class="col-md-3" style="padding-left: 27px">No.</td>
+                                            <td class="col-md-9" style="padding-left: 27px">Date of first det.</td>
+                                            <td class="col-md-9" style="padding-left: 27px">Date of last det.</td>
                                         </tr>
                                         <tr>
                                             <td class="col-md-5">ABOD</td>
@@ -1307,118 +1307,133 @@
                                     <label class="set-label">&nbsp;&nbsp;Antigens</label>
                                     <table class="col-md-36" id="label-set-2">
                                         <tr>
-                                            <td class="col-md-2"><label class="set-label" for="Rh_AG">Rh</label><input type="text" class="col-md-34 long-label1" id="Rh_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Ag_C_AG">Ag C</label><input type="text" class="col-md-34 long-label1" id="Ag_C_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Ag_c_AG">Ag c</label><input type="text" class="col-md-34 long-label1" id="Ag_c_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Ag_E_AG">Ag E</label><input type="text" class="col-md-34 long-label1" id="Ag_E_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Ag_e_AG">Ag e</label><input type="text" class="col-md-34 long-label1" id="Ag_e_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Ag_K_AG">Ag K</label><input type="text" class="col-md-34 long-label1" id="Ag_K_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Ag_Mia_AG">Ag Mia</label><input type="text" class="col-md-34 long-label1" id="Ag_Mia_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Ag_Mur_AG">Ag Mur</label><input type="text" class="col-md-34 long-label1" id="Ag_Mur_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Ag_Dia_AG">Ag Dia</label><input type="text" class="col-md-34 long-label1" id="Ag_Dia_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Ag_Dib_AG">Ag Dib</label><input type="text" class="col-md-34 long-label1" id="Ag_Dib_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Ag_Xga_AG">Ag Xga</label><input type="text" class="col-md-34 long-label1" id="Ag_Xga_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Ag_Tja_AG">Ag Tja</label><input type="text" class="col-md-34 long-label1" id="Ag_Tja_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Ag_Jsa_AG">Ag Jsa</label><input type="text" class="col-md-34 long-label1" id="Ag_Jsa_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Ag_Jsb_AG">Ag Jsb</label><input type="text" class="col-md-34 long-label1" id="Ag_Jsb_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Ag_Lwa_AG">Ag Lwa</label><input type="text" class="col-md-34 long-label1" id="Ag_Lwa_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Ag_U_AG">Ag U</label><input type="text" class="col-md-34 long-label1" id="Ag_U_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Rh_AG">Rh</label><input type="text" class="col-md-34 long-label4" id="Rh_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Ag_C_AG">Ag C</label><input type="text" class="col-md-34 long-label4" id="Ag_C_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Ag_c_AG">Ag c</label><input type="text" class="col-md-34 long-label4" id="Ag_c_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Ag_E_AG">Ag E</label><input type="text" class="col-md-34 long-label4" id="Ag_E_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Ag_e_AG">Ag e</label><input type="text" class="col-md-34 long-label4" id="Ag_e_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Ag_K_AG">Ag K</label><input type="text" class="col-md-34 long-label4" id="Ag_K_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Ag_Mia_AG">Ag Mia</label><input type="text" class="col-md-34 long-label4" id="Ag_Mia_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Ag_Mur_AG">Ag Mur</label><input type="text" class="col-md-34 long-label4" id="Ag_Mur_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Ag_Dia_AG">Ag Dia</label><input type="text" class="col-md-34 long-label4" id="Ag_Dia_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Ag_Dib_AG">Ag Dib</label><input type="text" class="col-md-34 long-label4" id="Ag_Dib_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Ag_Xga_AG">Ag Xga</label><input type="text" class="col-md-34 long-label4" id="Ag_Xga_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Ag_Tja_AG">Ag Tja</label><input type="text" class="col-md-34 long-label4" id="Ag_Tja_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Ag_Jsa_AG">Ag Jsa</label><input type="text" class="col-md-34 long-label4" id="Ag_Jsa_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Ag_Jsb_AG">Ag Jsb</label><input type="text" class="col-md-34 long-label4" id="Ag_Jsb_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Ag_Lwa_AG">Ag Lwa</label><input type="text" class="col-md-34 long-label4" id="Ag_Lwa_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Ag_U_AG">Ag U</label><input type="text" class="col-md-34 long-label4" id="Ag_U_AG" value="" /></td>
                                         </tr>
                                         <tr>
-                                            <td class="col-md-2"><label class="set-label" for="Fya_AG">Fya</label><input type="text" class="col-md-34 long-label1" id="Fya_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Fyb_AG">Fyb</label><input type="text" class="col-md-34 long-label1" id="Fyb_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Jka_AG">Jka</label><input type="text" class="col-md-34 long-label1" id="Jka_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Jkb_AG">Jkb</label><input type="text" class="col-md-34 long-label1" id="Jkb_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="M_AG">M</label><input type="text" class="col-md-34 long-label1" id="M_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="N_AG">N</label><input type="text" class="col-md-34 long-label1" id="N_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="S_AG">S</label><input type="text" class="col-md-34 long-label1" id="S_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="s_AG">s</label><input type="text" class="col-md-34 long-label1" id="s_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Lea_AG">Lea</label><input type="text" class="col-md-34 long-label1" id="Lea_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Leb_AG">Leb</label><input type="text" class="col-md-34 long-label1" id="Leb_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Anti-Vel_AG">Anti-Vel</label><input type="text" class="col-md-34 long-label1" id="Anti-Vel_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Ag_Doa_AG">Ag Doa</label><input type="text" class="col-md-34 long-label1" id="Ag_Doa_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Ag_Dob_AG">Ag Dob</label><input type="text" class="col-md-34 long-label1" id="Ag_Dob_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Ag_Coa_AG">Ag Coa</label><input type="text" class="col-md-34 long-label1" id="Ag_Coa_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Ag_Cob_AG">Ag Cob</label><input type="text" class="col-md-34 long-label1" id="Ag_Cob_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Mga_AG">Mga</label><input type="text" class="col-md-34 long-label1" id="Mga_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Fya_AG">Fya</label><input type="text" class="col-md-34 long-label4" id="Fya_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Fyb_AG">Fyb</label><input type="text" class="col-md-34 long-label4" id="Fyb_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Jka_AG">Jka</label><input type="text" class="col-md-34 long-label4" id="Jka_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Jkb_AG">Jkb</label><input type="text" class="col-md-34 long-label4" id="Jkb_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="M_AG">M</label><input type="text" class="col-md-34 long-label4" id="M_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="N_AG">N</label><input type="text" class="col-md-34 long-label4" id="N_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="S_AG">S</label><input type="text" class="col-md-34 long-label4" id="S_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="s_AG">s</label><input type="text" class="col-md-34 long-label4" id="s_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Lea_AG">Lea</label><input type="text" class="col-md-34 long-label4" id="Lea_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Leb_AG">Leb</label><input type="text" class="col-md-34 long-label4" id="Leb_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Anti-Vel_AG">Anti-Vel</label><input type="text" class="col-md-34 long-label4" id="Anti-Vel_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Ag_Doa_AG">Ag Doa</label><input type="text" class="col-md-34 long-label4" id="Ag_Doa_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Ag_Dob_AG">Ag Dob</label><input type="text" class="col-md-34 long-label4" id="Ag_Dob_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Ag_Coa_AG">Ag Coa</label><input type="text" class="col-md-34 long-label4" id="Ag_Coa_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Ag_Cob_AG">Ag Cob</label><input type="text" class="col-md-34 long-label4" id="Ag_Cob_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Mga_AG">Mga</label><input type="text" class="col-md-34 long-label4" id="Mga_AG" value="" /></td>
                                         </tr>
                                         <tr>
-                                            <td class="col-md-2"><label class="set-label" for="Cw_AG">Cw</label><input type="text" class="col-md-34 long-label1" id="Cw_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Lua_AG">Lua</label><input type="text" class="col-md-34 long-label1" id="Lua_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Lub_AG">Lub</label><input type="text" class="col-md-34 long-label1" id="Lub_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Kpa_AG">Kpa</label><input type="text" class="col-md-34 long-label1" id="Kpa_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Kpb_AG">Kpb</label><input type="text" class="col-md-34 long-label1" id="Kpb_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="P1_AG">P1</label><input type="text" class="col-md-34 long-label1" id="P1_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="k_AG">k</label><input type="text" class="col-md-34 long-label1" id="k_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Ag_H_AG">Ag H</label><input type="text" class="col-md-34 long-label1" id="Ag_H_AG" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="41">&nbsp;</label><input type="text" class="col-md-34 long-label1" id="41" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="42">&nbsp;</label><input type="text" class="col-md-34 long-label1" id="42" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="43">&nbsp;</label><input type="text" class="col-md-34 long-label1" id="43" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="44">&nbsp;</label><input type="text" class="col-md-34 long-label1" id="44" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="45">&nbsp;</label><input type="text" class="col-md-34 long-label1" id="45" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="46">&nbsp;</label><input type="text" class="col-md-34 long-label1" id="46" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="47">&nbsp;</label><input type="text" class="col-md-34 long-label1" id="47" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="48">&nbsp;</label><input type="text" class="col-md-34 long-label1" id="48" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Cw_AG">Cw</label><input type="text" class="col-md-34 long-label4" id="Cw_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Lua_AG">Lua</label><input type="text" class="col-md-34 long-label4" id="Lua_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Lub_AG">Lub</label><input type="text" class="col-md-34 long-label4" id="Lub_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Kpa_AG">Kpa</label><input type="text" class="col-md-34 long-label4" id="Kpa_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Kpb_AG">Kpb</label><input type="text" class="col-md-34 long-label4" id="Kpb_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="P1_AG">P1</label><input type="text" class="col-md-34 long-label4" id="P1_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="k_AG">k</label><input type="text" class="col-md-34 long-label4" id="k_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Ag_H_AG">Ag H</label><input type="text" class="col-md-34 long-label4" id="Ag_H_AG" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="41">&nbsp;</label><input type="text" class="col-md-34 long-label4" id="41" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="42">&nbsp;</label><input type="text" class="col-md-34 long-label4" id="42" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="43">&nbsp;</label><input type="text" class="col-md-34 long-label4" id="43" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="44">&nbsp;</label><input type="text" class="col-md-34 long-label4" id="44" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="45">&nbsp;</label><input type="text" class="col-md-34 long-label4" id="45" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="46">&nbsp;</label><input type="text" class="col-md-34 long-label4" id="46" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="47">&nbsp;</label><input type="text" class="col-md-34 long-label4" id="47" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="48">&nbsp;</label><input type="text" class="col-md-34 long-label4" id="48" value="" /></td>
                                         </tr>
                                     </table>
                                     <br />
                                     <label class="set-label">&nbsp;&nbsp;Antibodles</label>
                                     <table class="col-md-36" id="label-set-3">
                                         <tr>
-                                            <td class="col-md-2"><label class="set-label" for="D_A1">D</label><input type="text" class="col-md-34 long-label1" id="D_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="C_A1">C</label><input type="text" class="col-md-34 long-label1" id="C_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="c_A1">c</label><input type="text" class="col-md-34 long-label1" id="c_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="E_A1">E</label><input type="text" class="col-md-34 long-label1" id="E_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="e_A1">e</label><input type="text" class="col-md-34 long-label1" id="e_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="K_A1">K</label><input type="text" class="col-md-34 long-label1" id="K_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="55">&nbsp;</label><input type="text" class="col-md-34 long-label1" id="55" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="56">&nbsp;</label><input type="text" class="col-md-34 long-label1" id="56" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="57">&nbsp;</label><input type="text" class="col-md-34 long-label1" id="57" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="58">&nbsp;</label><input type="text" class="col-md-34 long-label1" id="58" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="59">&nbsp;</label><input type="text" class="col-md-34 long-label1" id="59" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="60">&nbsp;</label><input type="text" class="col-md-34 long-label1" id="60" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="61">&nbsp;</label><input type="text" class="col-md-34 long-label1" id="61" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="62">&nbsp;</label><input type="text" class="col-md-34 long-label1" id="62" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="63">&nbsp;</label><input type="text" class="col-md-34 long-label1" id="63" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="64">&nbsp;</label><input type="text" class="col-md-34 long-label1" id="64" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="D_A1">D</label><input type="text" class="col-md-34 long-label4" id="D_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="C_A1">C</label><input type="text" class="col-md-34 long-label4" id="C_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="c_A1">c</label><input type="text" class="col-md-34 long-label4" id="c_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="E_A1">E</label><input type="text" class="col-md-34 long-label4" id="E_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="e_A1">e</label><input type="text" class="col-md-34 long-label4" id="e_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="K_A1">K</label><input type="text" class="col-md-34 long-label4" id="K_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="55">&nbsp;</label><input type="text" class="col-md-34 long-label4" id="55" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="56">&nbsp;</label><input type="text" class="col-md-34 long-label4" id="56" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="57">&nbsp;</label><input type="text" class="col-md-34 long-label4" id="57" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="58">&nbsp;</label><input type="text" class="col-md-34 long-label4" id="58" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="59">&nbsp;</label><input type="text" class="col-md-34 long-label4" id="59" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="60">&nbsp;</label><input type="text" class="col-md-34 long-label4" id="60" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="61">&nbsp;</label><input type="text" class="col-md-34 long-label4" id="61" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="62">&nbsp;</label><input type="text" class="col-md-34 long-label4" id="62" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="63">&nbsp;</label><input type="text" class="col-md-34 long-label4" id="63" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="64">&nbsp;</label><input type="text" class="col-md-34 long-label4" id="64" value="" /></td>
                                         </tr>
                                         <tr>
-                                            <td class="col-md-2"><label class="set-label" for="Fya_A1">Fya</label><input type="text" class="col-md-34 long-label1" id="Fya_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Fyb_A1">Fyb</label><input type="text" class="col-md-34 long-label1" id="Fyb_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Jka_A1">Jka</label><input type="text" class="col-md-34 long-label1" id="Jka_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Jkb_A1">Jkb</label><input type="text" class="col-md-34 long-label1" id="Jkb_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="M_A1">M</label><input type="text" class="col-md-34 long-label1" id="M_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="N_A1">N</label><input type="text" class="col-md-34 long-label1" id="N_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="S_A1">S</label><input type="text" class="col-md-34 long-label1" id="S_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="s_A1">s</label><input type="text" class="col-md-34 long-label1" id="s_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Lea_A1">Lea</label><input type="text" class="col-md-34 long-label1" id="Lea_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Leb_A1">Leb</label><input type="text" class="col-md-34 long-label1" id="Leb_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Jsa_A1">Jsa</label><input type="text" class="col-md-34 long-label1" id="Jsa_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Jsb_A1">Jsb</label><input type="text" class="col-md-34 long-label1" id="Jsa_A2" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Lwa_A1">Lwa</label><input type="text" class="col-md-34 long-label1" id="Lwa_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="U_A1">U</label><input type="text" class="col-md-34 long-label1" id="U_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Pk_A1">Pk</label><input type="text" class="col-md-34 long-label1" id="Pk_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Mia_A1">Mia</label><input type="text" class="col-md-34 long-label1" id="Mia_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Fya_A1">Fya</label><input type="text" class="col-md-34 long-label4" id="Fya_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Fyb_A1">Fyb</label><input type="text" class="col-md-34 long-label4" id="Fyb_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Jka_A1">Jka</label><input type="text" class="col-md-34 long-label4" id="Jka_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Jkb_A1">Jkb</label><input type="text" class="col-md-34 long-label4" id="Jkb_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="M_A1">M</label><input type="text" class="col-md-34 long-label4" id="M_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="N_A1">N</label><input type="text" class="col-md-34 long-label4" id="N_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="S_A1">S</label><input type="text" class="col-md-34 long-label4" id="S_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="s_A1">s</label><input type="text" class="col-md-34 long-label4" id="s_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Lea_A1">Lea</label><input type="text" class="col-md-34 long-label4" id="Lea_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Leb_A1">Leb</label><input type="text" class="col-md-34 long-label4" id="Leb_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Jsa_A1">Jsa</label><input type="text" class="col-md-34 long-label4" id="Jsa_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Jsb_A1">Jsb</label><input type="text" class="col-md-34 long-label4" id="Jsa_A2" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Lwa_A1">Lwa</label><input type="text" class="col-md-34 long-label4" id="Lwa_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="U_A1">U</label><input type="text" class="col-md-34 long-label4" id="U_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Pk_A1">Pk</label><input type="text" class="col-md-34 long-label4" id="Pk_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Mia_A1">Mia</label><input type="text" class="col-md-34 long-label4" id="Mia_A1" value="" /></td>
                                         </tr>
                                         <tr>
-                                            <td class="col-md-2"><label class="set-label" for="Cw_A1">Cw</label><input type="text" class="col-md-34 long-label1" id="Cw_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Lua_A1">Lua</label><input type="text" class="col-md-34 long-label1" id="Lua_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Lub_A1">Lub</label><input type="text" class="col-md-34 long-label1" id="Lub_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Kpa_A1">Kpa</label><input type="text" class="col-md-34 long-label1" id="Kpa_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Kpb_A1">Kpb</label><input type="text" class="col-md-34 long-label1" id="Kpb_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="P1_A1">P1</label><input type="text" class="col-md-34 long-label1" id="P1_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="k_A1">k</label><input type="text" class="col-md-34 long-label1" id="k_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Vel_A1">Vel</label><input type="text" class="col-md-34 long-label1" id="Vel_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="TJA_A1">TJA</label><input type="text" class="col-md-34 long-label1" id="TJA_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Doa_A1">Doa</label><input type="text" class="col-md-34 long-label1" id="Doa_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Dob_A1">Dob</label><input type="text" class="col-md-34 long-label1" id="Dob_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Coa_A1">Coa</label><input type="text" class="col-md-34 long-label1" id="Coa_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Cob_A1">Cob</label><input type="text" class="col-md-34 long-label1" id="Cob_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="H_A1">H</label><input type="text" class="col-md-34 long-label1" id="H_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="Mga_A1">Mga</label><input type="text" class="col-md-34 long-label1" id="Mga_A1" value="" /></td>
-                                            <td class="col-md-2"><label class="set-label" for="78">&nbsp;</label><input type="text" class="col-md-34 long-label1" id="78" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Cw_A1">Cw</label><input type="text" class="col-md-34 long-label4" id="Cw_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Lua_A1">Lua</label><input type="text" class="col-md-34 long-label4" id="Lua_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Lub_A1">Lub</label><input type="text" class="col-md-34 long-label4" id="Lub_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Kpa_A1">Kpa</label><input type="text" class="col-md-34 long-label4" id="Kpa_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Kpb_A1">Kpb</label><input type="text" class="col-md-34 long-label4" id="Kpb_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="P1_A1">P1</label><input type="text" class="col-md-34 long-label4" id="P1_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="k_A1">k</label><input type="text" class="col-md-34 long-label4" id="k_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Vel_A1">Vel</label><input type="text" class="col-md-34 long-label4" id="Vel_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="TJA_A1">TJA</label><input type="text" class="col-md-34 long-label4" id="TJA_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Doa_A1">Doa</label><input type="text" class="col-md-34 long-label4" id="Doa_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Dob_A1">Dob</label><input type="text" class="col-md-34 long-label4" id="Dob_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Coa_A1">Coa</label><input type="text" class="col-md-34 long-label4" id="Coa_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Cob_A1">Cob</label><input type="text" class="col-md-34 long-label4" id="Cob_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="H_A1">H</label><input type="text" class="col-md-34 long-label4" id="H_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="Mga_A1">Mga</label><input type="text" class="col-md-34 long-label4" id="Mga_A1" value="" /></td>
+                                            <td class="col-md-2"><label class="set-label" for="78">&nbsp;</label><input type="text" class="col-md-34 long-label4" id="78" value="" /></td>
                                         </tr>
                                     </table>
+                                    <br />
+                                    <label class="set-label">&nbsp;&nbsp;HLA</label>
+                                    <table class="col-md-36" id="label-set-4">
+                                        <tr>
+                                            <td class="col-md-4"><label class="set-label" for="HLA-Ax">HLA-Ax</label><input type="text" class="col-md-35 long-label2" id="HLA-Ax" value="" /></td>
+                                            <td class="col-md-4"><label class="set-label" for="HLA-Ay">HLA-Ay</label><input type="text" class="col-md-35 long-label2" id="HLA-Ay" value="" /></td>
+                                            <td class="col-md-4"><label class="set-label" for="HLA-Bx">HLA-Bx</label><input type="text" class="col-md-35 long-label2" id="HLA-Bx" value="" /></td>
+                                            <td class="col-md-4"><label class="set-label" for="HLA-By">HLA-By</label><input type="text" class="col-md-35 long-label2" id="HLA-By" value="" /></td>
+                                            <td class="col-md-4"><label class="set-label" for="HLA-DRB1x">HLA-DRB1x</label><input type="text" class="col-md-35 long-label2" id="HLA-DRB1x" value="" /></td>
+                                            <td class="col-md-4"><label class="set-label" for="HLA-DRB1y">HLA-DRB1y</label><input type="text" class="col-md-35 long-label2" id="HLA-DRB1y" value="" /></td>
+                                            <td class="col-md-4"><label class="set-label" for="xx">&nbsp;</label><input type="text" class="col-md-35 long-label2" id="xx" value="" /></td>
+                                            <td class="col-md-4"><label class="set-label" for="xyx">&nbsp;</label><input type="text" class="col-md-35 long-label2" id="xyx" value="" /></td>
+                                        </tr>
+                                    </table>
+                                    <br />
                                 </div>
                             </div>
                             
