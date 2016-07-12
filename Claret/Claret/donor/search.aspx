@@ -11,14 +11,17 @@
                     $("#txtBloodGroup").focus();
                 },
                 onClose: function () {
-                    $("#txtBloodGroup").focus();
-                    donorSearch(true);
+                    //$("#txtBloodGroup").focus();
+                    //donorSearch(true);
                 },
-            });
+            });//.enterKey(function () { donorSearch(true); });
             $("#spSearch").click(function () {
                 donorSearch(true);
             });
+            $("#txtName").H2GNamebox(37);
+            $("#txtSurname").H2GNamebox(37);
             $("#divCriteria input").enterKey(function () {
+                console.log("Enter Key");
                 donorSearch(true);
                 return false;
             });
@@ -41,23 +44,25 @@
                 },
                 sortButton: function () {
                     //ถ้าเป็นการ sort field เดิมให้ทำการเปลี่ยน direction 
-                    if ($(this).H2GAttr("sortOrder") == $("#tbDonor").H2GAttr("sortOrder")) {
-                        if ($("#tbDonor").H2GAttr("sortDirection") == "asc") {
-                            $("#tbDonor").H2GFill({ sortDirection: "desc" });
-                            $(this).find(".glyphicon").removeClass("glyphicon-triangle-top").addClass("glyphicon-triangle-bottom");
+                    if ($(this).closest("table").H2GAttr("wStatus") != "working") {
+                        if ($(this).H2GAttr("sortOrder") == $("#tbDonor").H2GAttr("sortOrder")) {
+                            if ($("#tbDonor").H2GAttr("sortDirection") == "asc") {
+                                $("#tbDonor").H2GFill({ sortDirection: "desc" });
+                                $(this).find(".glyphicon").removeClass("glyphicon-triangle-top").addClass("glyphicon-triangle-bottom");
+                            }
+                            else {
+                                $("#tbDonor").H2GAttr("sortDirection", "asc");
+                                $(this).find(".glyphicon").removeClass("glyphicon-triangle-bottom").addClass("glyphicon-triangle-top");
+                            }
+                        } else {
+                            //ถ้าเป็นการ sort field ใหม่ให้ทำการเปลี่ยน field และเริ่ม direction ที่ desc
+                            $("#tbDonor").H2GFill({ sortDirection: "desc", sortOrder: $(this).H2GAttr("sortOrder") });
+                            //ต้องทำการย้าย direct sign ไปไว้กับหัวข้อที่เลือกใหม่ด้วย
+                            $("#tbDonor > thead > tr > th .glyphicon").removeClass("glyphicon-triangle-top").addClass("glyphicon-triangle-bottom")
+                                .appendTo($("#tbDonor thead button[sortOrder='" + $(this).H2GAttr("sortOrder") + "']"));
                         }
-                        else {
-                            $("#tbDonor").H2GAttr("sortDirection", "asc");
-                            $(this).find(".glyphicon").removeClass("glyphicon-triangle-bottom").addClass("glyphicon-triangle-top");
-                        }
-                    } else {
-                        //ถ้าเป็นการ sort field ใหม่ให้ทำการเปลี่ยน field และเริ่ม direction ที่ desc
-                        $("#tbDonor").H2GFill({ sortDirection: "desc", sortOrder: $(this).H2GAttr("sortOrder") });
-                        //ต้องทำการย้าย direct sign ไปไว้กับหัวข้อที่เลือกใหม่ด้วย
-                        $("#tbDonor > thead > tr > th .glyphicon").removeClass("glyphicon-triangle-top").addClass("glyphicon-triangle-bottom")
-                            .appendTo($("#tbDonor thead button[sortOrder='" + $(this).H2GAttr("sortOrder") + "']"));
+                        donorSearch(false);
                     }
-                    donorSearch(false);
                 },
                 donorSelect: function () {
                     $("#data").H2GAttr("donorID", $(this).closest("tr").H2GAttr("refID"));
@@ -71,13 +76,13 @@
         function validation() {
             if ($('#txtName').val() == "") {
                 $("#txtName").focus();
-                notiWarning("กรุณากรอกชื่อผู้บริจาก");
+                notiWarning("กรุณากรอกชื่อผู้บริจาค");
                 return false;
             } else if ($('#txtSurname').val() == "") {
                 $("#txtSurname").focus();
-                notiWarning("กรุณากรอกนามสกุลผู้บริจาก");
+                notiWarning("กรุณากรอกนามสกุลผู้บริจาค");
                 return false;
-            } else if ($('#txtBirthday').val() == "") {
+            } else if ($('#txtBirthday').val() == "" || !isDate($('#txtBirthday').val(), "dd/MM/yyyy")) {
                 $("#txtBirthday").focus();
                 notiWarning("กรุณากรอกวันเกิดผู้บริจาค");
                 return false;
@@ -117,19 +122,27 @@
                         if (!data.onError) {
                             data.getItems = jQuery.parseJSON(data.getItems);
                             if (data.getItems.SearchList.length > 0) {
-                                $.each((data.getItems.SearchList), function (index, e) {
-                                    var dataRow = $("#tbDonor > thead > tr.template-data").clone().show();
-                                    $(dataRow).H2GAttr('refID', e.ID);
-                                    $(dataRow).find('.td-donor-number').append(e.DonorNumber).H2GAttr("title", e.DonorNumber);
-                                    $(dataRow).find('.td-nation-number').append(e.NationNumber).H2GAttr("title", e.NationNumber);
-                                    $(dataRow).find('.td-ext-number').append(e.ExternalNumber).H2GAttr("title", e.ExternalNumber);
-                                    $(dataRow).find('.td-name').append(e.Name).H2GAttr("title", e.Name);
-                                    $(dataRow).find('.td-surname').append(e.Surname).H2GAttr("title", e.Surname);
-                                    $(dataRow).find('.td-birthday').append(e.Birthday).H2GAttr("title", e.Birthday);
-                                    $(dataRow).find('.td-blood-group').append(e.BloodGroup).H2GAttr("title", e.BloodGroup);
-                                    $(dataView).append(dataRow);
-                                });
-                                $(dataView).closest("table").attr("totalPage", data.getItems.TotalPage)
+                                if (data.getItems.GoNext == "Y") {
+                                    $.each((data.getItems.SearchList), function (index, e) {
+                                        var dataRow = $("#tbDonor > thead > tr.template-data").clone();
+                                        $(dataRow).attr('refID', e.ID).donorSelect();
+                                    });
+                                } else {
+                                    $.each((data.getItems.SearchList), function (index, e) {
+                                        var dataRow = $("#tbDonor > thead > tr.template-data").clone().show();
+                                        $(dataRow).H2GAttr('refID', e.ID);
+                                        $(dataRow).find('.td-donor-number').append(e.DonorNumber).H2GAttr("title", e.DonorNumber);
+                                        $(dataRow).find('.td-nation-number').append(e.NationNumber).H2GAttr("title", e.NationNumber);
+                                        $(dataRow).find('.td-ext-number').append(e.ExternalNumber).H2GAttr("title", e.ExternalNumber);
+                                        $(dataRow).find('.td-name').append(e.Name).H2GAttr("title", e.Name);
+                                        $(dataRow).find('.td-surname').append(e.Surname).H2GAttr("title", e.Surname);
+                                        $(dataRow).find('.td-birthday').append(e.Birthday).H2GAttr("title", e.Birthday);
+                                        $(dataRow).find('.td-blood-group').append(e.BloodGroup).H2GAttr("title", e.BloodGroup);
+                                        $(dataView).append(dataRow);
+                                    });
+                                    $(dataView).closest("table").attr("totalPage", data.getItems.TotalPage)
+                                }
+
                             } else {
                                 $(dataView).H2GValue($("#tbDonor > thead > tr.no-transaction").clone().show());
                                 $(dataView).closest("table").attr("totalPage", 0)

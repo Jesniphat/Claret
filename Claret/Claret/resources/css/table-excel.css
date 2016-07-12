@@ -105,7 +105,6 @@
 .panel > .table-responsive > .table-bordered-excel > tfoot > tr:last-child > th {
   border-bottom: 0;
 }
-
 .table-bordered-excel > tbody > tr > th, .table-bordered-excel > tfoot > tr > th, .table-bordered-excel > thead > tr > td, .table-bordered-excel > tbody > tr > td {
     padding: 0 1px;
 }
@@ -114,5 +113,70 @@
     border:0;
     width:100%;
     font-family: THSarabunNew;
+    font-size: 16px;
+}
+
+/*                        sorting tables                        */
+
+/*table.tablesorter {
+	font-family:arial;
+	background-color: #CDCDCD;
+	margin:10px 0pt 15px;
+	font-size: 8pt;
+	width: 100%;
+	text-align: left;
+}*/
+table.tablesorter thead tr th, table.tablesorter tfoot tr th {
+	/*font-size: 8pt;
+	padding: 4px;*/
+}
+table.tablesorter thead tr .header {
+	background-image: url(../../image/bg/bg.gif);
+	background-repeat: no-repeat;
+	background-position: center right;
+	cursor: pointer;
+}
+table.tablesorter tbody td {
+	color: #3D3D3D;
+	padding: 4px;
+	background-color: #FFF;
+	vertical-align: top;
+}
+table.tablesorter tbody tr.odd td {
+	background-color:#F0F0F6;
+}
+table.tablesorter thead tr .headerSortUp {
+	background-image: url(../../image/bg/asc.gif);
+}
+table.tablesorter thead tr .headerSortDown {
+	background-image: url(../../image/bg/desc.gif);
+}
+table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
+background-color: #8dbdd8;
+}
+
+/*      Header Of table        */
+
+.tableHeadDiv {
+    border-left: 1px solid;
+    border-right: 1px solid;
+    border-top: 1px solid;
+    margin-left: 1px;
+    margin-right: 1px;
+    width: 1123px;
+    background-color: #D9D9D9;
+    text-align: center;
+}
+
+/*         label at Immunohematology         */
+.long-label1 {
+    height: 25px;
+}
+.long-label3 {
+    height: 25px;
+}
+.set-label {
+    padding-left: 5px;
+    margin-bottom: 0px;
     font-size: 16px;
 }

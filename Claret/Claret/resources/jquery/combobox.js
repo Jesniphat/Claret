@@ -1,7 +1,7 @@
 ﻿(function ($) {
     $.widget("custom.combobox", {
         _create: function () {
-            this.wrapper = $("<span>")
+            this.wrapper = $("<span>", { style: "padding: 0;" })
               .addClass("custom-combobox")
               .insertAfter(this.element);
 
@@ -13,9 +13,8 @@
         _createAutocomplete: function () {
             var selected = this.element.children(":selected"),
               value = selected.val() ? selected.text() : "";
-
-            this.input = $("<input>")
-              .appendTo(this.wrapper)
+            this.input = $("<input>", { class: this.element.attr("class"), placeholder: "กรุณาเลือก", tabindex: this.element.attr("tabindex") || "" })
+              .appendTo(this.wrapper)//.css({ width: $(this).parent().width() - 30 })
               .val(value)
               .attr("title", "")
               .addClass("custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left")
@@ -24,6 +23,8 @@
                   minLength: 0,
                   source: $.proxy(this, "_source")
               });
+
+            this.input.css({ width: this.element.width() - 30 });
 
             this._on(this.input, {
                 autocompleteselect: function (event, ui) {
@@ -41,7 +42,7 @@
             var input = this.input,
               wasOpen = false;
 
-            $("<a>")
+            $("<a>", { class: this.element.attr("class") })
               .attr("tabIndex", -1)
               .attr("title", "Show All Items")
               .appendTo(this.wrapper)

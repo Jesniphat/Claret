@@ -12941,7 +12941,6 @@ var tabs = $.widget( "ui.tabs", {
 
 		this._processTabs();
 		options.active = this._initialActive();
-
 		// Take disabling tabs via class attribute from HTML
 		// into account and update option properly.
 		if ( $.isArray( options.disabled ) ) {
@@ -12970,7 +12969,7 @@ var tabs = $.widget( "ui.tabs", {
 		var active = this.options.active,
 			collapsible = this.options.collapsible,
 			locationHash = location.hash.substring( 1 );
-
+		
 		if ( active === null ) {
 			// check the fragment identifier in the URL
 			if ( locationHash ) {

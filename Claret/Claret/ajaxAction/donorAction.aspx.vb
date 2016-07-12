@@ -108,7 +108,7 @@ Public Class donorAction
                         DonorMainItem.Donor = DTransaction.WithItems(New DTransaction, dRow)
                     Next
                     If String.IsNullOrEmpty(_REQUEST("visit_id")) Then
-                        DonorMainItem.Donor.DuplicateTransaction = Cbase.QueryField("select count(id) from donation_visit where donor_id = '" & _REQUEST("id") & "' and to_char(create_date,'yyyyMMdd') = to_char(sysdate,'yyyyMMdd') ")
+                        DonorMainItem.Donor.DuplicateTransaction = Cbase.QueryField("select nvl(count(id),0) from donation_visit where donor_id = '" & _REQUEST("id") & "' and to_char(create_date,'yyyyMMdd') = to_char(sysdate,'yyyyMMdd') ")
                     End If
 
                     '### DonorItem
@@ -170,6 +170,18 @@ Public Class donorAction
                         drItem.DonateFrom = dRow("DONATION_FROM").ToString
                         drItem.DonateNumber = dRow("DONATION_NUMBER").ToString
                         drItem.DonateReward = ""
+
+                        For Each dReward As DataRow In Cbase.QueryTable("select RE.id as reward_id, RE.DESCRIPTION as reward_desc, dr.id as donation_reward_id
+                            , to_char(dr.reward_date, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as reward_date  
+                            from REWARD re 
+                            left join DONATION_REWARD dr on DR.REWARD_ID = RE.id
+                            where RE.DONATION_NUMBER = '" & drItem.DonateNumber & "' 
+                            or (to_date('" & CDate(dRow("DONATION_DATE").ToString).ToString("dd/MM/yyyy") & "','dd/MM/yyyy') between RE.START_DATE and re.END_DATE)
+                            order by re.id, RE.DONATION_NUMBER desc").Rows
+
+                            drItem.DonateReward &= dReward("reward_id").ToString() & "|" & dReward("reward_desc").ToString() & "|" & dReward("donation_reward_id").ToString() & "|" & dReward("reward_date") & "##"
+                        Next
+
                         DonorMainItem.DonationRecord.Add(drItem)
                     Next
 
@@ -177,13 +189,24 @@ Public Class donorAction
                     'Response.Write(JSONResponse.ToJSON())
                 Case "searchdonor"
                     Dim SearchItem As New SearchItem
+                    SearchItem.GoNext = "N"
                     SearchItem.SearchList = New List(Of DonorSearchItem)
                     Dim DonorSearchItem As DonorSearchItem
                     Dim intItemPerPage As Integer = 5
                     Dim intTotalPage As Integer = 1
 
-                    If Not String.IsNullOrEmpty(_REQUEST("donornumber")) Then param.Add("#DONOR_NUMBER", " and UPPER(dn.donor_number) like UPPER('" & _REQUEST("donornumber") & "') ")
-                    If Not String.IsNullOrEmpty(_REQUEST("nationnumber")) Then param.Add("#NATION_NUMBER", " and UPPER(dexc.card_number) like UPPER('" & _REQUEST("nationnumber") & "') ")
+                    If Not String.IsNullOrEmpty(_REQUEST("donornumber")) Then
+                        param.Add("#DONOR_NUMBER", " and UPPER(dn.donor_number) like UPPER('" & _REQUEST("donornumber") & "') ")
+                        If Not _REQUEST("donornumber").ToString.Contains("%") Then
+                            SearchItem.GoNext = "Y"
+                        End If
+                    End If
+                    If Not String.IsNullOrEmpty(_REQUEST("nationnumber")) Then
+                        param.Add("#NATION_NUMBER", " and UPPER(dexc.card_number) like UPPER('" & _REQUEST("nationnumber") & "') ")
+                        If Not _REQUEST("nationnumber").ToString.Contains("%") Then
+                            SearchItem.GoNext = "Y"
+                        End If
+                    End If
                     If Not String.IsNullOrEmpty(_REQUEST("extnumber")) Then param.Add("#EXT_NUMBER", " and UPPER(dexc.card_number) like UPPER('" & _REQUEST("extnumber") & "') ")
                     If Not String.IsNullOrEmpty(_REQUEST("name")) Then param.Add("#NAME", " and (UPPER(dn.name) like UPPER('" & _REQUEST("name") & "') or UPPER(dn.name_e) like UPPER('" & _REQUEST("name") & "')) ")
                     If Not String.IsNullOrEmpty(_REQUEST("surname")) Then param.Add("#SURNAME", " and (UPPER(dn.surname) like UPPER('" & _REQUEST("surname") & "') or UPPER(dn.surname_e) like UPPER('" & _REQUEST("surname") & "')) ")
@@ -274,7 +297,7 @@ Public Class donorAction
                             DRWRList.Add(DRWRItem)
                         Next
 
-                        '### DonorItem
+                        '### Reward record
                         Dim sql As String = ""
                         Dim RewardItem As RewardItem
                         For Each item As DonateRecordWithRewardItem In DRWRList
@@ -296,7 +319,8 @@ Public Class donorAction
                     'Response.Write(JSONResponse.ToJSON())
 
                 Case "historicalFileData"
-                    Dim donn_numero As String = _REQUEST("donn_numero")
+                    'Dim donn_numero As String = _REQUEST("donn_numero")
+                    Dim donn_numero As String = "1004230339"
 
                     Dim sql As String = "select pexamen.pex_lib show_exam,
                                         decode(substr(dossex.dex_res,1,1),'*',
@@ -425,6 +449,7 @@ Public Structure DonorMainItem
 End Structure
 
 Public Structure SearchItem
+    Public GoNext As String
     Public TotalPage As String
     Public SearchList As List(Of DonorSearchItem)
 End Structure

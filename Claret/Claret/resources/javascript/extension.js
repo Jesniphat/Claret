@@ -122,11 +122,10 @@ $.extend($.fn, {
                 if (!data.onError) {
                     data.getItems = jQuery.parseJSON(data.getItems);
                     $.each((data.getItems), function (index, e) {
-                        $("<option>", { value: e.code }).html(e.name).appendTo(self);
+                        $("<option>", { value: e.code, valueID: e.id }).html(e.name).appendTo(self);
                     });
                     $(self).setDropdowList().selecter("update");
                     if (defaultSelect != undefined) { $(self).val(defaultSelect).change(); }
-                    //$(self).find("option:contains('Thailand')").attr('value')
                 } else { $(self).setDropdowList().selecter("update"); }
             }
         });    //End ajax
@@ -152,16 +151,21 @@ $.extend($.fn, {
             },
             success: function (data) {
                 $(self).html('');//.selecter('destroy').setDropdowList();
-                $("<option>", { value: "" }).html("กรุณาเลือก").appendTo(self);
+                //$("<option>", { value: "" }).html("กรุณาเลือก").appendTo(self);
                 if (!data.onError) {
                     data.getItems = jQuery.parseJSON(data.getItems);
                     $.each((data.getItems), function (index, e) {
                         $("<option>", { value: e.code }).html(e.name).appendTo(self);
                     });
-                    $(self).combobox();
-                    //if (defaultSelect != undefined) { $(self).val(defaultSelect).change(); }
-                    //$(self).find("option:contains('Thailand')").attr('value')
-                } else { $(self).combobox(); }
+                    $(self).H2GValue(defaultSelect || "").combobox({
+                        appendTo: "#mstContent",
+                    });
+                    $(self).parent().find("span").find("input").val($(self).find(":selected").text());
+                } else {
+                    $(self).combobox({
+                        appendTo: "#mstContent",
+                    });
+                }
                 $("#tog" + $(self).H2GAttr("id").replace("ddl","")).click(function () {
                     $(self).toggle();
                 });
@@ -207,7 +211,7 @@ $.extend($.fn, {
             dayNamesMin: ["อ", "จ", "อ", "พ", "พ", "ศ", "ส"], 
             yearRange: config.yearRange,
             onSelect: config.onSelect,
-            onClose: config.onClose
+            onClose: config.onClose,
         });
         return this;
     },
@@ -258,8 +262,11 @@ $.extend($.fn, {
                         result = ($.trim($(this).val()) == $(this).attr('pretext') || $.trim($(this).val()) == '') ? '' : $.trim($(this).val());
                     } else if ($(this).attr('type') == 'radio') {
                         result = ($(this).prop('checked') == true || $(this).attr('checked') == 'checked') ? 'Y' : 'N';
+                    } else if ($(this).attr('type') == 'password') {
+                        result = $(this).val();
                     }
                     break;
+                case 'SELECT': result = $(this).val(); break;
                 case 'SELECT': result = $(this).val(); break;
                 case 'TEXTAREA': result = $.trim($(this).val()); break;
                 default: result = $(this).html(); break;
@@ -318,25 +325,40 @@ $.extend($.fn, {
 
         return this;
     },
-    H2GThaibox: function () {
+    H2GThaibox: function (optionKey) {
         $(this).keypress(function (e) {
             var keyCode = e.keyCode || e.which;
             console.log(keyCode);
             var ValueNullKey = ($.trim($(this).val()) === $(this).attr('pretext')) || ($.trim($(this).val()) === "");
             var OtherKey = ((e.ctrlKey && keyCode != 86) || e.ctrlKey || e.altKey || keyCode == 8 || keyCode == 45 || keyCode == 13);
+            OtherKey = (OtherKey || keyCode == optionKey)
             var NumKey = ((keyCode >= 3585 && keyCode <= 3641) || (keyCode >= 3648 && keyCode <= 3660));
             if (!NumKey && !OtherKey) { return false; } else { if (ValueNullKey) $(this).val(''); }
         });
 
         return this;
     },
-    H2GEnglishbox: function () {
+    H2GEnglishbox: function (optionKey) {
         $(this).keypress(function (e) {
             var keyCode = e.keyCode || e.which;
             console.log(keyCode);
             var ValueNullKey = ($.trim($(this).val()) === $(this).attr('pretext')) || ($.trim($(this).val()) === "");
             var OtherKey = ((e.ctrlKey && keyCode != 86) || e.ctrlKey || e.altKey || keyCode == 8 || keyCode == 45 || keyCode == 13);
+            OtherKey = (OtherKey || keyCode == optionKey)
             var NumKey = ((keyCode >= 65 && keyCode <= 90) || (keyCode >= 97 && keyCode <= 122));
+            if (!NumKey && !OtherKey) { return false; } else { if (ValueNullKey) $(this).val(''); }
+        });
+        return this;
+    },
+    H2GNamebox: function (optionKey) {
+        $(this).keypress(function (e) {
+            var keyCode = e.keyCode || e.which;
+            console.log(keyCode);
+            var ValueNullKey = ($.trim($(this).val()) === $(this).attr('pretext')) || ($.trim($(this).val()) === "");
+            var OtherKey = ((e.ctrlKey && keyCode != 86) || e.ctrlKey || e.altKey || keyCode == 8 || keyCode == 45 || keyCode == 13);
+            OtherKey = (OtherKey || keyCode == optionKey)
+            var NumKey = ((keyCode >= 65 && keyCode <= 90) || (keyCode >= 97 && keyCode <= 122)
+                || (keyCode >= 3585 && keyCode <= 3641) || (keyCode >= 3648 && keyCode <= 3660));
             if (!NumKey && !OtherKey) { return false; } else { if (ValueNullKey) $(this).val(''); }
         });
         return this;
@@ -406,3 +428,22 @@ $.extend(String.prototype, {
     toRate: function () { var n = this, f = n != undefined ? parseFloat(parseFloat(n.replace(/,/g, '')).toFixed(5)) : 0; return (!isNaN(f)) ? f : 0; }
 });
 
+function notiSuccess(value) { showNoti(value, "ok"); }
+function notiError(value) { showNoti(value, "remove"); }
+function notiInfo(value) { showNoti(value, "info"); }
+function notiWarning(value) { showNoti(value, "question"); }
+function showNoti(value, type) {
+    var windowWidth = parseInt($(window).width());
+    $("#divNoti").find(".noti-message").html(value);
+    $("#divNoti").find(".sign").addClass("glyphicon-" + type + "-sign");
+    $("#divNoti").addClass("noti-" + type).css({ left: parseInt(windowWidth) - ($("#divNoti").outerWidth() + 20) });
+    if ($("#divNoti").css('display') == 'none') {
+        $("#divNoti").slideDown(function () {
+            setTimeout(function () {
+                $("#divNoti").slideUp(function () {
+                    $(this).removeClass("noti-" + type).find(".sign").removeClass("glyphicon-" + type + "-sign");
+                });
+            }, 3000);
+        });
+    }
+}

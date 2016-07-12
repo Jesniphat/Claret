@@ -26,7 +26,7 @@ Public Class masterAction
                     For Each dr As DataRow In dt.Rows()
                         CountryItem = New CountryItem
                         CountryItem.id = dr("id").ToString()
-                        CountryItem.code = dr("id").ToString()
+                        CountryItem.code = dr("code").ToString()
                         CountryItem.name = dr("name").ToString()
                         countryList.Add(CountryItem)
                     Next
@@ -35,13 +35,13 @@ Public Class masterAction
                 Case "collection"
                     Dim countryList As New List(Of CountryItem)
                     Dim CountryItem As CountryItem
-                    Dim dt As DataTable = Cbase.QueryTable("select id, code, description from Collection_Category where 1=1 order by description ")
+                    Dim dt As DataTable = Cbase.QueryTable("select id, code, name from collection_point order by name ")
 
                     For Each dr As DataRow In dt.Rows()
                         CountryItem = New CountryItem
                         CountryItem.id = dr("id").ToString()
-                        CountryItem.code = dr("id").ToString()
-                        CountryItem.name = dr("description").ToString()
+                        CountryItem.code = dr("code").ToString()
+                        CountryItem.name = dr("name").ToString()
                         countryList.Add(CountryItem)
                     Next
                     JSONResponse.setItems(JSON.Serialize(Of List(Of CountryItem))(countryList))
@@ -131,7 +131,7 @@ Public Class masterAction
                 Case "association"
                     Dim DataList As New List(Of ExCardItem)
                     Dim DataItem As ExCardItem
-                    Dim sql As String = "select id, code, name from association where name is not null order by name"
+                    Dim sql As String = "select id, code, code || ' ' || name as name from association where name is not null order by name"
                     Dim dt As DataTable = Cbase.QueryTable(sql)
 
                     If dt.Rows.Count > 0 Then

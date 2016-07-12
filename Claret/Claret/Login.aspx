@@ -5,16 +5,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title>Login</title>
-    <link href="/resources/css/bootstrap.css?ver=20160107" rel="stylesheet" />
-    <link href="/resources/css/bootflat.css?ver=20160107" rel="stylesheet" />
-    <link href="/resources/css/jquery.fs.selecter.css?ver=20160107" rel="stylesheet" />
-    <link href="/resources/jquery-ui/jquery-ui.css?ver=20160107" rel="stylesheet" />
-    <link href="/resources/css/custom.css?ver=20160107" rel="stylesheet" />
+    <link href="/resources/css/bootstrap.css?ver=20160118" rel="stylesheet" />
+    <link href="/resources/css/bootflat.css?ver=20160118" rel="stylesheet" />
+    <link href="/resources/css/jquery.fs.selecter.css?ver=20160118" rel="stylesheet" />
+    <link href="/resources/jquery-ui/jquery-ui.css?ver=20160118" rel="stylesheet" />
+    <link href="/resources/css/custom.css?ver=20160118" rel="stylesheet" />
     <script src="../resources/jquery/jquery.js" type="text/javascript"></script>
     <script src="../resources/jquery/bootstrap.min.js" type="text/javascript"></script>
     <script src="../resources/jquery/jquery.fs.selecter.js" type="text/javascript"></script>
     <script src="../resources/jquery-ui/jquery-ui.js" type="text/javascript"></script>
-    <script src="../resources/javascript/extension.js?ver=20160116" type="text/javascript"></script>
+    <script src="../resources/javascript/extension.js?ver=20160118" type="text/javascript"></script>
 
     <style>
         .box-Info {
@@ -32,20 +32,63 @@
     </style>
     <script>
         $(function () {
-            $("#ddlDepartment").setDropdowListValue({ url: 'ajaxAction/masterAction.aspx', data: { action: 'collection' } });
-            $("#ddlRegion").setDropdowListValue({ url: 'ajaxAction/masterAction.aspx', data: { action: 'site' } });            
+            $("#ddlDepartment").setDropdowListValue({ url: 'ajaxAction/masterAction.aspx', data: { action: 'collection' } }).on("change", function () {
+                $("#txtDepartment").H2GValue($("#ddlDepartment").H2GValue());
+            });
+            $("#ddlRegion").setDropdowListValue({ url: 'ajaxAction/masterAction.aspx', data: { action: 'site' } }).on("change", function () {
+                $("#txtRegion").H2GValue($("#ddlRegion").H2GValue());
+            });
             $("#txtRegion").blur(function () { $("#ddlRegion").val($("#txtRegion").val().toUpperCase()).change(); });
             $("#txtDepartment").blur(function () { $("#ddlDepartment").val($("#txtDepartment").val().toUpperCase()).change(); });
             $("#txtUser").focus();
 
             $("#btnLogin").click(function () {
-                $("#frmLogin").attr("action", "main.aspx").submit();
+                if (validationLogin()) {
+
+
+
+
+
+                    $("#data").H2GFill({ staffID: 1, siteID: $("#ddlRegion option:selected").H2GAttr("valueID"), collectionPointID: $("#ddlDepartment option:selected").H2GAttr("valueID") });
+                    $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "main.aspx", method: "post" }).submit();
+                    console.log('submit');
+                }
+                
             });
         });
+        function validationLogin() {
+            if ($("#txtUser").H2GValue() == "") {
+                $("#txtUser").focus();
+                notiWarning("กรุณากรอกชื่อผู้ใช้งาน");
+                return false;
+            } else if ($("#txtPassword").H2GValue() == "") {
+                $("#txtPassword").focus();
+                notiWarning("กรุณากรอกรหัสผ่าน");
+                return false;
+            } else if ($("#txtRegion").H2GValue() == "") {
+                $("#txtRegion").focus();
+                notiWarning("กรุณากรอกภาค");
+                return false;
+            } else if ($("#ddlRegion").H2GValue() == null) {
+                $("#ddlRegion").closest("div").focus();
+                notiWarning("ภาคไม่ถูกต้อง กรุณาเลือกใหม่");
+                return false;
+            } else if ($("#txtDepartment").H2GValue() == "") {
+                $("#txtDepartment").focus();
+                notiWarning("กรุณากรอกหน่วยงาน");
+                return false;
+            } else if ($("#ddlDepartment").H2GValue() == null) {
+                $("#ddlDepartment").closest("div").focus();
+                notiWarning("หน่วยงานไม่ถูกต้อง กรุณาเลือกใหม่");
+                return false;
+            } 
+            return true;           
+        }
     </script>
 </head>
 <body style="background-color:#F2F2F2">
     <form id="frmLogin" runat="server" method="post">
+    <input id="data" runat="server" style="display: none;" />
     <div>
         <div class="row" style="background-color:gray; padding:10px 0px; background: url(../../image/bg/bg-header-bar.png) repeat-x;">
             <div class="col-md-36">
@@ -111,6 +154,9 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div id="divNoti" class="noti" style="display:none;">
+        <span class="sign glyphicon"></span><span class="noti-message">กรุณากรอกชื่อผู้บริจาก</span>
     </div>
     </form>
 </body>
