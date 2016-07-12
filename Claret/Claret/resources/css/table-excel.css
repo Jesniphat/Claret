@@ -171,8 +171,16 @@ background-color: #8dbdd8;
 /*         label at Immunohematology         */
 .long-label1 {
     height: 25px;
+    margin-left: 27px;
+}
+.long-label2 {
+    height: 25px;
 }
 .long-label3 {
+    height: 25px;
+    margin-left: 27px;
+}
+.long-label4 {
     height: 25px;
 }
 .set-label {
