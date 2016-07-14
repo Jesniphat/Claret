@@ -53,9 +53,22 @@ span.glyphicon {
     padding: 0px 5px;
     color: #595959;/*89,89,89*/
     border: solid 1px #7F7F7F;
+    box-shadow: 1px 3px 3px #ccd1d9;
 }
 .btn:hover{
     border: solid 1px #7F7F7F;
+}
+.btn.btn-icon {
+    border: 0;
+    background: transparent;
+    color: #3BAFDA;
+    box-shadow: none;
+}
+.btn.btn-icon:hover, .btn.btn-icon:focus {
+    color: #4FC1E9;
+}
+.btn.btn-icon > i {
+    vertical-align: sub;
 }
 .shadow-box {
     -webkit-box-shadow: 0 0 8px rgba(0,0,0,.6);
@@ -80,7 +93,7 @@ a {
     border-top: 0;
 }
 .table > thead > tr > th {
-    padding:0 5px;
+    padding:0px;
     border-bottom: 2px solid #ddd;
     border-top: 0;
 }
@@ -214,4 +227,15 @@ a {
     overflow-y: auto;
     /* prevent horizontal scrollbar */
     overflow-x: hidden;
+}
+.ui-widget input {
+    font-family: THSarabunNew; 
+    font-size: 20px;
+}
+.table.table-bordered > thead > tr > th, .table.table-bordered > thead > tr > td, .table.table-bordered > thead:first-child > tr:first-child {
+    border-left: 1px solid transparent;
+    border-top: 1px solid transparent;
+    border-right: 1px solid transparent;
+    border-bottom: 1px solid #ddd;
+    
 }

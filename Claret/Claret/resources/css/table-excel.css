@@ -116,6 +116,21 @@
     font-size: 16px;
 }
 
+.td-number-excel {
+    font-size: 16px;
+    vertical-align: middle;
+}
+
+.td-date-excel {
+    font-size: 16px;
+    vertical-align: middle;
+}
+
+.td-text-excel {
+    font-size: 16px;
+    vertical-align: middle;
+}
+
 /*                        sorting tables                        */
 
 /*table.tablesorter {

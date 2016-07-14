@@ -137,6 +137,7 @@
     <Content Include="!SQLStore\donor\InsertMasterDonor.sql" />
     <Content Include="ajaxAction\donorAction.aspx" />
     <Content Include="ajaxAction\masterAction.aspx" />
+    <Content Include="ajaxAction\userAction.aspx" />
     <Content Include="Default.aspx" />
     <Content Include="donor\search.aspx" />
     <Content Include="donor\main.aspx" />
@@ -241,6 +242,13 @@
       <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Content Include="App_Code\donor.vb" />
+    <Compile Include="ajaxAction\userAction.aspx.designer.vb">
+      <DependentUpon>userAction.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ajaxAction\userAction.aspx.vb">
+      <DependentUpon>userAction.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
     <Compile Include="Default.aspx.designer.vb">
       <DependentUpon>Default.aspx</DependentUpon>
     </Compile>

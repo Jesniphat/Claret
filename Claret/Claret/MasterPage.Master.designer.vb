@@ -41,6 +41,24 @@ Partial Public Class MasterPage
     Protected WithEvents data As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
+    '''spUserName control.
+    '''</summary>
+    '''<remarks>
+    '''Auto-generated field.
+    '''To modify move field declaration from designer file to code-behind file.
+    '''</remarks>
+    Protected WithEvents spUserName As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
+    '''spCollectionPoint control.
+    '''</summary>
+    '''<remarks>
+    '''Auto-generated field.
+    '''To modify move field declaration from designer file to code-behind file.
+    '''</remarks>
+    Protected WithEvents spCollectionPoint As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
     '''cphMaster control.
     '''</summary>
     '''<remarks>

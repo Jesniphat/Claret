@@ -69,6 +69,24 @@ Auto-generated field.
 To modify move field declaration from designer file to code-behind file.
 </remarks>
 </member>
+<member name="F:Claret.MasterPage._spUserName">
+<summary>
+spUserName control.
+</summary>
+<remarks>
+Auto-generated field.
+To modify move field declaration from designer file to code-behind file.
+</remarks>
+</member>
+<member name="F:Claret.MasterPage._spCollectionPoint">
+<summary>
+spCollectionPoint control.
+</summary>
+<remarks>
+Auto-generated field.
+To modify move field declaration from designer file to code-behind file.
+</remarks>
+</member>
 <member name="F:Claret.MasterPage._cphMaster">
 <summary>
 cphMaster control.

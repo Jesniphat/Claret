@@ -129,13 +129,15 @@
             cursor: not-allowed;
             opacity: 0.5;
         }
-        table > thead > tr > th > button {
+        table.table > thead > tr > th > button {
+            font-family: THSarabunNew;
+            font-size:20px;
             height: 25px; 
             vertical-align: sub; 
             border: 0; 
             background-color: transparent;
         }
-        table > thead > tr > th > button > i {
+        table.table > thead > tr > th > button > i {
             vertical-align: middle;
             padding-left: 5px;
             font-size: 15px;
@@ -233,9 +235,7 @@
             $(xobj).addClass("selected");
             if (postAction) {
                 $("#data").H2GAttr("lmenu", $(xobj).H2GAttr("id"));
-                //$('#frmMaster').append(H2G.postedData($("#data"))).H2GAttr("action", $(xobj).H2GAttr("targetUrl")).H2GAttr("method", "post").submit();
                 $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: $(xobj).H2GAttr("targetUrl"), method: "post" }).submit();
-                //if ($("#data").attr("lmenu") != $(xobj).attr("id")) {
                 //}
             }
         }
@@ -329,9 +329,11 @@
                 </div>
                 <div class="col-md-24">
                     <div class="row">
-                        <div class="col-md-30 text-right" style="padding-top: 10px;">
-                            <span>ชื่อผู้ใช้งาน : Sittichai Habya(Nippon Sysit)</span>
-                            <img src="../image/icon/user-32x32.png" style="margin-top: -5px;" />
+                        <div class="col-md-30 text-right">
+                            <img src="../image/icon/user-32x32.png" style="margin-top: 5px;" />
+                            <span id="spUserName" runat="server" style="vertical-align: bottom;">ชื่อผู้ใช้งาน : Sittichai Habya(Nippon Sysit)</span>
+                            <span style="border-left: solid 1px black; padding: 0; vertical-align: text-top;">&nbsp;</span>
+                            <span id="spCollectionPoint" runat="server" style="vertical-align: bottom;"></span>
                         </div>
                         <div class="col-md-6 text-right" style="margin-top: 5px;padding-right: 8px;">
                             <span style="border-left: solid 1px black; padding: 0;">&nbsp;</span>

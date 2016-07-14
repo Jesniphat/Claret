@@ -9,10 +9,10 @@
     <script>
         $(function () {
             $("#txtCardNumber").enterKey(function () { $(this).addExtCard(); }).focus();
-            $("#txtDonorName").H2GThaibox();
-            $("#txtDonorSurName").H2GThaibox();
-            $("#txtDonorNameEng").H2GEnglishbox();
-            $("#txtDonorSurNameEng").H2GEnglishbox();
+            $("#txtDonorName").H2GNamebox();
+            $("#txtDonorSurName").H2GNamebox();
+            $("#txtDonorNameEng").H2GNamebox();
+            $("#txtDonorSurNameEng").H2GNamebox();
             $("#ddlDefferal").setDropdowList().on('change', function () {
                 if ($(this).H2GValue() == 'ACTIVE') { $("#tbDefferal > thead > tr[status=INACTIVE]").hide(); } else { $("#tbDefferal > thead > tr[status=INACTIVE]").show(); }
             });
@@ -63,18 +63,11 @@
                     $("#spAddDonateRecord").focus();
                 },
                 onClose: function () {
-                    var pattern = 'dd/MM/yyyy';
-                    if ($(this).H2GValue() != '') {
-                        $(this).H2GValue($(this).H2GValue().replace(/\W+/g, ''));
-                        $(this).next().remove();
-                        if (isDate($(this).H2GValue(), pattern.replace(/\W+/g, ''))) {
-                            var isValue = new Date(getDateFromFormat($(this).H2GValue(), pattern.replace(/\W+/g, '')));
-                            $(this).H2GValue(formatDate(isValue, pattern)).H2GAttr('donatedatetext', formatDate(isValue, "dd NNN yyyy"));
-                        }
-                    } else {
-                        $(this).H2GAttr('donatedatetext', '');
-                    }
-                }
+                    enterDatePicker($("#txtLastDonateDate"), "close");
+                },
+                onEnterKey: function () {
+                    enterDatePicker($("#txtLastDonateDate"), "enter");
+                },
             });
             $("#txtCommentDateForm").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy"));
             $("#txtCommentDateTo").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
@@ -208,10 +201,23 @@
                                         $.each((e.DonationRewardList), function (indexr, er) {
                                             var rowReward = $("#donateRewardTemp").clone();
                                             $(rowReward).find(".lbl-check-reward").append(er.Description).H2GAttr('rewardID', er.ID);
-                                            $(rowReward).find(".txt-reward-date").setCalendar({
+                                            $(rowReward).find(".lbl-check-reward input").on("change", function () { $(this).checkedReward() });
+                                            $(rowReward).find(".txt-reward-date").H2GFill({ rewardID: er.ID }).setCalendar({
                                                 maxDate: new Date(),
                                                 minDate: "-20y",
                                                 yearRange: "c-20:c+0",
+                                                onSelect: function (selectedDate, objDate) {
+                                                    if (selectedDate != '') {
+                                                        $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
+                                                    }
+                                                },
+                                                onClose: function () {
+                                                    if ($(this).H2GValue() == '') {
+                                                        $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", false);
+                                                    } else {
+                                                        $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
+                                                    }
+                                                },
                                             }).H2GDatebox();
                                             $(rowRecord).append($(rowReward).children());
                                         });
@@ -243,17 +249,27 @@
                         notiWarning(warning);
                     }
                 },
-                checkedReward: function (args) {
+                deleteDonateRecord: function (args) {
                     if ($(this).closest("div.row").H2GAttr("refID") == "NEW") {
                         $(this).closest("div.row").remove();
                     } else {
                         $(this).closest("div.row").hide().H2GAttr("refID", "D#" + $(this).closest("div.row").H2GAttr("refID"));
                     }
                 },
+                checkedReward: function (args) {
+                    if ($(this).is(":checked")) {
+                        if ($(this).closest("div.row").find("input.txt-reward-date[rewardID='" + $(this).closest("label").H2GAttr("rewardID") + "']").H2GValue() == "") {
+                            $(this).closest("div.row").find("input.txt-reward-date[rewardID='" + $(this).closest("label").H2GAttr("rewardID") + "']").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy"));
+                        }
+                    } else {
+                        $(this).closest("div.row").find("input.txt-reward-date[rewardID='" + $(this).closest("label").H2GAttr("rewardID") + "']").H2GValue("");
+                    }
+                },
             });
 
             $("#labPaneTab").click(setHistoricalFileDatas);
             $("#exams-tab").click(setExamsDatas);
+            $("#immunohaemtology-tab").click(setImmunohaemtologyFile);
             
             //### extend
         });
@@ -375,7 +391,6 @@
                 };
                 var DonorExtCard = [];
                 var create = 0;
-                console.log($('#divCardNumber .row'));
                 $('#divCardNumber .row').each(function (i, e) {
                     DonorExtCard[create] = {
                         ID: $(e).H2GAttr('refID'),
@@ -423,12 +438,12 @@
                     success: function (data) {
                         data.getItems = jQuery.parseJSON(data.getItems);
                         if (!data.onError) {
-                            console.log(data.getItems);
                             $("#data").H2GAttr("donorID", data.getItems.ID);
                             $("#spRegisNumber").H2GAttr("visitID", data.getItems.VisitID)
                             notiSuccess("บันทึกสำเร็จ");
                             showDonorData();                            
                         } else { notiError("บันทึกไม่สำเร็จ"); }
+                        $("#btnSave").prop("disabled", false);
                     }
                 });    //End ajax
             } else {
@@ -437,10 +452,12 @@
         }
         function getReward(xobj) {
             var reward = '';
-            if ($(xobj).find(".lbl-check-reward").H2GAttr("rewardID") != undefined) {
-                reward = "ID:" + $(xobj).find(".lbl-check-reward").H2GAttr("rewardID");
-                reward = reward + "|DATE:" + $(xobj).find(".txt-reward-date").H2GValue();
-            }
+            // reward_id|reward_date##
+            $(xobj).find(".txt-reward-date[DonateRewardID='NEW']").each(function (i, e) {
+                if ($(e).H2GValue() != "") {
+                    reward = $(e).H2GAttr("rewardID") + "|" + $(e).H2GValue() + "##";
+                }
+            });
             console.log(reward);
             return reward;
         }
@@ -637,24 +654,37 @@
                                         var rewardInfo = e.split("|");
                                         // reward_id|reward_desc|donation_reward_id|reward_date
                                         var rowReward = $("#donateRewardTemp").clone();
-                                        $(rowReward).find(".lbl-check-reward").append(rewardInfo[1]).H2GFill({ rewardID: rewardInfo[0], DonateRewardID: rewardInfo[2] }).find("input").prop("disabled", (rewardInfo[2] == "" ? "N" : "Y").toBoolean());
+                                        $(rowReward).find(".lbl-check-reward").append(rewardInfo[1]).H2GFill({ rewardID: rewardInfo[0], DonateRewardID: rewardInfo[2] }).find("input").prop("checked", (rewardInfo[2] == "" ? "N" : "Y").toBoolean());
+                                        $(rowReward).find(".txt-reward-date").H2GFill({ rewardID: rewardInfo[0] }).H2GValue(rewardInfo[3]);
+
                                         if (rewardInfo[2] != "") {
                                             $(rowReward).find(".lbl-check-reward input").prop("disabled", true);
                                             $(rowReward).find(".txt-reward-date").prop("disabled", true);
                                         } else {
+                                            $(rowReward).find(".lbl-check-reward input").on("change", function () { $(this).checkedReward() });
                                             $(rowReward).find(".txt-reward-date").setCalendar({
                                                 maxDate: new Date(),
                                                 minDate: "-20y",
                                                 yearRange: "c-20:c+0",
+                                                onSelect: function (selectedDate, objDate) {
+                                                    if (selectedDate != '') {
+                                                        $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
+                                                    }
+                                                },
+                                                onClose: function () {
+                                                    if ($(this).H2GValue() == '') {
+                                                        $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", false);
+                                                    } else {
+                                                        $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
+                                                    }
+                                                },
                                             }).H2GDatebox().H2GValue(rewardInfo[3]);
                                         }
                                         $(spRecord).append($(rowReward).children());
                                     }
                                 });
                             }
-
                             $('#divDonateRecord').prepend(spRecord).H2GAttr("lastrecord", e.DonateNumber);
-
                         });
 
                         if (!(data.getItems.Donor.DuplicateTransaction == "0")){
@@ -710,6 +740,61 @@
             });
         }
 
+        function setImmunohaemtologyFile() {
+            console.log("setImmunohaemtologyFile");
+            $.ajax({
+                url: '../../ajaxAction/donorAction.aspx',
+                data: H2G.ajaxData({ action: 'immunohaemtologyDataSet1', donn_numero: $("#spRegisNumber").H2GValue() }).config,
+                type: "POST",
+                dataType: "json",
+                error: function (xhr, s, err) {
+                    console.log(s, err);
+                },
+                success: function (data) {
+                    data.getItems = jQuery.parseJSON(data.getItems);
+                    // console.log("Respondata exams = ", data.getItems);
+                    if (!data.onError) {
+                        var data = data.getItems;
+                        if (data.length > 0) {
+                            for (var i = 0; i < data.length; i++){
+                                data[i].Rsx_Lib = data[i].Rsx_Lib.replace(" ", "_");
+                                data[i].Rsx_Cd = data[i].Rsx_Cd.substring(0, 2);
+                                
+                                $("#" + data[i].Rsx_Lib + "_" + data[i].Rsx_Cd).val(data[i].Dex_Res);
+                            }
+                        }
+                       // console.log(data);
+                    }
+                }
+            });
+
+
+            $.ajax({
+                url: '../../ajaxAction/donorAction.aspx',
+                data: H2G.ajaxData({ action: 'immunohaemtologyDataSet2', donn_numero: $("#spRegisNumber").H2GValue() }).config,
+                type: "POST",
+                dataType: "json",
+                error: function (xhr, s, err) {
+                    console.log(s, err);
+                },
+                success: function (data) {
+                    data.getItems = jQuery.parseJSON(data.getItems);
+                    // console.log("Respondata exams = ", data.getItems);
+                    if (!data.onError) {
+                        var dataz = data.getItems;
+                        if (dataz.length > 0) {
+                            for (var i = 0; i < dataz.length; i++) {
+                                dataz[i].Rsx_Lib = dataz[i].Rsx_Lib.replace(" ", "_");
+
+                                $("#" + dataz[i].Rsx_Lib + "_NO").val(dataz[i].Rsx_Type);
+                                $("#" + dataz[i].Rsx_Lib + "_RESULT").val(dataz[i].Result_Decode);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         function setExamsDatas() {
             console.log("setExamsDatas");
             $("tr").remove(".exams-tab-table-row");
@@ -725,28 +810,47 @@
                 },
                 success: function (data) {
                     data.getItems = jQuery.parseJSON(data.getItems);
-                     console.log("Respondata exams = ", data.getItems);
+                    // console.log("Respondata exams = ", data.getItems);
                     if (!data.onError) {
                         datas = data.getItems;
                         for (var i = 0; i < datas.length; i++) {
                             var rows = "<tr class='exams-tab-table-row'>" +
-                                            "<td><input type='text' class='text-left' readonly value='" + datas[i].DonnIncr + "' /></td>" +
-                                            "<td><input type='text' class='text-center' readonly value='" + datas[i].LabDate + "' /></td>" +
-                                            "<td><input type='text' class='text-center' readonly value='" + datas[i].PrelNo + "' /></td>" +
-                                            "<td><input type='text' class='text-center' readonly value='" + datas[i].PcatdLib + "' /></td>" +
-                                            "<td><input type='text' class='text-left' readonly value='" + datas[i].PexLibAff + "' /></td>" +
-                                            "<td><input type='text' class='text-left' readonly value='" + datas[i].PresAff + "' /></td>" +
-                                            "<td><input type='text' class='text-left' readonly value='" + datas[i].ExecutingLab + "' /></td>" +
-                                            "<td><input type='text' class='text-left' readonly value='" + datas[i].TestBy1 + "' /></td>" +
-                                            "<td><input type='text' class='text-left' readonly value='" + datas[i].TestBy2 + "' /></td>" +
-                                            "<td><input type='text' class='text-left' readonly value='" + datas[i].TestBy3 + "' /></td>" +
+                                            "<td class='text-right td-number-excel'>" + datas[i].DonnIncr + "</td>" +
+                                            "<td class='text-center td-date-excel'>" + datas[i].LabDate + "</td>" +
+                                            "<td class='text-center td-text-excel'>" + datas[i].PrelNo + "</td>" +
+                                            "<td class='text-center td-text-excel'>" + datas[i].PcatdLib + "</td>" +
+                                            "<td class='text-left td-text-excel'>" + datas[i].PexLibAff + "</td>" +
+                                            "<td class='text-left td-text-excel'>" + datas[i].PresAff + "</td>" +
+                                            "<td class='text-left td-text-excel'>" + datas[i].ExecutingLab + "</td>" +
+                                            "<td class='text-left td-text-excel'>" + datas[i].TestBy1 + "</td>" +
+                                            "<td class='text-left td-text-excel'>" + datas[i].TestBy2 + "</td>" +
+                                            "<td class='text-left td-text-excel'>" + datas[i].TestBy3 + "</td>" +
                                        "</tr>";
                             $('#exams-tab-table > tbody').append(rows);
                         }
-                        $("#exams-tab-table").tablesorter();
+                        $("#exams-tab-table").tablesorter({ dateFormat: "uk" });
                     }
                 }
             });
+        }
+        function enterDatePicker(dateControl, action) {
+            var pattern = 'dd/MM/yyyy';
+            if ($(dateControl).H2GValue() != '') {
+                $(dateControl).H2GValue($(dateControl).H2GValue().replace(/\W+/g, ''));
+                $(dateControl).next().remove();
+                if (isDate($(dateControl).H2GValue(), pattern.replace(/\W+/g, ''))) {
+                    var isValue = new Date(getDateFromFormat($(dateControl).H2GValue(), pattern.replace(/\W+/g, '')));
+                    $(dateControl).H2GValue(formatDate(isValue, pattern)).H2GAttr('donatedatetext', formatDate(isValue, "dd NNN yyyy"));
+                    if (action == "enter") {
+                        $(dateControl).addDonateRecord();
+                    }
+                } else {
+                    notiWarning("วันที่ไม่ถูกต้อง กรุณาตรวจสอบ");
+                    $(dateControl).focus();
+                }
+            } else {
+                $(dateControl).H2GAttr('donatedatetext', '');
+            }
         }
     </script>
 </asp:Content>
@@ -779,8 +883,9 @@
                 <input id="txtCardNumber" type="text" class="form-control" tabindex="1" />
             </div>
             <div class="col-md-2">
-                <%--<a class="icon"><span id="spInsertExtCard" class="glyphicon glyphicon-circle-arrow-right" aria-hidden="true" style="vertical-align: sub;"></span></a>--%>
-                <button id="spInsertExtCard" onclick="return false;" tabindex="1"><i class="glyphicon glyphicon-circle-arrow-right"></i></button>
+                <button id="spInsertExtCard" class="btn btn-icon" onclick="return false;" tabindex="1">
+                    <i class="glyphicon glyphicon-circle-arrow-right"></i>
+                </button>
             </div>
             <div class="col-md-19">
                 <div id="divCardNumber" min-height="30" style="overflow: hidden;">
@@ -1177,9 +1282,9 @@
                                                             <input id="txtLastDonateDate" type="text" class="form-control text-center" tabindex="3" />
                                                         </div>
                                                         <div class="col-md-2 text-center">
-                                                            <a class="icon">
-                                                                <span id="spAddDonateRecord" class="glyphicon glyphicon-circle-arrow-down" aria-hidden="true" style="vertical-align: sub;"></span>
-                                                            </a>
+                                                            <button id="spAddDonateRecord" class="btn btn-icon" onclick="return false;" tabindex="3">
+                                                                <i class="glyphicon glyphicon-circle-arrow-down" style="vertical-align: text-top;"></i>
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1221,7 +1326,7 @@
                                                                 </div>
                                                                 <div class="col-md-2"><span>เมื่อ</span></div>
                                                                 <div class="col-md-12" style="padding-left: 8px; padding-right: 14px;">
-                                                                    <input type="text" class="txt-reward-date form-control text-center" tabindex="3" />
+                                                                    <input type="text" class="txt-reward-date form-control text-center" tabindex="3" DonateRewardID="NEW" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1242,7 +1347,7 @@
                     <div id="labTab">
                         <ul>
                             <li><a href="#historicalFile" style="">Historical File</a></li>
-                            <li><a href="#immunohaemtologyFile" style="">Immunohaemtology File</a></li>
+                            <li><a href="#immunohaemtologyFile" id="immunohaemtology-tab" style="">Immunohaemtology File</a></li>
                             <li><a href="#exams" id="exams-tab" style="">Exams</a></li>
                         </ul>
                         <div id="historicalFile">
@@ -1275,7 +1380,7 @@
                                     <p><label>&nbsp;&nbsp; Doner No.</label> <label id="doner-label-no">123456789</label> <label id="doner-label-name">test</label></p>
                                     <table class="col-md-36" id="label-set-1">
                                         <tr>
-                                            <td class="col-md-5" style="padding-left: 27px">Exams</td>
+                                            <td class="col-md-5" style="padding-left: 1px">Exams</td>
                                             <td class="col-md-9" style="padding-left: 27px">Result</td>
                                             <td class="col-md-3" style="padding-left: 27px">No.</td>
                                             <td class="col-md-9" style="padding-left: 27px">Date of first det.</td>
@@ -1283,24 +1388,24 @@
                                         </tr>
                                         <tr>
                                             <td class="col-md-5">ABOD</td>
-                                            <td class="col-md-9"><input type="text" class="col-md-32 long-label1" id="abod-result" value="" /></td>
-                                            <td class="col-md-3"><input type="text" class="col-md-32 long-label3" id="abod-no" value="" /></td>
-                                            <td class="col-md-9"><input type="text" class="col-md-32 long-label1" id="abod-first-date" value="" /></td>
-                                            <td class="col-md-9"><input type="text" class="col-md-32 long-label1" id="abod-last-date" value="" /></td>
+                                            <td class="col-md-9"><input type="text" class="col-md-32 long-label1" id="ABOD_RESULT" value="" /></td>
+                                            <td class="col-md-3"><input type="text" class="col-md-32 long-label3" id="ABOD_NO" value="" /></td>
+                                            <td class="col-md-9"><input type="text" class="col-md-32 long-label1" id="ABOD_FIRST_DATE" value="" /></td>
+                                            <td class="col-md-9"><input type="text" class="col-md-32 long-label1" id="ABOD_LAST_DATE" value="" /></td>
                                         </tr>
                                         <tr>
                                             <td class="col-md-5">Ext Pheno</td>
-                                            <td class="col-md-9"><input type="text" class="col-md-32 long-label1" id="ext-pheno-result" value="" /></td>
-                                            <td class="col-md-3"><input type="text" class="col-md-32 long-label3" id="ext-pheno-no" value="" /></td>
-                                            <td class="col-md-9"><input type="text" class="col-md-32 long-label1" id="ext-pheno-first-date" value="" /></td>
-                                            <td class="col-md-9"><input type="text" class="col-md-32 long-label1" id="ext-pheno-last-date" value="" /></td>
+                                            <td class="col-md-9"><input type="text" class="col-md-32 long-label1" id="Ext_Pheno_RESULT" value="" /></td>
+                                            <td class="col-md-3"><input type="text" class="col-md-32 long-label3" id="Ext_Pheno_NO" value="" /></td>
+                                            <td class="col-md-9"><input type="text" class="col-md-32 long-label1" id="Ext_Pheno_FIRST_DATE" value="" /></td>
+                                            <td class="col-md-9"><input type="text" class="col-md-32 long-label1" id="Ext_Pheno_LAST_DATE" value="" /></td>
                                         </tr>
                                         <tr>
                                             <td class="col-md-5">Ab Screen</td>
-                                            <td class="col-md-9"><input type="text" class="col-md-32 long-label1" id="ab-screen-result" value="" /></td>
-                                            <td class="col-md-3"><input type="text" class="col-md-32 long-label3" id="ab-screen-no" value="" /></td>
-                                            <td class="col-md-9"><input type="text" class="col-md-32 long-label1" id="ab-screen-first-date" value="" /></td>
-                                            <td class="col-md-9"><input type="text" class="col-md-32 long-label1" id="ab-screen-last-date" value="" /></td>
+                                            <td class="col-md-9"><input type="text" class="col-md-32 long-label1" id="Ab_Screen_DA" value="" /></td>
+                                            <td class="col-md-3"><input type="text" class="col-md-32 long-label3" id="Ab_Screen_NO" value="" /></td>
+                                            <td class="col-md-9"><input type="text" class="col-md-32 long-label1" id="Ab_Screen_FIRST_DATE" value="" /></td>
+                                            <td class="col-md-9"><input type="text" class="col-md-32 long-label1" id="Ab_Screen_LAST_DATE" value="" /></td>
                                         </tr>
                                     </table>
                                     <br />
@@ -1423,12 +1528,12 @@
                                     <label class="set-label">&nbsp;&nbsp;HLA</label>
                                     <table class="col-md-36" id="label-set-4">
                                         <tr>
-                                            <td class="col-md-4"><label class="set-label" for="HLA-Ax">HLA-Ax</label><input type="text" class="col-md-35 long-label2" id="HLA-Ax" value="" /></td>
-                                            <td class="col-md-4"><label class="set-label" for="HLA-Ay">HLA-Ay</label><input type="text" class="col-md-35 long-label2" id="HLA-Ay" value="" /></td>
-                                            <td class="col-md-4"><label class="set-label" for="HLA-Bx">HLA-Bx</label><input type="text" class="col-md-35 long-label2" id="HLA-Bx" value="" /></td>
-                                            <td class="col-md-4"><label class="set-label" for="HLA-By">HLA-By</label><input type="text" class="col-md-35 long-label2" id="HLA-By" value="" /></td>
-                                            <td class="col-md-4"><label class="set-label" for="HLA-DRB1x">HLA-DRB1x</label><input type="text" class="col-md-35 long-label2" id="HLA-DRB1x" value="" /></td>
-                                            <td class="col-md-4"><label class="set-label" for="HLA-DRB1y">HLA-DRB1y</label><input type="text" class="col-md-35 long-label2" id="HLA-DRB1y" value="" /></td>
+                                            <td class="col-md-4"><label class="set-label" for="HLA-Ax_RESULT">HLA-Ax</label><input type="text" class="col-md-35 long-label2" id="HLA-Ax_RESULT" value="" /></td>
+                                            <td class="col-md-4"><label class="set-label" for="HLA-Ay_RESULT">HLA-Ay</label><input type="text" class="col-md-35 long-label2" id="HLA-Ay_RESULT" value="" /></td>
+                                            <td class="col-md-4"><label class="set-label" for="HLA-Bx_RESULT">HLA-Bx</label><input type="text" class="col-md-35 long-label2" id="HLA-Bx_RESULT" value="" /></td>
+                                            <td class="col-md-4"><label class="set-label" for="HLA-By_RESULT">HLA-By</label><input type="text" class="col-md-35 long-label2" id="HLA-By_RESULT" value="" /></td>
+                                            <td class="col-md-4"><label class="set-label" for="HLA-DRB1x_RESULT">HLA-DRB1x</label><input type="text" class="col-md-35 long-label2" id="HLA-DRB1x_RESULT" value="" /></td>
+                                            <td class="col-md-4"><label class="set-label" for="HLA-DRB1y_RESULT">HLA-DRB1y</label><input type="text" class="col-md-35 long-label2" id="HLA-DRB1y_RESULT" value="" /></td>
                                             <td class="col-md-4"><label class="set-label" for="xx">&nbsp;</label><input type="text" class="col-md-35 long-label2" id="xx" value="" /></td>
                                             <td class="col-md-4"><label class="set-label" for="xyx">&nbsp;</label><input type="text" class="col-md-35 long-label2" id="xyx" value="" /></td>
                                         </tr>
@@ -1496,9 +1601,9 @@
                     <input id="txtDonorComment" type="text" class="form-control"  tabindex="4" />
                 </div>
                 <div class="col-md-1 text-center">
-                    <a class="icon">
-                        <span id="spAddComment" class="glyphicon glyphicon-circle-arrow-down" aria-hidden="true" style="vertical-align: sub;"></span>
-                    </a>
+                    <button id="spAddComment" class="btn btn-icon" onclick="return false;" tabindex="4">
+                        <i class="glyphicon glyphicon-circle-arrow-down"></i>
+                    </button>
                 </div>
             </div>
             <div class="row">

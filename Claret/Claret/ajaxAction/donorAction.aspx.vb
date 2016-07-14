@@ -83,13 +83,45 @@ Public Class donorAction
                                         values(:id, :donor_id, sysdate, :create_staff, :donation_from, :donation_date, :donation_number)", paramDRecord)
 
                             '### check insert donation reward
-                            If True Then
+                            If Not String.IsNullOrEmpty(item.DonateReward) Then
+                                For Each strReward As String In item.DonateReward.Split("##")
+                                    If Not String.IsNullOrEmpty(strReward) Then
+                                        Dim paramDReward As New SQLCollection
 
+                                        paramDReward.Add(":id", DbType.Int64, Cbase.QueryField(H2G.nextVal("DONATION_REWARD")))
+                                        paramDReward.Add(":create_staff", DbType.Int64, H2G.Login.ID)
+                                        paramDReward.Add(":donor_id", DbType.Int64, DonorItem.ID)
+                                        paramDReward.Add(":donation_record_id", DbType.Int64, item.ID)
+                                        paramDReward.Add(":reward_id", DbType.Int64, strReward.Split("|")(0))
+                                        paramDReward.Add(":reward_date", DbType.Date, H2G.BE2AC(H2G.Convert(Of DateTime)(strReward.Split("|")(1).Replace("/", "-"))).ToString("dd-MM-yyyy"))
+                                        Cbase.Execute("insert into donation_record (id, create_date, create_staff, donor_id, donation_record_id, reward_id, reward_date) 
+                                        values(:id, sysdate, :create_staff, :donor_id, :donation_record_id, :reward_id, :reward_date)", paramDReward)
+
+                                    End If
+                                Next
                             End If
                         ElseIf (item.ID.Contains("D#")) Then
 
                         Else
 
+                            '### check insert donation reward
+                            If Not String.IsNullOrEmpty(item.DonateReward) Then
+                                For Each strReward As String In item.DonateReward.Split("##")
+                                    If Not String.IsNullOrEmpty(strReward) Then
+                                        Dim paramDReward As New SQLCollection
+
+                                        paramDReward.Add(":id", DbType.Int64, Cbase.QueryField(H2G.nextVal("DONATION_REWARD")))
+                                        paramDReward.Add(":create_staff", DbType.Int64, H2G.Login.ID)
+                                        paramDReward.Add(":donor_id", DbType.Int64, DonorItem.ID)
+                                        paramDReward.Add(":donation_record_id", DbType.Int64, item.ID)
+                                        paramDReward.Add(":reward_id", DbType.Int64, strReward.Split("|")(0))
+                                        paramDReward.Add(":reward_date", DbType.Date, H2G.BE2AC(H2G.Convert(Of DateTime)(strReward.Split("|")(1).Replace("/", "-"))).ToString("dd-MM-yyyy"))
+                                        Cbase.Execute("insert into donation_reward (id, create_date, create_staff, donor_id, donation_record_id, reward_id, reward_date) 
+                                        values(:id, sysdate, :create_staff, :donor_id, :donation_record_id, :reward_id, :reward_date)", paramDReward)
+
+                                    End If
+                                Next
+                            End If
                         End If
                     Next
 
@@ -107,8 +139,9 @@ Public Class donorAction
                     For Each dRow As DataRow In Cbase.QueryTable(sqlMain, param).Rows
                         DonorMainItem.Donor = DTransaction.WithItems(New DTransaction, dRow)
                     Next
+                    DonorMainItem.Donor.DuplicateTransaction = 0
                     If String.IsNullOrEmpty(_REQUEST("visit_id")) Then
-                        DonorMainItem.Donor.DuplicateTransaction = Cbase.QueryField("select nvl(count(id),0) from donation_visit where donor_id = '" & _REQUEST("id") & "' and to_char(create_date,'yyyyMMdd') = to_char(sysdate,'yyyyMMdd') ")
+                        DonorMainItem.Donor.DuplicateTransaction = Cbase.QueryField("select nvl(count(id),0) from donation_visit where donor_id = '" & _REQUEST("id") & "' and to_char(create_date,'yyyyMMdd') = to_char(sysdate,'yyyyMMdd') ", "0")
                     End If
 
                     '### DonorItem
@@ -174,7 +207,7 @@ Public Class donorAction
                         For Each dReward As DataRow In Cbase.QueryTable("select RE.id as reward_id, RE.DESCRIPTION as reward_desc, dr.id as donation_reward_id
                             , to_char(dr.reward_date, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as reward_date  
                             from REWARD re 
-                            left join DONATION_REWARD dr on DR.REWARD_ID = RE.id
+                            left join DONATION_REWARD dr on DR.REWARD_ID = RE.id and dr.donor_id = '" & DonorMainItem.Donor.DonorID & "'
                             where RE.DONATION_NUMBER = '" & drItem.DonateNumber & "' 
                             or (to_date('" & CDate(dRow("DONATION_DATE").ToString).ToString("dd/MM/yyyy") & "','dd/MM/yyyy') between RE.START_DATE and re.END_DATE)
                             order by re.id, RE.DONATION_NUMBER desc").Rows
@@ -361,6 +394,48 @@ Public Class donorAction
                     JSONResponse.setItems(JSON.Serialize(Of List(Of HistoricalFlie))(HistoricalFlieList))
                     'Response.Write(JSONResponse.ToJSON())
 
+                Case "immunohaemtologyDataSet1"
+                    Dim donn_numero As String = _REQUEST("donn_numero")
+                    Dim sql As String = "select pparecr.rsx_lib,a.dex_res,pparecr.rsx_cd 
+                                        from pparecr left join 
+                                        (select * from dossex where dossex.donn_numero = '1004230339' ) a on  a.dex_exam = pparecr.rsx_cd 
+                                        where  ((pparecr.ppe_site = '9999') 
+                                        and (pparecr.ppe_masque = 'DOSSIH')) and pparecr.ppe_type = 0
+                                        order by pparecr.ppe_champ"
+                    Dim dt As DataTable = Hbase.QueryTable(sql)
+                    Dim ImmunohaemtologyDataSet1List As New List(Of ImmunohaemtologyDataSet1)
+                    For Each dr As DataRow In dt.Rows
+                        Dim Item As New ImmunohaemtologyDataSet1
+                        Item.Rsx_Lib = dr("RSX_LIB").ToString
+                        Item.Dex_Res = dr("DEX_RES").ToString
+                        Item.Rsx_Cd = dr("RSX_CD").ToString
+
+                        ImmunohaemtologyDataSet1List.Add(Item)
+                    Next
+                    JSONResponse.setItems(JSON.Serialize(Of List(Of ImmunohaemtologyDataSet1))(ImmunohaemtologyDataSet1List))
+                    'Response.Write(JSONResponse.ToJSON())
+
+                Case "immunohaemtologyDataSet2"
+                    Dim donn_numero As String = _REQUEST("donn_numero")
+                    Dim sql As String = "select  pparecr.rsx_lib,presumex.rsx_type,
+                                        replace(rsx_liste,chr(0),'') result_decode
+                                        from pparecr inner join presumex on pparecr.rsx_cd = presumex.rsx_cd 
+                                        where ((pparecr.ppe_site = '9999') and 
+                                        (pparecr.ppe_masque = 'DOSSIH')) and pparecr.ppe_type = 1 
+                                        order by pparecr.ppe_champ"
+                    Dim dt As DataTable = Hbase.QueryTable(sql)
+                    Dim ImmunohaemtologyDataSet2List As New List(Of ImmunohaemtologyDataSet2)
+                    For Each dr As DataRow In dt.Rows
+                        Dim Item As New ImmunohaemtologyDataSet2
+                        Item.Rsx_Lib = dr("RSX_LIB").ToString
+                        Item.Rsx_Type = dr("RSX_TYPE").ToString
+                        Item.Result_Decode = dr("RESULT_DECODE").ToString
+
+                        ImmunohaemtologyDataSet2List.Add(Item)
+                    Next
+                    JSONResponse.setItems(JSON.Serialize(Of List(Of ImmunohaemtologyDataSet2))(ImmunohaemtologyDataSet2List))
+                    'Response.Write(JSONResponse.ToJSON())
+
                 Case "examsData"
                     Dim donn_numero As String = _REQUEST("donn_numero")
                     Dim sql As String = "select donexam.donn_incr,to_char(donexam.prelx_date, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') lab_date,
@@ -394,6 +469,101 @@ Public Class donorAction
                     Next
                     JSONResponse.setItems(JSON.Serialize(Of List(Of ExamsData))(ExamsDataList))
                     'Response.Write(JSONResponse.ToJSON())
+
+                Case "donorpostqueue"
+                    Dim PostQueueItem As New PostQueueSearchItem
+                    PostQueueItem.GoNext = "N"
+                    PostQueueItem.PostQueueList = New List(Of PostQueueItem)
+                    Dim Item As PostQueueItem
+                    Dim intItemPerPage As Integer = 5
+                    Dim intTotalPage As Integer = 1
+
+                    If Not String.IsNullOrEmpty(_REQUEST("queuenumber")) Then
+                        param.Add("#QUEUE_NUMBER", " and to_char(dv.queue_number) like '" & _REQUEST("queuenumber") & "' ")
+                        If Not _REQUEST("queuenumber").ToString.Contains("%") Then
+                            PostQueueItem.GoNext = "Y"
+                        End If
+                    End If
+                    If Not String.IsNullOrEmpty(_REQUEST("donornumber")) Then
+                        param.Add("#DONOR_NUMBER", " and UPPER(dn.donor_number) like UPPER('" & _REQUEST("donornumber") & "') ")
+                        If Not _REQUEST("donornumber").ToString.Contains("%") Then
+                            PostQueueItem.GoNext = "Y"
+                        End If
+                    End If
+                    If Not String.IsNullOrEmpty(_REQUEST("nationnumber")) Then
+                        param.Add("#NATION_NUMBER", " and UPPER(dexc.card_number) like UPPER('" & _REQUEST("nationnumber") & "') ")
+                        If Not _REQUEST("nationnumber").ToString.Contains("%") Then
+                            PostQueueItem.GoNext = "Y"
+                        End If
+                    End If
+                    If Not String.IsNullOrEmpty(_REQUEST("name")) Then param.Add("#NAME", " and (UPPER(dn.name) like UPPER('" & _REQUEST("name") & "') or UPPER(dn.name_e) like UPPER('" & _REQUEST("name") & "')) ")
+                    If Not String.IsNullOrEmpty(_REQUEST("surname")) Then param.Add("#SURNAME", " and (UPPER(dn.surname) like UPPER('" & _REQUEST("surname") & "') or UPPER(dn.surname_e) like UPPER('" & _REQUEST("surname") & "')) ")
+                    If Not String.IsNullOrEmpty(_REQUEST("birthday")) Then param.Add("#BIRTHDAY", "and to_char(dn.birthday, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("birthday") & "' ")
+                    If Not String.IsNullOrEmpty(_REQUEST("bloodgroup")) Then param.Add("#BLOOD_GROUP", " and UPPER(rg.description) like UPPER('" & _REQUEST("bloodgroup") & "') ")
+                    If Not String.IsNullOrEmpty(_REQUEST("samplenumber")) Then param.Add("#BLOOD_GROUP", " and UPPER(rg.description) like UPPER('" & _REQUEST("bloodgroup") & "') ")
+
+                    Dim sqlRecord As String = "SELECT DN.rn as row_num, dn.id, dn.donor_number, dn.ext_id, dn.nation_number, dn.external_number, dn.name, dn.surname
+			                    , dn.blood_group, to_char(dn.birthday , 'DD MON YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as birthday 
+                                FROM (
+                                    SELECT ROWNUM AS rn, dn.* 
+                                        FROM (
+                                            SELECT dn.* 
+                                                FROM (
+									                    select DV.id as visit_id, DN.id as donor_id, DV.QUEUE_NUMBER, DN.name || ' '  || DN.SURNAME as name
+                                                        , DV.SAMPLE_NUMBER, DV.COMMENT_TEXT, to_char(nvl(DV.VISIT_DATE,dv.create_date),'HH24:mm') as regis_time
+                                                        , DV.CREATE_STAFF as regis_staff, to_char(dv.INTEVIEW_DATE,'HH24,mm') as INTEVIEW_time, dv.INTEVIEW_STAFF
+                                                        , '' as collection_time, '' as collection_staff, '' as lab_time, '' as lab_staff
+                                                        from DONATION_VISIT dv
+                                                        inner join donor dn on DN.id = DV.DONOR_ID
+                                                        left join donor_external_card dexc on dexc.donor_id = dn.id and dexc.external_card_id = 3 
+                                                        left join external_card ec on ec.id = dexc.external_card_id
+                                                        left join rh_group rg on rg.id = dn.rh_group_id
+                                                        where 1=1 /*#QUEUE_NUMBER*/ /*#DONOR_NUMBER*/ /*#NATION_NUMBER*/ /*#NAME*/ /*#SURNAME*/ 
+                                                        /*#BIRTHDAY*/ /*#BLOOD_GROUP*/ 
+									                ) dn
+                                            ORDER BY dn./*#SORT_ORDER*/ /*#SORT_DIRECTION*/
+                                            ) dn
+                                    ) dn
+                                WHERE rn BETWEEN :start_row AND :end_row "
+
+                    Dim sqlTotal As String = "SELECT count(id) from ( select DV.id as visit_id
+                                                        from DONATION_VISIT dv
+                                                        inner join donor dn on DN.id = DV.DONOR_ID
+                                                        left join donor_external_card dexc on dexc.donor_id = dn.id and dexc.external_card_id = 3 
+                                                        left join external_card ec on ec.id = dexc.external_card_id
+                                                        left join rh_group rg on rg.id = dn.rh_group_id
+                                                        where 1=1 /*#QUEUE_NUMBER*/ /*#DONOR_NUMBER*/ /*#NATION_NUMBER*/ /*#NAME*/ /*#SURNAME*/ 
+                                                        /*#BIRTHDAY*/ /*#BLOOD_GROUP*/  ) dn"
+
+
+                    param.Add(":start_row", DbType.String, (intItemPerPage * _REQUEST("p")) - (intItemPerPage - 1))
+                    param.Add(":end_row", DbType.String, (intItemPerPage * _REQUEST("p")))
+                    param.Add("#SORT_ORDER", _REQUEST("so"))
+                    param.Add("#SORT_DIRECTION", _REQUEST("sd"))
+
+                    PostQueueItem.TotalPage = Math.Ceiling(CDec(Cbase.QueryField(sqlTotal, param)) / CDec(intItemPerPage))
+
+                    For Each dRow As DataRow In Cbase.QueryTable(sqlRecord, param).Rows
+                        Item = New PostQueueItem
+                        Item.VisitID = dRow("visit_id")
+                        Item.DonorID = dRow("donor_id")
+                        Item.QueueNumber = dRow("QUEUE_NUMBER")
+                        Item.Name = dRow("name")
+                        Item.SampleNumber = dRow("SAMPLE_NUMBER")
+                        Item.Comment = dRow("COMMENT_TEXT")
+                        Item.RegisTime = dRow("regis_time")
+                        Item.RegisStaff = dRow("regis_staff")
+                        Item.InteviewTime = dRow("INTEVIEW_time")
+                        Item.InteviewStaff = dRow("INTEVIEW_STAFF")
+                        Item.CollectionTime = dRow("collection_time")
+                        Item.CollectionStaff = dRow("collection_staff")
+                        Item.LabTime = dRow("lab_time")
+                        Item.LabStaff = dRow("lab_staff")
+
+                        PostQueueItem.PostQueueList.Add(Item)
+                    Next
+
+                    JSONResponse.setItems(JSON.Serialize(Of PostQueueSearchItem)(PostQueueItem))
 
             End Select
 
@@ -466,6 +636,30 @@ Public Structure DonorSearchItem
 
 End Structure
 
+Public Structure PostQueueSearchItem
+    Public GoNext As String
+    Public TotalPage As String
+    Public PostQueueList As List(Of PostQueueItem)
+End Structure
+
+Public Structure PostQueueItem
+    Public VisitID As String
+    Public DonorID As String
+    Public Name As String
+    Public QueueNumber As String
+    Public SampleNumber As String
+    Public Comment As String
+    Public RegisTime As String
+    Public RegisStaff As String
+    Public InteviewTime As String
+    Public InteviewStaff As String
+    Public CollectionTime As String
+    Public CollectionStaff As String
+    Public LabTime As String
+    Public LabStaff As String
+
+End Structure
+
 Public Structure DonateRecordWithRewardItem
     Public DonationDate As String
     Public DonationDateText As String
@@ -520,4 +714,14 @@ Public Structure ExamsData
 
 End Structure
 
+Public Structure ImmunohaemtologyDataSet1
+    Public Rsx_Lib As String
+    Public Dex_Res As String
+    Public Rsx_Cd As String
+End Structure
 
+Public Structure ImmunohaemtologyDataSet2
+    Public Rsx_Lib As String
+    Public Rsx_Type As String
+    Public Result_Decode As String
+End Structure

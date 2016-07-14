@@ -32,58 +32,89 @@
     </style>
     <script>
         $(function () {
-            $("#ddlDepartment").setDropdowListValue({ url: 'ajaxAction/masterAction.aspx', data: { action: 'collection' } }).on("change", function () {
-                $("#txtDepartment").H2GValue($("#ddlDepartment").H2GValue());
-            });
-            $("#ddlRegion").setDropdowListValue({ url: 'ajaxAction/masterAction.aspx', data: { action: 'site' } }).on("change", function () {
+            $("#ddlRegion").setDropdowListValue({ url: 'ajaxAction/masterAction.aspx', data: { action: 'site' } }, "1000").on("change", function () {
                 $("#txtRegion").H2GValue($("#ddlRegion").H2GValue());
+            });
+            $("#ddlDepartment").setDropdowListValue({ url: 'ajaxAction/masterAction.aspx', data: { action: 'collection' } }, "0A0000").on("change", function () {
+                $("#txtDepartment").H2GValue($("#ddlDepartment").H2GValue());
             });
             $("#txtRegion").blur(function () { $("#ddlRegion").val($("#txtRegion").val().toUpperCase()).change(); });
             $("#txtDepartment").blur(function () { $("#ddlDepartment").val($("#txtDepartment").val().toUpperCase()).change(); });
-            $("#txtUser").focus();
 
-            $("#btnLogin").click(function () {
-                if (validationLogin()) {
+            $("#btnLogin").click(function () { login(); });
 
-
-
-
-
-                    $("#data").H2GFill({ staffID: 1, siteID: $("#ddlRegion option:selected").H2GAttr("valueID"), collectionPointID: $("#ddlDepartment option:selected").H2GAttr("valueID") });
-                    $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "main.aspx", method: "post" }).submit();
-                    console.log('submit');
-                }
-                
-            });
+            $("#txtUser").enterKey(function () { login(); }).focus();
+            $("#txtPassword").enterKey(function () { login(); });
         });
+        function login() {
+            if (validationLogin()) {
+                $("#btnLogin").prop('disabled', true);
+                $.ajax({
+                    url: '../ajaxAction/userAction.aspx',
+                    data: {
+                        action: 'selectstaff'
+                        , user: $("#txtUser").H2GValue()
+                        , password: $("#txtPassword").H2GValue()
+                        , sid: $("#ddlRegion option:selected").H2GAttr("valueID")
+                        , cpid: $("#ddlDepartment option:selected").H2GAttr("valueID")
+                    },
+                    type: "POST",
+                    dataType: "json",
+                    error: function (xhr, s, err) {
+                        console.log(s, err);
+                        notiError(data.exMessage);
+                        $("#btnLogin").prop('disabled', false);
+                    },
+                    success: function (data) {
+                        if (!data.onError) {
+                            data.getItems = jQuery.parseJSON(data.getItems);
+                                
+                            $("#data").H2GFill({ staffID: data.getItems.ID, siteID: $("#ddlRegion option:selected").H2GAttr("valueID"), collectionPointID: $("#ddlDepartment option:selected").H2GAttr("valueID") });
+                            $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "main.aspx", method: "post" }).submit();
+
+                        } else {
+                            notiError(data.exMessage);
+                            $("#txtUser").focus();
+                        }
+                        $("#btnLogin").prop('disabled', false);
+                    }
+                });    //End ajax
+            }
+        }
         function validationLogin() {
-            if ($("#txtUser").H2GValue() == "") {
-                $("#txtUser").focus();
-                notiWarning("กรุณากรอกชื่อผู้ใช้งาน");
+            if (!$('#btnLogin').is(':disabled')) {
+                if ($("#txtUser").H2GValue() == "") {
+                    $("#txtUser").focus();
+                    notiWarning("กรุณากรอกชื่อผู้ใช้งาน");
+                    return false;
+                } else if ($("#txtPassword").H2GValue() == "") {
+                    $("#txtPassword").focus();
+                    notiWarning("กรุณากรอกรหัสผ่าน");
+                    return false;
+                } else if ($("#txtRegion").H2GValue() == "") {
+                    $("#txtRegion").focus();
+                    notiWarning("กรุณากรอกภาค");
+                    return false;
+                } else if ($("#ddlRegion").H2GValue() == null) {
+                    $("#ddlRegion").closest("div").focus();
+                    notiWarning("ภาคไม่ถูกต้อง กรุณาเลือกใหม่");
+                    return false;
+                } else if ($("#txtDepartment").H2GValue() == "") {
+                    $("#txtDepartment").focus();
+                    notiWarning("กรุณากรอกหน่วยงาน");
+                    return false;
+                } else if ($("#ddlDepartment").H2GValue() == null) {
+                    $("#ddlDepartment").closest("div").focus();
+                    notiWarning("หน่วยงานไม่ถูกต้อง กรุณาเลือกใหม่");
+                    return false;
+                }
+            } else {
                 return false;
-            } else if ($("#txtPassword").H2GValue() == "") {
-                $("#txtPassword").focus();
-                notiWarning("กรุณากรอกรหัสผ่าน");
-                return false;
-            } else if ($("#txtRegion").H2GValue() == "") {
-                $("#txtRegion").focus();
-                notiWarning("กรุณากรอกภาค");
-                return false;
-            } else if ($("#ddlRegion").H2GValue() == null) {
-                $("#ddlRegion").closest("div").focus();
-                notiWarning("ภาคไม่ถูกต้อง กรุณาเลือกใหม่");
-                return false;
-            } else if ($("#txtDepartment").H2GValue() == "") {
-                $("#txtDepartment").focus();
-                notiWarning("กรุณากรอกหน่วยงาน");
-                return false;
-            } else if ($("#ddlDepartment").H2GValue() == null) {
-                $("#ddlDepartment").closest("div").focus();
-                notiWarning("หน่วยงานไม่ถูกต้อง กรุณาเลือกใหม่");
-                return false;
-            } 
+            }
+
             return true;           
         }
+        
     </script>
 </head>
 <body style="background-color:#F2F2F2">
@@ -125,7 +156,7 @@
                     <span>ภาค</span>
                 </div>
                 <div class="col-md-6" style="text-align:right;padding-right: 0;">
-                    <input id="txtRegion" type="text" class="form-control required" placeholder="ภาค" />
+                    <input id="txtRegion" type="text" class="form-control required" placeholder="ภาค" /><%-- value="1000"--%>
                 </div>
                 <div class="col-md-18" style="padding-left: 5px;">
                     <select id="ddlRegion" class="required text-left" tabindex="-1">
@@ -138,7 +169,7 @@
                     <span>หน่วยงาน</span>
                 </div>
                 <div class="col-md-6" style="text-align:right;padding-right: 0;">
-                    <input id="txtDepartment" type="text" class="form-control required" placeholder="หน่วยงาน" />
+                    <input id="txtDepartment" type="text" class="form-control required" placeholder="หน่วยงาน" /><%-- value="0A0000"--%>
                 </div>
                 <div class="col-md-18" style="padding-left: 5px;">
                     <select id="ddlDepartment" class="required text-left" tabindex="-1">

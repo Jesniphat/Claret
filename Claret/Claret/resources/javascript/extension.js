@@ -184,12 +184,14 @@ $.extend($.fn, {
             showButtonPanel: false,
             yearRange: "c-20:c+20",
             onSelect: function (selectedDate, objDate) { },
-            onClose: function () { }
+            onClose: function () { },
+            onEnterKey: function () { },
         };
         $.extend(config, setting);
         $(this).bind("keydown", function (e) {
             if (e.which == 13) {
                 $(this).datepicker("hide");
+                config.onEnterKey();
                 e.preventDefault();
                 return false;
             }
