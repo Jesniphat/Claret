@@ -84,7 +84,6 @@
         },
 
         _removeIfInvalid: function (event, ui) {
-
             // Selected an item, nothing to do
             if (ui.item) {
                 return;

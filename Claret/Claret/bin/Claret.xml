@@ -143,23 +143,5 @@ To modify move field declaration from designer file to code-behind file.
   resource lookups using this strongly typed resource class.
 </summary>
 </member>
-<member name="F:Claret.test_hematos._form1">
-<summary>
-form1 control.
-</summary>
-<remarks>
-Auto-generated field.
-To modify move field declaration from designer file to code-behind file.
-</remarks>
-</member>
-<member name="F:Claret.WebForm1._form1">
-<summary>
-form1 control.
-</summary>
-<remarks>
-Auto-generated field.
-To modify move field declaration from designer file to code-behind file.
-</remarks>
-</member>
 </members>
 </doc>

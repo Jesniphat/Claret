@@ -139,6 +139,7 @@
     <Content Include="ajaxAction\masterAction.aspx" />
     <Content Include="ajaxAction\userAction.aspx" />
     <Content Include="Default.aspx" />
+    <Content Include="donor\Donate.aspx" />
     <Content Include="donor\search.aspx" />
     <Content Include="donor\main.aspx" />
     <Content Include="donor\register.aspx" />
@@ -178,14 +179,15 @@
     <Content Include="main.aspx" />
     <Content Include="mobile\main.aspx" />
     <Content Include="resources\css\bootflat.css" />
+    <Content Include="resources\css\donateStyle.css" />
     <Content Include="resources\css\table-excel.css" />
+    <Content Include="resources\javascript\donateScript.js" />
     <Content Include="resources\javascript\jquery-date.js" />
     <Content Include="resources\jquery\jquery-latest.js" />
     <Content Include="resources\jquery\jquery.metadata.js" />
     <Content Include="resources\jquery\bootstrap.js" />
     <Content Include="resources\jquery\combobox.js" />
     <Content Include="resources\jquery\jquery.tablesorter.js" />
-    <Content Include="WebForm1.aspx" />
     <None Include="My Project\PublishProfiles\ClaretSystem.pubxml" />
     <None Include="resources\css\bootstrap.css.bak" />
     <Content Include="resources\css\checkbox.css" />
@@ -256,6 +258,13 @@
       <DependentUpon>Default.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
+    <Compile Include="donor\Donate.aspx.designer.vb">
+      <DependentUpon>Donate.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="donor\Donate.aspx.vb">
+      <DependentUpon>Donate.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
     <Compile Include="donor\search.aspx.designer.vb">
       <DependentUpon>search.aspx</DependentUpon>
     </Compile>
@@ -323,20 +332,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="test_hematos.aspx.designer.vb">
-      <DependentUpon>test_hematos.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="test_hematos.aspx.vb">
-      <DependentUpon>test_hematos.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="WebForm1.aspx.designer.vb">
-      <DependentUpon>WebForm1.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="WebForm1.aspx.vb">
-      <DependentUpon>WebForm1.aspx</DependentUpon>
-      <SubType>ASPXCodebehind</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>

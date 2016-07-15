@@ -18,11 +18,26 @@
             });
             $("#ddlVisit").setDropdowList();
             $("#infoTab").tabs({
-                active: 1
+                active: 1,
+                activate: function (event, ui) {
+                    if ($(ui.newPanel).find("textarea:visible:first").length > 0) {
+                        $(ui.newPanel).find("textarea:visible:first").focus();
+                    } else {
+                        $(ui.newPanel).find("input:not(input[type=button],input[type=submit],button):visible:first").focus();
+                    }
+                },
             });
-            $("#infoTabToday").tabs();
+            $("#infoTabToday").tabs({
+                activate: function (event, ui) {
+                    $(ui.newPanel).find("input:not(input[type=button],input[type=submit],button):visible:first").focus();
+                },
+            });
+            $("#labTab").tabs({
+                activate: function (event, ui) {
+                    $(ui.newPanel).find("input:not(input[type=button],input[type=submit],button):visible:first").focus();
+                },
+            });
             $("#togDeferal").toggleSlide();
-            $("#labTab").tabs();
             $("#togVisitInfo").toggleSlide();
             $("#txtBirthDay").H2GDatebox().setCalendar({
                 maxDate: new Date(),
@@ -88,7 +103,22 @@
                 }
             });
 
-            $("#ddlExtCard").setAutoListValue({ url: '../../ajaxAction/masterAction.aspx', data: { action: 'externalcard' } }, "3").on('change', function () { $("#txtCardNumber").focus(); });
+            $("#ddlExtCard").setAutoListValue({
+                url: '../../ajaxAction/masterAction.aspx',
+                data: { action: 'externalcard' },
+                selectItem: function () {
+                    console.log("selectItem");
+                    var cardNumber = $('#divCardNumber div[extID="' + $("#ddlExtCard").H2GValue() + '"]').H2GAttr('cardNumber');
+                    $("#txtCardNumber").H2GValue(cardNumber || '');
+                },
+                //closeItem: function () { console.log("closeItem"); $("#txtCardNumber").focus(); },
+            }, "3");
+            $("#ddlExtCard").on('autocompleteselect', function () {
+                console.log($(this).H2GValue());
+                console.log($('#divCardNumber div[extID="' + $(this).H2GValue() + '"]').H2GAttr('cardNumber'));
+                var cardNumber = $('#divCardNumber div[extID="' + $(this).H2GValue() + '"]').H2GAttr('cardNumber');
+                $("#txtCardNumber").H2GValue(cardNumber || '').focus();
+            });
             $("input:radio[name=gender]").change(function (e) {
                 $("#ddlTitleName").setAutoListValue({ url: '../../ajaxAction/masterAction.aspx', data: { action: 'titlename', gender: $("#rbtM").is(':checked') == true ? "M" : "F" } });
             });
@@ -111,6 +141,7 @@
 
             //#### Default donor info from id
             if ($("#data").H2GAttr("donorID") != undefined) {
+                if ($("#data").H2GAttr("visitID") != undefined) { $("#spRegisNumber").H2GAttr("visitID", $("#data").H2GAttr("visitID")); }
                 showDonorData();
             } else {
                 $("#txtDonorName").H2GValue($("#data").H2GAttr("donorName") || "");
@@ -453,7 +484,7 @@
         function getReward(xobj) {
             var reward = '';
             // reward_id|reward_date##
-            $(xobj).find(".txt-reward-date[DonateRewardID='NEW']").each(function (i, e) {
+            $(xobj).find(".txt-reward-date[donateRewardID='NEW']").each(function (i, e) {
                 if ($(e).H2GValue() != "") {
                     reward = $(e).H2GAttr("rewardID") + "|" + $(e).H2GValue() + "##";
                 }
@@ -605,6 +636,7 @@
                             var spExtCard = $("#divCardNumberTemp").children().clone();
                             $(spExtCard).H2GFill({ refID: e.ID, donorID: e.DonorID, extID: e.ExternalCardID, cardNumber: e.CardNumber }).find(".ext-number").H2GValue(e.CardName + " : " + e.CardNumber);
                             $('#divCardNumber').append(spExtCard);
+                            if (e.ExternalCardID == "3") { $('#txtCardNumber').H2GValue(e.CardNumber) }
                         });
 
                         //### Deferral
@@ -654,8 +686,8 @@
                                         var rewardInfo = e.split("|");
                                         // reward_id|reward_desc|donation_reward_id|reward_date
                                         var rowReward = $("#donateRewardTemp").clone();
-                                        $(rowReward).find(".lbl-check-reward").append(rewardInfo[1]).H2GFill({ rewardID: rewardInfo[0], DonateRewardID: rewardInfo[2] }).find("input").prop("checked", (rewardInfo[2] == "" ? "N" : "Y").toBoolean());
-                                        $(rowReward).find(".txt-reward-date").H2GFill({ rewardID: rewardInfo[0] }).H2GValue(rewardInfo[3]);
+                                        $(rowReward).find(".lbl-check-reward").append(rewardInfo[1]).H2GFill({ rewardID: rewardInfo[0] }).find("input").prop("checked", (rewardInfo[2] == "" ? "N" : "Y").toBoolean());
+                                        $(rowReward).find(".txt-reward-date").H2GFill({ rewardID: rewardInfo[0], donateRewardID: rewardInfo[2] }).H2GValue(rewardInfo[3]);
 
                                         if (rewardInfo[2] != "") {
                                             $(rowReward).find(".lbl-check-reward input").prop("disabled", true);
@@ -1326,7 +1358,7 @@
                                                                 </div>
                                                                 <div class="col-md-2"><span>เมื่อ</span></div>
                                                                 <div class="col-md-12" style="padding-left: 8px; padding-right: 14px;">
-                                                                    <input type="text" class="txt-reward-date form-control text-center" tabindex="3" DonateRewardID="NEW" />
+                                                                    <input type="text" class="txt-reward-date form-control text-center" tabindex="3" donateRewardID="NEW" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1467,7 +1499,7 @@
                                         </tr>
                                     </table>
                                     <br />
-                                    <label class="set-label">&nbsp;&nbsp;Antibodles</label>
+                                    <label class="set-label">&nbsp;&nbsp;Antibodies</label>
                                     <table class="col-md-36" id="label-set-3">
                                         <tr>
                                             <td class="col-md-2"><label class="set-label" for="D_A1">D</label><input type="text" class="col-md-34 long-label4" id="D_A1" value="" /></td>

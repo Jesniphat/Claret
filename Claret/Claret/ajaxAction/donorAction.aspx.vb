@@ -352,8 +352,8 @@ Public Class donorAction
                     'Response.Write(JSONResponse.ToJSON())
 
                 Case "historicalFileData"
-                    'Dim donn_numero As String = _REQUEST("donn_numero")
-                    Dim donn_numero As String = "1004230339"
+                    Dim donn_numero As String = _REQUEST("donn_numero")
+                    'Dim donn_numero As String = "1004230339"
 
                     Dim sql As String = "select pexamen.pex_lib show_exam,
                                         decode(substr(dossex.dex_res,1,1),'*',
@@ -398,7 +398,7 @@ Public Class donorAction
                     Dim donn_numero As String = _REQUEST("donn_numero")
                     Dim sql As String = "select pparecr.rsx_lib,a.dex_res,pparecr.rsx_cd 
                                         from pparecr left join 
-                                        (select * from dossex where dossex.donn_numero = '1004230339' ) a on  a.dex_exam = pparecr.rsx_cd 
+                                        (select * from dossex where dossex.donn_numero = '" & donn_numero & "' ) a on  a.dex_exam = pparecr.rsx_cd 
                                         where  ((pparecr.ppe_site = '9999') 
                                         and (pparecr.ppe_masque = 'DOSSIH')) and pparecr.ppe_type = 0
                                         order by pparecr.ppe_champ"
@@ -447,7 +447,7 @@ Public Class donorAction
                                         inner join plabo on donexam.prelx_labo = plabo.plabo_cd
                                         inner join pexamen on trim(donexam.prelx_exam) = trim(pexamen.pex_cd)
                                         inner join presultat on trim(pexamen.pex_famres) = trim(presultat.pfres_cd) and  trim(donexam.prelx_rqual) = trim(presultat.pres_cd)
-                                        where don.donn_numero = '1004230339'
+                                        where don.donn_numero = '" & donn_numero & "'
                                         order by donexam.donn_incr desc,donexam.prelx_incr"
 
                     Dim dt As DataTable = Hbase.QueryTable(sql)
@@ -502,23 +502,26 @@ Public Class donorAction
                     If Not String.IsNullOrEmpty(_REQUEST("bloodgroup")) Then param.Add("#BLOOD_GROUP", " and UPPER(rg.description) like UPPER('" & _REQUEST("bloodgroup") & "') ")
                     If Not String.IsNullOrEmpty(_REQUEST("samplenumber")) Then param.Add("#BLOOD_GROUP", " and UPPER(rg.description) like UPPER('" & _REQUEST("bloodgroup") & "') ")
 
-                    Dim sqlRecord As String = "SELECT DN.rn as row_num, dn.id, dn.donor_number, dn.ext_id, dn.nation_number, dn.external_number, dn.name, dn.surname
-			                    , dn.blood_group, to_char(dn.birthday , 'DD MON YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as birthday 
+                    Dim sqlRecord As String = "SELECT DN.rn as row_num, dn.visit_id, dn.donor_id, dn.QUEUE_NUMBER, dn.name, dn.SAMPLE_NUMBER, dn.COMMENT_TEXT, dn.regis_time
+			                    , dn.regis_staff, dn.INTEVIEW_time, dn.INTEVIEW_STAFF, dn.collection_time, dn.collection_staff, dn.lab_time, dn.lab_staff
                                 FROM (
                                     SELECT ROWNUM AS rn, dn.* 
                                         FROM (
                                             SELECT dn.* 
                                                 FROM (
 									                    select DV.id as visit_id, DN.id as donor_id, DV.QUEUE_NUMBER, DN.name || ' '  || DN.SURNAME as name
-                                                        , DV.SAMPLE_NUMBER, DV.COMMENT_TEXT, to_char(nvl(DV.VISIT_DATE,dv.create_date),'HH24:mm') as regis_time
-                                                        , DV.CREATE_STAFF as regis_staff, to_char(dv.INTEVIEW_DATE,'HH24,mm') as INTEVIEW_time, dv.INTEVIEW_STAFF
+                                                        , DV.SAMPLE_NUMBER, DV.COMMENT_TEXT, to_char(nvl(DV.VISIT_DATE,dv.create_date),'HH24,mm') as regis_time
+                                                        , st.code as regis_staff, to_char(dv.INTEVIEW_DATE,'HH24,mm') as INTEVIEW_time, dv.INTEVIEW_STAFF
                                                         , '' as collection_time, '' as collection_staff, '' as lab_time, '' as lab_staff
                                                         from DONATION_VISIT dv
                                                         inner join donor dn on DN.id = DV.DONOR_ID
                                                         left join donor_external_card dexc on dexc.donor_id = dn.id and dexc.external_card_id = 3 
                                                         left join external_card ec on ec.id = dexc.external_card_id
                                                         left join rh_group rg on rg.id = dn.rh_group_id
-                                                        where 1=1 /*#QUEUE_NUMBER*/ /*#DONOR_NUMBER*/ /*#NATION_NUMBER*/ /*#NAME*/ /*#SURNAME*/ 
+                                                        left join staff st on st.id = dv.create_staff
+                                                        where 1=1 and nvl(dv.VISIT_DATE,dv.CREATE_DATE) 
+                                                        between to_date(TO_CHAR(sysdate, 'ddMMyyyy'),'ddMMyyyy') and to_date(TO_CHAR(sysdate+1, 'ddMMyyyy'),'ddMMyyyy')
+                                                        /*#QUEUE_NUMBER*/ /*#DONOR_NUMBER*/ /*#NATION_NUMBER*/ /*#NAME*/ /*#SURNAME*/ 
                                                         /*#BIRTHDAY*/ /*#BLOOD_GROUP*/ 
 									                ) dn
                                             ORDER BY dn./*#SORT_ORDER*/ /*#SORT_DIRECTION*/
@@ -526,13 +529,15 @@ Public Class donorAction
                                     ) dn
                                 WHERE rn BETWEEN :start_row AND :end_row "
 
-                    Dim sqlTotal As String = "SELECT count(id) from ( select DV.id as visit_id
+                    Dim sqlTotal As String = "SELECT nvl(count(visit_id),0) from ( select DV.id as visit_id
                                                         from DONATION_VISIT dv
                                                         inner join donor dn on DN.id = DV.DONOR_ID
                                                         left join donor_external_card dexc on dexc.donor_id = dn.id and dexc.external_card_id = 3 
                                                         left join external_card ec on ec.id = dexc.external_card_id
                                                         left join rh_group rg on rg.id = dn.rh_group_id
-                                                        where 1=1 /*#QUEUE_NUMBER*/ /*#DONOR_NUMBER*/ /*#NATION_NUMBER*/ /*#NAME*/ /*#SURNAME*/ 
+                                                        where 1=1 and nvl(dv.VISIT_DATE,dv.CREATE_DATE) 
+                                                        between to_date(TO_CHAR(sysdate, 'ddMMyyyy'),'ddMMyyyy') and to_date(TO_CHAR(sysdate+1, 'ddMMyyyy'),'ddMMyyyy')
+                                                        /*#QUEUE_NUMBER*/ /*#DONOR_NUMBER*/ /*#NATION_NUMBER*/ /*#NAME*/ /*#SURNAME*/ 
                                                         /*#BIRTHDAY*/ /*#BLOOD_GROUP*/  ) dn"
 
 
@@ -541,24 +546,24 @@ Public Class donorAction
                     param.Add("#SORT_ORDER", _REQUEST("so"))
                     param.Add("#SORT_DIRECTION", _REQUEST("sd"))
 
-                    PostQueueItem.TotalPage = Math.Ceiling(CDec(Cbase.QueryField(sqlTotal, param)) / CDec(intItemPerPage))
+                    PostQueueItem.TotalPage = Math.Ceiling(CDec(Cbase.QueryField(sqlTotal, param, "0")) / CDec(intItemPerPage))
 
                     For Each dRow As DataRow In Cbase.QueryTable(sqlRecord, param).Rows
                         Item = New PostQueueItem
-                        Item.VisitID = dRow("visit_id")
-                        Item.DonorID = dRow("donor_id")
-                        Item.QueueNumber = dRow("QUEUE_NUMBER")
-                        Item.Name = dRow("name")
-                        Item.SampleNumber = dRow("SAMPLE_NUMBER")
-                        Item.Comment = dRow("COMMENT_TEXT")
-                        Item.RegisTime = dRow("regis_time")
-                        Item.RegisStaff = dRow("regis_staff")
-                        Item.InteviewTime = dRow("INTEVIEW_time")
-                        Item.InteviewStaff = dRow("INTEVIEW_STAFF")
-                        Item.CollectionTime = dRow("collection_time")
-                        Item.CollectionStaff = dRow("collection_staff")
-                        Item.LabTime = dRow("lab_time")
-                        Item.LabStaff = dRow("lab_staff")
+                        Item.VisitID = dRow("visit_id").ToString()
+                        Item.DonorID = dRow("donor_id").ToString()
+                        Item.QueueNumber = dRow("QUEUE_NUMBER").ToString()
+                        Item.Name = dRow("name").ToString()
+                        Item.SampleNumber = dRow("SAMPLE_NUMBER").ToString()
+                        Item.Comment = dRow("COMMENT_TEXT").ToString()
+                        Item.RegisTime = dRow("regis_time").ToString().Replace(",", ":")
+                        Item.RegisStaff = dRow("regis_staff").ToString()
+                        Item.InteviewTime = dRow("INTEVIEW_time").ToString().Replace(",", ":")
+                        Item.InteviewStaff = dRow("INTEVIEW_STAFF").ToString()
+                        Item.CollectionTime = dRow("collection_time").ToString().Replace(",", ":")
+                        Item.CollectionStaff = dRow("collection_staff").ToString()
+                        Item.LabTime = dRow("lab_time").ToString().Replace(",", ":")
+                        Item.LabStaff = dRow("lab_staff").ToString()
 
                         PostQueueItem.PostQueueList.Add(Item)
                     Next

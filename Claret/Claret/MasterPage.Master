@@ -5,19 +5,19 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title>Claret System : ระบบบริจาคโลหิต</title>
-    <link href="/resources/css/bootstrap.css?ver=20160118" rel="stylesheet" />
-    <link href="/resources/css/bootflat.css?ver=20160118" rel="stylesheet" />
-    <link href="/resources/css/jquery.fs.selecter.css?ver=20160118" rel="stylesheet" />
-    <link href="/resources/jquery-ui/jquery-ui.css?ver=20160118" rel="stylesheet" />
-    <link href="/resources/css/custom.css?ver=20160118" rel="stylesheet" />
+    <link href="/resources/css/bootstrap.css?ver=20160119" rel="stylesheet" />
+    <link href="/resources/css/bootflat.css?ver=20160119" rel="stylesheet" />
+    <link href="/resources/css/jquery.fs.selecter.css?ver=20160119" rel="stylesheet" />
+    <link href="/resources/jquery-ui/jquery-ui.css?ver=20160119" rel="stylesheet" />
+    <link href="/resources/css/custom.css?ver=20160119" rel="stylesheet" />
     <link href="/resources/css/table-excel.css" rel="stylesheet" />
     <script src="../resources/jquery/jquery.js" type="text/javascript"></script>
     <script src="../resources/jquery-ui/jquery-ui.js" type="text/javascript"></script>
-    <script src="../resources/javascript/jquery-date.js?ver=20160118" type="text/javascript"></script>
-    <script src="../resources/jquery/bootstrap.js" type="text/javascript"></script>
+    <script src="../resources/javascript/jquery-date.js?ver=20160119" type="text/javascript"></script>
+    <script src="../resources/jquery/bootstrap.js?ver=20160119" type="text/javascript"></script>
     <script src="../resources/jquery/jquery.fs.selecter.js" type="text/javascript"></script>
-    <script src="../resources/jquery/combobox.js" type="text/javascript"></script>
-    <script src="../resources/javascript/extension.js?ver=20160118" type="text/javascript"></script>
+    <script src="../resources/jquery/combobox.js?ver=20160119" type="text/javascript"></script>
+    <script src="../resources/javascript/extension.js?ver=20160119" type="text/javascript"></script>
     <script src="../resources/jquery/jquery.tablesorter.js" type="text/javascript"></script>
     <style>
         #leftMenu {
@@ -235,6 +235,7 @@
             $(xobj).addClass("selected");
             if (postAction) {
                 $("#data").H2GAttr("lmenu", $(xobj).H2GAttr("id"));
+                 //console.log($('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: $(xobj).H2GAttr("targetUrl"), method: "post" }).html());
                 $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: $(xobj).H2GAttr("targetUrl"), method: "post" }).submit();
                 //}
             }
@@ -356,7 +357,7 @@
                         <div class="col-md-36">
                             <span>คัดกรอง</span>
                         </div>
-                        <div class="col-md-36">
+                        <div id="lmenuDonate" targeturl="../donor/donate.aspx" class="col-md-36">
                             <span>บริจาค</span>
                         </div>
                         <div class="col-md-36">

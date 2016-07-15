@@ -4,7 +4,10 @@
     <script>
         $(function () {
             $("#searchTab").tabs({
-                active: 0
+                active: 0,
+                activate: function (event, ui) {
+                    $(ui.newPanel).find("input:not(input[type=button],input[type=submit],button):visible:first").focus();
+                },
             });
             $("#txtBirthday").H2GDatebox().setCalendar({
                 maxDate: new Date(),
@@ -159,7 +162,7 @@
                 $.ajax({
                     url: '../../ajaxAction/donorAction.aspx',
                     data: {
-                        action: 'searchpostqueue'
+                        action: 'donorpostqueue'
                         , queuenumber: $("#txtPostQueue").H2GValue()
                         , donornumber: $("#txtPostDonorNumber").H2GValue()
                         , nationnumber: $("#txtPostNationNumber").H2GValue()
@@ -183,14 +186,14 @@
                         $(dataView).H2GValue('');
                         if (!data.onError) {
                             data.getItems = jQuery.parseJSON(data.getItems);
-                            if (data.getItems.SearchList.length > 0) {
+                            if (data.getItems.PostQueueList.length > 0) {
                                 if (data.getItems.GoNext == "Y") {
-                                    $.each((data.getItems.SearchList), function (index, e) {
+                                    $.each((data.getItems.PostQueueList), function (index, e) {
                                         var dataRow = $("#tbPostQueue > thead > tr.template-data").clone();
-                                        $(dataRow).H2GFill({ refID: e.visitID, donorID: e.donorID }).donorSelect();
+                                        $(dataRow).H2GFill({ refID: e.VisitID, donorID: e.DonorID }).queueSelect();
                                     });
                                 } else {
-                                    $.each((data.getItems.SearchList), function (index, e) {
+                                    $.each((data.getItems.PostQueueList), function (index, e) {
                                         var dataRow = $("#tbPostQueue > thead > tr.template-data").clone().show();
                                         $(dataRow).H2GFill({ refID: e.VisitID, donorID: e.DonorID });
                                         $(dataRow).find('.td-queue').append(e.QueueNumber).H2GAttr("title", e.QueueNumber);
@@ -286,25 +289,27 @@
         }
         function sortButton(xobj, doFunction) {
             //ถ้าเป็นการ sort field เดิมให้ทำการเปลี่ยน direction 
-            if ($(xobj).closest("table").H2GAttr("wStatus") != "working") {
-                if ($(xobj).H2GAttr("sortOrder") == $(xobj).closest("table").H2GAttr("sortOrder")) {
-                    if ($(xobj).closest("table").H2GAttr("sortDirection") == "asc") {
-                        $(xobj).closest("table").H2GFill({ sortDirection: "desc" });
-                        $(xobj).find(".glyphicon").removeClass("glyphicon-triangle-top").addClass("glyphicon-triangle-bottom");
+            if ($(xobj).H2GAttr("sortOrder") != undefined) {
+                if ($(xobj).closest("table").H2GAttr("wStatus") != "working") {
+                    if ($(xobj).H2GAttr("sortOrder") == $(xobj).closest("table").H2GAttr("sortOrder")) {
+                        if ($(xobj).closest("table").H2GAttr("sortDirection") == "asc") {
+                            $(xobj).closest("table").H2GFill({ sortDirection: "desc" });
+                            $(xobj).find(".glyphicon").removeClass("glyphicon-triangle-top").addClass("glyphicon-triangle-bottom");
+                        }
+                        else {
+                            $(xobj).closest("table").H2GAttr("sortDirection", "asc");
+                            $(xobj).find(".glyphicon").removeClass("glyphicon-triangle-bottom").addClass("glyphicon-triangle-top");
+                        }
+                    } else {
+                        //ถ้าเป็นการ sort field ใหม่ให้ทำการเปลี่ยน field และเริ่ม direction ที่ desc
+                        $(xobj).closest("table").H2GFill({ sortDirection: "desc", sortOrder: $(xobj).H2GAttr("sortOrder") });
+                        //ต้องทำการย้าย direct sign ไปไว้กับหัวข้อที่เลือกใหม่ด้วย
+                        $(xobj).closest("table")
+                        $(xobj).closest("table").find("thead > tr > th .glyphicon").removeClass("glyphicon-triangle-top").addClass("glyphicon-triangle-bottom")
+                            .appendTo($(xobj).closest("table").find("thead button[sortOrder='" + $(xobj).H2GAttr("sortOrder") + "']"));
                     }
-                    else {
-                        $(xobj).closest("table").H2GAttr("sortDirection", "asc");
-                        $(xobj).find(".glyphicon").removeClass("glyphicon-triangle-bottom").addClass("glyphicon-triangle-top");
-                    }
-                } else {
-                    //ถ้าเป็นการ sort field ใหม่ให้ทำการเปลี่ยน field และเริ่ม direction ที่ desc
-                    $(xobj).closest("table").H2GFill({ sortDirection: "desc", sortOrder: $(xobj).H2GAttr("sortOrder") });
-                    //ต้องทำการย้าย direct sign ไปไว้กับหัวข้อที่เลือกใหม่ด้วย
-                    $(xobj).closest("table")
-                    $(xobj).closest("table").find("thead > tr > th .glyphicon").removeClass("glyphicon-triangle-top").addClass("glyphicon-triangle-bottom")
-                        .appendTo($(xobj).closest("table").find("thead button[sortOrder='" + $(xobj).H2GAttr("sortOrder") + "']"));
+                    doFunction(false);
                 }
-                doFunction(false);
             }
         }
     </script>
@@ -487,7 +492,7 @@
                     <div id="post-content-one" style="padding-left:15px; padding-bottom: 20px;">
                         <div class="row">
                             <div class="col-md-36">
-                                <span>1. ใส่ข้อมูลผู้บริจาคเพื่อค้นหาประวัติ (ใส่ % แทนสิ่งที่ไม่ทราบเช่น นามสกุล ลิขิต% แทนการพิมพ์นามสกุลเต็มๆ)</span>
+                                <span>1. ค้นหาผู้บริจาคเพื่อค้นหาประวัติ (ใส่ % แทนสิ่งที่ไม่ทราบเช่น นามสกุล ลิขิต% แทนการพิมพ์นามสกุลเต็มๆ)</span>
                             </div>
                         </div>
                         <div class="row" style="padding-left: 15px;">
@@ -555,7 +560,7 @@
                     <div id="post-content-two" style="padding-left:15px;padding-bottom: 20px;">
                         <div class="row">
                             <div class="col-md-36">
-                                <span>2. กรุณาตรวจสอบรายละเอียดเบื้องต้นและกด -> หากต้องการลงทะเบียน</span>
+                                <span>2. กด => เพื่อทำรายการให้กับผู้บริจาค</span>
                             </div>
                         </div>
                         <div class="row" style="padding-left: 15px;">
@@ -566,31 +571,31 @@
                         </div>
                         <div class="row" style="padding-left: 15px;">
                             <div class="col-md-36">
-                                <table id="tbPostQueue" class="table table-bordered" totalPage="1" currentPage="1" sortDirection="desc" sortOrder="donor_number">
+                                <table id="tbPostQueue" class="table table-bordered" totalPage="1" currentPage="1" sortDirection="desc" sortOrder="queue_number">
                                     <thead>
                                         <tr>
-                                            <th class="col-md-2"><button sortOrder="queue">คิวที่<i class="glyphicon glyphicon-triangle-bottom"></i></button>
+                                            <th class="col-md-2"><button sortOrder="QUEUE_NUMBER">คิวที่<i class="glyphicon glyphicon-triangle-bottom"></i></button>
                                             </th>
-                                            <th class="col-md-7"><button sortOrder="donor_name">ชื่อ-นามสกุล</button>
+                                            <th class="col-md-7"><button sortOrder="name">ชื่อ-นามสกุล</button>
                                             </th>
-                                            <th class="col-md-4"><button sortOrder="sample">Sample No.</button>
+                                            <th class="col-md-4"><button sortOrder="SAMPLE_NUMBER">Sample No.</button>
                                             </th>
-                                            <th class="col-md-6"><button sortOrder="external_number">หมายเหตุ</button>
+                                            <th class="col-md-6"><button>หมายเหตุ</button>
                                             </th>
-                                            <th class="col-md-4" colspan="2"><button sortOrder="">ลงทะเบียน</button>
+                                            <th class="col-md-4" colspan="2"><button>ลงทะเบียน</button>
                                             </th>
-                                            <th class="col-md-4" colspan="2"><button sortOrder="">คัดกรอง</button>
+                                            <th class="col-md-4" colspan="2"><button>คัดกรอง</button>
                                             </th>
-                                            <th class="col-md-4" colspan="2"><button sortOrder="">จัดเก็บ</button>
+                                            <th class="col-md-4" colspan="2"><button>จัดเก็บ</button>
                                             </th>
-                                            <th class="col-md-4" colspan="2"><button sortOrder="">Lab</button>
+                                            <th class="col-md-4" colspan="2"><button>Lab</button>
                                             </th>
                                             <th class="col-md-1"></th>
                                         </tr>
                                         <tr class="no-transaction" style="display:none;"><td align="center" colspan="13">No transaction</td></tr>
                                         <tr class="more-loading" style="display:none;"><td align="center" colspan="13">Loading detail...</td></tr>
                                         <tr class="template-data" style="display:none;" refID="NEW">
-                                            <td class="td-queue text-center">23
+                                            <td class="td-queue text-center">
                                             </td>
                                             <td class="td-name">
                                             </td>

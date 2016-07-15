@@ -1,11 +1,11 @@
 ﻿@media print {
   .table-bordered-excel th,
   .table-bordered-excel td {
-    border: 1px solid #000 !important;
+    border: 1px solid #CCCCCC !important;
   }
 }
 .table-bordered-excel {
-  border: 1px solid #000;
+  border: 1px solid #CCCCCC;
 }
 .table-bordered-excel > thead > tr > th,
 .table-bordered-excel > tbody > tr > th,
@@ -13,12 +13,12 @@
 .table-bordered-excel > thead > tr > td,
 .table-bordered-excel > tbody > tr > td,
 .table-bordered-excel > tfoot > tr > td {
-  border: 1px solid #000;
+  border: 1px solid #CCCCCC;
 }
 .table-bordered-excel > thead > tr > th,
 .table-bordered-excel > thead > tr > td {
   border-bottom-width: 1px;
-  background-color: #D9D9D9;
+  background-color: #F2F2F2;
   text-align:center; 
   vertical-align:middle;
 }
@@ -173,13 +173,13 @@ background-color: #8dbdd8;
 /*      Header Of table        */
 
 .tableHeadDiv {
-    border-left: 1px solid;
-    border-right: 1px solid;
-    border-top: 1px solid;
+    border-left: 1px solid #CCCCCC;
+    border-right: 1px solid #CCCCCC;
+    border-top: 1px solid #CCCCCC;
     margin-left: 1px;
     margin-right: 1px;
     width: 1123px;
-    background-color: #D9D9D9;
+    background-color: #F2F2F2;
     text-align: center;
 }
 

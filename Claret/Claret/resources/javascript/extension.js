@@ -90,6 +90,7 @@ var H2G = {
 
 $.extend($.fn, {
     setDropdowList: function () {
+        //console.log("setDropdowList");
         var dclass = "";
         if ($(this).attr("class") != undefined) {
             dclass = $(this).attr("class");
@@ -138,6 +139,8 @@ $.extend($.fn, {
             data: {},
             type: "POST",
             dataType: "json",
+            selectItem: function () { },
+            closeItem: function () { },
         };
         $.extend(config, setting);
 
@@ -157,18 +160,16 @@ $.extend($.fn, {
                     $.each((data.getItems), function (index, e) {
                         $("<option>", { value: e.code }).html(e.name).appendTo(self);
                     });
-                    $(self).H2GValue(defaultSelect || "").combobox({
-                        appendTo: "#mstContent",
-                    });
+                    $(self).H2GValue(defaultSelect || "").combobox({ select: config.selectItem, close: function() { console.log("closeItem"); } });
                     $(self).parent().find("span").find("input").val($(self).find(":selected").text());
                 } else {
                     $(self).combobox({
-                        appendTo: "#mstContent",
+                        select: config.selectItem
                     });
                 }
-                $("#tog" + $(self).H2GAttr("id").replace("ddl","")).click(function () {
-                    $(self).toggle();
-                });
+                //$("#tog" + $(self).H2GAttr("id").replace("ddl","")).click(function () {
+                //    $(self).toggle();
+                //});
             }
         });    //End ajax
         return this;

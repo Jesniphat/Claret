@@ -5,16 +5,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title>Login</title>
-    <link href="/resources/css/bootstrap.css?ver=20160118" rel="stylesheet" />
-    <link href="/resources/css/bootflat.css?ver=20160118" rel="stylesheet" />
-    <link href="/resources/css/jquery.fs.selecter.css?ver=20160118" rel="stylesheet" />
-    <link href="/resources/jquery-ui/jquery-ui.css?ver=20160118" rel="stylesheet" />
-    <link href="/resources/css/custom.css?ver=20160118" rel="stylesheet" />
+    <link href="/resources/css/bootstrap.css?ver=20160119" rel="stylesheet" />
+    <link href="/resources/css/bootflat.css?ver=20160119" rel="stylesheet" />
+    <link href="/resources/css/jquery.fs.selecter.css?ver=20160119" rel="stylesheet" />
+    <link href="/resources/jquery-ui/jquery-ui.css?ver=20160119" rel="stylesheet" />
+    <link href="/resources/css/custom.css?ver=20160119" rel="stylesheet" />
     <script src="../resources/jquery/jquery.js" type="text/javascript"></script>
     <script src="../resources/jquery/bootstrap.min.js" type="text/javascript"></script>
     <script src="../resources/jquery/jquery.fs.selecter.js" type="text/javascript"></script>
     <script src="../resources/jquery-ui/jquery-ui.js" type="text/javascript"></script>
-    <script src="../resources/javascript/extension.js?ver=20160118" type="text/javascript"></script>
+    <script src="../resources/javascript/extension.js?ver=20160119" type="text/javascript"></script>
 
     <style>
         .box-Info {
@@ -69,8 +69,8 @@
                         if (!data.onError) {
                             data.getItems = jQuery.parseJSON(data.getItems);
                                 
-                            $("#data").H2GFill({ staffID: data.getItems.ID, siteID: $("#ddlRegion option:selected").H2GAttr("valueID"), collectionPointID: $("#ddlDepartment option:selected").H2GAttr("valueID") });
-                            $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "main.aspx", method: "post" }).submit();
+                            $("#data").H2GFill({ staffID: data.getItems.ID, siteID: $("#ddlRegion option:selected").H2GAttr("valueID"), collectionPointID: $("#ddlDepartment option:selected").H2GAttr("valueID"), tmenu: "tmenuDonor", lmenu: "lmenuDonorRegis" });
+                            $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "donor/search.aspx", method: "post" }).submit();
 
                         } else {
                             notiError(data.exMessage);
