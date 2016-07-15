@@ -1577,7 +1577,7 @@
                         </div>
                         <div id="exams">
                             <div class="border-box">
-                                <div class="col-md-36 tableHeadDiv"><b>Donation exeminations</b></div>
+                                <div class="col-md-36 tableHeadDiv"><b>Donation examinations</b></div>
                                 <div class="col-md-36">
                                     <table class="table table-bordered-excel tablesorter" id="exams-tab-table">
                                         <thead>
@@ -1588,7 +1588,7 @@
                                                 <th class="col-md-4">ประเภทการบริจาค</th>
                                                 <th class="col-md-4">Examination</th>
                                                 <th class="col-md-4">Result</th>
-                                                <th class="col-md-5">executing laboratory</th>
+                                                <th class="col-md-5">Executing laboratory</th>
                                                 <th class="col-md-2">Test 1</th>
                                                 <th class="col-md-2">Test 2</th>
                                                 <th class="col-md-2">Test 3</th>
