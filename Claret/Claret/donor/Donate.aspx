@@ -84,6 +84,173 @@
                             <div class="col-md-8"></div>
                         </div>
                     </div>
+                    <div class="border-box">
+                        <div id="content-one" style="padding-left:15px; padding-bottom: 20px;">
+                            <div class="row">
+                                <div class="col-md-36">
+                                    <span>1. ค้นหาขผู้บริจาคหรือเลือกทำรายการจากคิวในขั้นตอนที่ 2</span>
+                                </div>
+                            </div>
+                            <div class="row" style="padding-left: 15px;">
+                                <div class="col-md-2">
+                                    <span>คิวที่</span>
+                                </div>
+                                <div class="col-md-5">
+                                    <span>เลขประจำตัวผู้บริจาค</span>
+                                </div>
+                                <div class="col-md-5">
+                                    <span>เลขประจำตัวประชาชน</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <span>เลขประจำตัวอ้างอิง</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <span>ชื่อ</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <span>นามสกุล</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <span>วันเกิด</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <span>กรุ๊ปเลือด</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <span>Sample No</span>
+                                </div>
+                                <div class="col-md-2">
+                                
+                                </div>
+                            </div>
+                            <div class="row" style="padding-left: 15px;">
+                                <div class="col-md-36">
+                                    <div style="background-color: #CCCCCC; height: 2px;"></div>
+                                </div>
+                            </div>
+                            <div id="divCriteria" class="row" style="padding-top: 3px; padding-bottom: 3px; padding-left:15px;">
+                                <div class="col-md-2">
+                                    <input id="txtDonateQueue" class="form-control color-yellow" type="text" />
+                                </div>
+                                <div class="col-md-5">
+                                    <input id="txtDonorNumber" class="form-control color-yellow" type="text" />
+                                </div>
+                                <div class="col-md-5">
+                                    <input id="txtNationNumber" class="form-control" type="text" />
+                                </div>
+                                <div class="col-md-4">
+                                    <input id="txtExtNumber" class="form-control" type="text" />
+                                </div>
+                                <div class="col-md-4">
+                                    <input id="txtName" class="form-control" type="text" />
+                                </div>
+                                <div class="col-md-4">
+                                    <input id="txtSurname" class="form-control" type="text" />
+                                </div>
+                                <div class="col-md-3">
+                                    <input id="txtBirthday" class="form-control text-center" type="text" />
+                                </div>
+                                <div class="col-md-3">
+                                    <input id="txtBloodGroup" class="form-control text-center" type="text" />
+                                </div>
+                                <div class="col-md-3">
+                                    <input id="txtSimplenumber" class="form-control text-center" type="text" />
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="col-md-36">
+                                        <a title="ลบข้อมูลที่กรอก"><span id="spClear" class="glyphicon glyphicon-remove"></span></a>
+                                        <a title="ค้นหา"><span id="spSearch" class="glyphicon glyphicon-search"></span></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="post-content-two" style="padding-left:15px;padding-bottom: 20px;">
+                            <div class="row">
+                                <div class="col-md-36">
+                                    <span>2. กด => เพื่อทำรายการให้กับผู้บริจาค</span>
+                                </div>
+                            </div>
+                            <div class="row" style="padding-left: 15px;">
+                                <div class="col-md-36">
+                                    <div id="post-paging-history">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="padding-left: 15px;">
+                                <div class="col-md-36">
+                                    <table id="tbPostQueue" class="table table-bordered" totalPage="1" currentPage="1" sortDirection="desc" sortOrder="queue_number">
+                                        <thead>
+                                            <tr>
+                                                <th class="col-md-2"><button sortOrder="QUEUE_NUMBER">คิวที่<i class="glyphicon glyphicon-triangle-bottom"></i></button>
+                                                </th>
+                                                <th class="col-md-7"><button sortOrder="name">ชื่อ-นามสกุล</button>
+                                                </th>
+                                                <th class="col-md-4"><button sortOrder="SAMPLE_NUMBER">Sample No.</button>
+                                                </th>
+                                                <th class="col-md-6"><button>หมายเหตุ</button>
+                                                </th>
+                                                <th class="col-md-4" colspan="2"><button>ลงทะเบียน</button>
+                                                </th>
+                                                <th class="col-md-4" colspan="2"><button>คัดกรอง</button>
+                                                </th>
+                                                <th class="col-md-4" colspan="2"><button>จัดเก็บ</button>
+                                                </th>
+                                                <th class="col-md-4" colspan="2"><button>Lab</button>
+                                                </th>
+                                                <th class="col-md-1"></th>
+                                            </tr>
+                                            <tr class="no-transaction" style="display:none;"><td align="center" colspan="13">No transaction</td></tr>
+                                            <tr class="more-loading" style="display:none;"><td align="center" colspan="13">Loading detail...</td></tr>
+                                            <tr class="template-data" style="display:none;" refID="NEW">
+                                                <td class="td-queue text-center">
+                                                </td>
+                                                <td class="td-name">
+                                                </td>
+                                                <td class="td-sample">
+                                                </td>
+                                                <td class="td-remarks">
+                                                </td>
+                                                <td class="td-regis-staff col-md-2" style="background-color: #DBEEF3;">
+                                                </td>
+                                                <td class="td-regis-time col-md-2 text-center" style="background-color: #DBEEF3;">
+                                                </td>
+                                                <td class="td-interview-staff col-md-2" style="background-color: #FAFDD7;">
+                                                </td>
+                                                <td class="td-interview-time col-md-2 text-center" style="background-color: #FAFDD7;">
+                                                </td>
+                                                <td class="td-collection-staff col-md-2" style="background-color: #E5F5D7;">
+                                                </td>
+                                                <td class="td-collection-time col-md-2 text-center" style="background-color: #E5F5D7;">
+                                                </td>
+                                                <td class="td-lab-staff col-md-2" style="background-color: #E5E0EC;">
+                                                </td>
+                                                <td class="td-lab-time col-md-2 text-center" style="background-color: #E5E0EC;">
+                                                </td>
+                                                <td class="col-md-1">
+                                                    <div>
+                                                        <a class="icon"><span class="glyphicon glyphicon-arrow-right" aria-hidden="true" onclick="return $(this).queueSelect();"></span></a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="no-transaction"><td align="center" colspan="13">No transaction</td></tr>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td align="right" colspan="13">
+                                                    <div class="page">
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
             <div id="postQueuePane">
