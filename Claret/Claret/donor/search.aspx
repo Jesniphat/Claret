@@ -3,6 +3,7 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <script>
         $(function () {
+            $("#spQueueHeader").H2GValue("คิวประจำวันที่ " + formatDate(H2G.today(), " dd MMM พ.ศ. yyyy"));
             $("#searchTab").tabs({
                 active: 0,
                 activate: function (event, ui) {
@@ -66,6 +67,8 @@
 
             $("#tbDonor thead button").click(function () { sortButton($(this), donorSearch); return false; });
             $("#tbPostQueue thead button").click(function () { sortButton($(this), postQueueSearch); return false; });
+            postQueueSearch(true);
+            donorSearch(true);
             $("#txtDonorNumber").focus();
         });
         function validation() {
@@ -321,7 +324,7 @@
 </asp:Content>
 <asp:Content ID="ctDonorSearch" ContentPlaceHolderID="cphMaster" runat="server">
     <div class="claret-page-header row">
-        <div class="col-md-36">
+        <div class="col-md-36" style="font-size:larger; font-weight:bold;">
             <span>ค้นหารายชื่อผู้บริจาค</span>
         </div>
     </div>
@@ -490,6 +493,11 @@
             <div id="postQueuePane">
                 <div class="border-box">
                     <div id="post-content-one" style="padding-left:15px; padding-bottom: 20px;">
+                        <div class="row">
+                            <div class="col-md-36 text-center">
+                                <span id="spQueueHeader"></span>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-md-36">
                                 <span>1. ค้นหาผู้บริจาคเพื่อค้นหาประวัติ (ใส่ % แทนสิ่งที่ไม่ทราบเช่น นามสกุล ลิขิต% แทนการพิมพ์นามสกุลเต็มๆ)</span>

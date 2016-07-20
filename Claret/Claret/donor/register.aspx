@@ -371,7 +371,6 @@
                     DonateNumberExt: $("#spRegisNumber").H2GAttr("donateNumberExt"),
                     VisitNumber: $("#spRegisNumber").H2GAttr("visitNumber"),
 
-        //Public VisitNumber As String
 
                 };
                 var DonorVisit = {
@@ -606,6 +605,7 @@
                         $("#spQueue").H2GValue(data.getItems.Donor.QueueNumber==""?"-":"คิวที่ " + data.getItems.Donor.QueueNumber).H2GAttr("queueNumber",data.getItems.Donor.QueueNumber);
                         $("input:radio[name=gender]").prop("checked", false);
                         if (data.getItems.Donor.Gender == "M") { $("#rbtM").prop("checked", true); } else { $("#rbtF").prop("checked", true); }
+                        $("#divBloodType").H2GValue(data.getItems.Donor.RHGroup);
                         $("#txtDonorName").H2GValue(data.getItems.Donor.Name);
                         $("#txtDonorSurName").H2GValue(data.getItems.Donor.Surname);
                         $("#txtDonorNameEng").H2GValue(data.getItems.Donor.NameE);
@@ -722,6 +722,7 @@
                         if (!(data.getItems.Donor.DuplicateTransaction == "0")){
                             alert("วันนี้คุณ " + data.getItems.Donor.Name + " " + data.getItems.Donor.Surname + "  ทำการลงทะเบียนไปแล้ว " + data.getItems.Donor.DuplicateTransaction + " ครั้ง");
                         }
+                        if ($("#spRegisNumber").H2GAttr("visitID") != undefined) { $("#btnSave").H2GValue("บันทึก"); }
 
                     } else { }
                     donorSelectDDL();
@@ -1558,7 +1559,7 @@
                                     </table>
                                     <br />
                                     <label class="set-label">&nbsp;&nbsp;HLA</label>
-                                    <table class="col-md-36" id="label-set-4">
+                                    <table class="col-md-36" id="label-set-4" style="margin-bottom:10px;">
                                         <tr>
                                             <td class="col-md-4"><label class="set-label" for="HLA-Ax_RESULT">HLA-Ax</label><input type="text" class="col-md-35 long-label2" id="HLA-Ax_RESULT" value="" /></td>
                                             <td class="col-md-4"><label class="set-label" for="HLA-Ay_RESULT">HLA-Ay</label><input type="text" class="col-md-35 long-label2" id="HLA-Ay_RESULT" value="" /></td>

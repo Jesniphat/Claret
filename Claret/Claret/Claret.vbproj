@@ -139,7 +139,9 @@
     <Content Include="ajaxAction\masterAction.aspx" />
     <Content Include="ajaxAction\userAction.aspx" />
     <Content Include="Default.aspx" />
+    <Content Include="donor\Collection.aspx" />
     <Content Include="donor\Donate.aspx" />
+    <Content Include="donor\historyReport.aspx" />
     <Content Include="donor\search.aspx" />
     <Content Include="donor\main.aspx" />
     <Content Include="donor\register.aspx" />
@@ -182,6 +184,7 @@
     <Content Include="resources\css\donateStyle.css" />
     <Content Include="resources\css\table-excel.css" />
     <Content Include="resources\javascript\donateScript.js" />
+    <Content Include="resources\javascript\donateScriptEdit.js" />
     <Content Include="resources\javascript\jquery-date.js" />
     <Content Include="resources\jquery\jquery-latest.js" />
     <Content Include="resources\jquery\jquery.metadata.js" />
@@ -258,11 +261,24 @@
       <DependentUpon>Default.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
+    <Compile Include="donor\Collection.aspx.designer.vb">
+      <DependentUpon>Collection.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="donor\Collection.aspx.vb">
+      <DependentUpon>Collection.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
     <Compile Include="donor\Donate.aspx.designer.vb">
       <DependentUpon>Donate.aspx</DependentUpon>
     </Compile>
     <Compile Include="donor\Donate.aspx.vb">
       <DependentUpon>Donate.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="donor\historyReport.aspx.designer.vb">
+      <DependentUpon>historyReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="donor\historyReport.aspx.vb">
+      <DependentUpon>historyReport.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Compile Include="donor\search.aspx.designer.vb">

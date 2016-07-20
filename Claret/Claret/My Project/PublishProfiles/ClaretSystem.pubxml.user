@@ -19,7 +19,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>07/07/2016 16:35:26</publishTime>
     </File>
     <File Include="!SQLStore/donor/SelectMasterDonorVisit.sql">
-      <publishTime>07/07/2016 16:45:53</publishTime>
+      <publishTime>07/15/2016 15:32:00</publishTime>
     </File>
     <File Include="!SQLStore/donor/UpdateMasterDonor.sql">
       <publishTime>07/01/2016 02:30:10</publishTime>
@@ -43,10 +43,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/03/2016 10:46:50</publishTime>
     </File>
     <File Include="bin/Claret.dll">
-      <publishTime>07/15/2016 09:28:10</publishTime>
+      <publishTime>07/15/2016 15:36:14</publishTime>
     </File>
     <File Include="bin/Claret.xml">
-      <publishTime>07/15/2016 09:28:10</publishTime>
+      <publishTime>07/15/2016 15:36:14</publishTime>
     </File>
     <File Include="bin/commons-logging.dll">
       <publishTime>01/04/2016 09:31:55</publishTime>
@@ -61,7 +61,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>01/04/2016 09:31:55</publishTime>
     </File>
     <File Include="bin/H2GEngine.dll">
-      <publishTime>07/13/2016 13:55:41</publishTime>
+      <publishTime>07/15/2016 10:10:55</publishTime>
     </File>
     <File Include="bin/ICSharpCode.SharpZipLib.dll">
       <publishTime>01/04/2016 09:31:54</publishTime>
@@ -150,14 +150,17 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="Default.aspx">
       <publishTime>07/15/2016 09:28:43</publishTime>
     </File>
+    <File Include="donor/historyReport.aspx">
+      <publishTime>07/15/2016 15:26:05</publishTime>
+    </File>
     <File Include="donor/main.aspx">
       <publishTime>06/09/2016 13:29:29</publishTime>
     </File>
     <File Include="donor/register.aspx">
-      <publishTime>07/15/2016 09:26:07</publishTime>
+      <publishTime>07/15/2016 15:27:23</publishTime>
     </File>
     <File Include="donor/search.aspx">
-      <publishTime>07/14/2016 15:18:51</publishTime>
+      <publishTime>07/15/2016 13:24:35</publishTime>
     </File>
     <File Include="image/bg/asc.gif">
       <publishTime>07/12/2016 13:32:36</publishTime>
@@ -262,7 +265,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/17/2016 15:34:36</publishTime>
     </File>
     <File Include="MasterPage.Master">
-      <publishTime>07/15/2016 09:29:18</publishTime>
+      <publishTime>07/15/2016 14:46:59</publishTime>
     </File>
     <File Include="mobile/main.aspx">
       <publishTime>07/12/2016 13:05:57</publishTime>
@@ -289,7 +292,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/15/2016 18:27:27</publishTime>
     </File>
     <File Include="resources/css/table-excel.css">
-      <publishTime>07/13/2016 09:52:59</publishTime>
+      <publishTime>07/15/2016 09:45:39</publishTime>
     </File>
     <File Include="resources/fonts/glyphicons-halflings-regular.eot">
       <publishTime>06/03/2016 17:29:47</publishTime>

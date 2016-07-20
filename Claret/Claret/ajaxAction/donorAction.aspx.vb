@@ -25,14 +25,22 @@ Public Class donorAction
                         DonorItem.DonorNumber = Me.getRunningNumber("DONORID", H2G.Login.SiteID)
                         DonorItem.ID = Cbase.QueryField(H2G.nextVal("DONOR"))
                         Cbase.Execute("SQL::donor/InsertMasterDonor", DonorItem.WithCollection(DonorItem))
+
+
+                        'INSERT INTO DONNEUR (DONN_NUMERO, DONN_SEXE, DONN_NOM, DONN_PRENOM, DONN_DNAISS, PTITRE_CD, DONN_ADRESSE, DONN_CPOST, PPAYS_CD, PPAYS_NAT_CD, DONN_TELP_NO, DONN_TELT_NO, DONN_TELT_POSTE, DONN_TELA_TYPE, DONN_TELA_NO, PPROF_CD, ASSOC_CD, DONN_DTE_VISITE, DONN_POIDS, DONN_DTE_POIDS, DONN_GRPRH, DONN_SX, DONN_DTE_TYPDONN )
+                        'VALUES(DONOR.DONOR_NUMBER, ถ้าผู้ชายใส่ '1’ ผู้หญิงใส่ ‘2’, DONER.NAME, DONER.SURNAME, DONOR.BIRTHDAY, TITLE.HIIG_CODE, DONOR.ADDRESS + ‘ ‘ + DONOR.SUB_DISTRICT + ‘ ‘ + DONOR.DISTRICT, DONOR.ZIPCODE, COUNTRY.HIIG_CODE, COUNTRY.HIIG_CODE, DONOR.TEL_MOBILE1, DONOR.TEL_OFFICE, DONOR.TEL_OFFICE_EXT, ‘M’, DONOR.TEL_MOBILE2, OCCUPATION.HIIG_CODE, ASSOCICATION.HIIG_CODE, DONOR_VISIT.CREATE_DATE, DONOR.WEIGHT, DONOR_VISIT.CREATE_DATE, RH_GROUP.HIIG_CODE, DONER.GENDER, TO_CHAR(DONOR_VISIT.CREATE_DATE,’yyyymmdd’))
+
+
                     Else
                         Cbase.Execute("SQL::donor/UpdateMasterDonor", DonorItem.WithCollection(DonorItem))
+
                     End If
 
                     Dim DVisitItem As DonationVisitItem = JSON.Deserialize(Of DonationVisitItem)(_REQUEST("dv"))
                     If String.IsNullOrEmpty(DVisitItem.ID) Then
                         DVisitItem.ID = Cbase.QueryField(H2G.nextVal("DONATION_VISIT"))
                         DVisitItem.DonorID = DonorItem.ID
+                        DVisitItem.Status = "WAIT INTEVIEW" 'สร้างใหม่ต้องเป็น WAIT INTEVIEW เสมอ
                         DVisitItem.QueueNumber = Cbase.QueryField("select nvl(max(queue_number),0)+1 from donation_visit where create_date between to_date('" & Today.ToString("ddMMyyyy") & "','ddMMyyyy') and to_date('" & Today.AddDays(1).ToString("ddMMyyyy") & "','ddMMyyyy') ")
                         DVisitItem.VisitNumber = Cbase.QueryField("select nvl(max(visit_number),0)+1 from donation_visit where donor_id = " & DonorItem.ID & " ")
 
@@ -144,12 +152,12 @@ Public Class donorAction
                         DonorMainItem.Donor.DuplicateTransaction = Cbase.QueryField("select nvl(count(id),0) from donation_visit where donor_id = '" & _REQUEST("id") & "' and to_char(create_date,'yyyyMMdd') = to_char(sysdate,'yyyyMMdd') ", "0")
                     End If
 
-                    '### DonorItem
+                    '### ExternalCardItem
                     DonorMainItem.ExtCard = New List(Of DonorExtCardItem)
                     For Each dRow As DataRow In Cbase.QueryTable("
                         select dexc.id, dexc.donor_id, dexc.external_card_id, dexc.card_number, ec.description 
                         from donor_external_card dexc
-                        inner join external_card ec on ec.id = dexc.external_card_id where dexc.donor_id = :id", param).Rows
+                        inner join external_card ec on ec.id = dexc.external_card_id where dexc.donor_id = :id order by ec.description ", param).Rows
                         DonorMainItem.ExtCard.Add(DonorExtCardItem.WithItems(New DonorExtCardItem, dRow))
                     Next
 
@@ -195,7 +203,7 @@ Public Class donorAction
                         select dr.id as record_id, DR.DONATION_FROM, DR.DONATION_DATE, DR.DONATION_NUMBER
                         , to_char(DR.DONATION_DATE, 'DD MON YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as DONATION_DATE_TEXT 
                         from donation_record dr 
-                        where DR.DONOR_ID = :id ", param).Rows
+                        where DR.DONOR_ID = :id order by DR.DONATION_NUMBER ", param).Rows
                         Dim drItem As New DonationRecordItem
                         drItem.ID = dRow("record_id").ToString
                         drItem.DonateDate = H2G.AC2BE(CDate(dRow("DONATION_DATE").ToString)).ToString("dd/MM/yyyy")
@@ -225,7 +233,7 @@ Public Class donorAction
                     SearchItem.GoNext = "N"
                     SearchItem.SearchList = New List(Of DonorSearchItem)
                     Dim DonorSearchItem As DonorSearchItem
-                    Dim intItemPerPage As Integer = 5
+                    Dim intItemPerPage As Integer = 20
                     Dim intTotalPage As Integer = 1
 
                     If Not String.IsNullOrEmpty(_REQUEST("donornumber")) Then
@@ -372,7 +380,7 @@ Public Class donorAction
                                         and nvl(trim(substr(dossex.dex_res,0,instr(dossex.dex_res,chr(27))-1)),trim(dossex.dex_res)) = trim(presultat.pres_cd)
                                         left join plabo plabo_first  on dossex.dex_labpdet = plabo_first.plabo_cd
                                         left join plabo plabo_last on dossex.dex_labddet = plabo_last.plabo_cd
-                                        where dossex.donn_numero = '" & donn_numero & "'
+                                        where dossex.donn_numero = get_hiig_donor('" & donn_numero & "')
                                         order by dex_exam"
 
                     Dim dt As DataTable = Hbase.QueryTable(sql)
@@ -398,7 +406,7 @@ Public Class donorAction
                     Dim donn_numero As String = _REQUEST("donn_numero")
                     Dim sql As String = "select pparecr.rsx_lib,a.dex_res,pparecr.rsx_cd 
                                         from pparecr left join 
-                                        (select * from dossex where dossex.donn_numero = '" & donn_numero & "' ) a on  a.dex_exam = pparecr.rsx_cd 
+                                        (select * from dossex where dossex.donn_numero = get_hiig_donor('" & donn_numero & "')) a on  a.dex_exam = pparecr.rsx_cd 
                                         where  ((pparecr.ppe_site = '9999') 
                                         and (pparecr.ppe_masque = 'DOSSIH')) and pparecr.ppe_type = 0
                                         order by pparecr.ppe_champ"
@@ -423,6 +431,7 @@ Public Class donorAction
                                         where ((pparecr.ppe_site = '9999') and 
                                         (pparecr.ppe_masque = 'DOSSIH')) and pparecr.ppe_type = 1 
                                         order by pparecr.ppe_champ"
+
                     Dim dt As DataTable = Hbase.QueryTable(sql)
                     Dim ImmunohaemtologyDataSet2List As New List(Of ImmunohaemtologyDataSet2)
                     For Each dr As DataRow In dt.Rows
@@ -447,7 +456,7 @@ Public Class donorAction
                                         inner join plabo on donexam.prelx_labo = plabo.plabo_cd
                                         inner join pexamen on trim(donexam.prelx_exam) = trim(pexamen.pex_cd)
                                         inner join presultat on trim(pexamen.pex_famres) = trim(presultat.pfres_cd) and  trim(donexam.prelx_rqual) = trim(presultat.pres_cd)
-                                        where don.donn_numero = '" & donn_numero & "'
+                                        where don.donn_numero = get_hiig_donor('" & donn_numero & "')
                                         order by donexam.donn_incr desc,donexam.prelx_incr"
 
                     Dim dt As DataTable = Hbase.QueryTable(sql)
@@ -475,7 +484,7 @@ Public Class donorAction
                     PostQueueItem.GoNext = "N"
                     PostQueueItem.PostQueueList = New List(Of PostQueueItem)
                     Dim Item As PostQueueItem
-                    Dim intItemPerPage As Integer = 5
+                    Dim intItemPerPage As Integer = 20
                     Dim intTotalPage As Integer = 1
 
                     If Not String.IsNullOrEmpty(_REQUEST("queuenumber")) Then
@@ -510,8 +519,8 @@ Public Class donorAction
                                             SELECT dn.* 
                                                 FROM (
 									                    select DV.id as visit_id, DN.id as donor_id, DV.QUEUE_NUMBER, DN.name || ' '  || DN.SURNAME as name
-                                                        , DV.SAMPLE_NUMBER, DV.COMMENT_TEXT, to_char(nvl(DV.VISIT_DATE,dv.create_date),'HH24,mm') as regis_time
-                                                        , st.code as regis_staff, to_char(dv.INTEVIEW_DATE,'HH24,mm') as INTEVIEW_time, dv.INTEVIEW_STAFF
+                                                        , DV.SAMPLE_NUMBER, DV.COMMENT_TEXT, to_char(nvl(DV.VISIT_DATE,dv.create_date),'HH24,MI') as regis_time
+                                                        , st.code as regis_staff, to_char(dv.INTEVIEW_DATE,'HH24,MI') as INTEVIEW_time, dv.INTEVIEW_STAFF
                                                         , '' as collection_time, '' as collection_staff, '' as lab_time, '' as lab_staff
                                                         from DONATION_VISIT dv
                                                         inner join donor dn on DN.id = DV.DONOR_ID

@@ -90,7 +90,6 @@ var H2G = {
 
 $.extend($.fn, {
     setDropdowList: function () {
-        //console.log("setDropdowList");
         var dclass = "";
         if ($(this).attr("class") != undefined) {
             dclass = $(this).attr("class");

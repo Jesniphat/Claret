@@ -18,6 +18,8 @@
                 yearRange: "c-100:c+0",
                 onSelect: function (selectedDate, objDate) { $("#txtDonorComment").focus(); },
             });
+
+            $("#btnIssue").click(linkToCollection)
         })
     </script>
     <style>
@@ -35,7 +37,7 @@
     <div id="donateTabBox" class="row">
         <div id="donateTab">
             <ul>
-                <li><a href="#donatePane" style="">Donete</a></li>
+                <li><a href="#donatePane" style="">Donate</a></li>
                 <li><a href="#postQueuePane" style="">Post Queue</a></li>
             </ul>
             <div id="donatePane">
@@ -46,22 +48,22 @@
                             <div class="col-md-4 text-right setPaddingRight">ประเภทการบริจาค</div>
                             <div class="col-md-7">
                                 <select id="donateType">
-                                    <option value="0">น้องเอ้ย...</option>
-                                    <option value="1">ทนไม่ไหวแล้ว...</option>
+                                    <option value="0">ทดสอบ...</option>
+                                    <option value="1">ทดสอบ2...</option>
                                 </select>
                             </div>
                             <div class="col-md-4 text-right setPaddingRight">ประเภทถุง</div>
                             <div class="col-md-7">
                                 <select id="donateBagType">
-                                    <option value="0">น้องเอ้ย...</option>
-                                    <option value="1">ทนไม่ไหวแล้ว...</option>
+                                    <option value="0">ทดสอบ...</option>
+                                    <option value="1">ทดสอบ2...</option>
                                 </select>
                             </div>
                             <div class="col-md-4 text-right setPaddingRight">การนำไปใช้งาน</div>
                             <div class="col-md-7">
                                 <select id="donateApply">
-                                    <option value="0">น้องเอ้ย...</option>
-                                    <option value="1">ทนไม่ไหวแล้ว...</option>
+                                    <option value="0">ทดสอบ...</option>
+                                    <option value="1">ทดสอบ2...</option>
                                 </select>
                             </div>
                             <div class="col-md-3"><input id="btnIssue" type="button" class="btn btn-success btn-block" value="ดำเนินการ" /></div>
@@ -77,8 +79,8 @@
                             <div class="col-md-2 text-right setPaddingRight">สถานะ</div>
                             <div class="col-md-9">
                                 <select id="donateStatus">
-                                    <option value="0">น้องเอ้ย...</option>
-                                    <option value="1">ทนไม่ไหวแล้ว...</option>
+                                    <option value="0">ทดสอบ...</option>
+                                    <option value="1">ทดสอบ2...</option>
                                 </select>
                             </div>
                             <div class="col-md-8"></div>
