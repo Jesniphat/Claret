@@ -3,18 +3,6 @@ Imports H2GEngine.DataItem
 Public Class donateAction
     Inherits UI.Page 'System.Web.UI.Page
 
-    Public Structure JSONObject
-        Public Status As Object
-        Public Data As Object
-        Public Param As Object
-        Public exMessage As String
-    End Structure
-
-    Public Structure JSONObjectArray
-        Public Param() As Object
-        Public exMessage As String
-    End Structure
-
     Dim JSONResponse As New CallbackException()
     Dim param As New SQLCollection()
     Dim Cbase As New oraDBQuery(oraDBQuery.Schema.CLARET)
@@ -31,7 +19,7 @@ Public Class donateAction
     End Sub
 
     Private Sub GetDonateTypeList()
-        'Dim JSONResponse As New JSONObject()
+
         Try
             Dim sql As String = "select * from Donation_type"
 
