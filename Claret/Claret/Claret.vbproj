@@ -135,6 +135,7 @@
     <Content Include="!SQLStore\donor\SelectMasterDonor.sql" />
     <Content Include="!SQLStore\donor\UpdateMasterDonor.sql" />
     <Content Include="!SQLStore\donor\InsertMasterDonor.sql" />
+    <Content Include="ajaxAction\donateAction.aspx" />
     <Content Include="ajaxAction\donorAction.aspx" />
     <Content Include="ajaxAction\masterAction.aspx" />
     <Content Include="ajaxAction\userAction.aspx" />
@@ -232,6 +233,13 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ajaxAction\donateAction.aspx.designer.vb">
+      <DependentUpon>donateAction.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ajaxAction\donateAction.aspx.vb">
+      <DependentUpon>donateAction.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
     <Compile Include="ajaxAction\donorAction.aspx.designer.vb">
       <DependentUpon>donorAction.aspx</DependentUpon>
     </Compile>
@@ -273,6 +281,7 @@
     </Compile>
     <Compile Include="donor\Donate.aspx.vb">
       <DependentUpon>Donate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="donor\historyReport.aspx.designer.vb">
       <DependentUpon>historyReport.aspx</DependentUpon>
@@ -382,6 +391,9 @@
     <Content Include="resources\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="resources\fonts\glyphicons-halflings-regular.woff2" />
     <Content Include="resources\css\bootstrap.css.map" />
+    <Content Include="resources\fonts\icomoon.eot" />
+    <Content Include="resources\fonts\icomoon.ttf" />
+    <Content Include="resources\fonts\icomoon.woff" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

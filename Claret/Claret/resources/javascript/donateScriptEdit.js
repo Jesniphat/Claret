@@ -20,6 +20,9 @@ function removeLabExamination(i) {
 }
 
 function addLabExamination() {
+    if ($("#labExamination").val() == "") {
+        return;
+    }
     labExaminationList.push({ text: $("#labExamination").val() });
     //console.log("data = ", labExaminationList);
     randerAddLabExamination();

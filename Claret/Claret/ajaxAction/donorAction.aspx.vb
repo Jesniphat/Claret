@@ -510,6 +510,12 @@ Public Class donorAction
                     If Not String.IsNullOrEmpty(_REQUEST("birthday")) Then param.Add("#BIRTHDAY", "and to_char(dn.birthday, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("birthday") & "' ")
                     If Not String.IsNullOrEmpty(_REQUEST("bloodgroup")) Then param.Add("#BLOOD_GROUP", " and UPPER(rg.description) like UPPER('" & _REQUEST("bloodgroup") & "') ")
                     If Not String.IsNullOrEmpty(_REQUEST("samplenumber")) Then param.Add("#BLOOD_GROUP", " and UPPER(rg.description) like UPPER('" & _REQUEST("bloodgroup") & "') ")
+                    'If Not String.IsNullOrEmpty(_REQUEST("reportdate")) Then param.Add("#REPORT_DATE", " and nvl(dv.VISIT_DATE,dv.CREATE_DATE) between to_date('" & _REQUEST("reportdate").Replace("/", "") & "','ddMMyyyy') and to_date('" & _REQUEST("reportdate").Replace("/", "") & "','ddMMyyyy')+1 ")
+
+                    If Not String.IsNullOrEmpty(_REQUEST("reportdate")) Then param.Add("#REPORT_DATE", "and to_char(nvl(dv.VISIT_DATE,dv.CREATE_DATE), 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("reportdate") & "' ")
+
+                    If Not String.IsNullOrEmpty(_REQUEST("status")) Then param.Add("#STATUS", " and dv.status = '" & _REQUEST("status") & "' ")
+
 
                     Dim sqlRecord As String = "SELECT DN.rn as row_num, dn.visit_id, dn.donor_id, dn.QUEUE_NUMBER, dn.name, dn.SAMPLE_NUMBER, dn.COMMENT_TEXT, dn.regis_time
 			                    , dn.regis_staff, dn.INTEVIEW_time, dn.INTEVIEW_STAFF, dn.collection_time, dn.collection_staff, dn.lab_time, dn.lab_staff
@@ -528,8 +534,7 @@ Public Class donorAction
                                                         left join external_card ec on ec.id = dexc.external_card_id
                                                         left join rh_group rg on rg.id = dn.rh_group_id
                                                         left join staff st on st.id = dv.create_staff
-                                                        where 1=1 and nvl(dv.VISIT_DATE,dv.CREATE_DATE) 
-                                                        between to_date(TO_CHAR(sysdate, 'ddMMyyyy'),'ddMMyyyy') and to_date(TO_CHAR(sysdate+1, 'ddMMyyyy'),'ddMMyyyy')
+                                                        where 1=1 /*#REPORT_DATE*/ /*#STATUS*/
                                                         /*#QUEUE_NUMBER*/ /*#DONOR_NUMBER*/ /*#NATION_NUMBER*/ /*#NAME*/ /*#SURNAME*/ 
                                                         /*#BIRTHDAY*/ /*#BLOOD_GROUP*/ 
 									                ) dn
@@ -544,8 +549,7 @@ Public Class donorAction
                                                         left join donor_external_card dexc on dexc.donor_id = dn.id and dexc.external_card_id = 3 
                                                         left join external_card ec on ec.id = dexc.external_card_id
                                                         left join rh_group rg on rg.id = dn.rh_group_id
-                                                        where 1=1 and nvl(dv.VISIT_DATE,dv.CREATE_DATE) 
-                                                        between to_date(TO_CHAR(sysdate, 'ddMMyyyy'),'ddMMyyyy') and to_date(TO_CHAR(sysdate+1, 'ddMMyyyy'),'ddMMyyyy')
+                                                        where 1=1 /*#REPORT_DATE*/ /*#STATUS*/
                                                         /*#QUEUE_NUMBER*/ /*#DONOR_NUMBER*/ /*#NATION_NUMBER*/ /*#NAME*/ /*#SURNAME*/ 
                                                         /*#BIRTHDAY*/ /*#BLOOD_GROUP*/  ) dn"
 
@@ -579,6 +583,50 @@ Public Class donorAction
 
                     JSONResponse.setItems(JSON.Serialize(Of PostQueueSearchItem)(PostQueueItem))
 
+                Case "visithistory"
+
+                    Dim HistoryList As New List(Of VisitHistoryItem)
+                    Dim Item As VisitHistoryItem
+
+                    Dim sqlRecord As String = "
+                    select dn.visit_id, dn.DONATION_NUMBER, to_char(dn.VISIT_DATE, 'DD MON YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as VISIT_DATE 
+                    , dn.DONATION_TYPE, dn.bag, dn.site, dn.COLLECTION_POINT, dn.CREATE_STAFF
+                    , dn.INTEVIEW_STAFF, dn.INTEVIEW_STATUS, dn.sample_number
+                    , to_char(dn.lab_date, 'DD MON YYYY HH24,MI', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as lab_date
+                    from (
+                        Select dv.id as visit_id, dr.DONATION_NUMBER, nvl(DV.VISIT_DATE, dv.create_date) As VISIT_DATE, DT.DESCRIPTION As DONATION_TYPE
+                        , ba.description as bag, si.name as site, cp.name as COLLECTION_POINT, crs.name || ' ' || crs.surname as CREATE_STAFF
+                        , ins.name || ' ' || ins.surname as INTEVIEW_STAFF, dv.INTEVIEW_STATUS, dr.lab_date, dv.sample_number
+                        From DONATION_VISIT dv
+                        Left Join DONATION_RECORD dr on dr.DONATION_VISIT_id = dv.id
+                        Left Join DONATION_TYPE dt on dt.id = dv.DONATION_TYPE_ID
+                        Left Join bag ba on ba.id = dv.BAG_ID
+                        Left Join site si on si.id = dv.site_ID
+                        Left Join COLLECTION_POINT cp on cp.id = dv.COLLECTION_POINT_ID
+                        Left Join STAFF crs on crs.id = dv.CREATE_STAFF
+                        Left Join STAFF ins on ins.id = dv.INTEVIEW_STAFF
+                        where dv.donor_id = '" & _REQUEST("id") & "'
+                        ORDER BY nvl(dv.VISIT_DATE, dv.create_date) desc
+                    ) dn "
+                    For Each dRow As DataRow In Cbase.QueryTable(sqlRecord).Rows
+                        Item = New VisitHistoryItem
+                        Item.VisitID = dRow("visit_id").ToString()
+                        Item.Bag = dRow("bag").ToString()
+                        Item.CollectionPoint = dRow("COLLECTION_POINT").ToString()
+                        Item.CreateStaff = dRow("CREATE_STAFF").ToString()
+                        Item.DonationNumber = dRow("DONATION_NUMBER").ToString()
+                        Item.DonationType = dRow("DONATION_TYPE").ToString()
+                        Item.InterviewStaff = dRow("INTEVIEW_STAFF").ToString()
+                        Item.InterviewStatus = dRow("INTEVIEW_STATUS").ToString()
+                        Item.LabDate = dRow("lab_date").ToString().Replace(",", ":")
+                        Item.SampleNumber = dRow("sample_number").ToString()
+                        Item.Site = dRow("site").ToString()
+                        Item.VisitDate = dRow("VISIT_DATE").ToString()
+
+                        HistoryList.Add(Item)
+                    Next
+
+                    JSONResponse.setItems(JSON.Serialize(Of List(Of VisitHistoryItem))(HistoryList))
             End Select
 
         Catch ex As Exception
@@ -690,7 +738,6 @@ Public Structure RewardItem
 
 End Structure
 
-
 Public Structure DonationRecordItem
     Public ID As String
     Public DonateDate As String
@@ -698,6 +745,22 @@ Public Structure DonationRecordItem
     Public DonateNumber As String
     Public DonateFrom As String
     Public DonateReward As String
+
+End Structure
+
+Public Structure VisitHistoryItem
+    Public VisitID As String
+    Public DonationNumber As String
+    Public VisitDate As String
+    Public DonationType As String
+    Public Bag As String
+    Public Site As String
+    Public CollectionPoint As String
+    Public CreateStaff As String
+    Public InterviewStaff As String
+    Public InterviewStatus As String
+    Public LabDate As String
+    Public SampleNumber As String
 
 End Structure
 

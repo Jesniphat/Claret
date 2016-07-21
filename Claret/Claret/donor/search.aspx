@@ -174,6 +174,8 @@
                         , birthday: $("#txtPostBirthday").H2GValue()
                         , bloodgroup: $("#txtPostBloodGroup").H2GValue()
                         , samplenumber: $("#txtPostSample").H2GValue()
+                        , reportdate: formatDate(H2G.today(), "dd/MM/yyyy") //$("#txtReportDate").H2GValue()
+                        , status: ""
                         , p: $("#tbPostQueue").attr("currentPage") || 1
                         , so: $("#tbPostQueue").attr("sortOrder") || "queue_number"
                         , sd: $("#tbPostQueue").attr("sortDirection") || "desc"
@@ -233,88 +235,6 @@
             }
         }
 
-        function genGridPage(tbData, doFunction) {
-            var totalPage = ($(tbData).attr("totalPage") || "1").toNumber(); var currentPage = ($(tbData).attr("currentPage") || "1").toNumber();
-            var divpage = null; var page = "";
-            divpage = $(tbData).find("div.page").H2GValue("");
-
-            var backward = currentPage == 1 ? 1 : currentPage - 1;
-            var forward = currentPage < totalPage ? currentPage + 1 : totalPage;
-            if (totalPage > 0) {
-                $(divpage).append($("<span>", { style: "vertical-align:text-top;" }).H2GValue("หน้าที่"));
-                $(divpage).append($("<button>", { page: 1 }).append($("<i>", { class: "glyphicon glyphicon-fast-backward" })).click(function () { changePage($(this), doFunction); return false; }));
-                $(divpage).append($("<button>", { page: backward }).append($("<i>", { class: "glyphicon glyphicon-backward" })).click(function () { changePage($(this), doFunction); return false; }));
-                $(divpage).append($("<input>", { type: "text", value: currentPage }).focusin(function () { $(this).select(); }).H2GNumberbox()
-                    .change(function () {
-                    if ($(this).H2GValue() != "") {
-                        if (!($(this).H2GValue().toNumber() == 0 || $(this).H2GValue().toNumber() > totalPage)) {
-                            changePage($(this).H2GFill({ page: $(this).H2GValue() }), doFunction);
-                        } else { $(this).focus(); notiWarning("เลขหน้าไม่ถูกต้อง"); }
-                    } else { $(this).focus(); notiWarning("กรุณากรอกเลขหน้าที่ต้องการ"); }
-                }).select());
-                $(divpage).append($("<span>", { class: "total-page", style: "vertical-align:text-top;" }).H2GValue("/" + totalPage));
-                $(divpage).append($("<button>", { page: forward }).append($("<i>", { class: "glyphicon glyphicon-forward" })).click(function () { changePage($(this), doFunction); return false; }));
-                $(divpage).append($("<button>", { page: totalPage }).append($("<i>", { class: "glyphicon glyphicon-fast-forward" })).click(function () { changePage($(this), doFunction); return false; }));
-                if (currentPage <= 1) {
-                    $(divpage).find(".glyphicon-fast-backward").closest("button").prop('disabled', true);
-                    $(divpage).find(".glyphicon-backward").closest("button").prop('disabled', true);
-                }
-                if (currentPage == totalPage) {
-                    $(divpage).find(".glyphicon-fast-forward").closest("button").prop('disabled', true);
-                    $(divpage).find(".glyphicon-forward").closest("button").prop('disabled', true);
-                }
-            }
-        }
-        function enterDatePicker(dateControl, action, doFunction) {
-            var doFun = doFunction || donorSearch;
-
-            var pattern = 'dd/MM/yyyy';
-            if ($(dateControl).H2GValue() != '') {
-                $(dateControl).H2GValue($(dateControl).H2GValue().replace(/\W+/g, ''));
-                $(dateControl).next().remove();
-                if (isDate($(dateControl).H2GValue(), pattern.replace(/\W+/g, ''))) {
-                    var isValue = new Date(getDateFromFormat($(dateControl).H2GValue(), pattern.replace(/\W+/g, '')));
-                    $(dateControl).H2GValue(formatDate(isValue, pattern))
-                    if (action == "enter") {
-                        doFun(true);
-                    }
-                } else {
-                    notiWarning("วันที่ไม่ถูกต้อง กรุณาตรวจสอบ");
-                    $(dateControl).focus();
-                }
-            } else { doFun(true); }
-        }
-        function changePage(xobj, doFunction) {
-            if ($(xobj).closest("table").H2GAttr("wStatus") != "working") {
-                $(xobj).closest("table").H2GAttr("currentPage", $(xobj).H2GAttr("page"))
-                doFunction(false);
-            }
-        }
-        function sortButton(xobj, doFunction) {
-            //ถ้าเป็นการ sort field เดิมให้ทำการเปลี่ยน direction 
-            if ($(xobj).H2GAttr("sortOrder") != undefined) {
-                if ($(xobj).closest("table").H2GAttr("wStatus") != "working") {
-                    if ($(xobj).H2GAttr("sortOrder") == $(xobj).closest("table").H2GAttr("sortOrder")) {
-                        if ($(xobj).closest("table").H2GAttr("sortDirection") == "asc") {
-                            $(xobj).closest("table").H2GFill({ sortDirection: "desc" });
-                            $(xobj).find(".glyphicon").removeClass("glyphicon-triangle-top").addClass("glyphicon-triangle-bottom");
-                        }
-                        else {
-                            $(xobj).closest("table").H2GAttr("sortDirection", "asc");
-                            $(xobj).find(".glyphicon").removeClass("glyphicon-triangle-bottom").addClass("glyphicon-triangle-top");
-                        }
-                    } else {
-                        //ถ้าเป็นการ sort field ใหม่ให้ทำการเปลี่ยน field และเริ่ม direction ที่ desc
-                        $(xobj).closest("table").H2GFill({ sortDirection: "desc", sortOrder: $(xobj).H2GAttr("sortOrder") });
-                        //ต้องทำการย้าย direct sign ไปไว้กับหัวข้อที่เลือกใหม่ด้วย
-                        $(xobj).closest("table")
-                        $(xobj).closest("table").find("thead > tr > th .glyphicon").removeClass("glyphicon-triangle-top").addClass("glyphicon-triangle-bottom")
-                            .appendTo($(xobj).closest("table").find("thead button[sortOrder='" + $(xobj).H2GAttr("sortOrder") + "']"));
-                    }
-                    doFunction(false);
-                }
-            }
-        }
     </script>
     <style>
         #searchTab .border-box {
@@ -432,7 +352,7 @@
                                             <th style="width: 8.33333333%;"><button sortOrder="blood_group">กรุ๊ปเลือด</button>
                                             </th>
                                         </tr>
-                                        <tr class="no-transaction" style="display:none;"><td align="center" colspan="7">No transaction</td></tr>
+                                        <tr class="no-transaction" style="display:none;"><td align="center" colspan="7">ไม่พบข้อมูล</td></tr>
                                         <tr class="more-loading" style="display:none;"><td align="center" colspan="7">Loading detail...</td></tr>
                                         <tr class="template-data" style="display:none;" refID="NEW">
                                             <td class="td-donor-number">
@@ -455,7 +375,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr class="no-transaction"><td align="center" colspan="7">No transaction</td></tr>
+                                        <tr class="no-transaction"><td align="center" colspan="7">ไม่พบข้อมูล</td></tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
@@ -600,7 +520,7 @@
                                             </th>
                                             <th class="col-md-1"></th>
                                         </tr>
-                                        <tr class="no-transaction" style="display:none;"><td align="center" colspan="13">No transaction</td></tr>
+                                        <tr class="no-transaction" style="display:none;"><td align="center" colspan="13">ไม่พบข้อมูล</td></tr>
                                         <tr class="more-loading" style="display:none;"><td align="center" colspan="13">Loading detail...</td></tr>
                                         <tr class="template-data" style="display:none;" refID="NEW">
                                             <td class="td-queue text-center">
@@ -635,7 +555,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr class="no-transaction"><td align="center" colspan="13">No transaction</td></tr>
+                                        <tr class="no-transaction"><td align="center" colspan="13">ไม่พบข้อมูล</td></tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>

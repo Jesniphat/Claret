@@ -3,7 +3,6 @@
     <link href="../resources/css/donateStyle.css" rel="stylesheet" />
     <script src="../resources/javascript/donateScript.js" type="text/javascript"></script>
     <script>
-        console.log("Donate")
         $(function () {
             $("#donateTab").tabs({
                 active: 0
@@ -19,7 +18,8 @@
                 onSelect: function (selectedDate, objDate) { $("#txtDonorComment").focus(); },
             });
 
-            $("#btnIssue").click(linkToCollection)
+            $("#btnIssue").click(linkToCollection);
+            getDonateTypeList();
         })
     </script>
     <style>

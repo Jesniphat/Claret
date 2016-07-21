@@ -12,10 +12,43 @@
 }
 @font-face {
 	font-family: 'THSarabunNewItalic';
-    src: url('../resources/fonts/THSarabunNew/THSarabunNew_Italic.ttf');
+    src: url('../fonts/THSarabunNew/THSarabunNew_Italic.ttf');
 	font-weight: normal;
 	font-style: normal;
 }
+/* icomoon config =========== */
+@font-face {
+    font-family: 'icomoon';
+    src:    url('../fonts/icomoon.eot?l9kr27');
+    src:    url('../fonts/icomoon.eot?l9kr27#iefix') format('embedded-opentype'),
+        url('../fonts/icomoon.ttf?l9kr27') format('truetype'),
+        url('../fonts/icomoon.woff?l9kr27') format('woff'),
+        url('../fonts/icomoon.svg?l9kr27#icomoon') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: 'icomoon' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    padding: 0px 0px;
+    vertical-align: sub;
+
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-blood-bag:before {
+    content: "\e900";
+}
+/* icomoon config =========== */
 html {
     overflow:hidden;
 }
@@ -47,6 +80,9 @@ span.glyphicon {
 }
 .color-yellow {
     background-color:#FAFDD7;
+}
+.blue {
+    color:#4F7CCB;
 }
 .btn {
     font-size: 20px !important; /* 1 */
@@ -142,6 +178,98 @@ a {
     border: solid 2px #EF8B2C;
     background-color: #EF8B2C;
     color: #FFF;
+}
+div.page span.glyphicon {
+    padding: 1px 3px;
+    font-size: large;
+}
+div.page > button {
+    height: 25px; 
+    vertical-align: sub; 
+    font-size: 17px !important; 
+    border: 0; 
+    background-color: transparent;
+}
+div.page > input {
+    width: 35px; 
+    height: 20px; 
+    text-align: center; 
+    margin: 0px 3px;
+}
+div.page > button[disabled] {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+table.table > thead > tr > th > button {
+    font-family: THSarabunNew;
+    font-size:20px;
+    height: 25px; 
+    vertical-align: sub; 
+    border: 0; 
+    background-color: transparent;
+    padding-left: 0;
+    padding-right: 0;
+}
+table.table > thead > tr > th > button > i {
+    vertical-align: middle;
+    padding-left: 5px;
+    font-size: 15px;
+}
+table.table-bordered-excel > thead > tr > th > button {
+    font-size:18px;
+}
+table.table-bordered-excel > thead > tr > th > button > i {
+    font-size: 8px;
+}
+.custom-combobox .custom-combobox {
+    position: relative;
+    display: inline-block;
+}
+.custom-combobox .custom-combobox-toggle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin-left: -1px;
+    padding: 0;
+    background: #ffffff;
+    border: 1px solid #aab2bd;
+    height: 30px;
+    width: 34px;
+}
+.custom-combobox .custom-combobox-input {
+    margin: 0;
+    font-family: THSarabunNew;
+    padding: 0px 0px 0px 5px;
+    font-weight: normal;
+    color: #333333;
+    background: white;
+    border-color: #aab2bd;
+    border-bottom-left-radius: 4px;
+    border-top-left-radius: 4px;
+}
+.custom-combobox .custom-combobox-input.required {
+    background: #fff5f5 !important;
+}
+.ui-menu .ui-menu-item {
+    font-family: THSarabunNew;
+    padding: 0px 0px 0px 5px;
+}
+.ui-menu-item.ui-state-focus {
+    padding: 0px 0px 0px 5px;
+    font-weight: normal;
+}
+.ui-menu .ui-state-focus,
+.ui-menu .ui-state-active {
+	margin: 0px;
+    border:0;
+    background:#A9B1BB;
+    color: white;
+}
+.ui-autocomplete {
+    max-height: 280px;
+    overflow-y: auto;
+    /* prevent horizontal scrollbar */
+    overflow-x: hidden;
 }
 /*Adjust jquery ui tab*/
 .ui-datepicker {

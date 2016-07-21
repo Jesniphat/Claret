@@ -2,6 +2,12 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <script>
         $(function () {
+            $.extend($.fn, {
+                queueSelect: function () {
+                    $("#data").H2GFill({ donorID: $(this).closest("tr").H2GAttr("donorID"), visitID: $(this).closest("tr").H2GAttr("refID") });
+                    $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "register.aspx", method: "post", staffaction: "register" }).submit();
+                },
+            });
             $("#txtReportDate").H2GDatebox().setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
@@ -10,9 +16,110 @@
                     $("#txtPostQueue").focus();
                 },
             });
+            $("#txtPostBirthday").H2GDatebox().setCalendar({
+                maxDate: new Date(),
+                minDate: "-100y",
+                yearRange: "c-100:c+0",
+                onSelect: function (selectedDate, objDate) {
+                    $("#txtPostBloodGroup").focus();
+                },
+            });
+            $("#divPostCriteria input").enterKey(function () {
+                postQueueSearch(true);
+                return false;
+            });
+            $("#spPostSearch").click(function () {
+                postQueueSearch(true);
+            });
+            $("#spPostClear").click(function () {
+                $("#divPostCriteria input").H2GValue('');
+                $("#txtPostQueue").focus();
+            });
             
             $("#ddlStatus").setDropdowList();
+            $("#txtReportDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy"));
+            postQueueSearch(true);
         });
+        function postQueueSearch(newSearch) {
+            var dataView = $("#tbPostQueue > tbody");
+            $(dataView).H2GValue($("#tbPostQueue > thead > tr.more-loading").clone().show());
+            if ($(dataView).closest("table").H2GAttr("wStatus") != "working") {
+                if (newSearch) { $("#tbPostQueue").attr("currentPage", 1) }
+                $(dataView).closest("table").H2GAttr("wStatus", "working");
+                $.ajax({
+                    url: '../../ajaxAction/donorAction.aspx',
+                    data: {
+                        action: 'donorpostqueue'
+                        , queuenumber: $("#txtPostQueue").H2GValue()
+                        , donornumber: $("#txtPostDonorNumber").H2GValue()
+                        , nationnumber: $("#txtPostNationNumber").H2GValue()
+                        , name: $("#txtPostName").H2GValue()
+                        , surname: $("#txtPostSurname").H2GValue()
+                        , birthday: $("#txtPostBirthday").H2GValue()
+                        , bloodgroup: $("#txtPostBloodGroup").H2GValue()
+                        , samplenumber: $("#txtPostSample").H2GValue()
+                        , reportdate: $("#txtReportDate").H2GValue()
+                        , status: $("#ddlStatus").H2GValue()
+                        , p: $("#tbPostQueue").attr("currentPage") || 1
+                        , so: $("#tbPostQueue").attr("sortOrder") || "queue_number"
+                        , sd: $("#tbPostQueue").attr("sortDirection") || "desc"
+                    },
+                    type: "POST",
+                    dataType: "json",
+                    error: function (xhr, s, err) {
+                        console.log(s, err);
+                        $(dataView).H2GValue($("#tbPostQueue > thead > tr.no-transaction").clone().show());
+                        $(dataView).closest("table").H2GAttr("wStatus", "error");
+                    },
+                    success: function (data) {
+                        $(dataView).H2GValue('');
+                        if (!data.onError) {
+                            data.getItems = jQuery.parseJSON(data.getItems);
+                            if (data.getItems.PostQueueList.length > 0) {
+                                if (data.getItems.GoNext == "Y") {
+                                    $.each((data.getItems.PostQueueList), function (index, e) {
+                                        var dataRow = $("#tbPostQueue > thead > tr.template-data").clone();
+                                        $(dataRow).H2GFill({ refID: e.VisitID, donorID: e.DonorID }).queueSelect();
+                                    });
+                                } else {
+                                    $.each((data.getItems.PostQueueList), function (index, e) {
+                                        var dataRow = $("#tbPostQueue > thead > tr.template-data").clone().show();
+                                        $(dataRow).H2GFill({ refID: e.VisitID, donorID: e.DonorID });
+                                        $(dataRow).find('.td-queue').append(e.QueueNumber).H2GAttr("title", e.QueueNumber);
+                                        $(dataRow).find('.td-name').append(e.Name).H2GAttr("title", e.Name);
+                                        $(dataRow).find('.td-sample').append(e.SampleNumber).H2GAttr("title", e.SampleNumber);
+                                        $(dataRow).find('.td-remarks').append(e.Comment).H2GAttr("title", e.Comment);
+
+                                        $(dataRow).find('.td-regis-staff').append(e.RegisStaff).H2GAttr("title", e.RegisStaff);
+                                        $(dataRow).find('.td-regis-time').append(e.RegisTime).H2GAttr("title", e.RegisTime);
+                                        $(dataRow).find('.td-interview-staff').append(e.InteviewStaff).H2GAttr("title", e.InteviewStaff);
+                                        $(dataRow).find('.td-interview-time').append(e.InteviewTime).H2GAttr("title", e.InteviewTime);
+                                        $(dataRow).find('.td-collection-staff').append(e.CollectionStaff).H2GAttr("title", e.CollectionStaff);
+                                        $(dataRow).find('.td-collection-time').append(e.CollectionTime).H2GAttr("title", e.CollectionTime);
+                                        $(dataRow).find('.td-lab-staff').append(e.LabStaff).H2GAttr("title", e.LabStaff);
+                                        $(dataRow).find('.td-lab-time').append(e.LabTime).H2GAttr("title", e.LabTime);
+                                        $(dataView).append(dataRow);
+                                    });
+                                    $(dataView).closest("table").attr("totalPage", data.getItems.TotalPage)
+                                }
+
+                            } else {
+                                $(dataView).H2GValue($("#tbPostQueue > thead > tr.no-transaction").clone().show());
+                                $(dataView).closest("table").attr("totalPage", 0)
+                            }
+                        } else {
+                            $(dataView).H2GValue($("#tbPostQueue > thead > tr.no-transaction").clone().show());
+                            $(dataView).closest("table").attr("totalPage", 0)
+                        }
+                        $(dataView).closest("table").H2GAttr("wStatus", "done");
+
+                        $(dataView).closest("table").find("thead button").click(function () { sortButton($(this), postQueueSearch); return false; });
+                        genGridPage($(dataView).closest("table"), postQueueSearch);
+                        $("#txtPostQueue").focus();
+                    }
+                });    //End ajax
+            }
+        }
     </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="cphMaster" runat="server">
@@ -131,7 +238,7 @@
                                 <tr>
                                     <th class="col-md-2"><button sortOrder="QUEUE_NUMBER">คิวที่<i class="glyphicon glyphicon-triangle-bottom"></i></button>
                                     </th>
-                                    <th class="col-md-7"><button sortOrder="name">ชื่อ-นามสกุล</button>
+                                    <th class="col-md-6"><button sortOrder="name">ชื่อ-นามสกุล</button>
                                     </th>
                                     <th class="col-md-4"><button sortOrder="SAMPLE_NUMBER">Sample No.</button>
                                     </th>
@@ -145,9 +252,9 @@
                                     </th>
                                     <th class="col-md-4" colspan="2"><button>Lab</button>
                                     </th>
-                                    <th class="col-md-1"></th>
+                                    <th class="col-md-2"></th>
                                 </tr>
-                                <tr class="no-transaction" style="display:none;"><td align="center" colspan="13">No transaction</td></tr>
+                                <tr class="no-transaction" style="display:none;"><td align="center" colspan="13">ไม่พบข้อมูล</td></tr>
                                 <tr class="more-loading" style="display:none;"><td align="center" colspan="13">Loading detail...</td></tr>
                                 <tr class="template-data" style="display:none;" refID="NEW">
                                     <td class="td-queue text-center">
@@ -174,15 +281,16 @@
                                     </td>
                                     <td class="td-lab-time col-md-2 text-center" style="background-color: #E5E0EC;">
                                     </td>
-                                    <td class="col-md-1">
-                                        <div>
-                                            <a class="icon"><span class="glyphicon glyphicon-arrow-right" aria-hidden="true" onclick="return $(this).queueSelect();"></span></a>
+                                    <td>
+                                        <div class="text-center">
+                                            <a class="icon"><span class="glyphicon glyphicon-pencil" aria-hidden="true" onclick="return $(this).queueSelect();"></span></a>
+                                            <a class="icon"><span class="icon-blood-bag" aria-hidden="true" onclick="return false;"></span></a>
                                         </div>
                                     </td>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="no-transaction"><td align="center" colspan="13">No transaction</td></tr>
+                                <tr class="no-transaction"><td align="center" colspan="13">ไม่พบข้อมูล</td></tr>
                             </tbody>
                             <tfoot>
                                 <tr>

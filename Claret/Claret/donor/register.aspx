@@ -8,6 +8,8 @@
     </style>
     <script>
         $(function () {
+            $("#tbDonateHistory thead button").click(function () { sortButton($(this), postQueueSearch); return false; });
+
             $("#txtCardNumber").enterKey(function () { $(this).addExtCard(); }).focus();
             $("#txtDonorName").H2GNamebox();
             $("#txtDonorSurName").H2GNamebox();
@@ -488,7 +490,6 @@
                     reward = $(e).H2GAttr("rewardID") + "|" + $(e).H2GValue() + "##";
                 }
             });
-            console.log(reward);
             return reward;
         }
         function validation() {
@@ -602,7 +603,8 @@
                         $("#infoTab > ul > li > a[href='#todayPane']").H2GValue(data.getItems.Donor.VisitDateText)
 
                         $("#spRegisNumber").H2GValue(data.getItems.Donor.DonorNumber);
-                        $("#spQueue").H2GValue(data.getItems.Donor.QueueNumber==""?"-":"คิวที่ " + data.getItems.Donor.QueueNumber).H2GAttr("queueNumber",data.getItems.Donor.QueueNumber);
+                        $("#spQueue").H2GValue(data.getItems.Donor.QueueNumber == "" ? "-" : "คิวที่ " + data.getItems.Donor.QueueNumber).H2GAttr("queueNumber", data.getItems.Donor.QueueNumber);
+                        $("#spStatus").H2GValue(data.getItems.Donor.Status);
                         $("input:radio[name=gender]").prop("checked", false);
                         if (data.getItems.Donor.Gender == "M") { $("#rbtM").prop("checked", true); } else { $("#rbtF").prop("checked", true); }
                         $("#divBloodType").H2GValue(data.getItems.Donor.RHGroup);
@@ -842,6 +844,7 @@
                     console.log(s, err);
                 },
                 success: function (data) {
+                    // console.log("xxxx = ", data);
                     data.getItems = jQuery.parseJSON(data.getItems);
                     // console.log("Respondata exams = ", data.getItems);
                     if (!data.onError) {
@@ -851,13 +854,13 @@
                                             "<td class='text-right td-number-excel'>" + datas[i].DonnIncr + "</td>" +
                                             "<td class='text-center td-date-excel'>" + datas[i].LabDate + "</td>" +
                                             "<td class='text-center td-text-excel'>" + datas[i].PrelNo + "</td>" +
-                                            "<td class='text-center td-text-excel'>" + datas[i].PcatdLib + "</td>" +
                                             "<td class='text-left td-text-excel'>" + datas[i].PexLibAff + "</td>" +
                                             "<td class='text-left td-text-excel'>" + datas[i].PresAff + "</td>" +
-                                            "<td class='text-left td-text-excel'>" + datas[i].ExecutingLab + "</td>" +
                                             "<td class='text-left td-text-excel'>" + datas[i].TestBy1 + "</td>" +
                                             "<td class='text-left td-text-excel'>" + datas[i].TestBy2 + "</td>" +
                                             "<td class='text-left td-text-excel'>" + datas[i].TestBy3 + "</td>" +
+                                            "<td class='text-left td-text-excel'>" + datas[i].ExecutingLab + "</td>" +
+                                            "<td class='text-center td-text-excel'>" + datas[i].PcatdLib + "</td>" +
                                        "</tr>";
                             $('#exams-tab-table > tbody').append(rows);
                         }
@@ -894,7 +897,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="border-box" style="border-radius: 4px 4px 0px 0px; color: #4F7CCB; font-weight: bold;">
+        <div class="border-box blue" style="border-radius: 4px 4px 0px 0px; font-weight: bold;">
             <div class="col-md-27">
                 <span id="spQueue">-</span>/ เลขประจำตัวผู้บริจาค :
                 <span id="spRegisNumber" visitID dPlanID dPointID siteID="1" visitFrom="HOSPITAL" queueNum dTypeID bagID dToID donateNumberExt="0" donateNumber="0" visitNumber="0"></span>
@@ -939,7 +942,7 @@
     </div>
     <div class="row">
         <div class="col-md-3 col-shift-left">
-            <div id="divBloodType" class="border-box text-center" style="font-size: 66px; font-weight: bold; height: 108px;">
+            <div id="divBloodType" class="border-box text-center blue" style="font-size: 66px; font-weight: bold; height: 108px;">
             </div>
         </div>
         <div class="col-md-33">
@@ -1060,7 +1063,7 @@
                                 </th>
                             </tr>
                             <tr class="no-transaction" style="display: none;">
-                                <td align="center" colspan="4">No transaction</td>
+                                <td align="center" colspan="4">ไม่พบข้อมูล</td>
                             </tr>
                             <tr class="more-loading" style="display: none;">
                                 <td align="center" colspan="4">Loading detail...</td>
@@ -1074,7 +1077,7 @@
                         </thead>
                         <tbody>
                             <tr class="no-transaction">
-                                <td align="center" colspan="4">No transaction</td>
+                                <td align="center" colspan="4">ไม่พบข้อมูล</td>
                             </tr>
                         </tbody>
                     </table>
@@ -1174,6 +1177,64 @@
             <div id="historyPane">
                 <div class="border-box">
                     <div class="col-md-36">แฟ้มประวัติ</div>
+                    <div class="border-box">
+                        <div class="col-md-36">
+                            <table id="tbDonateHistory" class="table table-bordered-excel" style="font-size:18px;">
+                                <thead>
+                                    <tr>
+                                        <th class="col-md-2 text-center"><button sortOrder="donate_number">ครั้งที่<i class="glyphicon glyphicon-triangle-bottom"></i></button>
+                                        </th>
+                                        <th class="col-md-3 text-center"><button sortOrder="visit_date">วันลงทะเบียน</button>
+                                        </th>
+                                        <th class="col-md-4"><button sortOrder="donate_type">ประเภทการบริจาค</button>
+                                        </th>
+                                        <th class="col-md-3"><button sortOrder="bag_type">ประเภทถุง</button>
+                                        </th>
+                                        <th class="col-md-3 text-center"><button sortOrder="site">ภาค</button>
+                                        </th>
+                                        <th class="col-md-3 text-center"><button sortOrder="collection_point">หน่วย</button>
+                                        </th>
+                                        <th class="col-md-3"><button sortOrder="regis_by">ลงทะเบียนโดย</button>
+                                        </th>
+                                        <th class="col-md-3"><button sortOrder="collection_by">คัดกรองโดย</button>
+                                        </th>
+                                        <th class="col-md-4"><button sortOrder="collection_result">ผลการคัดกรอง</button>
+                                        </th>
+                                        <th class="col-md-4 text-center"><button sortOrder="lab_date">Date of lab</button>
+                                        </th>
+                                        <th class="col-md-3 text-center"><button sortOrder="sample_number">Sample No</button>
+                                        </th>
+                                        <th class="col-md-1"></th>
+                                    </tr>
+                                    <tr class="no-transaction" style="display:none;"><td align="center" colspan="12">ไม่พบข้อมูล</td></tr>
+                                    <tr class="more-loading" style="display:none;"><td align="center" colspan="12">Loading detail...</td></tr>
+                                    <tr class="template-data" style="display:none;" refID="NEW">
+                                        <td><input type="text" class="txt-donate-number text-center" readonly value="" /></td>
+                                        <td><input type="text" class="txt-visit-date text-center" readonly value="" /></td>
+                                        <td><input type="text" class="txt-donate-type text-left" readonly value="" /></td>
+                                        <td><input type="text" class="txt-bag-type text-left" readonly value="" /></td>
+                                        <td><input type="text" class="txt-site text-center" readonly value="" /></td>
+                                        <td><input type="text" class="txt-collection-point text-center" readonly value="" /></td>
+                                        <td><input type="text" class="txt-regis-by text-left" readonly value="" /></td>
+                                        <td><input type="text" class="txt-collection-by text-left" readonly value="" /></td>
+                                        <td><input type="text" class="txt-collection-result text-left" readonly value="" /></td>
+                                        <td><input type="text" class="txt-lab-date text-center" readonly value="" /></td>
+                                        <td><input type="text" class="txt-sample-number text-center" readonly value="" /></td>
+                                        <td class="text-center">
+                                            <div>
+                                                <a class="icon">
+                                                    <span class="glyphicon glyphicon-arrow-right" aria-hidden="true" onclick="return false;"></span>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="no-transaction"><td align="center" colspan="12">ไม่พบข้อมูล</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div id="todayPane">
@@ -1585,14 +1646,14 @@
                                             <tr>
                                                 <th class="col-md-2">ครั้งที่</th>
                                                 <th class="col-md-3">วันที่ตรวจสอบ</th>
-                                                <th class="col-md-4">Sample no</th>
-                                                <th class="col-md-4">ประเภทการบริจาค</th>
-                                                <th class="col-md-4">Examination</th>
-                                                <th class="col-md-4">Result</th>
-                                                <th class="col-md-5">Executing laboratory</th>
-                                                <th class="col-md-2">Test 1</th>
-                                                <th class="col-md-2">Test 2</th>
-                                                <th class="col-md-2">Test 3</th>
+                                                <th class="col-md-3">Sample no</th>
+                                                <th class="col-md-3">Examination</th>
+                                                <th class="col-md-3">Result</th>
+                                                <th class="col-md-3">Input 1</th>
+                                                <th class="col-md-3">Input 2</th>
+                                                <th class="col-md-4">Validation by</th>
+                                                <th class="col-md-4">Ext. Lab</th>
+                                                <th class="col-md-4">Type Donation</th>
                                             </tr>
                                         </thead>
                                         <tbody>

@@ -18,6 +18,7 @@
             
             randerAddLabExamination();
             randerAddCollectedProblem();
+            $("#donate-table").tablesorter({ dateFormat: "uk" });
         });
         
     </script>
@@ -175,11 +176,37 @@
             </div>
         </div>
     </div>
-    <div class="row">
+    <div class="row" style="margin-top:10px;">
         <div class="col-md-36">
             <div class="col-md-30">&nbsp;</div>
             <div class="col-md-3"><input id="btnCancel" type="button" class="btn btn-block" value="ยกเลิก" tabindex="-1" /></div>
             <div class="col-md-3"><input id="btnSave" type="button" class="btn btn-success btn-block" value="บันทึก" tabindex="1" /></div>
+        </div>
+    </div>
+    <div class="row" style="margin-top:20px;">
+        <div class="col-md-36" style="padding-left:0px;">
+            <div class="tableHeadDivFullDark" id="headTimeDiv">
+                <b>รายการ วันที่ 12 ก.ย. 2559 เจาะเก็บที่ ห้องเจาะเก็บชั้น 2 - รวมเจาะเก็บ 10 Sample</b>
+            </div>
+        </div>
+        <div class="col-md-36">
+            <table class="table table-bordered-excel tablesorter" id="donate-table">
+                <thead>
+                    <tr>
+                        <th class="col-md-5">Sample No</th>
+                        <th class="col-md-5">รหัสผู้บริจาค</th>
+                        <th class="col-md-5">ประเภทการบริจาค</th>
+                        <th class="col-md-5">ประเภทถุง</th>
+                        <th class="col-md-5">ประเภทการใช้งาน</th>
+                        <th class="col-md-4">Volumn</th>
+                        <th class="col-md-4">เวลา</th>
+                        <th class="col-md-3">ระยะเวลา</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
         </div>
     </div>
     
