@@ -13,8 +13,8 @@ Public Class donateAction
         Public exMessage As String
     End Structure
 
-    Dim JSONResponse As New CallbackException()
-    Dim param As New SQLCollection()
+    'Dim JSONResponse As New CallbackException()
+    'Dim param As New SQLCollection()
     Dim Cbase As New oraDBQuery(oraDBQuery.Schema.CLARET)
     Dim Hbase As New oraDBQuery(oraDBQuery.Schema.HEMATOS)
     Dim sqlMain As String = ""
@@ -29,7 +29,7 @@ Public Class donateAction
     End Sub
 
     Private Sub GetDonateTypeList()
-        ' Dim JSONResponse As New JSONObject()
+        Dim JSONResponse As New JSONObject()
         Try
             Dim sql As String = "select * from Donation_type"
 
@@ -50,9 +50,9 @@ Public Class donateAction
             'Response.Write(JSONResponse.setItems(Of List(Of DonationType))(DonationTypeList))
 
         Catch ex As Exception
-            Response.Write(New CallbackException(ex).ToJSON())
-            'JSONResponse.Param = ""
-            'Response.Write(JSON.Serialize(Of JSONObject)(JSONResponse))
+            'Response.Write(New CallbackException(ex).ToJSON())
+            JSONResponse.Param = ""
+            Response.Write(JSON.Serialize(Of JSONObject)(JSONResponse))
         End Try
         Response.End()
     End Sub
