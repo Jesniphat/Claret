@@ -16,9 +16,12 @@ function getDonateTypeList() {
             console.log(s, err);
         },
         success: function (data) {
-            console.log("Respondata = ", data);
-            if (data.length > 0) {
-                console.log("Respondata = ", data);
+            // console.log("Respondata = ", data);
+            if (!data.onError) {
+                data.getItems = jQuery.parseJSON(data.getItems);
+                console.log("Data = ", data.getItems);
+            } else {
+                console.log("Error = ", data.exMessage)
             }
         }
     });
