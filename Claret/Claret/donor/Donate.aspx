@@ -7,19 +7,38 @@
             $("#donateTab").tabs({
                 active: 0
             });
-            $("#donateType").setDropdowList();
-            $("#donateBagType").setDropdowList();
-            $("#donateApply").setDropdowList();
+            getDonateTypeList();
+            getDonateBagTypeList();
+            getDonateApplyList();
+            
             $("#donateStatus").setDropdowList();
             $("#donateDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
-                maxDate: "+10y",
-                // minDate: new Date(),
+                maxDate: "0",
+                minDate: new Date(),
                 yearRange: "c-100:c+0",
                 onSelect: function (selectedDate, objDate) { $("#txtDonorComment").focus(); },
-            });
+            }).prop({disabled:true});
 
             $("#btnIssue").click(linkToCollection);
-            getDonateTypeList();
+            $("#spSearch").click(function () {
+                donateSearch(true);
+            });
+            donateSearch(true);
+
+            $.extend($.fn, {
+                queueSelect: function () {
+                    var param = {
+                        donateAction: "edit",
+                        donateType: $("#donateType").val(),
+                        donateBagType: $("#donateBagType").val(),
+                        donateApply: $("#donateApply").val(),
+                        donateDate: $("#donateDate").val(),
+                        donateStatus: $("#donateStatus").val()
+                    };
+                    $("#data").H2GFill({ donorID: $(this).closest("tr").H2GAttr("donorID"), visitID: $(this).closest("tr").H2GAttr("refID") });
+                    $('<form>').append(H2G.postedData($("#data").H2GFill(param))).H2GFill({ action: "Collection.aspx", method: "post" }).submit();
+                },
+            });
         })
     </script>
     <style>
@@ -48,22 +67,16 @@
                             <div class="col-md-4 text-right setPaddingRight">ประเภทการบริจาค</div>
                             <div class="col-md-7">
                                 <select id="donateType">
-                                    <option value="0">ทดสอบ...</option>
-                                    <option value="1">ทดสอบ2...</option>
                                 </select>
                             </div>
                             <div class="col-md-4 text-right setPaddingRight">ประเภทถุง</div>
                             <div class="col-md-7">
                                 <select id="donateBagType">
-                                    <option value="0">ทดสอบ...</option>
-                                    <option value="1">ทดสอบ2...</option>
                                 </select>
                             </div>
                             <div class="col-md-4 text-right setPaddingRight">การนำไปใช้งาน</div>
                             <div class="col-md-7">
                                 <select id="donateApply">
-                                    <option value="0">ทดสอบ...</option>
-                                    <option value="1">ทดสอบ2...</option>
                                 </select>
                             </div>
                             <div class="col-md-3"><input id="btnIssue" type="button" class="btn btn-success btn-block" value="ดำเนินการ" /></div>
@@ -74,13 +87,17 @@
                             <div class="col-md-8"></div>
                             <div class="col-md-4 text-right setPaddingRight">รายการวันที่</div>
                             <div class="col-md-5">
-                                <input type="text" id="donateDate" class="col-md-36 form-control" value="" />
+                                <input type="text" id="donateDate" class="col-md-36 form-control" value="" readonly/>
                             </div>
                             <div class="col-md-2 text-right setPaddingRight">สถานะ</div>
                             <div class="col-md-9">
                                 <select id="donateStatus">
-                                    <option value="0">ทดสอบ...</option>
-                                    <option value="1">ทดสอบ2...</option>
+                                    <option value="REGISTER">REGISTER</option>
+                                    <option value="WAIT INTEVEIW">WAIT INTEVEIW</option>
+                                    <option value="WAIT COLLECTION" selected>WAIT COLLECTION</option>
+                                    <option value="WAIT RESULT">WAIT RESULT</option>
+                                    <option value="FINISH">FINISH</option>
+                                    <option value="CANCEL">CANCEL</option>
                                 </select>
                             </div>
                             <div class="col-md-8"></div>
@@ -97,19 +114,16 @@
                                 <div class="col-md-2">
                                     <span>คิวที่</span>
                                 </div>
-                                <div class="col-md-5">
+                                <div class="col-md-6">
                                     <span>เลขประจำตัวผู้บริจาค</span>
                                 </div>
-                                <div class="col-md-5">
+                                <div class="col-md-6">
                                     <span>เลขประจำตัวประชาชน</span>
                                 </div>
-                                <div class="col-md-4">
-                                    <span>เลขประจำตัวอ้างอิง</span>
-                                </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <span>ชื่อ</span>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-5">
                                     <span>นามสกุล</span>
                                 </div>
                                 <div class="col-md-3">
@@ -121,9 +135,9 @@
                                 <div class="col-md-3">
                                     <span>Sample No</span>
                                 </div>
-                                <div class="col-md-2">
+                                <%--<div class="col-md-2">
                                 
-                                </div>
+                                </div>--%>
                             </div>
                             <div class="row" style="padding-left: 15px;">
                                 <div class="col-md-36">
@@ -132,31 +146,28 @@
                             </div>
                             <div id="divCriteria" class="row" style="padding-top: 3px; padding-bottom: 3px; padding-left:15px;">
                                 <div class="col-md-2">
-                                    <input id="txtDonateQueue" class="form-control color-yellow" type="text" />
+                                    <input id="txtPostQueue" class="form-control color-yellow" type="text" />
+                                </div>
+                                <div class="col-md-6">
+                                    <input id="txtPostDonorNumber" class="form-control color-yellow" type="text" />
+                                </div>
+                                <div class="col-md-6">
+                                    <input id="txtPostNationNumber" class="form-control color-yellow" type="text" />
+                                </div>
+                                <div class="col-md-6">
+                                    <input id="txtPostName" class="form-control" type="text" />
                                 </div>
                                 <div class="col-md-5">
-                                    <input id="txtDonorNumber" class="form-control color-yellow" type="text" />
-                                </div>
-                                <div class="col-md-5">
-                                    <input id="txtNationNumber" class="form-control" type="text" />
-                                </div>
-                                <div class="col-md-4">
-                                    <input id="txtExtNumber" class="form-control" type="text" />
-                                </div>
-                                <div class="col-md-4">
-                                    <input id="txtName" class="form-control" type="text" />
-                                </div>
-                                <div class="col-md-4">
-                                    <input id="txtSurname" class="form-control" type="text" />
+                                    <input id="txtPostSurname" class="form-control" type="text" />
                                 </div>
                                 <div class="col-md-3">
-                                    <input id="txtBirthday" class="form-control text-center" type="text" />
+                                    <input id="txtPostBirthday" class="form-control text-center" type="text" />
                                 </div>
                                 <div class="col-md-3">
-                                    <input id="txtBloodGroup" class="form-control text-center" type="text" />
+                                    <input id="txtPostBloodGroup" class="form-control text-center" type="text" />
                                 </div>
                                 <div class="col-md-3">
-                                    <input id="txtSimplenumber" class="form-control text-center" type="text" />
+                                    <input id="txtPostSample" class="form-control text-center" type="text" />
                                 </div>
                                 <div class="col-md-2">
                                     <div class="col-md-36">

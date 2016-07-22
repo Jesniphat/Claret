@@ -4,12 +4,8 @@
     <script src="../resources/javascript/donateScriptEdit.js" type="text/javascript"></script>
     <script>
         $(function () {
-            var x = $("#data").attr("donateAction");
-            console.log("x : ", x)
-
-            $("#donateType").setDropdowList();
-            $("#bagType").setDropdowList();
-            $("#useType").setDropdowList();
+            checkParam();
+            
             $("#collectedProblem").setDropdowList();
             $("#collectedProblemReason1").setDropdowList();
             $("#collectedProblemReason2").setDropdowList();
@@ -50,8 +46,7 @@
                     <div class="col-md-8 text-left">ประเภทการบริจาค</div>
                     <div class="col-md-14" style="padding-left:9px; max-width:232px; width:100%;">
                         <select id="donateType" class="required">
-                            <option value="0">ทดสอบ...</option>
-                            <option value="1">ทดสอบ2...</option>
+                            
                         </select>
                     </div>
                     <div class="col-md-8 text-left" style="float:left;">&nbsp;</div>
@@ -59,18 +54,16 @@
                 <div class="row">
                     <div class="col-md-8 text-left">ประเภทถุง</div>
                     <div class="col-md-14" style="padding-left:9px; max-width:232px; width:100%;">
-                        <select id="bagType" class="required">
-                            <option value="0">ทดสอบ...</option>
-                            <option value="1">ทดสอบ2...</option>
+                        <select id="donateBagType" class="required">
+                            
                         </select>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-8 text-left">ประเภทการใช้งาน</div>
                     <div class="col-md-14" style="padding-left:9px; max-width:232px; width:100%;">
-                        <select id="useType" class="required">
-                            <option value="0">ทดสอบ...</option>
-                            <option value="1">ทดสอบ2...</option>
+                        <select id="donateApply" class="required">
+                            
                         </select>
                     </div>
                 </div>

@@ -1471,7 +1471,7 @@
                         <div id="immunohaemtologyFile">
                             <div class="border-box">
                                 <div class="col-md-36" style="border:1px solid black">
-                                    <p><label>&nbsp;&nbsp; Doner No.</label> <label id="doner-label-no">123456789</label> <label id="doner-label-name">test</label></p>
+                                    <%--<p><label>&nbsp;&nbsp; Doner No.</label> <label id="doner-label-no">123456789</label> <label id="doner-label-name">test</label></p>--%>
                                     <table class="col-md-36" id="label-set-1">
                                         <tr>
                                             <td class="col-md-5" style="padding-left: 1px">Exams</td>
@@ -1653,7 +1653,7 @@
                                                 <th class="col-md-3">Input 2</th>
                                                 <th class="col-md-4">Validation by</th>
                                                 <th class="col-md-4">Ext. Lab</th>
-                                                <th class="col-md-4">Type Donation</th>
+                                                <th class="col-md-4">ประเภทผู้บริจาค</th>
                                             </tr>
                                         </thead>
                                         <tbody>
