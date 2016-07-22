@@ -6,7 +6,7 @@
         $(function () {
             checkParam();
             
-            $("#collectedProblem").setDropdowList();
+            $("#collectedProblem").selecter();
             $("#collectedProblemReason1").setDropdowList();
             $("#collectedProblemReason2").setDropdowList();
 

@@ -58,8 +58,9 @@ function getDonateTypeList() {
                 for (var i = 0; i < data.getItems.length; i++) {
                     $("#donateType").append($("<option value='" + data.getItems[i].Id + "'>" + data.getItems[i].Description + "</option>"));
                 }
-                //$("#donateType").setDropdowList();
+                $("#donateType").selecter();
                 $("#donateType").val(getParam.donateType);
+                $("#donateType").change();
             } else {
                 console.log("Error = ", data.exMessage)
             }
@@ -85,7 +86,9 @@ function getDonateBagTypeList() {
                     $("#donateBagType").append($("<option value='" + data.getItems[i].Id + "'>" + data.getItems[i].Description + "</option>"));
                 }
                 //$("#donateBagType").setDropdowList();
+                $("#donateBagType").selecter();
                 $("#donateBagType").val(getParam.donateBagType);
+                $("#donateBagType").change();
             } else {
                 console.log("Error = ", data.exMessage)
             }
@@ -110,7 +113,9 @@ function getDonateApplyList() {
                     $("#donateApply").append($("<option value='" + data.getItems[i].Id + "'>" + data.getItems[i].Description + "</option>"));
                 }
                 //$("#donateApply").setDropdowList();
+                $("#donateApply").selecter();
                 $("#donateApply").val(getParam.donateApply);
+                $("#donateApply").change();
             } else {
                 console.log("Error = ", data.exMessage)
             }
