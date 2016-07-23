@@ -5,16 +5,43 @@
     <script>
         $(function () {
             checkParam();
-            
-            $("#collectedProblem").selecter();
-            $("#collectedProblemReason1").setDropdowList();
-            $("#collectedProblemReason2").setDropdowList();
+            getDonateTypeList();
+            getDonateBagTypeList();
+            getDonateApplyList();
+            getExamination();
+            getProblemReason();
+            randerAddLabExamination();
+            randerAddCollectedProblem();
+
+            //$("#collectedProblem").selecter();
+            //$("#collectedProblemReason1").setDropdowList();
+            //$("#collectedProblemReason2").setDropdowList();
 
             $("#addLabExamination").click(addLabExamination);
             
-            randerAddLabExamination();
-            randerAddCollectedProblem();
             $("#donate-table").tablesorter({ dateFormat: "uk" });
+            $("#labExamination").autocomplete({
+                source: examinationAutoData
+            });
+            $("#collectedProblem").autocomplete({
+                source: problemDataAuto
+            });
+            $("#collectedProblemReason1").autocomplete({
+                source: problemDataAuto
+            });
+            $("#collectedProblemReason2").autocomplete({
+                source: problemDataAuto
+            });
+            $("#collectedProblem").blur(function () {
+                setIdProblem("collectedProblem");
+            });
+            $("#collectedProblemReason1").blur(function () {
+                setIdProblem("collectedProblemReason1");
+            });
+            $("#collectedProblemReason2").blur(function () {
+                setIdProblem("collectedProblemReason2");
+            });
+            $("#btnSave").click(saveData);
         });
         
     </script>
@@ -45,7 +72,7 @@
                 <div class="row">
                     <div class="col-md-8 text-left">ประเภทการบริจาค</div>
                     <div class="col-md-14" style="padding-left:9px; max-width:232px; width:100%;">
-                        <select id="donateType" class="required">
+                        <select id="donateType" class="required selecte-box-custom">
                             
                         </select>
                     </div>
@@ -54,7 +81,7 @@
                 <div class="row">
                     <div class="col-md-8 text-left">ประเภทถุง</div>
                     <div class="col-md-14" style="padding-left:9px; max-width:232px; width:100%;">
-                        <select id="donateBagType" class="required">
+                        <select id="donateBagType" class="required selecte-box-custom">
                             
                         </select>
                     </div>
@@ -62,7 +89,7 @@
                 <div class="row">
                     <div class="col-md-8 text-left">ประเภทการใช้งาน</div>
                     <div class="col-md-14" style="padding-left:9px; max-width:232px; width:100%;">
-                        <select id="donateApply" class="required">
+                        <select id="donateApply" class="required selecte-box-custom">
                             
                         </select>
                     </div>
@@ -132,27 +159,30 @@
                         <tbody>
                             <tr>
                                 <td class="col-md-11" style="border:1px solid #ffffff; padding: 0px;">
-                                    <select id="collectedProblem">
+                                    <%--<select id="collectedProblem">
                                         <option value="0">ทดสอบ...</option>
                                         <option value="1">ทดสอบ2...</option>
-                                    </select>
+                                    </select>--%>
+                                    <input class="form-control" id="collectedProblem" value="" />
                                 </td>
                                 <td class="col-md-11" style="border:1px solid #ffffff; padding: 0px;">
-                                    <select id="collectedProblemReason1">
+                                    <%--<select id="collectedProblemReason1">
                                         <option value="0">ทดสอบ...</option>
                                         <option value="1">ทดสอบ2...</option>
-                                    </select>
+                                    </select>--%>
+                                    <input class="form-control" id="collectedProblemReason1" value="" />
                                 </td>
                                 <td class="col-md-11" style="border:1px solid #ffffff; padding: 0px;">
-                                    <select id="collectedProblemReason2">
+                                    <%--<select id="collectedProblemReason2">
                                         <option value="0">ทดสอบ...</option>
                                         <option value="1">ทดสอบ2...</option>
-                                    </select>
+                                    </select>--%>
+                                    <input class="form-control" id="collectedProblemReason2" value="" />
                                 </td>
                                 <td class="col-md-1" style="border:1px solid #ffffff;">
-                                    <button id="addCollectedProblem" class="btn btn-icon" onclick="return false;" tabindex="1">
+                                    <%--<button id="addCollectedProblem" class="btn btn-icon" onclick="return false;" tabindex="1">
                                         <i class="glyphicon glyphicon-circle-arrow-down"></i>
-                                    </button>
+                                    </button>--%>
                                 </td>
                             </tr>
                         </tbody>

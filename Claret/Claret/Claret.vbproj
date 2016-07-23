@@ -182,8 +182,10 @@
     <Content Include="main.aspx" />
     <Content Include="mobile\main.aspx" />
     <Content Include="resources\css\bootflat.css" />
+    <Content Include="resources\css\bootstrap-select.css" />
     <Content Include="resources\css\donateStyle.css" />
     <Content Include="resources\css\table-excel.css" />
+    <Content Include="resources\javascript\bootstrap-select.js" />
     <Content Include="resources\javascript\donateScript.js" />
     <Content Include="resources\javascript\donateScriptEdit.js" />
     <Content Include="resources\javascript\jquery-date.js" />

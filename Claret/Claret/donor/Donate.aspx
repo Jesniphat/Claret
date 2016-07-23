@@ -91,7 +91,7 @@
                             </div>
                             <div class="col-md-2 text-right setPaddingRight">สถานะ</div>
                             <div class="col-md-9">
-                                <select id="donateStatus">
+                                <select id="donateStatus" disabled>
                                     <option value="REGISTER">REGISTER</option>
                                     <option value="WAIT INTEVEIW">WAIT INTEVEIW</option>
                                     <option value="WAIT COLLECTION" selected>WAIT COLLECTION</option>

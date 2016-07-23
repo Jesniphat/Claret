@@ -19,6 +19,10 @@ Public Class donateAction
                 Call GetDonateApplyList()
             Case "donorpostqueue"
                 Call Donorpostqueue()
+            Case "getExamination"
+                Call GetExamination()
+            Case "getProblemReason"
+                Call GetProblemReason()
 
         End Select
 
@@ -210,6 +214,85 @@ Public Class donateAction
 
     End Sub
 
+    Private Sub GetExamination()
+        Try
+            Dim ExaminationSetData As New ExaminationSet
+
+            Dim sql As String = "select * from EXAMINATION_GROUP"
+            Dim dt As DataTable = Cbase.QueryTable(sql)
+            ExaminationSetData.examinationgrouplist = New List(Of ExaminationGroup)
+            For Each dr As DataRow In dt.Rows
+                Dim Item As New ExaminationGroup
+                Item.id = dr("ID").ToString
+                Item.code = dr("CODE").ToString
+                Item.description = dr("DESCRIPTION").ToString
+                Item.hiig_code = dr("HIIG_CODE").ToString
+
+                ExaminationSetData.examinationgrouplist.Add(Item)
+            Next
+
+            Dim sql2 As String = "select * from EXAMINATION"
+            Dim dt2 As DataTable = Cbase.QueryTable(sql2)
+            ExaminationSetData.examinationlist = New List(Of Examination)
+            For Each dr As DataRow In dt2.Rows
+                Dim Item As New Examination
+                Item.id = dr("ID").ToString
+                Item.code = dr("CODE").ToString
+                Item.description = dr("DESCRIPTION").ToString
+                Item.hiig_code = dr("HIIG_CODE").ToString
+
+                ExaminationSetData.examinationlist.Add(Item)
+            Next
+
+            Dim sql3 As String = "select G.EXAMINATION_GROUP_ID AS G_ID,E.ID AS E_ID,E.CODE || ' - ' || E.DESCRIPTION AS TEXT,E.HIIG_CODE 
+                                  from EXAMINATION_GROUPING G inner join EXAMINATION E on G.EXAMINATION_ID = E.ID"
+            Dim dt3 As DataTable = Cbase.QueryTable(sql3)
+            ExaminationSetData.examinationjoinlist = New List(Of ExaminationJoin)
+            For Each dr As DataRow In dt3.Rows
+                Dim Item As New ExaminationJoin
+                Item.g_id = dr("G_ID").ToString
+                Item.e_id = dr("E_ID").ToString
+                Item.text = dr("TEXT").ToString
+                Item.hiig_code = dr("HIIG_CODE").ToString
+
+                ExaminationSetData.examinationjoinlist.Add(Item)
+            Next
+
+            JSONResponse.setItems(JSON.Serialize(Of ExaminationSet)(ExaminationSetData))
+            Response.Write(JSONResponse.ToJSON())
+        Catch ex As Exception
+            Response.Write(New CallbackException(ex).ToJSON())
+        End Try
+    End Sub
+
+    Private Sub GetProblemReason()
+        Try
+            Dim sql As String = "select * from Reason where hiig_table = 'MOTIFDEST'"
+
+            Dim dt As DataTable = Cbase.QueryTable(sql)
+            Dim ProblemReasonList = New List(Of ProblemReason)
+            For Each dr As DataRow In dt.Rows
+                Dim Item As New ProblemReason
+                Item.id = dr("ID").ToString
+                Item.code = dr("CODE").ToString
+                Item.description = dr("DESCRIPTION").ToString
+                Item.priority = dr("PRIORITY").ToString
+                Item.hiig_code = dr("HIIG_CODE").ToString
+                Item.hiig_table = dr("HIIG_TABLE").ToString
+                Item.hiig_ppar_type = dr("HIIG_PPAR_TYPE").ToString
+                Item.hiig_ppar_cd = dr("HIIG_PPAR_CD").ToString
+                Item.used_module = dr("USED_MODULE").ToString
+
+                ProblemReasonList.Add(Item)
+            Next
+
+            JSONResponse.setItems(JSON.Serialize(Of List(Of ProblemReason))(ProblemReasonList))
+            Response.Write(JSONResponse.ToJSON())
+        Catch ex As Exception
+            Response.Write(New CallbackException(ex).ToJSON())
+        End Try
+    End Sub
+
 End Class
 
 Public Structure DonationType
@@ -237,3 +320,41 @@ Public Structure DonateApply
     Public Used_module As String
 End Structure
 
+Public Structure ExaminationSet
+    Public examinationgrouplist As List(Of ExaminationGroup)
+    Public examinationlist As List(Of Examination)
+    Public examinationjoinlist As List(Of ExaminationJoin)
+End Structure
+
+Public Structure Examination
+    Public id As String
+    Public code As String
+    Public description As String
+    Public hiig_code As String
+End Structure
+
+Public Structure ExaminationGroup
+    Public id As String
+    Public code As String
+    Public description As String
+    Public hiig_code As String
+End Structure
+
+Public Structure ExaminationJoin
+    Public g_id As String
+    Public e_id As String
+    Public text As String
+    Public hiig_code As String
+End Structure
+
+Public Structure ProblemReason
+    Public id As String
+    Public code As String
+    Public description As String
+    Public priority As String
+    Public hiig_code As String
+    Public hiig_table As String
+    Public hiig_ppar_type As String
+    Public hiig_ppar_cd As String
+    Public used_module As String
+End Structure

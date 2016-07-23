@@ -41,8 +41,8 @@ function donateSearch(newSearch) {
                 , birthday: $("#txtPostBirthday").H2GValue()
                 , bloodgroup: $("#txtPostBloodGroup").H2GValue()
                 , samplenumber: $("#txtPostSample").H2GValue()
-                , reportdate: formatDate(H2G.today(), "dd/MM/yyyy") //$("#txtReportDate").H2GValue()
-                , status: ""  // change here
+                , reportdate: "22/07/2559"//formatDate(H2G.today(), "dd/MM/yyyy") //$("#txtReportDate").H2GValue()
+                , status: $("#donateStatus").val()  // change here
                 , p: $("#tbPostQueue").attr("currentPage") || 1
                 , so: $("#tbPostQueue").attr("sortOrder") || "queue_number"
                 , sd: $("#tbPostQueue").attr("sortDirection") || "desc"

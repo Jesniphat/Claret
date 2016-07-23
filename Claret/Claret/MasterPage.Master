@@ -11,6 +11,7 @@
     <link href="/resources/jquery-ui/jquery-ui.css?ver=20160119" rel="stylesheet" />
     <link href="/resources/css/custom.css?ver=20160119" rel="stylesheet" />
     <link href="/resources/css/table-excel.css" rel="stylesheet" />
+    <link href="/resources/css/bootstrap-select.css" rel="stylesheet" />
     <script src="../resources/jquery/jquery.js" type="text/javascript"></script>
     <script src="../resources/jquery-ui/jquery-ui.js" type="text/javascript"></script>
     <script src="../resources/javascript/jquery-date.js?ver=20160119" type="text/javascript"></script>
@@ -19,6 +20,7 @@
     <script src="../resources/jquery/combobox.js?ver=20160119" type="text/javascript"></script>
     <script src="../resources/javascript/extension.js?ver=20160119" type="text/javascript"></script>
     <script src="../resources/jquery/jquery.tablesorter.js" type="text/javascript"></script>
+    <script src="../resources/javascript/bootstrap-select.js" type="text/javascript"></script>
     <style>
         #leftMenu {
             background-color: #D7D7D7;
