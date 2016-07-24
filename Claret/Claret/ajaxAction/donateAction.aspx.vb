@@ -23,6 +23,10 @@ Public Class donateAction
                 Call GetExamination()
             Case "getProblemReason"
                 Call GetProblemReason()
+            Case "checkDonateNum"
+                Call CheckDonateNum()
+            Case "checkSampleNumber"
+                Call CheckSampleNumber()
 
         End Select
 
@@ -293,6 +297,57 @@ Public Class donateAction
         End Try
     End Sub
 
+    Private Sub CheckDonateNum()
+        Try
+            Dim donn_number As String = _REQUEST("donateNumber")
+            Dim sql As String = "select d.ID, d.DONOR_NUMBER from DONATION_VISIT dv inner join DONOR d on d.ID = dv.DONOR_ID 
+                                    where dv.STATUS = 'WAIT COLLECTION' AND d.DONOR_NUMBER = '" & donn_number & "'"
+
+            Dim dt As DataTable = Cbase.QueryTable(sql)
+            Dim DonorNumber = New List(Of CheckDonorId)
+            For Each dr As DataRow In dt.Rows
+                Dim Item As New CheckDonorId
+                Item.donorId = dr("ID").ToString
+                Item.donorNumber = dr("DONOR_NUMBER").ToString
+
+                DonorNumber.Add(Item)
+            Next
+
+            JSONResponse.setItems(JSON.Serialize(Of List(Of CheckDonorId))(DonorNumber))
+            Response.Write(JSONResponse.ToJSON())
+
+        Catch ex As Exception
+            Response.Write(New CallbackException(ex).ToJSON())
+        End Try
+    End Sub
+
+    Private Sub CheckSampleNumber()
+        Try
+            Dim sample_number As String = _REQUEST("sampleNumber")
+            Dim donn_number As String = _REQUEST("donateNumber")
+            Dim sql As String = "select d.ID, d.DONOR_NUMBER, dv.ID AS VISIT_ID, dv.SAMPLE_NUMBER 
+                                    from DONATION_VISIT dv inner join DONOR d on d.ID = dv.DONOR_ID 
+                                    where dv.STATUS = 'WAIT COLLECTION' AND dv.SAMPLE_NUMBER = '" & sample_number & "' 
+                                    AND d.DONOR_NUMBER = '" & donn_number & "'"
+
+            Dim dt As DataTable = Cbase.QueryTable(sql)
+            Dim SampleNumber = New List(Of CheckSampleNum)
+            For Each dr As DataRow In dt.Rows
+                Dim Item As New CheckSampleNum
+                Item.visitId = dr("VISIT_ID").ToString
+                Item.sampleNumber = dr("SAMPLE_NUMBER").ToString
+
+                SampleNumber.Add(Item)
+            Next
+
+            JSONResponse.setItems(JSON.Serialize(Of List(Of CheckSampleNum))(SampleNumber))
+            Response.Write(JSONResponse.ToJSON())
+
+        Catch ex As Exception
+            Response.Write(New CallbackException(ex).ToJSON())
+        End Try
+    End Sub
+
 End Class
 
 Public Structure DonationType
@@ -357,4 +412,14 @@ Public Structure ProblemReason
     Public hiig_ppar_type As String
     Public hiig_ppar_cd As String
     Public used_module As String
+End Structure
+
+Public Structure CheckDonorId
+    Public donorId As String
+    Public donorNumber As String
+End Structure
+
+Public Structure CheckSampleNum
+    Public visitId As String
+    Public sampleNumber As String
 End Structure

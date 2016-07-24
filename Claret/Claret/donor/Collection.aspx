@@ -11,7 +11,6 @@
             getExamination();
             getProblemReason();
             randerAddLabExamination();
-            randerAddCollectedProblem();
 
             //$("#collectedProblem").selecter();
             //$("#collectedProblemReason1").setDropdowList();
@@ -20,6 +19,8 @@
             $("#addLabExamination").click(addLabExamination);
             
             $("#donate-table").tablesorter({ dateFormat: "uk" });
+            $("#startDonateDate").datepicker();
+            $('#donateTimes').timepicker();
             $("#labExamination").autocomplete({
                 source: examinationAutoData
             });
@@ -41,6 +42,10 @@
             $("#collectedProblemReason2").blur(function () {
                 setIdProblem("collectedProblemReason2");
             });
+
+            $("#donerNumber").blur(checkDonateNum);
+            $("#sampleNumber").keydown(checkValidDonateNum);
+            $("#sampleNumber").blur(checkSampleNumber);
             $("#btnSave").click(saveData);
         });
         
@@ -61,7 +66,7 @@
                 </div>
                 <div class="col-md-3 text-left" style="padding-left:18px;">Sample No</div>
                 <div class="col-md-7">
-                    <input class="col-md-36 form-control required" id="sampleNumber" type="text" value=""/>
+                    <input class="col-md-36 form-control required" id="sampleNumber" type="text" value="" />
                 </div>
             </div>
         </div>

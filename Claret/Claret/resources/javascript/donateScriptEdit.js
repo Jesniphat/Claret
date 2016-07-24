@@ -291,7 +291,94 @@ function randerAddCollectedProblem() {
     }
 }
 
+function checkDonateNum() {
+    if ($("#data").attr("donateAction") == "new") {
+        $.ajax({
+            url: '../../ajaxAction/donateAction.aspx',
+            data: H2G.ajaxData({ action: 'checkDonateNum', donateNumber: $("#donerNumber").val() }).config,
+            type: "POST",
+            dataType: "json",
+            beforeSend: function(){
+                $('body').block();
+            },
+            error: function (xhr, s, err) {
+                console.log(s, err);
+            },
+            success: function (data) {
+                if (!data.onError) {
+                    data.getItems = jQuery.parseJSON(data.getItems);
+                    if (data.getItems.length == 0) {
+                        $("#donerNumber").focus();
+                        getParam.donorID = "0";
+                        getParam.visitID = "0";
+                        notiWarning("ไม่พบเลขผู้บริจาคนี้");
+                        $("#donerNumber").val("");
+                        $("#sampleNumber").val("");
+                    } else {
+                        getParam.donorID = data.getItems[0].donorId;
+                        $("#sampleNumber").focus();
+                        //notiSuccess("พบเลขผู้บริจาคนี้");
+                    }
+                    $('body').unblock();
+                    //console.log(problemDataAuto);
+                } else {
+                    console.log("Error = ", data.exMessage)
+                    $('body').unblock();
+                }
+            }
+        });
+    }
+}
+
+function checkValidDonateNum() {
+    if ($("#donerNumber").val() == "") {
+        $("#donerNumber").focus();
+        notiWarning("กรุณากรอกเลขผู้บริจาคก่อน");
+    } else if (getParam.donorID == "0") {
+        console.log("dddd");
+        $("#donerNumber").focus();
+        notiWarning("ไม่พบเลขผู้บริจาคนี้");
+    }
+}
+
+function checkSampleNumber() {
+    if (($("#data").attr("donateAction") == "new") && $("#donerNumber").val() != "" && getParam.donorID != "0") {
+        $.ajax({
+            url: '../../ajaxAction/donateAction.aspx',
+            data: H2G.ajaxData({ action: 'checkSampleNumber', sampleNumber: $("#sampleNumber").val(), donateNumber: $("#donerNumber").val() }).config,
+            type: "POST",
+            dataType: "json",
+            beforeSend: function () {
+                $('body').block();
+            },
+            error: function (xhr, s, err) {
+                console.log(s, err);
+            },
+            success: function (data) {
+                if (!data.onError) {
+                    data.getItems = jQuery.parseJSON(data.getItems);
+                    if (data.getItems.length == 0) {
+                        //$("#sampleNumber").focus();
+                        getParam.visitID = "0";
+                        notiWarning("ไม่พบเลข Sample Number นี้");
+                        $("#sampleNumber").val("");
+                    } else {
+                        getParam.visitID = data.getItems[0].visitId;
+                        //notiSuccess("พบเลข Sample Number นี้");
+                    }
+                    $('body').unblock();
+                    //console.log(problemDataAuto);
+                } else {
+                    console.log("Error = ", data.exMessage)
+                    $('body').unblock();
+                }
+            }
+        });
+    }
+}
+
 function saveData() {
     console.log("ID List = ", labExaminationIdList);
     console.log("Data List = ", labExaminationList);
+    console.log("param = ", getParam);
 }
