@@ -27,6 +27,8 @@ Public Class donateAction
                 Call CheckDonateNum()
             Case "checkSampleNumber"
                 Call CheckSampleNumber()
+            Case "getInitialData"
+                Call GetInitialData()
 
         End Select
 
@@ -348,6 +350,27 @@ Public Class donateAction
         End Try
     End Sub
 
+    Private Sub GetInitialData()
+        Try
+            Dim DonorId As String = _REQUEST("donorId")
+            Dim VistId As String = _REQUEST("visitId")
+
+            Dim GetDonor As String = "select d.ID, d.DONOR_NUMBER from DONATION_VISIT dv inner join DONOR d on d.ID = dv.DONOR_ID 
+                                      where d.ID = '" & DonorId & "'"
+            Dim GetVisit As String = "select d.ID, d.DONOR_NUMBER, dv.ID AS VISIT_ID, dv.SAMPLE_NUMBER 
+                                      from DONATION_VISIT dv inner join DONOR d on d.ID = dv.DONOR_ID 
+                                      where dv.STATUS = 'WAIT COLLECTION' AND dv.ID = '" & VistId & "' 
+                                      AND d.ID = '" & DonorId & "'"
+            Dim GetInData As String = "SELECT VOLUMN_ACTUAL, DONATION_TIME, DURATION, COLLECTION_STAFF, COLLECTION_DATE, 
+                                       REFUSE_REASON1_ID, REFUSE_REASON2_ID, REFUSE_REASON3_ID FROM DONATION_RECORD 
+                                       WHERE DONOR_ID = '" & DonorId & "' AND DONATION_VISIT_ID = '" & VistId & "' "
+            Dim GetExamination As String = "select * from DONATION_EXAMINATION WHERE DONATION_VISIT_ID '" & VistId & "'"
+
+        Catch ex As Exception
+
+        End Try
+    End Sub
+
 End Class
 
 Public Structure DonationType
@@ -422,4 +445,35 @@ End Structure
 Public Structure CheckSampleNum
     Public visitId As String
     Public sampleNumber As String
+End Structure
+
+Public Structure InitalData
+    Public volumn_actual As String
+    Public danation_time As String
+    Public dulation As String
+    Public collection_staff As String
+    Public collection_date As String
+    Public refuse_reason1_id As String
+    Public refuse_reason2_id As String
+    Public refuse_reason3_id As String
+End Structure
+
+Public Structure DonationExamination
+    Public id As String
+    Public create_date As String
+    Public create_staff As String
+    Public donation_visit_id As String
+    Public donation_hospital_id As String
+    Public donation_from As String
+    Public examination_group_id As String
+    Public examination_group_desc As String
+    Public examination_id As String
+    Public examination_desc As String
+End Structure
+
+Public Structure InitalDataList
+    Public donar As List(Of CheckDonorId)
+    Public visit As List(Of CheckSampleNum)
+    Public InitalData As List(Of InitalData)
+    Public DonationExamination As List(Of DonationExamination)
 End Structure

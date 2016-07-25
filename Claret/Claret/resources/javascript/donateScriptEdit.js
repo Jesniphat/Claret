@@ -15,6 +15,8 @@ var collectedProblemList = [];
 var problemDataList = [];
 var problemDataAuto = [];
 var problemReason = { collectedProblem: "", collectedProblemReason1: "", collectedProblemReason2: "" };
+
+var dataSave = {};
 ////////////////////////////////////////////////////// function ///////////////////////////////////////////////////////////////
 
 function checkParam() {
@@ -36,7 +38,22 @@ function checkParam() {
 }
 
 function getInitialData() {
-    $("#donerNumber").val(getParam.donorID);
+    $.ajax({
+        url: '../../ajaxAction/donateAction.aspx',
+        data: H2G.ajaxData({ action: 'getInitialData', visitId: getParam.visitID, donorId: getParam.donorID }).config,
+        type: "POST",
+        dataType: "json",
+        error: function (xhr, s, err) {
+            console.log(s, err);
+        },
+        success: function (data) {
+            if (!data.onError) {
+                data.getItems = jQuery.parseJSON(data.getItems);
+            } else {
+                console.log("Error = ", data.exMessage)
+            }
+        }
+    });
 }
 
 function getDonateTypeList() {
