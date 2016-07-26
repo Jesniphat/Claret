@@ -20,6 +20,7 @@ var dataSave = {};
 ////////////////////////////////////////////////////// function ///////////////////////////////////////////////////////////////
 
 function checkParam() {
+    var deferred = $.Deferred();
     getParam = {
         donateAction: $("#data").attr("donateAction"),
         donorID: $("#data").attr("donorid"),
@@ -35,12 +36,14 @@ function checkParam() {
     if (getParam.donateAction == "edit") {
         getInitialData();
     }
+    deferred.resolve("Ok");
+    return deferred.promise();
 }
 
 function getInitialData() {
     $.ajax({
         url: '../../ajaxAction/donateAction.aspx',
-        data: H2G.ajaxData({ action: 'getInitialData', visitId: getParam.visitID, donorId: getParam.donorID }).config,
+        data: H2G.ajaxData({ action: 'getInitialData' }).config,
         type: "POST",
         dataType: "json",
         error: function (xhr, s, err) {
@@ -49,6 +52,28 @@ function getInitialData() {
         success: function (data) {
             if (!data.onError) {
                 data.getItems = jQuery.parseJSON(data.getItems);
+                console.log("data = ", data.getItems);
+                if (data.getItems.doner.length > 0) {
+                    $("#donerNumber").val(data.getItems.doner[0].donorNumber);
+                    $("#donerNumber").prop("readonly", true);
+                }
+                if (data.getItems.visit.length > 0) {
+                    $("#sampleNumber").val(data.getItems.visit[0].sampleNumber);
+                    $("#sampleNumber").prop("readonly", true);
+                }
+                if (data.getItems.DonationExamination.length > 0) {
+                    var ExninationList = data.getItems.DonationExamination;
+                    // console.log("Ex1 = ", ExninationList, " Ex2 = ", examinationData);
+                    for (var i = 0; i < ExninationList.length; i++) {
+                        for (var j = 0; j < examinationData.length; j++) {
+                            if (ExninationList[i].examination_id == examinationData[j].id) {
+                                labExaminationList.push({ text: examinationData[j].code + " - " + examinationData[j].description });
+                                labExaminationIdList.push(ExninationList[i].examination_id);
+                            }
+                        }
+                    }
+                    randerAddLabExamination();
+                }
             } else {
                 console.log("Error = ", data.exMessage)
             }
@@ -57,6 +82,7 @@ function getInitialData() {
 }
 
 function getDonateTypeList() {
+    var deferred = $.Deferred();
     $.ajax({
         url: '../../ajaxAction/donateAction.aspx',
         data: H2G.ajaxData({ action: 'getDonateTypeList' }).config,
@@ -73,15 +99,18 @@ function getDonateTypeList() {
                     $("#donateType").append($("<option value='" + data.getItems[i].Id + "'>" + data.getItems[i].Description + "</option>"));
                 }
                 $("#donateType").val(getParam.donateType);
+                deferred.resolve("Ok");
             } else {
-                console.log("Error = ", data.exMessage)
+                console.log("Error = ", data.exMessage);
+                deferred.reject("error");
             }
         }
     });
-
+    return deferred.promise();
 }
 
 function getDonateBagTypeList() {
+    var deferred = $.Deferred();
     $.ajax({
         url: '../../ajaxAction/donateAction.aspx',
         data: H2G.ajaxData({ action: 'getDonateBagTypeList' }).config,
@@ -98,14 +127,18 @@ function getDonateBagTypeList() {
                     $("#donateBagType").append($("<option value='" + data.getItems[i].Id + "'>" + data.getItems[i].Description + "</option>"));
                 }
                 $("#donateBagType").val(getParam.donateBagType);
+                deferred.resolve("Ok");
             } else {
-                console.log("Error = ", data.exMessage)
+                console.log("Error = ", data.exMessage);
+                deferred.reject("error");
             }
         }
     });
+    return deferred.promise();
 }
 
 function getDonateApplyList() {
+    var deferred = $.Deferred();
     $.ajax({
         url: '../../ajaxAction/donateAction.aspx',
         data: H2G.ajaxData({ action: 'getDonateApplyList' }).config,
@@ -122,14 +155,18 @@ function getDonateApplyList() {
                     $("#donateApply").append($("<option value='" + data.getItems[i].Id + "'>" + data.getItems[i].Description + "</option>"));
                 }
                 $("#donateApply").val(getParam.donateApply);
+                deferred.resolve("Ok");
             } else {
-                console.log("Error = ", data.exMessage)
+                console.log("Error = ", data.exMessage);
+                deferred.reject("Error");
             }
         }
     });
+    return deferred.promise();
 }
 
 function getExamination() {
+    var deferred = $.Deferred();
     $.ajax({
         url: '../../ajaxAction/donateAction.aspx',
         data: H2G.ajaxData({ action: 'getExamination' }).config,
@@ -156,11 +193,14 @@ function getExamination() {
                     examinationCheckGroup.push(examinationGroupData[j].code + " - " + examinationGroupData[j].description);
                 }
                 //console.log(examinationAutoData);
+                deferred.resolve("Ok");
             } else {
-                console.log("Error = ", data.exMessage)
+                console.log("Error = ", data.exMessage);
+                deferred.reject("Error");
             }
         }
     });
+    return deferred.promise();
 }
 
 function removeLabExamination(i) {
@@ -253,6 +293,7 @@ function randerAddLabExamination() {
 }
 
 function getProblemReason() {
+    var deferred = $.Deferred();
     $.ajax({
         url: '../../ajaxAction/donateAction.aspx',
         data: H2G.ajaxData({ action: 'getProblemReason' }).config,
@@ -270,11 +311,14 @@ function getProblemReason() {
                     problemDataAuto.push(problemDataList[i].code + " - " + problemDataList[i].description);
                 }
                 //console.log(problemDataAuto);
+                deferred.resolve("Ok");
             } else {
-                console.log("Error = ", data.exMessage)
+                console.log("Error = ", data.exMessage);
+                deferred.reject("Error");
             }
         }
     });
+    return deferred.promise();
 }
 
 function setIdProblem(id) {
@@ -362,7 +406,7 @@ function checkSampleNumber() {
     if (($("#data").attr("donateAction") == "new") && $("#donerNumber").val() != "" && getParam.donorID != "0") {
         $.ajax({
             url: '../../ajaxAction/donateAction.aspx',
-            data: H2G.ajaxData({ action: 'checkSampleNumber', sampleNumber: $("#sampleNumber").val(), donateNumber: $("#donerNumber").val() }).config,
+            data: H2G.ajaxData({ action: 'checkSampleNumber', sampleNumber: $("#sampleNumber").val(), donateNumber: $("#donerNumber").val(),sdfsd:[] }).config,
             type: "POST",
             dataType: "json",
             beforeSend: function () {
@@ -395,7 +439,26 @@ function checkSampleNumber() {
 }
 
 function saveData() {
+    var saveData = {
+        donerIds: getParam.donorID,
+        visitIds: getParam.visitID,
+        donateAction: getParam.donateAction,
+        donateTypeId: $("#donateType").val(),
+        donateBagTypeId: $("#donateBagType").val(),
+        donateApplyId: $("#donateApply").val(),
+        volumnActual: $("#vol").val(),
+        donationTime: $("#startDonateDate").val(),
+        duration: $("#donateTimes").val(),
+        collection_staff: $("#donateStaff").val(),
+        refuse_reason1_id: problemReason.collectedProblem,
+        refuse_reason2_id: problemReason.collectedProblemReason1,
+        refuse_reason3_id: problemReason.collectedProblemReason2,
+        labExaminationIdList: labExaminationIdList
+    }
+
+
+    console.log("save data = ", saveData);
+
     console.log("ID List = ", labExaminationIdList);
     console.log("Data List = ", labExaminationList);
-    console.log("param = ", getParam);
 }

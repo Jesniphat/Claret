@@ -352,22 +352,81 @@ Public Class donateAction
 
     Private Sub GetInitialData()
         Try
-            Dim DonorId As String = _REQUEST("donorId")
-            Dim VistId As String = _REQUEST("visitId")
+            Dim DonorId As String = _REQUEST("donorid")
+            Dim VistId As String = _REQUEST("visitid")
 
             Dim GetDonor As String = "select d.ID, d.DONOR_NUMBER from DONATION_VISIT dv inner join DONOR d on d.ID = dv.DONOR_ID 
-                                      where d.ID = '" & DonorId & "'"
+                                      where d.ID = '" & DonorId & "' AND dv.ID = '" & VistId & "'"
             Dim GetVisit As String = "select d.ID, d.DONOR_NUMBER, dv.ID AS VISIT_ID, dv.SAMPLE_NUMBER 
                                       from DONATION_VISIT dv inner join DONOR d on d.ID = dv.DONOR_ID 
                                       where dv.STATUS = 'WAIT COLLECTION' AND dv.ID = '" & VistId & "' 
                                       AND d.ID = '" & DonorId & "'"
-            Dim GetInData As String = "SELECT VOLUMN_ACTUAL, DONATION_TIME, DURATION, COLLECTION_STAFF, COLLECTION_DATE, 
+            Dim GetInData As String = "SELECT VOLUME_ACTUAL, DONATION_TIME, DURATION, COLLECTION_STAFF, COLLECTION_DATE, 
                                        REFUSE_REASON1_ID, REFUSE_REASON2_ID, REFUSE_REASON3_ID FROM DONATION_RECORD 
                                        WHERE DONOR_ID = '" & DonorId & "' AND DONATION_VISIT_ID = '" & VistId & "' "
-            Dim GetExamination As String = "select * from DONATION_EXAMINATION WHERE DONATION_VISIT_ID '" & VistId & "'"
+            Dim GetExamination As String = "select * from DONATION_EXAMINATION WHERE DONATION_VISIT_ID = '" & VistId & "'"
 
+
+            Dim AllInitalDataList As New InitalDataList
+
+            Dim dtDorner As DataTable = Cbase.QueryTable(GetDonor)
+            AllInitalDataList.doner = New List(Of CheckDonorId)
+            For Each dr As DataRow In dtDorner.Rows
+                Dim Item As New CheckDonorId
+                Item.donorId = dr("ID").ToString
+                Item.donorNumber = dr("DONOR_NUMBER").ToString
+
+                AllInitalDataList.doner.Add(Item)
+            Next
+
+            Dim dtVisit As DataTable = Cbase.QueryTable(GetVisit)
+            AllInitalDataList.visit = New List(Of CheckSampleNum)
+            For Each dr As DataRow In dtVisit.Rows
+                Dim Item As New CheckSampleNum
+                Item.visitId = dr("VISIT_ID").ToString
+                Item.sampleNumber = dr("SAMPLE_NUMBER").ToString
+
+                AllInitalDataList.visit.Add(Item)
+            Next
+
+            Dim dtInData As DataTable = Cbase.QueryTable(GetInData)
+            AllInitalDataList.InitalData = New List(Of InitalData)
+            For Each dr As DataRow In dtInData.Rows
+                Dim Item As New InitalData
+                Item.volume_actual = dr("VOLUME_ACTUAL").ToString
+                Item.donation_time = dr("DONATION_TIME").ToString
+                Item.dulation = dr("DURATION").ToString
+                Item.collection_staff = dr("COLLECTION_STAFF").ToString
+                Item.collection_date = dr("COLLECTION_DATE").ToString
+                Item.refuse_reason1_id = dr("REFUSE_REASON1_ID").ToString
+                Item.refuse_reason2_id = dr("REFUSE_REASON2_ID").ToString
+                Item.refuse_reason3_id = dr("REFUSE_REASON3_ID").ToString
+
+                AllInitalDataList.InitalData.Add(Item)
+            Next
+
+            Dim dtDonationExamination As DataTable = Cbase.QueryTable(GetExamination)
+            AllInitalDataList.DonationExamination = New List(Of DonationExamination)
+            For Each dr As DataRow In dtDonationExamination.Rows
+                Dim Item As New DonationExamination
+                Item.id = dr("ID").ToString
+                Item.create_date = dr("CREATE_DATE").ToString
+                Item.create_staff = dr("CREATE_STAFF").ToString
+                Item.donation_visit_id = dr("DONATION_VISIT_ID").ToString
+                Item.donation_hospital_id = dr("DONATION_HOSPITAL_ID").ToString
+                Item.donation_from = dr("DONATION_FROM").ToString
+                Item.examination_group_id = dr("EXAMINATION_GROUP_ID").ToString
+                Item.examination_group_desc = dr("EXAMINATION_GROUP_DESC").ToString
+                Item.examination_id = dr("EXAMINATION_ID").ToString
+                Item.examination_desc = dr("EXAMINATION_DESC").ToString
+
+                AllInitalDataList.DonationExamination.Add(Item)
+            Next
+
+            JSONResponse.setItems(JSON.Serialize(Of InitalDataList)(AllInitalDataList))
+            Response.Write(JSONResponse.ToJSON())
         Catch ex As Exception
-
+            Response.Write(New CallbackException(ex).ToJSON())
         End Try
     End Sub
 
@@ -448,8 +507,8 @@ Public Structure CheckSampleNum
 End Structure
 
 Public Structure InitalData
-    Public volumn_actual As String
-    Public danation_time As String
+    Public volume_actual As String
+    Public donation_time As String
     Public dulation As String
     Public collection_staff As String
     Public collection_date As String
@@ -472,7 +531,7 @@ Public Structure DonationExamination
 End Structure
 
 Public Structure InitalDataList
-    Public donar As List(Of CheckDonorId)
+    Public doner As List(Of CheckDonorId)
     Public visit As List(Of CheckSampleNum)
     Public InitalData As List(Of InitalData)
     Public DonationExamination As List(Of DonationExamination)

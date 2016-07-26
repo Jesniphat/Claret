@@ -4,13 +4,16 @@
     <script src="../resources/javascript/donateScriptEdit.js" type="text/javascript"></script>
     <script>
         $(function () {
-            checkParam();
-            getDonateTypeList();
-            getDonateBagTypeList();
-            getDonateApplyList();
-            getExamination();
-            getProblemReason();
-            randerAddLabExamination();
+            getDonateTypeList()
+            .then(getDonateBagTypeList)
+            .then(getDonateApplyList)
+            .then(getExamination)
+            .then(getProblemReason)
+            .done(checkParam)
+            .fail(function (err) {
+            console.log(err);
+            });
+            //randerAddLabExamination();
 
             //$("#collectedProblem").selecter();
             //$("#collectedProblemReason1").setDropdowList();
@@ -19,8 +22,7 @@
             $("#addLabExamination").click(addLabExamination);
             
             $("#donate-table").tablesorter({ dateFormat: "uk" });
-            $("#startDonateDate").datepicker();
-            $('#donateTimes').timepicker();
+            $("#startDonateDate").timepicker();
             $("#labExamination").autocomplete({
                 source: examinationAutoData
             });
@@ -105,12 +107,12 @@
             <div class="border-box">
                 <div class="row">
                     <div class="col-md-8 text-left">Prescribed Volumn</div>
-                    <div class="col-md-9 text-left"><input class="col-md-9 form-control" id="prescribedVol" type="text" value=""/></div>
+                    <div class="col-md-9 text-left"><input class="col-md-9 form-control" id="prescribedVol" type="text" value="" readonly/></div>
                     <div class="col-md-8 text-left">Volumn</div>
                     <div class="col-md-9 text-left"><input class="col-md-9 form-control required" id="vol" type="text" value=""/></div>
                 </div>
                 <div class="row">
-                    <div class="col-md-8 text-left">วันที่เริ่มบริจาค</div>
+                    <div class="col-md-8 text-left">เวลาที่เริ่มบริจาค</div>
                     <div class="col-md-9 text-left"><input class="col-md-9 form-control required" id="startDonateDate" type="text" value=""/></div>
                     <div class="col-md-8 text-left">ระยะเวลาที่บริจาค</div>
                     <div class="col-md-9 text-left"><input class="col-md-9 form-control required" id="donateTimes" type="text" value=""/></div>
