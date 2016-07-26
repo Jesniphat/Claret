@@ -31,54 +31,56 @@ function checkParam() {
         donateDate: $("#data").attr("donatedate"),
         donatestatus: $("#data").attr("donatestatus")
     }
-
-    // console.log("GetParam = ", getParam);
-    if (getParam.donateAction == "edit") {
-        getInitialData();
-    }
     deferred.resolve("Ok");
     return deferred.promise();
 }
 
 function getInitialData() {
-    $.ajax({
-        url: '../../ajaxAction/donateAction.aspx',
-        data: H2G.ajaxData({ action: 'getInitialData' }).config,
-        type: "POST",
-        dataType: "json",
-        error: function (xhr, s, err) {
-            console.log(s, err);
-        },
-        success: function (data) {
-            if (!data.onError) {
-                data.getItems = jQuery.parseJSON(data.getItems);
-                console.log("data = ", data.getItems);
-                if (data.getItems.doner.length > 0) {
-                    $("#donerNumber").val(data.getItems.doner[0].donorNumber);
-                    $("#donerNumber").prop("readonly", true);
-                }
-                if (data.getItems.visit.length > 0) {
-                    $("#sampleNumber").val(data.getItems.visit[0].sampleNumber);
-                    $("#sampleNumber").prop("readonly", true);
-                }
-                if (data.getItems.DonationExamination.length > 0) {
-                    var ExninationList = data.getItems.DonationExamination;
-                    // console.log("Ex1 = ", ExninationList, " Ex2 = ", examinationData);
-                    for (var i = 0; i < ExninationList.length; i++) {
-                        for (var j = 0; j < examinationData.length; j++) {
-                            if (ExninationList[i].examination_id == examinationData[j].id) {
-                                labExaminationList.push({ text: examinationData[j].code + " - " + examinationData[j].description });
-                                labExaminationIdList.push(ExninationList[i].examination_id);
+    var deferred = $.Deferred();
+    if (getParam.donateAction == "edit"){
+        $.ajax({
+            url: '../../ajaxAction/donateAction.aspx',
+            data: H2G.ajaxData({ action: 'getInitialData' }).config,
+            type: "POST",
+            dataType: "json",
+            error: function (xhr, s, err) {
+                console.log(s, err);
+            },
+            success: function (data) {
+                if (!data.onError) {
+                    data.getItems = jQuery.parseJSON(data.getItems);
+                    console.log("data = ", data.getItems);
+                    if (data.getItems.doner.length > 0) {
+                        $("#donerNumber").val(data.getItems.doner[0].donorNumber);
+                        $("#donerNumber").prop("readonly", true);
+                    }
+                    if (data.getItems.visit.length > 0) {
+                        $("#sampleNumber").val(data.getItems.visit[0].sampleNumber);
+                        $("#sampleNumber").prop("readonly", true);
+                    }
+                    if (data.getItems.DonationExamination.length > 0) {
+                        var ExninationList = data.getItems.DonationExamination;
+                        // console.log("Ex1 = ", ExninationList, " Ex2 = ", examinationData);
+                        for (var i = 0; i < ExninationList.length; i++) {
+                            for (var j = 0; j < examinationData.length; j++) {
+                                if (ExninationList[i].examination_id == examinationData[j].id) {
+                                    labExaminationList.push({ text: examinationData[j].code + " - " + examinationData[j].description });
+                                    labExaminationIdList.push(ExninationList[i].examination_id);
+                                }
                             }
                         }
+                        randerAddLabExamination();
                     }
-                    randerAddLabExamination();
+                    deferred.resolve("Ok");
+                } else {
+                    console.log("Error = ", data.exMessage)
+                    deferred.reject("Error");
                 }
-            } else {
-                console.log("Error = ", data.exMessage)
             }
-        }
-    });
+        });
+    }
+
+    return deferred.promise();
 }
 
 function getDonateTypeList() {
@@ -406,7 +408,7 @@ function checkSampleNumber() {
     if (($("#data").attr("donateAction") == "new") && $("#donerNumber").val() != "" && getParam.donorID != "0") {
         $.ajax({
             url: '../../ajaxAction/donateAction.aspx',
-            data: H2G.ajaxData({ action: 'checkSampleNumber', sampleNumber: $("#sampleNumber").val(), donateNumber: $("#donerNumber").val(),sdfsd:[] }).config,
+            data: H2G.ajaxData({ action: 'checkSampleNumber', sampleNumber: $("#sampleNumber").val(), donateNumber: $("#donerNumber").val() }).config,
             type: "POST",
             dataType: "json",
             beforeSend: function () {
@@ -440,8 +442,7 @@ function checkSampleNumber() {
 
 function saveData() {
     var saveData = {
-        donerIds: getParam.donorID,
-        visitIds: getParam.visitID,
+        action: 'saveDonate',
         donateAction: getParam.donateAction,
         donateTypeId: $("#donateType").val(),
         donateBagTypeId: $("#donateBagType").val(),
@@ -453,12 +454,24 @@ function saveData() {
         refuse_reason1_id: problemReason.collectedProblem,
         refuse_reason2_id: problemReason.collectedProblemReason1,
         refuse_reason3_id: problemReason.collectedProblemReason2,
-        labExaminationIdList: labExaminationIdList
+        labExaminationIdList: labExaminationIdList.join()
     }
-
-
-    console.log("save data = ", saveData);
-
-    console.log("ID List = ", labExaminationIdList);
-    console.log("Data List = ", labExaminationList);
+    console.log("data = ", saveData);
+    $.ajax({
+        url: '../../ajaxAction/donateAction.aspx',
+        data: H2G.ajaxData( saveData ).config,
+        type: "POST",
+        dataType: "json",
+        error: function (xhr, s, err) {
+            console.log(s, err);
+        },
+        success: function (data) {
+            if (!data.onError) {
+                data.getItems = jQuery.parseJSON(data.getItems);
+                
+            } else {
+                console.log("Error = ", data.exMessage);
+            }
+        }
+    });
 }

@@ -4,12 +4,13 @@
     <script src="../resources/javascript/donateScriptEdit.js" type="text/javascript"></script>
     <script>
         $(function () {
-            getDonateTypeList()
+            checkParam()
+            .then(getDonateTypeList)
             .then(getDonateBagTypeList)
             .then(getDonateApplyList)
             .then(getExamination)
             .then(getProblemReason)
-            .done(checkParam)
+            .done(getInitialData)
             .fail(function (err) {
             console.log(err);
             });

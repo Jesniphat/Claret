@@ -29,6 +29,8 @@ Public Class donateAction
                 Call CheckSampleNumber()
             Case "getInitialData"
                 Call GetInitialData()
+            Case "saveDonate"
+                Call DonateSaveData()
 
         End Select
 
@@ -430,6 +432,16 @@ Public Class donateAction
         End Try
     End Sub
 
+    Private Sub DonateSaveData()
+        Try
+            Dim donerIds As String = _REQUEST("donerIds")
+            Dim List As String = _REQUEST("labExaminationIdList")
+            Dim myArray As Array = List.Split(",")
+            Dim test As String = "xxx"
+        Catch ex As Exception
+
+        End Try
+    End Sub
 End Class
 
 Public Structure DonationType
