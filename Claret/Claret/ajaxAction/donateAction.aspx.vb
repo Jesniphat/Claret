@@ -31,6 +31,8 @@ Public Class donateAction
                 Call GetInitialData()
             Case "saveDonate"
                 Call DonateSaveData()
+            Case "getDonationList"
+                Call GetDonationList()
 
         End Select
 
@@ -361,7 +363,7 @@ Public Class donateAction
                                       where d.ID = '" & DonorId & "' AND dv.ID = '" & VistId & "'"
             Dim GetVisit As String = "select d.ID, d.DONOR_NUMBER, dv.ID AS VISIT_ID, dv.SAMPLE_NUMBER 
                                       from DONATION_VISIT dv inner join DONOR d on d.ID = dv.DONOR_ID 
-                                      where dv.STATUS = 'WAIT COLLECTION' AND dv.ID = '" & VistId & "' 
+                                      where dv.ID = '" & VistId & "' 
                                       AND d.ID = '" & DonorId & "'"
             Dim GetInData As String = "SELECT VOLUME_ACTUAL, DONATION_TIME, DURATION, COLLECTION_STAFF, COLLECTION_DATE, 
                                        REFUSE_REASON1_ID, REFUSE_REASON2_ID, REFUSE_REASON3_ID FROM DONATION_RECORD 
@@ -460,7 +462,7 @@ Public Class donateAction
             Dim strLabExaminationString As String = LabExaminationString.Substring(0, (LabExaminationString.Length - 1))
             Dim ExaminationDonationListSql = "SELECT el.ID AS EL_ID, el.DONATION_TYPE_ID, el.EXAMINATION_ID AS id, e.CODE, e.DESCRIPTION, el.EXAMINATION_GROUP_ID as group_id
                 FROM EXAMINATION_DONATION_LIST el inner join EXAMINATION e on el.EXAMINATION_ID = e.ID 
-                WHERE DONATION_TYPE_ID = '" & donateTypeId & "' AND el.EXAMINATION_ID not in (" & strLabExaminationString & ")"
+                WHERE DONATION_TYPE_ID = '" & donateTypeId & "' AND el.NEW_DONOR_FLAG = 'A' AND el.EXAMINATION_ID not in (" & strLabExaminationString & ")"
 
             Dim NewExaminationList As DataTable = Cbase.QueryTable(ExaminationDonationListSql)
             For Each dr As DataRow In NewExaminationList.Rows
@@ -509,6 +511,50 @@ Public Class donateAction
             Response.Write(JSONResponse.ToJSON())
         Catch ex As Exception
             Cbase.Rollback()
+            Response.Write(New CallbackException(ex).ToJSON())
+        End Try
+    End Sub
+
+    Private Sub GetDonationList()
+        Try
+            Dim sql As String = "SELECT D.ID AS DONOR_ID,DV.ID AS VISIT_ID,D.DONOR_NUMBER,DV.SAMPLE_NUMBER,DV.DONATION_TYPE_ID,DV.BAG_ID,DV.DONATION_TO_ID, 
+                                DR.VOLUME_ACTUAL,DR.DONATION_TIME,DR.DURATION,DR.COLLECTION_DATE,DR.COLLECTION_STAFF,
+                                DR.REFUSE_REASON1_ID,DR.REFUSE_REASON2_ID,DR.REFUSE_REASON3_ID,
+                                DT.DESCRIPTION AS TYPE_DES,G.DESCRIPTION AS BAG_DES, DTT.DESCRIPTION AS APPLY_DES 
+                                FROM DONOR D INNER JOIN DONATION_VISIT DV ON D.ID = DV.DONOR_ID 
+                                INNER JOIN DONATION_RECORD DR ON D.ID = DR.DONOR_ID AND DV.ID = DR.DONATION_VISIT_ID
+                                INNER JOIN DONATION_TYPE DT ON DV.DONATION_TYPE_ID = DT.ID
+                                INNER JOIN BAG G ON DV.BAG_ID = G.ID INNER JOIN Donation_To DTT ON DV.DONATION_TO_ID = DTT.ID
+                                WHERE DV.STATUS IN ('WAIT RESULT','WAIT COLLECTION')"
+            Dim dt As DataTable = Cbase.QueryTable(sql)
+            Dim DonationLists = New List(Of DonationList)
+            For Each dr As DataRow In dt.Rows
+                Dim Item As New DonationList
+                Item.donor_id = dr("DONOR_ID").ToString
+                Item.visit_id = dr("VISIT_ID").ToString
+                Item.dornor_number = dr("DONOR_NUMBER").ToString
+                Item.sample_number = dr("SAMPLE_NUMBER").ToString
+                Item.donation_type_id = dr("DONATION_TYPE_ID").ToString
+                Item.bag_id = dr("BAG_ID").ToString
+                Item.donation_to_id = dr("DONATION_TO_ID").ToString
+                Item.volume_actual = dr("VOLUME_ACTUAL").ToString
+                Item.donation_time = dr("DONATION_TIME").ToString
+                Item.duration = dr("DURATION").ToString
+                Item.collection_date = dr("COLLECTION_DATE").ToString
+                Item.collection_staff = dr("COLLECTION_STAFF").ToString
+                Item.refuse_reason1_id = dr("REFUSE_REASON1_ID").ToString
+                Item.refuse_reason2_id = dr("REFUSE_REASON2_ID").ToString
+                Item.refuse_reason3_id = dr("REFUSE_REASON3_ID").ToString
+                Item.type_des = dr("TYPE_DES").ToString
+                Item.bag_des = dr("BAG_DES").ToString
+                Item.apply_des = dr("APPLY_DES").ToString
+
+                DonationLists.Add(Item)
+            Next
+
+            JSONResponse.setItems(JSON.Serialize(Of List(Of DonationList))(DonationLists))
+            Response.Write(JSONResponse.ToJSON())
+        Catch ex As Exception
             Response.Write(New CallbackException(ex).ToJSON())
         End Try
     End Sub
@@ -624,4 +670,25 @@ Public Structure LabExaminationLists
     Public code As String
     Public description As String
     Public group_id As String
+End Structure
+
+Public Structure DonationList
+    Public donor_id As String
+    Public visit_id As String
+    Public dornor_number As String
+    Public sample_number As String
+    Public donation_type_id As String
+    Public bag_id As String
+    Public donation_to_id As String
+    Public volume_actual As String
+    Public donation_time As String
+    Public duration As String
+    Public collection_date As String
+    Public collection_staff As String
+    Public refuse_reason1_id As String
+    Public refuse_reason2_id As String
+    Public refuse_reason3_id As String
+    Public type_des As String
+    Public bag_des As String
+    Public apply_des As String
 End Structure

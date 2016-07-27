@@ -10,6 +10,7 @@
             .then(getDonateApplyList)
             .then(getExamination)
             .then(getProblemReason)
+            .then(getDonationList)
             .done(getInitialData)
             .fail(function (err) {
             console.log(err);
@@ -22,7 +23,6 @@
 
             $("#addLabExamination").click(addLabExamination);
             
-            $("#donate-table").tablesorter({ dateFormat: "uk" });
             $("#startDonateDate").timepicker();
             $("#labExamination").autocomplete({
                 source: examinationAutoData
@@ -229,9 +229,10 @@
                         <th class="col-md-5">ประเภทการบริจาค</th>
                         <th class="col-md-5">ประเภทถุง</th>
                         <th class="col-md-5">ประเภทการใช้งาน</th>
-                        <th class="col-md-4">Volumn</th>
-                        <th class="col-md-4">เวลา</th>
+                        <th class="col-md-3">Volumn</th>
+                        <th class="col-md-3">เวลา</th>
                         <th class="col-md-3">ระยะเวลา</th>
+                        <th class="col-md-2">Action</th>
                     </tr>
                 </thead>
                 <tbody>

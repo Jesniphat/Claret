@@ -5,6 +5,7 @@ var getParam = {};
 var labExaminationList = [];
 var labExaminationIdList = [];
 var labExaminationSaveList = [];
+
 var examinationData = [];
 var examinationJoinData = [];
 var examinationGroupData = [];
@@ -32,6 +33,7 @@ function checkParam() {
         donateDate: $("#data").attr("donatedate"),
         donatestatus: $("#data").attr("donatestatus")
     }
+    console.log(getParam);
     deferred.resolve("Ok");
     return deferred.promise();
 }
@@ -58,6 +60,32 @@ function getInitialData() {
                     if (data.getItems.visit.length > 0) {
                         $("#sampleNumber").val(data.getItems.visit[0].sampleNumber);
                         $("#sampleNumber").prop("readonly", true);
+                    }
+                    if (data.getItems.InitalData.length > 0) {
+                        // console.log("sss = ", data.getItems.InitalData);
+                        $("#vol").val(data.getItems.InitalData[0].volume_actual);
+                        $("#startDonateDate").val(data.getItems.InitalData[0].donation_time);
+                        $("#donateTimes").val(data.getItems.InitalData[0].dulation);
+                        $("#donateStaff").val(data.getItems.InitalData[0].collection_staff);
+
+                        var proBl = data.getItems.InitalData[0];
+                        problemReason.collectedProblem = proBl.refuse_reason1_id;
+                        problemReason.collectedProblemReason1 = proBl.refuse_reason2_id;
+                        problemReason.collectedProblemReason2 = proBl.refuse_reason3_id;
+                        for (var i = 0; i < problemDataList.length; i++) {
+                            if (proBl.refuse_reason1_id == problemDataList[i].id) {
+                                $("#collectedProblem").val(problemDataList[i].code + " - " + problemDataList[i].description);
+
+                            }
+                            if (proBl.refuse_reason2_id == problemDataList[i].id) {
+                                $("#collectedProblemReason1").val(problemDataList[i].code + " - " + problemDataList[i].description);
+
+                            }
+                            if (proBl.refuse_reason3_id == problemDataList[i].id) {
+                                $("#collectedProblemReason2").val(problemDataList[i].code + " - " + problemDataList[i].description);
+
+                            }
+                        }
                     }
                     if (data.getItems.DonationExamination.length > 0) {
                         var ExninationList = data.getItems.DonationExamination;
@@ -487,11 +515,120 @@ function saveData() {
                 data.getItems = jQuery.parseJSON(data.getItems);
                 $('body').unblock();
                 notiSuccess("บันทึกข้อมูลสำเร็จ");
+                
+                resetData();
+                randerAddLabExamination();
             } else {
                 console.log("Error = ", data.exMessage);
                 $('body').unblock();
                 notiWarning("บันทึกข้อมูลไม่สำเร็จ");
             }
         }
+    });
+}
+
+function resetData() {
+    var deferred = $.Deferred();
+    $("#donateType").val("0");
+    $("#donateBagType").val("0");
+    $("#donateApply").val("0");
+    $("#prescribedVol").val("");
+    $("#vol").val("");
+    $("#startDonateDate").val("");
+    $("#donateTimes").val("");
+    $("#donateStaff").val("");
+
+    $("#donerNumber").val("");
+    $("#sampleNumber").val("");
+    $("#donerNumber").prop("readonly", false);
+    $("#sampleNumber").prop("readonly", false);
+
+    $("#collectedProblem").val("");
+    $("#collectedProblemReason1").val("");
+    $("#collectedProblemReason2").val("");
+
+    labExaminationList = [];
+    labExaminationIdList = [];
+    labExaminationSaveList = [];
+
+    $("#data").attr("donateAction", "new");
+    $("#data").attr("donorid", "0");
+    $("#data").attr("visitid", "0");
+    $("#data").attr("donatetype", "0");
+    $("#data").attr("donatebagtype", "0");
+    $("#data").attr("donateapply", "0");
+    // $("#data").attr("donatedate", "");
+    $("#data").attr("donatestatus", "WAIT COLLECTION");
+    deferred.resolve("OK");
+    return deferred.promise();
+}
+
+function getDonationList() {
+    var deferred = $.Deferred();
+    $.ajax({
+        url: '../../ajaxAction/donateAction.aspx',
+        data: H2G.ajaxData({ action: 'getDonationList' }).config,
+        type: "POST",
+        dataType: "json",
+        error: function (xhr, s, err) {
+            console.log(s, err);
+        },
+        success: function (data) {
+            if (!data.onError) {
+                data.getItems = jQuery.parseJSON(data.getItems);
+                console.log(data.getItems);
+                for (var i = 0; i < data.getItems.length; i++) {
+                    var rows = "<tr class='donate-table-rows'>" +
+                                    "<td class='col-md-5'>" + data.getItems[i].sample_number + "</td>" +
+                                    "<td class='col-md-5'>" + data.getItems[i].dornor_number + "</td>" +
+                                    "<td class='col-md-5'>" + data.getItems[i].type_des + "</td>" +
+                                    "<td class='col-md-5'>" + data.getItems[i].bag_des + "</td>" +
+                                    "<td class='col-md-5'>" + data.getItems[i].apply_des + "</td>" +
+                                    "<td class='col-md-3'>" + data.getItems[i].volume_actual + "</td>" +
+                                    "<td class='col-md-3'>" + data.getItems[i].collection_date + "</td>" +
+                                    "<td class='col-md-3'>" + data.getItems[i].donation_time + "</td>" +
+                                    "<td class='col-md-3'>" +
+                                        "<button class='btn btn-icon' onclick='goEditIt(" + data.getItems[i].visit_id + ", " + data.getItems[i].donor_id + ");' tabindex='1'>" +
+                                            "<i class='glyphicon glyphicon-remove'></i>" +
+                                        "</button>" +
+                                    + "</td>" +
+                                "</tr>";
+                    $('#donate-table > tbody').append(rows);
+                }
+                deferred.resolve("OK");
+            } else {
+                console.log("Error = ", data.exMessage);
+                deferred.reject("Error");
+            }
+            $("#donate-table").tablesorter({ dateFormat: "uk" });
+        }
+    });
+    return deferred.promise();
+}
+
+function setForEditList() {
+    var deferred = $.Deferred();
+    $("#data").attr("donateAction", "edit");
+    $("#data").attr("donorid", donorId);
+    $("#data").attr("visitid", visitId);
+    deferred.resolve("OK");
+    return deferred.promise();
+}
+
+function goEditIt(visitId, donorId) {
+
+    resetData()
+    .then(function () {
+        var deferred = $.Deferred();
+        $("#data").attr("donateAction", "edit");
+        $("#data").attr("donorid", donorId);
+        $("#data").attr("visitid", visitId);
+        deferred.resolve("OK");
+        return deferred.promise();
+    })
+    .then(checkParam)
+    .then(getInitialData)
+    .fail(function (err) {
+        console.log(err);
     });
 }
