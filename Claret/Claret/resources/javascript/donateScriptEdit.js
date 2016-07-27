@@ -4,6 +4,7 @@ var getParam = {};
 
 var labExaminationList = [];
 var labExaminationIdList = [];
+var labExaminationSaveList = [];
 var examinationData = [];
 var examinationJoinData = [];
 var examinationGroupData = [];
@@ -66,6 +67,7 @@ function getInitialData() {
                                 if (ExninationList[i].examination_id == examinationData[j].id) {
                                     labExaminationList.push({ text: examinationData[j].code + " - " + examinationData[j].description });
                                     labExaminationIdList.push(ExninationList[i].examination_id);
+                                    labExaminationSaveList.push({ id: ExninationList[i].examination_id, code: examinationData[j].code, description: ExninationList[i].examination_desc, group_id: ExninationList[i].examination_group_id })
                                 }
                             }
                         }
@@ -208,6 +210,7 @@ function getExamination() {
 function removeLabExamination(i) {
     labExaminationList.splice(i, 1);
     labExaminationIdList.splice(i, 1);
+    labExaminationSaveList.splice(i, 1);
     randerAddLabExamination();
 }
 
@@ -238,6 +241,8 @@ function setDataNotInGroup(text) {
     for (var i = 0; i < examinationData.length; i++) {
         if (examinationData[i].code == code) {
             var emtId = examinationData[i].id;
+            var emCode = examinationData[i].code;
+            var emDesc = examinationData[i].description;
         }
     }
     if (jQuery.inArray(emtId, labExaminationIdList) != -1) {
@@ -249,6 +254,7 @@ function setDataNotInGroup(text) {
     //console.log(emtId);
     labExaminationList.push({ text: text });
     labExaminationIdList.push(emtId);
+    labExaminationSaveList.push({ id: emtId, code: emCode, description: emDesc, group_id: null });
     randerAddLabExamination();
     $("#labExamination").val("");
     $("#labExamination").focus();
@@ -269,8 +275,14 @@ function setDataIngroup(text) {
             if (jQuery.inArray(examinationJoinData[i].e_id, labExaminationIdList) != -1) {
                 continue;
             }
+
             labExaminationList.push({ text: examinationJoinData[i].text });
             labExaminationIdList.push(examinationJoinData[i].e_id);
+            for (var j = 0; j < examinationData.length; j++) {
+                if (examinationJoinData[i].e_id == examinationData[j].id) {
+                    labExaminationSaveList.push({ id: examinationJoinData[i].e_id, code: examinationData[j].code, description: examinationData[j].description, group_id: emtGpId });
+                }
+            }
         }
     }
     randerAddLabExamination();
@@ -447,6 +459,7 @@ function saveData() {
         donateTypeId: $("#donateType").val(),
         donateBagTypeId: $("#donateBagType").val(),
         donateApplyId: $("#donateApply").val(),
+        prescribedVol: $("#prescribedVol").val(),
         volumnActual: $("#vol").val(),
         donationTime: $("#startDonateDate").val(),
         duration: $("#donateTimes").val(),
@@ -454,23 +467,30 @@ function saveData() {
         refuse_reason1_id: problemReason.collectedProblem,
         refuse_reason2_id: problemReason.collectedProblemReason1,
         refuse_reason3_id: problemReason.collectedProblemReason2,
-        labExaminationIdList: labExaminationIdList.join()
+        labExaminationSaveList: JSON.stringify(labExaminationSaveList)
     }
     console.log("data = ", saveData);
+    
     $.ajax({
         url: '../../ajaxAction/donateAction.aspx',
         data: H2G.ajaxData( saveData ).config,
         type: "POST",
         dataType: "json",
+        beforeSend: function () {
+            $('body').block();
+        },
         error: function (xhr, s, err) {
             console.log(s, err);
         },
         success: function (data) {
             if (!data.onError) {
                 data.getItems = jQuery.parseJSON(data.getItems);
-                
+                $('body').unblock();
+                notiSuccess("บันทึกข้อมูลสำเร็จ");
             } else {
                 console.log("Error = ", data.exMessage);
+                $('body').unblock();
+                notiWarning("บันทึกข้อมูลไม่สำเร็จ");
             }
         }
     });

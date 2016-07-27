@@ -434,12 +434,82 @@ Public Class donateAction
 
     Private Sub DonateSaveData()
         Try
-            Dim donerIds As String = _REQUEST("donerIds")
-            Dim List As String = _REQUEST("labExaminationIdList")
-            Dim myArray As Array = List.Split(",")
-            Dim test As String = "xxx"
-        Catch ex As Exception
+            Dim donerId As String = _REQUEST("donorid")
+            Dim visitId As String = _REQUEST("visitid")
+            Dim donateAction As String = _REQUEST("donateAction")
+            Dim donateTypeId As String = _REQUEST("donateTypeId")
+            Dim donateBagTypeId As String = _REQUEST("donateBagTypeId")
+            Dim donateApplyId As String = _REQUEST("donateApplyId")
+            Dim prescribedVol As String = _REQUEST("prescribedVol")
+            Dim volumnActual As String = _REQUEST("volumnActual")
+            Dim donationTime As String = _REQUEST("donationTime")
+            Dim duration As String = _REQUEST("duration")
+            Dim collectionStaff As String = _REQUEST("collection_staff")
+            Dim refuseReason1Id As String = _REQUEST("refuse_reason1_id")
+            Dim refuseReason2Id As String = _REQUEST("refuse_reason2_id")
+            Dim refuseReason3Id As String = _REQUEST("refuse_reason3_id")
 
+            'Dim labExaminationSaveString As String = _REQUEST("labExaminationSaveList")
+            Dim labExaminationSaveList As List(Of LabExaminationLists) = JSON.Deserialize(Of List(Of LabExaminationLists))(_REQUEST("labExaminationSaveList"))
+
+            Dim LabExaminationString As String = ""
+            For Each Les As LabExaminationLists In labExaminationSaveList
+                LabExaminationString += "'" & Les.id & "',"
+            Next
+
+            Dim strLabExaminationString As String = LabExaminationString.Substring(0, (LabExaminationString.Length - 1))
+            Dim ExaminationDonationListSql = "SELECT el.ID AS EL_ID, el.DONATION_TYPE_ID, el.EXAMINATION_ID AS id, e.CODE, e.DESCRIPTION, el.EXAMINATION_GROUP_ID as group_id
+                FROM EXAMINATION_DONATION_LIST el inner join EXAMINATION e on el.EXAMINATION_ID = e.ID 
+                WHERE DONATION_TYPE_ID = '" & donateTypeId & "' AND el.EXAMINATION_ID not in (" & strLabExaminationString & ")"
+
+            Dim NewExaminationList As DataTable = Cbase.QueryTable(ExaminationDonationListSql)
+            For Each dr As DataRow In NewExaminationList.Rows
+                Dim Item As New LabExaminationLists
+                Item.id = dr("ID").ToString
+                Item.code = dr("CODE").ToString
+                Item.description = dr("DESCRIPTION").ToString
+                Item.group_id = dr("GROUP_ID").ToString
+
+                labExaminationSaveList.Add(Item)
+            Next
+
+            Dim UpdateDonationVisitSql As String = "UPDATE DONATION_VISIT SET " &
+                                                   "DONATION_TYPE_ID = '" & donateTypeId & "', " &
+                                                   "BAG_ID = '" & donateBagTypeId & "', " &
+                                                   "DONATION_TO_ID = '" & donateApplyId & "', " &
+                                                   "STATUS = 'WAIT RESULT' WHERE ID = '" & visitId & "' " &
+                                                   "AND DONOR_ID = '" & donerId & "'"
+            Cbase.Execute(UpdateDonationVisitSql)
+
+            Dim UpdateDonationRecordSql As String = "UPDATE DONATION_RECORD SET " &
+                                                    "VOLUME_ACTUAL = '" & volumnActual & "', " &
+                                                    "DONATION_TIME = " & "SYSDATE" & ", " &
+                                                    "DURATION = " & "SYSDATE" & ", " &
+                                                    "COLLECTION_STAFF = '" & collectionStaff & "', " &
+                                                    "COLLECTION_DATE = SYSDATE, " &
+                                                    "REFUSE_REASON1_ID = '" & refuseReason1Id & "', " &
+                                                    "REFUSE_REASON2_ID = '" & refuseReason2Id & "', " &
+                                                    "REFUSE_REASON3_ID = '" & refuseReason3Id & "' " &
+                                                    "WHERE DONATION_VISIT_ID = '" & visitId & "' " &
+                                                    "AND DONOR_ID = '" & donerId & "' "
+            Cbase.Execute(UpdateDonationRecordSql)
+
+            Cbase.Execute("delete from DONATION_EXAMINATION where DONATION_VISIT_ID = '" & visitId & "'")
+
+            For Each list As LabExaminationLists In labExaminationSaveList
+                Dim InsertExaminationSql = "INSERT INTO DONATION_EXAMINATION (ID, CREATE_DATE, CREATE_STAFF, DONATION_VISIT_ID, donation_from, examination_group_id, " &
+                                           "examination_group_desc, examination_id, examination_desc) VALUES " &
+                                           "(SQ_DONATION_EXAMINATION_ID.nextval, SYSDATE, '" & collectionStaff & "', '" & visitId & "', " &
+                                           "'0', '" & list.group_id & "', '0', '" & list.id & "', '" & list.description & "')"
+                Cbase.Execute(InsertExaminationSql)
+            Next
+
+            Cbase.Apply()
+            JSONResponse.setItems(JSON.Serialize(Of List(Of LabExaminationLists))(labExaminationSaveList))
+            Response.Write(JSONResponse.ToJSON())
+        Catch ex As Exception
+            Cbase.Rollback()
+            Response.Write(New CallbackException(ex).ToJSON())
         End Try
     End Sub
 End Class
@@ -547,4 +617,11 @@ Public Structure InitalDataList
     Public visit As List(Of CheckSampleNum)
     Public InitalData As List(Of InitalData)
     Public DonationExamination As List(Of DonationExamination)
+End Structure
+
+Public Structure LabExaminationLists
+    Public id As String
+    Public code As String
+    Public description As String
+    Public group_id As String
 End Structure
