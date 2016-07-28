@@ -6,888 +6,365 @@
             border-bottom: 0;
         }
     </style>
+    <script src="../resources/javascript/page/registerScript.js" type="text/javascript"></script>
     <script>
         $(function () {
-            $("#tbDonateHistory thead button").click(function () { sortButton($(this), postQueueSearch); return false; });
-
-            $("#txtCardNumber").enterKey(function () { $(this).addExtCard(); }).focus();
-            $("#txtDonorName").H2GNamebox();
-            $("#txtDonorSurName").H2GNamebox();
-            $("#txtDonorNameEng").H2GNamebox();
-            $("#txtDonorSurNameEng").H2GNamebox();
-            $("#ddlDefferal").setDropdowList().on('change', function () {
-                if ($(this).H2GValue() == 'ACTIVE') { $("#tbDefferal > thead > tr[status=INACTIVE]").hide(); } else { $("#tbDefferal > thead > tr[status=INACTIVE]").show(); }
-            });
-            $("#ddlVisit").setDropdowList();
-            $("#infoTab").tabs({
-                active: 1,
-                activate: function (event, ui) {
-                    if ($(ui.newPanel).find("textarea:visible:first").length > 0) {
-                        $(ui.newPanel).find("textarea:visible:first").focus();
-                    } else {
-                        $(ui.newPanel).find("input:not(input[type=button],input[type=submit],button):visible:first").focus();
-                    }
-                },
-            });
-            $("#infoTabToday").tabs({
-                activate: function (event, ui) {
-                    $(ui.newPanel).find("input:not(input[type=button],input[type=submit],button):visible:first").focus();
-                },
-            });
-            $("#labTab").tabs({
-                activate: function (event, ui) {
-                    $(ui.newPanel).find("input:not(input[type=button],input[type=submit],button):visible:first").focus();
-                },
-            });
-            $("#togDeferal").toggleSlide();
-            $("#togVisitInfo").toggleSlide();
-            $("#txtBirthDay").H2GDatebox().setCalendar({
-                maxDate: new Date(),
-                minDate: "-100y",
-                yearRange: "c-100:c+0",
-                onSelect: function (selectedDate, objDate) {
-                    if (selectedDate != '') { $("#txtAge").H2GValue(H2G.calAge(selectedDate) + ' ปี'); } else { $("#txtAge").H2GValue(''); }
-                    $("#ddlOccupation").closest("div").focus();
-                },
-                onClose: function () {
-                    var pattern = 'dd/MM/yyyy';
-                    if ($(this).H2GValue() != '') {
-                        $(this).H2GValue($(this).H2GValue().replace(/\W+/g, ''));
-                        $(this).next().remove();
-                        if (isDate($(this).H2GValue(), pattern.replace(/\W+/g, ''))) {
-                            var isValue = new Date(getDateFromFormat($(this).H2GValue(), pattern.replace(/\W+/g, '')));
-                            $(this).H2GValue(formatDate(isValue, pattern));
-                        }
-                        $("#txtAge").H2GValue(H2G.calAge($(this).H2GValue()) + ' ปี');
-                    } else {
-                        $("#txtAge").H2GValue('');
-                    }
-                },
-            });
-            $("#txtStmRegisDate").setCalendar().H2GDatebox();
-            $("#txtOuterDonate").H2GNumberbox();
-            $("#txtMobile1").H2GPhonebox();
-            $("#txtMobile2").H2GPhonebox();
-            $("#txtHomeTel").H2GPhonebox();
-            $("#txtTel").H2GPhonebox();
-            $("#txtTelExt").H2GPhonebox();
-            $("#txtLastDonateDate").H2GDatebox().setCalendar({
-                maxDate: new Date(),
-                minDate: "-100y",
-                yearRange: "c-100:c+0",
-                onSelect: function (selectedDate, objDate) {
-                    if (selectedDate != '') { $(this).H2GAttr('donatedatetext', formatDate($(this).datepicker("getDate"),"dd MMM yyyy")); } else { $(this).H2GAttr('donatedatetext', ''); }
-                    $("#spAddDonateRecord").focus();
-                },
-                onClose: function () {
-                    enterDatePicker($("#txtLastDonateDate"), "close");
-                },
-                onEnterKey: function () {
-                    enterDatePicker($("#txtLastDonateDate"), "enter");
-                },
-            });
-            $("#txtCommentDateForm").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy"));
-            $("#txtCommentDateTo").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
-                maxDate: "+10y",
-                minDate: new Date(),
-                yearRange: "c-100:c+0",
-                onSelect: function (selectedDate, objDate) { $("#txtDonorComment").focus(); },
-            });
-            $("#txtDonorComment").enterKey(function () { $(this).addComment(); }).focus();
-
-            $("#togCardNumber").click(function () {
-                if (parseInt($("#divCardNumber").H2GAttr("min-height")) < parseInt($("#divCardNumber").height())) {
-                    $("#divCardNumber").css({ height: 30 });
-                    $(this).removeClass("glyphicon-menu-up").addClass("glyphicon-menu-down");
-                } else {
-                    $("#divCardNumber").css({ height: "" });
-                    $(this).removeClass("glyphicon-menu-down").addClass("glyphicon-menu-up");
-                }
-            });
-
-            $("#ddlExtCard").setAutoListValue({
-                url: '../../ajaxAction/masterAction.aspx',
-                data: { action: 'externalcard' },
-                selectItem: function () {
-                    console.log("selectItem");
-                    var cardNumber = $('#divCardNumber div[extID="' + $("#ddlExtCard").H2GValue() + '"]').H2GAttr('cardNumber');
-                    $("#txtCardNumber").H2GValue(cardNumber || '');
-                },
-                //closeItem: function () { console.log("closeItem"); $("#txtCardNumber").focus(); },
-            }, "3");
-            $("#ddlExtCard").on('autocompleteselect', function () {
-                console.log($(this).H2GValue());
-                console.log($('#divCardNumber div[extID="' + $(this).H2GValue() + '"]').H2GAttr('cardNumber'));
-                var cardNumber = $('#divCardNumber div[extID="' + $(this).H2GValue() + '"]').H2GAttr('cardNumber');
-                $("#txtCardNumber").H2GValue(cardNumber || '').focus();
-            });
-            $("input:radio[name=gender]").change(function (e) {
-                $("#ddlTitleName").setAutoListValue({ url: '../../ajaxAction/masterAction.aspx', data: { action: 'titlename', gender: $("#rbtM").is(':checked') == true ? "M" : "F" } });
-            });
-
-            $("#btnSave").click(function () {
-                saveDonorInfo();
-            });
-            $("#btnCancel").click(function () {
-                cancelRegis(this);
-            });
-            $("#spInsertExtCard").click(function () {
-                $("#txtCardNumber").addExtCard();
-            })
-            $("#spAddComment").click(function () {
-                $("#txtDonorComment").addComment();
-            })
-            $("#spAddDonateRecord").click(function () {
-                $("#txtOuterDonate").addDonateRecord();
-            })
-
-            //#### Default donor info from id
-            if ($("#data").H2GAttr("donorID") != undefined) {
-                if ($("#data").H2GAttr("visitID") != undefined) { $("#spRegisNumber").H2GAttr("visitID", $("#data").H2GAttr("visitID")); }
-                showDonorData();
-            } else {
-                $("#txtDonorName").H2GValue($("#data").H2GAttr("donorName") || "");
-                $("#txtDonorSurName").H2GValue($("#data").H2GAttr("donorSurname") || "");
-                $("#txtBirthDay").H2GValue($("#data").H2GAttr("birthday") || "");
-                $("#txtAge").H2GValue(H2G.calAge($("#data").H2GAttr("birthday") || "") + ' ปี');
-                $("#spVisitInfo").H2GValue("วันที่ลงทะเบียน " + formatDate(H2G.today(), "dd NNN yyyy HH:mm") + " เข้าพบครั้งแรก กำลังดำเนินการบริจาคครั้งที่ 1").H2GFill({ visitDateText: formatDate(H2G.today(), "dd NNN yyyy HH:mm"), lastVisitDateText: "", currentDonateNumber: "1" });
-                $("#infoTab > ul > li > a[href='#todayPane']").H2GValue(formatDate(H2G.today(), "dd NNN yyyy"))
-                $("#spVisitCount").H2GValue("รวมจำนวนการเข้าพบ 0 ครั้ง / บริจาค 0 ครั้ง");
-                donorSelectDDL();
-            }
-
-            $.extend($.fn, {
-                addExtCard: function (args) {
-                    if ($(this).H2GValue() != "") {
-                        var extCard = $('#divCardNumber div[extID="' + $("#ddlExtCard").H2GValue() + '"]');
-                        if (extCard.length>0) {
-                            $(extCard).find(".ext-number").H2GValue($("#ddlExtCard :selected").text() + " : " + $(this).H2GValue()).H2GAttr("cardNumber", $(this).H2GValue());
+                $("#txtCardNumber").enterKey(function () { $(this).addExtCard(); }).focus();
+                $("#txtDonorName").H2GNamebox();
+                $("#txtDonorSurName").H2GNamebox();
+                $("#txtDonorNameEng").H2GNamebox();
+                $("#txtDonorSurNameEng").H2GNamebox();
+                $("#ddlDefferal").setDropdowList().on('change', function () {
+                    if ($(this).H2GValue() == 'ACTIVE') { $("#tbDefferal > thead > tr[status=INACTIVE]").hide(); } else { $("#tbDefferal > thead > tr[status=INACTIVE]").show(); }
+                });
+                $("#ddlVisit").setDropdowList();
+                $("#infoTab").tabs({
+                    active: 1,
+                    activate: function (event, ui) {
+                        if ($(ui.newPanel).find("textarea:visible:first").length > 0) {
+                            $(ui.newPanel).find("textarea:visible:first").focus();
                         } else {
-                            var spExtCard = $("#divCardNumberTemp").children().clone();
-                            $(spExtCard).H2GFill({ extID: $("#ddlExtCard").H2GValue(), cardNumber: $(this).H2GValue() }).find(".ext-number").H2GValue($("#ddlExtCard :selected").text() + " : " + $(this).H2GValue());
-                            $('#divCardNumber').append(spExtCard);
+                            $(ui.newPanel).find("input:not(input[type=button],input[type=submit],button):visible:first").focus();
                         }
-                        $(this).H2GValue('');
-                    } else {
-                        notiWarning("กรุณากรอกเลขบัตร");
-                        $(this).focus();
-                    }
-                },
-                deleteExtCard: function (args) {
-                    if (confirm("ต้องการจะลบ " + $(this).closest("div.row").find(".ext-number").H2GValue() + " ใช่หรือไม่?")) {
-                        if ($(this).closest("div.row").H2GAttr("refID") == "NEW") {
-                            $(this).closest("div.row").remove();
-                        } else {
-                            $(this).closest("div.row").hide().H2GAttr("refID", "D#" + $(this).closest("div.row").H2GAttr("refID"));
-                        }
-                    }
-                },
-                addComment: function (args) {
-                    if ($("#txtCommentDateTo").H2GValue() != "" && $(this).H2GValue() != "") {
-                        var spComment = $("#divCommentTemp").children().clone();
-                        $(spComment).H2GAttr({ startDate: $("#txtCommentDateForm").H2GValue(), endDate: $("#txtCommentDateTo").H2GValue() });
-                        $(spComment).find(".dc-datecomment").H2GValue(H2G.dateText($("#txtCommentDateForm").H2GValue()) + " - " + H2G.dateText($("#txtCommentDateTo").H2GValue()));
-                        $(spComment).find(".dc-comment").H2GValue($(this).H2GValue());
-                        $('#divComment').prepend(spComment);
-                        $(this).H2GValue('');
-                    } else {
-                        var warning = "";
-                        if ($("#txtCommentDateTo").H2GValue() == "") { warning = "กรุณากรอกวันที่สิ้นสุด"; $("#txtCommentDateTo").focus(); }
-                        else { warning = "กรุณากรอกความเห็น"; $(this).focus(); };
-                        notiWarning(warning);
-                    }
-                },
-                deleteComment: function (args) {
-                    if (confirm("ต้องการจะลบความเห็น" + $(this).closest("div.row").find(".dc-datecomment").H2GValue() + "ใช่หรือไม่?")) {
-                        if ($(this).closest("div.row").H2GAttr("refID") == "NEW") {
-                            $(this).closest("div.row").remove();
-                        } else {
-                            $(this).closest("div.row").hide().H2GAttr("refID", "D#" + $(this).closest("div.row").H2GAttr("refID"));
-                        }
-                    }
-                },
-                addDonateRecord: function (args) {
-                    if ($("#txtOuterDonate").H2GValue() != "" && $("#txtLastDonateDate").H2GValue() != "") {
-                        $.ajax({
-                            url: "../../ajaxAction/donorAction.aspx",
-                            data: H2G.ajaxData({ 
-                                action: 'getdonatereward',
-                                id: $("#data").H2GAttr("donorID"),
-                                donatedate: $("#txtLastDonateDate").H2GValue(),
-                                donatenumber: $("#txtOuterDonate").H2GValue(),
-                                lastrecord: $("#divDonateRecord").H2GAttr("lastrecord") ? $("#divDonateRecord").H2GAttr("lastrecord") : 0
-                            }).config,
-                            type: "POST",
-                            dataType: "json",
-                            error: function (xhr, s, err) {
-                                console.log(s, err);
-                            },
-                            success: function (data) {
-                                if (!data.onError) {
-                                    data.getItems = jQuery.parseJSON(data.getItems);                                    
-                                    $.each((data.getItems), function (index, e) {
-                                        var rowRecord = $("#divDonateRecordTemp").children().clone();
-                                        $(rowRecord).H2GAttr({ donatedate: $("#txtLastDonateDate").H2GValue(), donatenumber: e.DonationNumber, donatefrom: e.DonationFrom });
-                                        $(rowRecord).find("span.rec-text").H2GValue("ครั้งที่ " + e.DonationNumber + " บริจาควันที่ " + $("#txtLastDonateDate").H2GAttr("donatedatetext") + " ณ โรงพยาบาลนอกเครือข่าย");
-                                        
-                                        // for each reward 
-                                        $.each((e.DonationRewardList), function (indexr, er) {
-                                            var rowReward = $("#donateRewardTemp").clone();
-                                            $(rowReward).find(".lbl-check-reward").append(er.Description).H2GAttr('rewardID', er.ID);
-                                            $(rowReward).find(".lbl-check-reward input").on("change", function () { $(this).checkedReward() });
-                                            $(rowReward).find(".txt-reward-date").H2GFill({ rewardID: er.ID }).setCalendar({
-                                                maxDate: new Date(),
-                                                minDate: "-20y",
-                                                yearRange: "c-20:c+0",
-                                                onSelect: function (selectedDate, objDate) {
-                                                    if (selectedDate != '') {
-                                                        $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
-                                                    }
-                                                },
-                                                onClose: function () {
-                                                    if ($(this).H2GValue() == '') {
-                                                        $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", false);
-                                                    } else {
-                                                        $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
-                                                    }
-                                                },
-                                            }).H2GDatebox();
-                                            $(rowRecord).append($(rowReward).children());
-                                        });
-
-                                        $('#divDonateRecord').prepend(rowRecord).H2GAttr("lastrecord", e.DonationNumber);
-                                    });
-                                    $("#spRegisNumber").H2GAttr({ donateNumberExt: $("#txtOuterDonate").H2GValue().toNumber() + $("#spRegisNumber").H2GAttr("donateNumberExt").toNumber() });
-
-                                    $("#spVisitCount").H2GValue("รวมจำนวนการเข้าพบ " + $("#spRegisNumber").H2GAttr("visitNumber") + " ครั้ง / บริจาค " + ($("#spRegisNumber").H2GAttr("donateNumber").toNumber() + $("#spRegisNumber").H2GAttr("donateNumberExt").toNumber()) + " ครั้ง");
-
-                                    $("#spVisitInfo").H2GValue("");
-                                    $("#spVisitInfo").append("วันที่ลงทะเบียน " + $("#spVisitInfo").H2GAttr("visitDateText"));
-                                    if ($("#spVisitInfo").H2GAttr("lastVisitDateText") != "") {
-                                        $("#spVisitInfo").append(" เข้าพบครั้งสุดท้ายเมื่อ " + $("#spVisitInfo").H2GAttr("lastVisitDateText") + " ( " + $("#spVisitInfo").H2GAttr("diffDate") + " วัน )");
-                                    } else {
-                                        $("#spVisitInfo").append(" เข้าพบครั้งแรก");
-                                    }
-
-                                    $("#spVisitInfo").append(" กำลังดำเนินการบริจาคครั้งที่ " + ($("#spVisitInfo").H2GAttr("currentDonateNumber").toNumber() + $("#txtOuterDonate").H2GValue().toNumber()));
-
-                                    $("#txtOuterDonate").H2GValue(""); $("#txtLastDonateDate").H2GValue("");
-                                } 
-                            }
-                        });    //End ajax
-                    } else {
-                        var warning = "";
-                        if ($("#txtOuterDonate").H2GValue() == "") { warning = "กรุณากรอกจำนวนครั้งที่บริจาค"; $("#txtOuterDonate").focus(); }
-                        else if ($("#txtLastDonateDate").H2GValue() == "") { warning = "กรุณากรอกวันที่บริจาค"; $("#txtLastDonateDate").focus(); }
-                        notiWarning(warning);
-                    }
-                },
-                deleteDonateRecord: function (args) {
-                    if ($(this).closest("div.row").H2GAttr("refID") == "NEW") {
-                        $(this).closest("div.row").remove();
-                    } else {
-                        $(this).closest("div.row").hide().H2GAttr("refID", "D#" + $(this).closest("div.row").H2GAttr("refID"));
-                    }
-                },
-                checkedReward: function (args) {
-                    if ($(this).is(":checked")) {
-                        if ($(this).closest("div.row").find("input.txt-reward-date[rewardID='" + $(this).closest("label").H2GAttr("rewardID") + "']").H2GValue() == "") {
-                            $(this).closest("div.row").find("input.txt-reward-date[rewardID='" + $(this).closest("label").H2GAttr("rewardID") + "']").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy"));
-                        }
-                    } else {
-                        $(this).closest("div.row").find("input.txt-reward-date[rewardID='" + $(this).closest("label").H2GAttr("rewardID") + "']").H2GValue("");
-                    }
-                },
-            });
-
-            $("#labPaneTab").click(setHistoricalFileDatas);
-            $("#exams-tab").click(setExamsDatas);
-            $("#immunohaemtology-tab").click(setImmunohaemtologyFile);
-            
-            //### extend
-        });
-
-        function donorSelectDDL() {
-            if ($("#ddlTitleName option").length > 1) { $("#ddlTitleName").H2GValue($("#ddlTitleName").H2GAttr("selectItem")).change(); } else {
-                $("#ddlTitleName").setAutoListValue({ url: '../../ajaxAction/masterAction.aspx', data: { action: 'titlename', gender: $("#rbtM").is(':checked') == true ? "M" : "F" } }, $("#ddlTitleName").H2GAttr("selectItem")).on('autocompleteselect', function () {
-                    $("#txtDonorName").focus();
-                });
-            }
-            if ($("#ddlCountry option").length > 1) { $("#ddlCountry").H2GValue($("#ddlCountry").H2GAttr("selectItem")).change(); } else {
-                $("#ddlCountry").setAutoListValue({ url: '../../ajaxAction/masterAction.aspx', data: { action: 'country' } }, $("#ddlCountry").H2GAttr("selectItem") || "64").on('autocompleteselect', function () {
-                    $("#txtMobile1").focus();
-                });
-            }
-            if ($("#ddlOccupation option").length > 1) { $("#ddlOccupation").H2GValue($("#ddlOccupation").H2GAttr("selectItem")).change(); } else {
-                $("#ddlOccupation").setAutoListValue({ url: '../../ajaxAction/masterAction.aspx', data: { action: 'occupation' } }, $("#ddlOccupation").H2GAttr("selectItem")).on('autocompleteselect', function () {
-                    $("#ddlNationality").closest("div").focus();
-                });
-            }
-            if ($("#ddlNationality option").length > 1) { $("#ddlNationality").H2GValue($("#ddlNationality").H2GAttr("selectItem")).change(); } else {
-                $("#ddlNationality").setAutoListValue({ url: '../../ajaxAction/masterAction.aspx', data: { action: 'nationality' } }, $("#ddlNationality").H2GAttr("selectItem") || "1").on('autocompleteselect', function () {
-                    $("#ddlRace").closest("div").focus();
-                });
-            }
-            if ($("#ddlRace option").length > 1) { $("#ddlRace").H2GValue($("#ddlRace").H2GAttr("selectItem")).change(); } else {
-                $("#ddlRace").setAutoListValue({ url: '../../ajaxAction/masterAction.aspx', data: { action: 'nationality' } }, $("#ddlRace").H2GAttr("selectItem") || "1").on('autocompleteselect', function () {
-                    $("#txtAddress").focus();
-                });
-            }
-            if ($("#ddlAssociation option").length > 1) { $("#ddlAssociation").H2GValue($("#ddlAssociation").H2GAttr("selectItem")).change(); } else {
-                $("#ddlAssociation").setAutoListValue({ url: '../../ajaxAction/masterAction.aspx', data: { action: 'association' } }, $("#ddlAssociation").H2GAttr("selectItem")).on('autocompleteselect', function () {
-                    $("#txtOuterDonate").focus();
-                });
-            }
-            $("#txtCardNumber").focus();
-            
-        }
-        function saveDonorInfo() {
-            $("#btnSave").prop("disabled", true);
-            if (validation()) {
-                var MasterDonor = {
-                    ID: $("#spRegisNumber").H2GAttr("donorID"),
-                    DonorNumber: $("#spRegisNumber").H2GValue(),
-                    Gender: $("#rbtM").is(':checked') == true ? "M" : "F",
-                    Name: $("#txtDonorName").H2GValue(),
-                    Surname: $("#txtDonorSurName").H2GValue(),
-                    NameE: $("#txtDonorNameEng").H2GValue(),
-                    SurnameE: $("#txtDonorSurNameEng").H2GValue(),
-                    Birthday: $("#txtBirthDay").H2GValue(),
-                    TitleID: $("#ddlTitleName").H2GValue(),
-                    Address: $("#txtAddress").H2GValue(),
-                    SubDistrict: $("#txtSubDistrict").H2GValue(),
-                    District: $("#txtDistrict").H2GValue(),
-                    Province: $("#txtProvince").H2GValue(),
-                    Zipcode: $("#txtZipcode").H2GValue(),
-                    CountryID: $("#ddlCountry").H2GValue(),
-                    OccupationID: $("#ddlOccupation").H2GValue(),
-                    NationalityID: $("#ddlNationality").H2GValue(),
-                    RaceID: $("#ddlRace").H2GValue(),
-                    Mobile1: $("#txtMobile1").H2GValue(),
-                    Mobile2: $("#txtMobile2").H2GValue(),
-                    HomeTel: $("#txtHomeTel").H2GValue(),
-                    OfficeTel: $("#txtTel").H2GValue(),
-                    OfficeTelExt: $("#txtTelExt").H2GValue(),
-                    Email: $("#txtEmail").H2GValue(),
-                    AssociationID: $("#ddlAssociation").H2GValue(),
-                    DonateNumberExt: $("#spRegisNumber").H2GAttr("donateNumberExt"),
-                    VisitNumber: $("#spRegisNumber").H2GAttr("visitNumber"),
-
-
-                };
-                var DonorVisit = {
-                    ID: $("#spRegisNumber").H2GAttr("visitID"),
-                    DonorID: $("#spRegisNumber").H2GAttr("donorID"),
-                    QueueNumber: $("#spRegisNumber").H2GAttr("queueNum"),
-                    VisitFrom: $("#spRegisNumber").H2GAttr("visitFrom"),
-                    DonationTypeID: $("#spRegisNumber").H2GAttr("dTypeID"),
-                    BagID: $("#spRegisNumber").H2GAttr("bagID"),
-                    DonationToID: $("#spRegisNumber").H2GAttr("dToID"),
-                    CollectionPlanID: $("#spRegisNumber").H2GAttr("cPlanID"),
-                    CollectionPointID: $("#spRegisNumber").H2GAttr("dPointID"),
-                    SiteID: $("#spRegisNumber").H2GAttr("siteID"),
-                    VisitNumber: $("#spRegisNumber").H2GAttr("visitNumber"),
-                    Status: $("#spStatus").H2GValue(),
-                    //RefuseDefferalID: '',
-                    //Comment: '',
-                    //SanpleNumber: '',
-                    //Weight: '',
-                    //PressureMax: '',
-                    //PressureMin: '',
-                    //HB: '',
-                    //PLT: '',
-                    //HBTest: '',
-                    //HeartLung: '',
-                    //HospitalID: '',
-                    //DepartmentID: '',
-                    //ExtSampleNumber: '',
-                    //ExtComment: '',
-                    //Volume: '',
-                    //VolumeActual: '',
-                    //DonationTime: '',
-                    //Duration: '',
-                    //CollectionDate: '',
-                    //CollectionStaff: '',
-                    //RefuseReasonID1: '',
-                    //RefuseReasonID2: '',
-                    //RefuseReasonID3: '',
-                    //PurgeDate: '',
-                    //PurgeStaff: '',
-                };
-                var DonorComment = {
-                    ID:'',
-                    DornerID: '',
-                    StartDate:'',
-                    EndDate: '',
-                    Description:'',
-                };
-                var DonorExtCard = [];
-                var create = 0;
-                $('#divCardNumber .row').each(function (i, e) {
-                    DonorExtCard[create] = {
-                        ID: $(e).H2GAttr('refID'),
-                        DonorID: $(e).H2GAttr('donorID'),
-                        ExternalCardID: $(e).H2GAttr('extID'),
-                        CardNumber: $(e).H2GAttr('cardNumber'),
-                    };
-                    create++;
-                });
-                var DonorComment = [];
-                create = 0;
-                $('#divComment .row').each(function (i, e) {
-                    DonorComment[create] = {
-                        ID: $(e).H2GAttr('refID'),
-                        StartDate: $(e).H2GAttr('startDate'),
-                        EndDate: $(e).H2GAttr('endDate'),
-                        Description: $(e).find(".dc-comment").H2GValue(),
-                    };
-                    create++;
-                });
-                var DonorRecord = [];
-                create = 0;
-                $('#divDonateRecord .row').each(function (i, e) {
-                    DonorRecord[create] = {
-                        ID: $(e).H2GAttr('refID'),
-                        DonateDate: $(e).H2GAttr('donatedate'),
-                        DonateNumber: $(e).H2GAttr('donatenumber'),
-                        DonateFrom: $(e).H2GAttr('donatefrom'),
-                        DonateReward: getReward(e),
-                    };
-                    create++;
-                });
-                DonorRecord.sort(H2G.keysrt('DonateNumber'));
-
-                $.ajax({
-                    url: '../../ajaxAction/donorAction.aspx',
-                    data: H2G.ajaxData({ action: 'savedonor', md: JSON.stringify(MasterDonor), dv: JSON.stringify(DonorVisit), dec: JSON.stringify(DonorExtCard), dc: JSON.stringify(DonorComment), dr: JSON.stringify(DonorRecord) }).config,
-                    type: "POST",
-                    dataType: "json",
-                    error: function (xhr, s, err) {
-                        console.log(s, err);
-                        notiError("บันทึกไม่สำเร็จ");
-                        $("#btnSave").prop("disabled", false);
                     },
-                    success: function (data) {
-                        data.getItems = jQuery.parseJSON(data.getItems);
-                        if (!data.onError) {
-                            $("#data").H2GAttr("donorID", data.getItems.ID);
-                            $("#spRegisNumber").H2GAttr("visitID", data.getItems.VisitID)
-                            notiSuccess("บันทึกสำเร็จ");
-                            showDonorData();                            
-                        } else { notiError("บันทึกไม่สำเร็จ"); }
-                        $("#btnSave").prop("disabled", false);
-                    }
-                });    //End ajax
-            } else {
-                $("#btnSave").prop("disabled", false);
-            }
-        }
-        function getReward(xobj) {
-            var reward = '';
-            // reward_id|reward_date##
-            $(xobj).find(".txt-reward-date[donateRewardID='NEW']").each(function (i, e) {
-                if ($(e).H2GValue() != "") {
-                    reward = $(e).H2GAttr("rewardID") + "|" + $(e).H2GValue() + "##";
-                }
-            });
-            return reward;
-        }
-        function validation() {
-            if ($('#divCardNumber > div').length == 0) {
-                $("#txtExtNumber").focus();
-                notiWarning("กรุณากรอกข้อมูลบัตรผู้บริจาคอย่างน้อย 1 ใบ");
-                return false;
-            } else if ($('#ddlTitleName').H2GValue() == "") {
-                $("#ddlTitleName").focus();
-                notiWarning("กรุณาเลือกคำนำหน้าชื่อผู้บริจาค");
-                return false;
-            } else if ($('#txtDonorName').H2GValue() == "") {
-                $("#txtDonorName").focus();
-                notiWarning("กรุณากรอกชื่อผู้บริจาค");
-                return false;
-            } else if ($('#txtDonorSurName').H2GValue() == "") {
-                $("#txtDonorSurName").focus();
-                notiWarning("กรุณากรอกนามสกุลผู้บริจาค");
-                return false;
-            } else if ($('#txtDonorNameEng').H2GValue() == "") {
-                $("#txtDonorNameEng").focus();
-                notiWarning("กรุณากรอกชื่อภาษาอังกฤษผู้บริจาค");
-                return false;
-            } else if ($('#txtDonorSurNameEng').H2GValue() == "") {
-                $("#txtDonorSurNameEng").focus();
-                notiWarning("กรุณากรอกนามสกุลภาษาอังกฤษผู้บริจาค");
-                return false;
-            } else if ($('#txtBirthday').H2GValue() == "") {
-                $("#txtBirthday").focus();
-                notiWarning("กรุณากรอกวันเกิดผู้บริจาค");
-                return false;
-            } else if ($('#ddlOccupation').H2GValue() == "") {
-                $("#ddlOccupation").focus();
-                notiWarning("กรุณาเลือกอาชีพผู้บริจาค");
-                return false;
-            } else if ($('#ddlNationality').H2GValue() == "") {
-                $("#ddlNationality").focus();
-                notiWarning("กรุณาเลือกสัญชาติผู้บริจาค");
-                return false;
-            } else if ($('#txtAddress').H2GValue() == "") {
-                $("#txtAddress").focus();
-                notiWarning("กรุณากรอกที่อยู่ผู้บริจาค");
-                return false;
-            } else if ($('#txtSubDistrict').H2GValue() == "") {
-                $("#txtSubDistrict").focus();
-                notiWarning("กรุณากรอกแขวง/ตำบลผู้บริจาค");
-                return false;
-            } else if ($('#txtDistrict').H2GValue() == "") {
-                $("#txtDistrict").focus();
-                notiWarning("กรุณากรอกเขต/อำเภอผู้บริจาค");
-                return false;
-            } else if ($('#txtProvince').H2GValue() == "") {
-                $("#txtProvince").focus();
-                notiWarning("กรุณากรอกจังหวัดผู้บริจาค");
-                return false;
-            } else if ($('#txtZipcode').H2GValue() == "") {
-                $("#txtZipcode").focus();
-                notiWarning("กรุณากรอกรหัสไปรษณีย์ผู้บริจาค");
-                return false;
-            } else if ($('#txtMobile1').H2GValue() == "") {
-                $("#txtMobile1").focus();
-                notiWarning("กรุณากรอกเบอร์โทรศัพท์มือถือผู้บริจาค");
-                return false;
-            } else if ($('#txtEmail').H2GValue() != "") {
-                if (!H2G.IsEmail($('#txtEmail').H2GValue())) {
-                    $("#txtEmail").focus();
-                    notiWarning("กรุณากรอกอีเมลให้ถูกต้อง");
-                    return false;
-                }
-            }
-            return true;
-        }
-        function showDonorData() {
-            $.ajax({
-                url: '../../ajaxAction/donorAction.aspx',
-                data: H2G.ajaxData({ action: 'selectregister', id: $("#data").H2GAttr("donorID"), visit_id: $("#spRegisNumber").H2GAttr("visitID") }).config,
-                type: "POST",
-                dataType: "json",
-                error: function (xhr, s, err) {
-                    $("#btnSave").prop("disabled", false);
-                    console.log(s, err);
-                },
-                success: function (data) {
-                    data.getItems = jQuery.parseJSON(data.getItems);
-                    if (!data.onError) {
-                        console.log('selectregister', data.getItems);
-                        $("#spRegisNumber").H2GFill({
-                            donorID: data.getItems.Donor.DonorID,
-                            visitID: data.getItems.Donor.VisitID,
-                            dPlanID: data.getItems.Donor.CollectionPlanID,
-                            dPointID: data.getItems.Donor.CollectionPointID,
-                            siteID: data.getItems.Donor.SiteID,
-                            visitFrom: data.getItems.Donor.VisitFrom,
-                            queueNum: data.getItems.Donor.QueueNumber,
-                            dTypeID: data.getItems.Donor.DonationTypeID,
-                            bagID: data.getItems.Donor.BagID,
-                            dToID: data.getItems.Donor.DonationToID,
-                            donateNumber: data.getItems.Donor.DonateNumber,
-                            donateNumberExt: data.getItems.Donor.DonateNumberExt,
-                            visitNumber: data.getItems.Donor.VisitNumber
-                        });
-                        
-                        $("#spVisitCount").H2GValue("รวมจำนวนการเข้าพบ " + data.getItems.Donor.VisitNumber + " ครั้ง / บริจาค " + data.getItems.Donor.DonateCount + " ครั้ง");
-                        $("#spVisitInfo").H2GValue("วันที่ลงทะเบียน " + data.getItems.Donor.VisitDateTimeText + " เข้าพบครั้งสุดท้ายเมื่อ " + data.getItems.Donor.LastVisitDateText + " ( " + data.getItems.Donor.DiffDate + " วัน ) กำลังดำเนินการบริจาคครั้งที่ " + data.getItems.Donor.CurrentDonateNumber)
-                            .H2GFill({
-                                visitDateText: data.getItems.Donor.VisitDateText,
-                                lastVisitDateText: data.getItems.Donor.LastVisitDateText,
-                                diffDate: data.getItems.Donor.DiffDate,
-                                currentDonateNumber: data.getItems.Donor.CurrentDonateNumber
-                            });
-                        $("#infoTab > ul > li > a[href='#todayPane']").H2GValue(data.getItems.Donor.VisitDateText)
-
-                        $("#spRegisNumber").H2GValue(data.getItems.Donor.DonorNumber);
-                        $("#spQueue").H2GValue(data.getItems.Donor.QueueNumber == "" ? "-" : "คิวที่ " + data.getItems.Donor.QueueNumber).H2GAttr("queueNumber", data.getItems.Donor.QueueNumber);
-                        $("#spStatus").H2GValue(data.getItems.Donor.Status);
-                        $("input:radio[name=gender]").prop("checked", false);
-                        if (data.getItems.Donor.Gender == "M") { $("#rbtM").prop("checked", true); } else { $("#rbtF").prop("checked", true); }
-                        $("#divBloodType").H2GValue(data.getItems.Donor.RHGroup);
-                        $("#txtDonorName").H2GValue(data.getItems.Donor.Name);
-                        $("#txtDonorSurName").H2GValue(data.getItems.Donor.Surname);
-                        $("#txtDonorNameEng").H2GValue(data.getItems.Donor.NameE);
-                        $("#txtDonorSurNameEng").H2GValue(data.getItems.Donor.SurnameE);
-                        $("#txtBirthDay").H2GValue(data.getItems.Donor.Birthday);
-                        $("#txtAge").H2GValue(data.getItems.Donor.Age);
-                        $("#ddlTitleName").H2GAttr("selectItem", data.getItems.Donor.TitleID);
-                        $("#txtAddress").H2GValue(data.getItems.Donor.Address);
-                        $("#txtSubDistrict").H2GValue(data.getItems.Donor.SubDistrict);
-                        $("#txtDistrict").H2GValue(data.getItems.Donor.District);
-                        $("#txtProvince").H2GValue(data.getItems.Donor.Province);
-                        $("#txtZipcode").H2GValue(data.getItems.Donor.Zipcode);
-                        $("#ddlCountry").H2GAttr("selectItem", data.getItems.Donor.CountryID);
-                        $("#ddlOccupation").H2GAttr("selectItem", data.getItems.Donor.OccupationID);
-                        $("#ddlNationality").H2GAttr("selectItem", data.getItems.Donor.NationalityID);
-                        $("#ddlRace").H2GAttr("selectItem", data.getItems.Donor.RaceID);
-                        $("#txtMobile1").H2GValue(data.getItems.Donor.Mobile1);
-                        $("#txtMobile2").H2GValue(data.getItems.Donor.Mobile2);
-                        $("#txtHomeTel").H2GValue(data.getItems.Donor.HomeTel);
-                        $("#txtTel").H2GValue(data.getItems.Donor.OfficeTel);
-                        $("#txtTelExt").H2GValue(data.getItems.Donor.OfficeTelExt);
-                        $("#txtEmail").H2GValue(data.getItems.Donor.Email);
-                        $("#ddlAssociation").H2GAttr("selectItem", data.getItems.Donor.AssociationID);
-
-                        //### External Card
-                        $('#divCardNumber').H2GValue("");
-                        $.each((data.getItems.ExtCard), function (index, e) {
-                            var spExtCard = $("#divCardNumberTemp").children().clone();
-                            $(spExtCard).H2GFill({ refID: e.ID, donorID: e.DonorID, extID: e.ExternalCardID, cardNumber: e.CardNumber }).find(".ext-number").H2GValue(e.CardName + " : " + e.CardNumber);
-                            $('#divCardNumber').append(spExtCard);
-                            if (e.ExternalCardID == "3") { $('#txtCardNumber').H2GValue(e.CardNumber) }
-                        });
-
-                        //### Deferral
-                        if (data.getItems.Deferral.length > 0) {
-                            var dataView = $("#tbDefferal").H2GValue('');
-                            $.each((data.getItems.Deferral), function (index, e) {
-                                var dataRow = $("#tbDefferal > thead > tr.template-data").clone().show();
-                                if (e.Status == "INACTIVE") { dataRow.hide(); }
-                                $(dataRow).H2GAttr('status', e.Status);
-                                $(dataRow).find('.td-def-code').append(e.Code).H2GAttr("title", e.Code);
-                                $(dataRow).find('.td-def-date').append(e.EndDate).H2GAttr("title", e.EndDate);
-                                $(dataRow).find('.td-def-description').append(e.Description).H2GAttr("title", e.Description);
-                                $(dataRow).find('.td-def-status').append(e.DeferralType).H2GAttr("title", e.DeferralType);
-                                $(dataView).append(dataRow);
-                            });
-                        }
-
-                        //### Deferral
-                        $.each((data.getItems.DonationType), function (index, e) {
-                            var span = $("span[donationCode=" + e.Code + "]");
-                            if (span) { $(span).H2GValue('บริจาคล่าสุดเมื่อ ' + e.LastDate); }
-                            if (e.Code == 'SC') { $(span).show(); $("#txtStmRegisDate").hide(); }
-                        });
-
-                        //### Donor Comment
-                        $('#divComment').H2GValue("");
-                        $.each((data.getItems.DonorComment), function (index, e) {
-                            var spComment = $("#divCommentTemp").children().clone();
-                            $(spComment).H2GAttr("refID", e.ID);
-                            $(spComment).find(".dc-datecomment").H2GValue(e.StartDate + " - " + e.EndDate);
-                            $(spComment).find(".dc-comment").H2GValue(e.Description);
-                            $('#divComment').append(spComment);
-                        });
-
-                        //### Donation Record
-                        $('#divDonateRecord').H2GValue("");
-                        $.each((data.getItems.DonationRecord), function (index, e) {
-                            var spRecord = $("#divDonateRecordTemp").children().clone();
-                            $(spRecord).H2GFill({ refID: e.ID, donatedate: e.DonateDate, donatenumber: e.DonateNumber, donatefrom: e.DonateFrom });
-                            $(spRecord).find("span.rec-text").H2GValue("ครั้งที่ " + e.DonateNumber + " บริจาควันที่ " + e.DonateDateText + (e.DonateFrom == "EXTERNAL" ? " ณ โรงพยาบาลนอกเครือข่าย" : " ณ โรงพยาบาลในเครือข่าย"));
-
-                            //มี Reward ต้องแสดง
-                            if (e.DonateReward != "") {
-                                var rewardRec = e.DonateReward.split('##');
-                                $.each((rewardRec), function (index, e) {
-                                    if (e != "") {
-                                        var rewardInfo = e.split("|");
-                                        // reward_id|reward_desc|donation_reward_id|reward_date
-                                        var rowReward = $("#donateRewardTemp").clone();
-                                        $(rowReward).find(".lbl-check-reward").append(rewardInfo[1]).H2GFill({ rewardID: rewardInfo[0] }).find("input").prop("checked", (rewardInfo[2] == "" ? "N" : "Y").toBoolean());
-                                        $(rowReward).find(".txt-reward-date").H2GFill({ rewardID: rewardInfo[0], donateRewardID: rewardInfo[2] }).H2GValue(rewardInfo[3]);
-
-                                        if (rewardInfo[2] != "") {
-                                            $(rowReward).find(".lbl-check-reward input").prop("disabled", true);
-                                            $(rowReward).find(".txt-reward-date").prop("disabled", true);
-                                        } else {
-                                            $(rowReward).find(".lbl-check-reward input").on("change", function () { $(this).checkedReward() });
-                                            $(rowReward).find(".txt-reward-date").setCalendar({
-                                                maxDate: new Date(),
-                                                minDate: "-20y",
-                                                yearRange: "c-20:c+0",
-                                                onSelect: function (selectedDate, objDate) {
-                                                    if (selectedDate != '') {
-                                                        $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
-                                                    }
-                                                },
-                                                onClose: function () {
-                                                    if ($(this).H2GValue() == '') {
-                                                        $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", false);
-                                                    } else {
-                                                        $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
-                                                    }
-                                                },
-                                            }).H2GDatebox().H2GValue(rewardInfo[3]);
-                                        }
-                                        $(spRecord).append($(rowReward).children());
-                                    }
-                                });
+                });
+                $("#infoTabToday").tabs({
+                    activate: function (event, ui) {
+                        $(ui.newPanel).find("input:not(input[type=button],input[type=submit],button):visible:first").focus();
+                    },
+                });
+                $("#labTab").tabs({
+                    activate: function (event, ui) {
+                        $(ui.newPanel).find("input:not(input[type=button],input[type=submit],button):visible:first").focus();
+                    },
+                });
+                $("#togDeferal").toggleSlide();
+                $("#togVisitInfo").toggleSlide();
+                $("#txtBirthDay").H2GDatebox().setCalendar({
+                    maxDate: new Date(),
+                    minDate: "-100y",
+                    yearRange: "c-100:c+0",
+                    onSelect: function (selectedDate, objDate) {
+                        if (selectedDate != '') { $("#txtAge").H2GValue(H2G.calAge(selectedDate) + ' ปี'); } else { $("#txtAge").H2GValue(''); }
+                        $("#ddlOccupation").closest("div").focus();
+                    },
+                    onClose: function () {
+                        var pattern = 'dd/MM/yyyy';
+                        if ($(this).H2GValue() != '') {
+                            $(this).H2GValue($(this).H2GValue().replace(/\W+/g, ''));
+                            $(this).next().remove();
+                            if (isDate($(this).H2GValue(), pattern.replace(/\W+/g, ''))) {
+                                var isValue = new Date(getDateFromFormat($(this).H2GValue(), pattern.replace(/\W+/g, '')));
+                                $(this).H2GValue(formatDate(isValue, pattern));
                             }
-                            $('#divDonateRecord').prepend(spRecord).H2GAttr("lastrecord", e.DonateNumber);
-                        });
-
-                        if (!(data.getItems.Donor.DuplicateTransaction == "0")){
-                            alert("วันนี้คุณ " + data.getItems.Donor.Name + " " + data.getItems.Donor.Surname + "  ทำการลงทะเบียนไปแล้ว " + data.getItems.Donor.DuplicateTransaction + " ครั้ง");
+                            $("#txtAge").H2GValue(H2G.calAge($(this).H2GValue()) + ' ปี');
+                        } else {
+                            $("#txtAge").H2GValue('');
                         }
-                        if ($("#spRegisNumber").H2GAttr("visitID") != undefined) { $("#btnSave").H2GValue("บันทึก"); }
+                    },
+                });
+                $("#txtStmRegisDate").setCalendar().H2GDatebox();
+                $("#txtOuterDonate").H2GNumberbox();
+                $("#txtMobile1").H2GPhonebox();
+                $("#txtMobile2").H2GPhonebox();
+                $("#txtHomeTel").H2GPhonebox();
+                $("#txtTel").H2GPhonebox();
+                $("#txtTelExt").H2GPhonebox();
+                $("#txtLastDonateDate").H2GDatebox().setCalendar({
+                    maxDate: new Date(),
+                    minDate: "-100y",
+                    yearRange: "c-100:c+0",
+                    onSelect: function (selectedDate, objDate) {
+                        if (selectedDate != '') { $(this).H2GAttr('donatedatetext', formatDate($(this).datepicker("getDate"),"dd MMM yyyy")); } else { $(this).H2GAttr('donatedatetext', ''); }
+                        $("#spAddDonateRecord").focus();
+                    },
+                    onClose: function () {
+                        enterDatePicker($("#txtLastDonateDate"), "close");
+                    },
+                    onEnterKey: function () {
+                        enterDatePicker($("#txtLastDonateDate"), "enter");
+                    },
+                });
+                $("#txtCommentDateForm").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy"));
+                $("#txtCommentDateTo").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
+                    maxDate: "+10y",
+                    minDate: new Date(),
+                    yearRange: "c-100:c+0",
+                    onSelect: function (selectedDate, objDate) { $("#txtDonorComment").focus(); },
+                });
+                $("#txtDonorComment").enterKey(function () { $(this).addComment(); }).focus();
 
-                    } else { }
-                    donorSelectDDL();
-                    $("#btnSave").prop("disabled", false);
-                }
-            });    //End ajax
-        }
-        function cancelRegis(xobj) {
-            $("#data").H2GAttr("donorID", "");
-            $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: 'search.aspx', method: "post" }).submit();
-        }
-
-        function setHistoricalFileDatas() {
-            //console.log("setHistoricalFileDatas");
-            $("tr").remove(".historicalFileTableRows");
-            //console.log("id = ", $("#spRegisNumber").H2GValue());
-            var datas = [];
-
-            $.ajax({
-                url: '../../ajaxAction/donorAction.aspx',
-                data: H2G.ajaxData({ action: 'historicalFileData', donn_numero: $("#spRegisNumber").H2GValue() }).config,
-                type: "POST",
-                dataType: "json",
-                error: function (xhr, s, err) {
-                    console.log(s, err);
-                },
-                success: function (data) {
-                    data.getItems = jQuery.parseJSON(data.getItems);
-                    // console.log("Respondata = ", data.getItems);
-                    if (!data.onError) {
-                        datas = data.getItems;
-                        for (var i = 0; i < datas.length; i++) {
-                            var rows = "<tr class='historicalFileTableRows'>" +
-                                            "<td><input type='text' class='text-left' readonly value='" + datas[i].Exams + "' /></td>" +
-                                            "<td><input type='text' class='text-left' readonly value='" + datas[i].Result + "' /></td>" +
-                                            "<td><input type='text' class='text-center' readonly value='" + datas[i].DateOfFirstDet + "' /></td>" +
-                                            "<td><input type='text' class='text-center' readonly value='" + datas[i].DateOfLastDet + "' /></td>" +
-                                            "<td><input type='text' class='text-center' readonly value='" + datas[i].SamplesTested + "' /></td>" +
-                                            "<td><input type='text' class='text-left' readonly value='" + datas[i].FirstSample + "' /></td>" +
-                                            "<td><input type='text' class='text-left' readonly value='" + datas[i].LastSample + "' /></td>" +
-                                            "<td><input type='text' class='text-left' readonly value='" + datas[i].FirstAuthorisingLab + "' /></td>" +
-                                            "<td><input type='text' class='text-left' readonly value='" + datas[i].LastAuthorisingLab + "' /></td>" +
-                                       "</tr>";
-                            $('#historicalFileTable > tbody').append(rows);
-                        }
+                $("#togCardNumber").click(function () {
+                    if (parseInt($("#divCardNumber").H2GAttr("min-height")) < parseInt($("#divCardNumber").height())) {
+                        $("#divCardNumber").css({ height: 30 });
+                        $(this).removeClass("glyphicon-menu-up").addClass("glyphicon-menu-down");
+                    } else {
+                        $("#divCardNumber").css({ height: "" });
+                        $(this).removeClass("glyphicon-menu-down").addClass("glyphicon-menu-up");
                     }
-                }
-            });
-        }
+                });
 
-        function setImmunohaemtologyFile() {
-            console.log("setImmunohaemtologyFile");
-            $.ajax({
-                url: '../../ajaxAction/donorAction.aspx',
-                data: H2G.ajaxData({ action: 'immunohaemtologyDataSet1', donn_numero: $("#spRegisNumber").H2GValue() }).config,
-                type: "POST",
-                dataType: "json",
-                error: function (xhr, s, err) {
-                    console.log(s, err);
-                },
-                success: function (data) {
-                    data.getItems = jQuery.parseJSON(data.getItems);
-                    // console.log("Respondata exams = ", data.getItems);
-                    if (!data.onError) {
-                        var data = data.getItems;
-                        if (data.length > 0) {
-                            for (var i = 0; i < data.length; i++){
-                                data[i].Rsx_Lib = data[i].Rsx_Lib.replace(" ", "_");
-                                data[i].Rsx_Cd = data[i].Rsx_Cd.substring(0, 2);
-                                
-                                $("#" + data[i].Rsx_Lib + "_" + data[i].Rsx_Cd).val(data[i].Dex_Res);
-                            }
-                        }
-                       // console.log(data);
-                    }
-                }
-            });
+                $("#ddlExtCard").setAutoListValue({
+                    url: '../../ajaxAction/masterAction.aspx',
+                    data: { action: 'externalcard' },
+                    selectItem: function () {
+                        console.log("selectItem");
+                        var cardNumber = $('#divCardNumber div[extID="' + $("#ddlExtCard").H2GValue() + '"]').H2GAttr('cardNumber');
+                        $("#txtCardNumber").H2GValue(cardNumber || '');
+                    },
+                }, "3");
+                $("#ddlExtCard").on('autocompleteselect', function () {
+                    console.log($(this).H2GValue());
+                    console.log($('#divCardNumber div[extID="' + $(this).H2GValue() + '"]').H2GAttr('cardNumber'));
+                    var cardNumber = $('#divCardNumber div[extID="' + $(this).H2GValue() + '"]').H2GAttr('cardNumber');
+                    $("#txtCardNumber").H2GValue(cardNumber || '').focus();
+                });
+                $("input:radio[name=gender]").change(function (e) {
+                    $("#ddlTitleName").setAutoListValue({ url: '../../ajaxAction/masterAction.aspx', data: { action: 'titlename', gender: $("#rbtM").is(':checked') == true ? "M" : "F" } });
+                });
 
+                $("#btnSave").click(function () {
+                    saveDonorInfo();
+                });
+                $("#btnCancel").click(function () {
+                    cancelRegis(this);
+                });
+                $("#spInsertExtCard").click(function () {
+                    $("#txtCardNumber").addExtCard();
+                })
+                $("#spAddComment").click(function () {
+                    $("#txtDonorComment").addComment();
+                })
+                $("#spAddDonateRecord").click(function () {
+                    $("#txtOuterDonate").addDonateRecord();
+                })
 
-            $.ajax({
-                url: '../../ajaxAction/donorAction.aspx',
-                data: H2G.ajaxData({ action: 'immunohaemtologyDataSet2', donn_numero: $("#spRegisNumber").H2GValue() }).config,
-                type: "POST",
-                dataType: "json",
-                error: function (xhr, s, err) {
-                    console.log(s, err);
-                },
-                success: function (data) {
-                    data.getItems = jQuery.parseJSON(data.getItems);
-                    // console.log("Respondata exams = ", data.getItems);
-                    if (!data.onError) {
-                        var dataz = data.getItems;
-                        if (dataz.length > 0) {
-                            for (var i = 0; i < dataz.length; i++) {
-                                dataz[i].Rsx_Lib = dataz[i].Rsx_Lib.replace(" ", "_");
-
-                                $("#" + dataz[i].Rsx_Lib + "_NO").val(dataz[i].Rsx_Type);
-                                $("#" + dataz[i].Rsx_Lib + "_RESULT").val(dataz[i].Result_Decode);
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function setExamsDatas() {
-            console.log("setExamsDatas");
-            $("tr").remove(".exams-tab-table-row");
-            var datas = [];
-
-            $.ajax({
-                url: '../../ajaxAction/donorAction.aspx',
-                data: H2G.ajaxData({ action: 'examsData', donn_numero: $("#spRegisNumber").H2GValue() }).config,
-                type: "POST",
-                dataType: "json",
-                error: function (xhr, s, err) {
-                    console.log(s, err);
-                },
-                success: function (data) {
-                    // console.log("xxxx = ", data);
-                    data.getItems = jQuery.parseJSON(data.getItems);
-                    // console.log("Respondata exams = ", data.getItems);
-                    if (!data.onError) {
-                        datas = data.getItems;
-                        for (var i = 0; i < datas.length; i++) {
-                            var rows = "<tr class='exams-tab-table-row'>" +
-                                            "<td class='text-right td-number-excel'>" + datas[i].DonnIncr + "</td>" +
-                                            "<td class='text-center td-date-excel'>" + datas[i].LabDate + "</td>" +
-                                            "<td class='text-center td-text-excel'>" + datas[i].PrelNo + "</td>" +
-                                            "<td class='text-left td-text-excel'>" + datas[i].PexLibAff + "</td>" +
-                                            "<td class='text-left td-text-excel'>" + datas[i].PresAff + "</td>" +
-                                            "<td class='text-left td-text-excel'>" + datas[i].TestBy1 + "</td>" +
-                                            "<td class='text-left td-text-excel'>" + datas[i].TestBy2 + "</td>" +
-                                            "<td class='text-left td-text-excel'>" + datas[i].TestBy3 + "</td>" +
-                                            "<td class='text-left td-text-excel'>" + datas[i].ExecutingLab + "</td>" +
-                                            "<td class='text-center td-text-excel'>" + datas[i].PcatdLib + "</td>" +
-                                       "</tr>";
-                            $('#exams-tab-table > tbody').append(rows);
-                        }
-                        $("#exams-tab-table").tablesorter({ dateFormat: "uk" });
-                    }
-                }
-            });
-        }
-        function enterDatePicker(dateControl, action) {
-            var pattern = 'dd/MM/yyyy';
-            if ($(dateControl).H2GValue() != '') {
-                $(dateControl).H2GValue($(dateControl).H2GValue().replace(/\W+/g, ''));
-                $(dateControl).next().remove();
-                if (isDate($(dateControl).H2GValue(), pattern.replace(/\W+/g, ''))) {
-                    var isValue = new Date(getDateFromFormat($(dateControl).H2GValue(), pattern.replace(/\W+/g, '')));
-                    $(dateControl).H2GValue(formatDate(isValue, pattern)).H2GAttr('donatedatetext', formatDate(isValue, "dd NNN yyyy"));
-                    if (action == "enter") {
-                        $(dateControl).addDonateRecord();
-                    }
+                //#### Default donor info from id
+                if ($("#data").H2GAttr("donorID") != undefined) {
+                    if ($("#data").H2GAttr("visitID") != undefined) { $("#spRegisNumber").H2GAttr("visitID", $("#data").H2GAttr("visitID")); }
+                    showDonorData();
                 } else {
-                    notiWarning("วันที่ไม่ถูกต้อง กรุณาตรวจสอบ");
-                    $(dateControl).focus();
+                    $("#txtDonorName").H2GValue($("#data").H2GAttr("donorName") || "");
+                    $("#txtDonorSurName").H2GValue($("#data").H2GAttr("donorSurname") || "");
+                    $("#txtBirthDay").H2GValue($("#data").H2GAttr("birthday") || "");
+                    $("#txtAge").H2GValue(H2G.calAge($("#data").H2GAttr("birthday") || "") + ' ปี');
+                    $("#spVisitInfo").H2GValue("วันที่ลงทะเบียน " + formatDate(H2G.today(), "dd NNN yyyy HH:mm") + " เข้าพบครั้งแรก กำลังดำเนินการบริจาคครั้งที่ 1").H2GFill({
+                        visitDateText: formatDate(H2G.today(), "dd NNN yyyy HH:mm"),
+                        lastVisitDateText: "",
+                        currentDonateNumber: "1",
+                        visitDate: formatDate(H2G.today(), "dd-MM-yyyy HH:mm")
+                    });
+                    $("#infoTab > ul > li > a[href='#todayPane']").H2GValue(formatDate(H2G.today(), "dd NNN yyyy"))
+                    $("#spVisitCount").H2GValue("รวมจำนวนการเข้าพบ 0 ครั้ง / บริจาค 0 ครั้ง");
+                    donorSelectDDL();
                 }
-            } else {
-                $(dateControl).H2GAttr('donatedatetext', '');
+
+                $.extend($.fn, {
+                    addExtCard: function (args) {
+                        if ($(this).H2GValue() != "") {
+                            var extCard = $('#divCardNumber div[extID="' + $("#ddlExtCard").H2GValue() + '"]');
+                            if (extCard.length>0) {
+                                $(extCard).find(".ext-number").H2GValue($("#ddlExtCard :selected").text() + " : " + $(this).H2GValue()).H2GAttr("cardNumber", $(this).H2GValue());
+                            } else {
+                                var spExtCard = $("#divCardNumberTemp").children().clone();
+                                $(spExtCard).H2GFill({ extID: $("#ddlExtCard").H2GValue(), cardNumber: $(this).H2GValue() }).find(".ext-number").H2GValue($("#ddlExtCard :selected").text() + " : " + $(this).H2GValue());
+                                $('#divCardNumber').append(spExtCard);
+                            }
+                            $(this).H2GValue('');
+                        } else {
+                            notiWarning("กรุณากรอกเลขบัตร");
+                            $(this).focus();
+                        }
+                    },
+                    deleteExtCard: function (args) {
+                        if (confirm("ต้องการจะลบ " + $(this).closest("div.row").find(".ext-number").H2GValue() + " ใช่หรือไม่?")) {
+                            if ($(this).closest("div.row").H2GAttr("refID") == "NEW") {
+                                $(this).closest("div.row").remove();
+                            } else {
+                                $(this).closest("div.row").hide().H2GAttr("refID", "D#" + $(this).closest("div.row").H2GAttr("refID"));
+                            }
+                        }
+                    },
+                    addComment: function (args) {
+                        if ($("#txtCommentDateTo").H2GValue() != "" && $(this).H2GValue() != "") {
+                            var spComment = $("#divCommentTemp").children().clone();
+                            $(spComment).H2GAttr({ startDate: $("#txtCommentDateForm").H2GValue(), endDate: $("#txtCommentDateTo").H2GValue() });
+                            $(spComment).find(".dc-datecomment").H2GValue(H2G.dateText($("#txtCommentDateForm").H2GValue()) + " - " + H2G.dateText($("#txtCommentDateTo").H2GValue()));
+                            $(spComment).find(".dc-comment").H2GValue($(this).H2GValue());
+                            $('#divComment').prepend(spComment);
+                            $(this).H2GValue('');
+                        } else {
+                            var warning = "";
+                            if ($("#txtCommentDateTo").H2GValue() == "") { warning = "กรุณากรอกวันที่สิ้นสุด"; $("#txtCommentDateTo").focus(); }
+                            else { warning = "กรุณากรอกความเห็น"; $(this).focus(); };
+                            notiWarning(warning);
+                        }
+                    },
+                    deleteComment: function (args) {
+                        if (confirm("ต้องการจะลบความเห็น" + $(this).closest("div.row").find(".dc-datecomment").H2GValue() + "ใช่หรือไม่?")) {
+                            if ($(this).closest("div.row").H2GAttr("refID") == "NEW") {
+                                $(this).closest("div.row").remove();
+                            } else {
+                                $(this).closest("div.row").hide().H2GAttr("refID", "D#" + $(this).closest("div.row").H2GAttr("refID"));
+                            }
+                        }
+                    },
+                    addDonateRecord: function (args) {
+                        if ($("#txtOuterDonate").H2GValue() != "" && $("#txtLastDonateDate").H2GValue() != "") {
+                            $.ajax({
+                                url: "../../ajaxAction/donorAction.aspx",
+                                data: H2G.ajaxData({ 
+                                    action: 'getdonatereward',
+                                    id: $("#data").H2GAttr("donorID"),
+                                    donatedate: $("#txtLastDonateDate").H2GValue(),
+                                    donatenumber: $("#txtOuterDonate").H2GValue(),
+                                    lastrecord: $("#divDonateRecord").H2GAttr("lastrecord") ? $("#divDonateRecord").H2GAttr("lastrecord") : 0
+                                }).config,
+                                type: "POST",
+                                dataType: "json",
+                                error: function (xhr, s, err) {
+                                    console.log(s, err);
+                                },
+                                success: function (data) {
+                                    if (!data.onError) {
+                                        data.getItems = jQuery.parseJSON(data.getItems);                                    
+                                        $.each((data.getItems), function (index, e) {
+                                            var rowRecord = $("#divDonateRecordTemp").children().clone();
+                                            $(rowRecord).H2GAttr({ donatedate: $("#txtLastDonateDate").H2GValue(), donatenumber: e.DonationNumber, donatefrom: e.DonationFrom });
+                                            $(rowRecord).find("span.rec-text").H2GValue("ครั้งที่ " + e.DonationNumber + " บริจาควันที่ " + $("#txtLastDonateDate").H2GAttr("donatedatetext") + " ณ โรงพยาบาลนอกเครือข่าย");
+                                        
+                                            // for each reward 
+                                            $.each((e.DonationRewardList), function (indexr, er) {
+                                                var rowReward = $("#donateRewardTemp").clone();
+                                                $(rowReward).find(".lbl-check-reward").append(er.Description).H2GAttr('rewardID', er.ID);
+                                                $(rowReward).find(".lbl-check-reward input").on("change", function () { $(this).checkedReward() });
+                                                $(rowReward).find(".txt-reward-date").H2GFill({ rewardID: er.ID }).setCalendar({
+                                                    maxDate: new Date(),
+                                                    minDate: "-20y",
+                                                    yearRange: "c-20:c+0",
+                                                    onSelect: function (selectedDate, objDate) {
+                                                        if (selectedDate != '') {
+                                                            $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
+                                                        }
+                                                    },
+                                                    onClose: function () {
+                                                        if ($(this).H2GValue() == '') {
+                                                            $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", false);
+                                                        } else {
+                                                            $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
+                                                        }
+                                                    },
+                                                }).H2GDatebox();
+                                                $(rowRecord).append($(rowReward).children());
+                                            });
+
+                                            $('#divDonateRecord').prepend(rowRecord).H2GAttr("lastrecord", e.DonationNumber);
+                                        });
+                                        $("#spRegisNumber").H2GAttr({ donateNumberExt: $("#txtOuterDonate").H2GValue().toNumber() + $("#spRegisNumber").H2GAttr("donateNumberExt").toNumber() });
+
+                                        $("#spVisitCount").H2GValue("รวมจำนวนการเข้าพบ " + $("#spRegisNumber").H2GAttr("visitNumber") + " ครั้ง / บริจาค " + ($("#spRegisNumber").H2GAttr("donateNumber").toNumber() + $("#spRegisNumber").H2GAttr("donateNumberExt").toNumber()) + " ครั้ง");
+
+                                        $("#spVisitInfo").H2GValue("");
+                                        $("#spVisitInfo").append("วันที่ลงทะเบียน " + $("#spVisitInfo").H2GAttr("visitDateText"));
+                                        if ($("#spVisitInfo").H2GAttr("lastVisitDateText") != "") {
+                                            $("#spVisitInfo").append(" เข้าพบครั้งสุดท้ายเมื่อ " + $("#spVisitInfo").H2GAttr("lastVisitDateText") + " ( " + $("#spVisitInfo").H2GAttr("diffDate") + " วัน )");
+                                        } else {
+                                            $("#spVisitInfo").append(" เข้าพบครั้งแรก");
+                                        }
+
+                                        $("#spVisitInfo").append(" กำลังดำเนินการบริจาคครั้งที่ " + ($("#spVisitInfo").H2GAttr("currentDonateNumber").toNumber() + $("#txtOuterDonate").H2GValue().toNumber()));
+
+                                        $("#txtOuterDonate").H2GValue(""); $("#txtLastDonateDate").H2GValue("");
+                                    } 
+                                }
+                            });    //End ajax
+                        } else {
+                            var warning = "";
+                            if ($("#txtOuterDonate").H2GValue() == "") { warning = "กรุณากรอกจำนวนครั้งที่บริจาค"; $("#txtOuterDonate").focus(); }
+                            else if ($("#txtLastDonateDate").H2GValue() == "") { warning = "กรุณากรอกวันที่บริจาค"; $("#txtLastDonateDate").focus(); }
+                            notiWarning(warning);
+                        }
+                    },
+                    deleteDonateRecord: function (args) {
+                        if ($(this).closest("div.row").H2GAttr("refID") == "NEW") {
+                            $(this).closest("div.row").remove();
+                        } else {
+                            $(this).closest("div.row").hide().H2GAttr("refID", "D#" + $(this).closest("div.row").H2GAttr("refID"));
+                        }
+                    },
+                    checkedReward: function (args) {
+                        if ($(this).is(":checked")) {
+                            if ($(this).closest("div.row").find("input.txt-reward-date[rewardID='" + $(this).closest("label").H2GAttr("rewardID") + "']").H2GValue() == "") {
+                                $(this).closest("div.row").find("input.txt-reward-date[rewardID='" + $(this).closest("label").H2GAttr("rewardID") + "']").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy"));
+                            }
+                        } else {
+                            $(this).closest("div.row").find("input.txt-reward-date[rewardID='" + $(this).closest("label").H2GAttr("rewardID") + "']").H2GValue("");
+                        }
+                    },
+                });
+
+                $("#labPaneTab").click(setHistoricalFileDatas);
+                $("#exams-tab").click(setExamsDatas);
+                $("#immunohaemtology-tab").click(setImmunohaemtologyFile);
+                showVisitHistory();
+                //### extend
+            });
+
+            function showVisitHistory() {
+                var dataView = $("#tbVisitHistory > tbody");
+                $(dataView).H2GValue($("#tbVisitHistory > thead > tr.more-loading").clone().show());
+                if ($(dataView).closest("table").H2GAttr("wStatus") != "working") {
+                    $(dataView).closest("table").H2GAttr("wStatus", "working");
+                    $.ajax({
+                        url: '../../ajaxAction/donorAction.aspx',
+                        data: H2G.ajaxData({
+                            action: 'visithistory'
+                            , id: $("#data").H2GAttr("donorID")
+                            , so: $("#tbVisitHistory").attr("sortOrder") || "visit_date"
+                            , sd: $("#tbVisitHistory").attr("sortDirection") || "desc"
+                        }).config,
+                        type: "POST",
+                        dataType: "json",
+                        error: function (xhr, s, err) {
+                            console.log(s, err);
+                            $(dataView).H2GValue($("#tbVisitHistory > thead > tr.no-transaction").clone().show());
+                            $(dataView).closest("table").H2GAttr("wStatus", "error");
+                        },
+                        success: function (data) {
+                            $(dataView).H2GValue('');
+                            if (!data.onError) {
+                                data.getItems = jQuery.parseJSON(data.getItems);
+                                //### Visit History
+                                if (data.getItems.length > 0) {
+                                    $.each((data.getItems), function (index, e) {
+                                        var dataRow = $("#tbVisitHistory > thead > tr.template-data").clone().show();
+                                        $(dataRow).H2GFill({ refID: e.VisitID });
+                                        $(dataRow).find('.txt-donate-number').H2GValue(e.DonationNumber).H2GAttr("title", e.DonationNumber);
+                                        $(dataRow).find('.txt-visit-date').H2GValue(e.VisitDate).H2GAttr("title", e.VisitDate);
+                                        $(dataRow).find('.txt-donate-type').H2GValue(e.DonationType).H2GAttr("title", e.DonationType);
+                                        $(dataRow).find('.txt-bag-type').H2GValue(e.Bag).H2GAttr("title", e.Bag);
+                                        $(dataRow).find('.txt-site').H2GValue(e.Site).H2GAttr("title", e.Site);
+                                        $(dataRow).find('.txt-collection-point').H2GValue(e.CollectionPoint).H2GAttr("title", e.CollectionPoint);
+                                        $(dataRow).find('.txt-regis-by').H2GValue(e.CreateStaff).H2GAttr("title", e.CreateStaff);
+                                        $(dataRow).find('.txt-collection-by').H2GValue(e.InterviewStaff).H2GAttr("title", e.InterviewStaff);
+                                        $(dataRow).find('.txt-collection-result').H2GValue(e.InterviewStatus).H2GAttr("title", e.InterviewStatus);
+                                        $(dataRow).find('.txt-lab-date').H2GValue(e.LabDate).H2GAttr("title", e.LabDate);
+                                        $(dataRow).find('.txt-sample-number').H2GValue(e.SampleNumber).H2GAttr("title", e.SampleNumber);
+
+                                        $(dataView).append(dataRow);
+                                    });
+                                } else {
+                                    $(dataView).H2GValue($("#tbVisitHistory > thead > tr.no-transaction").clone().show());
+                                }
+                            } else {
+                                $(dataView).H2GValue($("#tbVisitHistory > thead > tr.no-transaction").clone().show());
+                            }
+                            $("#tbVisitHistory thead button").click(function () { sortButton($(this), showVisitHistory); return false; });
+                            $(dataView).closest("table").H2GAttr("wStatus", "done");
+                        }
+                    });    //End ajax
+                }
             }
-        }
     </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="cphMaster" runat="server">
@@ -1176,29 +653,27 @@
             </ul>
             <div id="historyPane">
                 <div class="border-box">
-                    <div class="col-md-36">แฟ้มประวัติ</div>
-                    <div class="border-box">
                         <div class="col-md-36">
-                            <table id="tbDonateHistory" class="table table-bordered-excel" style="font-size:18px;">
+                            <table id="tbVisitHistory" class="table table-bordered-excel" style="font-size:18px;">
                                 <thead>
                                     <tr>
-                                        <th class="col-md-2 text-center"><button sortOrder="donate_number">ครั้งที่<i class="glyphicon glyphicon-triangle-bottom"></i></button>
+                                        <th class="col-md-2 text-center"><button sortOrder="donation_number">ครั้งที่</button>
                                         </th>
-                                        <th class="col-md-3 text-center"><button sortOrder="visit_date">วันลงทะเบียน</button>
+                                        <th class="col-md-3 text-center"><button sortOrder="visit_date">วันลงทะเบียน<i class="glyphicon glyphicon-triangle-bottom"></i></button>
                                         </th>
-                                        <th class="col-md-4"><button sortOrder="donate_type">ประเภทการบริจาค</button>
+                                        <th class="col-md-4"><button sortOrder="donation_type">ประเภทการบริจาค</button>
                                         </th>
-                                        <th class="col-md-3"><button sortOrder="bag_type">ประเภทถุง</button>
+                                        <th class="col-md-3"><button sortOrder="bag">ประเภทถุง</button>
                                         </th>
-                                        <th class="col-md-3 text-center"><button sortOrder="site">ภาค</button>
+                                        <th class="col-md-2 text-center"><button sortOrder="site">ภาค</button>
                                         </th>
-                                        <th class="col-md-3 text-center"><button sortOrder="collection_point">หน่วย</button>
+                                        <th class="col-md-2 text-center"><button sortOrder="collection_point">หน่วย</button>
                                         </th>
-                                        <th class="col-md-3"><button sortOrder="regis_by">ลงทะเบียนโดย</button>
+                                        <th class="col-md-4"><button sortOrder="create_staff">ลงทะเบียนโดย</button>
                                         </th>
-                                        <th class="col-md-3"><button sortOrder="collection_by">คัดกรองโดย</button>
+                                        <th class="col-md-4"><button sortOrder="interview_staff">คัดกรองโดย</button>
                                         </th>
-                                        <th class="col-md-4"><button sortOrder="collection_result">ผลการคัดกรอง</button>
+                                        <th class="col-md-4"><button sortOrder="interview_status">ผลการคัดกรอง</button>
                                         </th>
                                         <th class="col-md-4 text-center"><button sortOrder="lab_date">Date of lab</button>
                                         </th>
@@ -1235,7 +710,6 @@
                             </table>
                         </div>
                     </div>
-                </div>
             </div>
             <div id="todayPane">
                 <div class="border-box">
@@ -1349,7 +823,7 @@
                                                         รหัสเชื่อมโยงโรงพยาบาลในเครือ
                                                     </div>
                                                     <div class="col-md-24">
-                                                        <select id="ddlAssociation" style="width: 363px;" tabindex="1">
+                                                        <select id="ddlAssociation" style="width: 363px;" tabindex="3">
                                                             <option value="0">Loading...</option>
                                                         </select>
                                                     </div>
@@ -1437,7 +911,6 @@
             </div>
             <div id="labPane">
                 <div class="border-box">
-                    <div class="col-md-36">ข้อมูล LAB</div>
                     <div id="labTab">
                         <ul>
                             <li><a href="#historicalFile" style="">Historical File</a></li>

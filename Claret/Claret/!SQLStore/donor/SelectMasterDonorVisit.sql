@@ -10,6 +10,7 @@ select dor.id as donor_id, dor.Donor_Number, dor.Gender, dor.Name, dor.Surname, 
 , dv.queue_number, dv.donation_type_id, dv.bag_id, dv.donation_to_id
 , to_char(nvl(DV.visit_date,nvl(dv.Create_Date,sysdate)), 'DD MON YYYY HH24,MI', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as visit_date_time_text
 , to_char(nvl(DV.visit_date,nvl(dv.Create_Date,sysdate)), 'DD MON YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as visit_date_text
+, to_char(nvl(DV.visit_date,nvl(dv.Create_Date,sysdate)), 'DD-MM-YYYY HH24,MI', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as visit_date
 from donor dor 
 left join donation_visit dv on DV.donor_id = dor.id  and dv.id = :visit_id 
 left join rh_group rg on rg.id = dor.RH_Group_ID

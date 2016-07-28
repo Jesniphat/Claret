@@ -217,7 +217,7 @@
     <div class="row" style="margin-top:20px;">
         <div class="col-md-36" style="padding-left:0px;">
             <div class="tableHeadDivFullDark" id="headTimeDiv">
-                <b>รายการ วันที่ 12 ก.ย. 2559 เจาะเก็บที่ ห้องเจาะเก็บชั้น 2 - รวมเจาะเก็บ 10 Sample</b>
+                <b>รายการ วันที่ <span id="donateDate"></span> เจาะเก็บที่ ห้องเจาะเก็บชั้น 2 - รวมเจาะเก็บ <span id="sampleCount">Sample</span></b>
             </div>
         </div>
         <div class="col-md-36">

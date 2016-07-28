@@ -579,19 +579,19 @@ function getDonationList() {
                 console.log(data.getItems);
                 for (var i = 0; i < data.getItems.length; i++) {
                     var rows = "<tr class='donate-table-rows'>" +
-                                    "<td class='col-md-5'>" + data.getItems[i].sample_number + "</td>" +
-                                    "<td class='col-md-5'>" + data.getItems[i].dornor_number + "</td>" +
-                                    "<td class='col-md-5'>" + data.getItems[i].type_des + "</td>" +
-                                    "<td class='col-md-5'>" + data.getItems[i].bag_des + "</td>" +
-                                    "<td class='col-md-5'>" + data.getItems[i].apply_des + "</td>" +
-                                    "<td class='col-md-3'>" + data.getItems[i].volume_actual + "</td>" +
-                                    "<td class='col-md-3'>" + data.getItems[i].collection_date + "</td>" +
-                                    "<td class='col-md-3'>" + data.getItems[i].donation_time + "</td>" +
+                                    "<td class='col-md-5'><input value = '" + data.getItems[i].sample_number + "' /></td>" +
+                                    "<td class='col-md-5'><input value = '" + data.getItems[i].dornor_number + "' /></td>" +
+                                    "<td class='col-md-5'><input value = '" + data.getItems[i].type_des + "' /></td>" +
+                                    "<td class='col-md-5'><input value = '" + data.getItems[i].bag_des + "' /></td>" +
+                                    "<td class='col-md-5'><input value = '" + data.getItems[i].apply_des + "' /></td>" +
+                                    "<td class='col-md-3'><input value = '" + data.getItems[i].volume_actual + "' /></td>" +
+                                    "<td class='col-md-3'><input value = '" + data.getItems[i].collection_date + "' /></td>" +
+                                    "<td class='col-md-3'><input value = '" + data.getItems[i].donation_time + "' /></td>" +
                                     "<td class='col-md-3'>" +
                                         "<button class='btn btn-icon' onclick='goEditIt(" + data.getItems[i].visit_id + ", " + data.getItems[i].donor_id + ");' tabindex='1'>" +
-                                            "<i class='glyphicon glyphicon-remove'></i>" +
+                                            "<i class='glyphicon glyphicon-circle-arrow-up'></i>" +
                                         "</button>" +
-                                    + "</td>" +
+                                    "</td>" +
                                 "</tr>";
                     $('#donate-table > tbody').append(rows);
                 }

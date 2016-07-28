@@ -144,7 +144,7 @@ $.extend($.fn, {
         $.extend(config, setting);
 
         $.ajax({
-            url: config.url,//'../../ajaxAction/donorAction.aspx',
+            url: config.url,
             data: config.data,
             type: config.type,
             dataType: config.dataType,
@@ -166,9 +166,6 @@ $.extend($.fn, {
                         select: config.selectItem
                     });
                 }
-                //$("#tog" + $(self).H2GAttr("id").replace("ddl","")).click(function () {
-                //    $(self).toggle();
-                //});
             }
         });    //End ajax
         return this;
@@ -449,8 +446,8 @@ function showNoti(value, type) {
         });
     }
 }
-//### Paging 
 
+//### Paging 
 function genGridPage(tbData, doFunction) {
     var totalPage = ($(tbData).attr("totalPage") || "1").toNumber(); var currentPage = ($(tbData).attr("currentPage") || "1").toNumber();
     var divpage = null; var page = "";
@@ -533,3 +530,4 @@ function sortButton(xobj, doFunction) {
         }
     }
 }
+//### Paging 

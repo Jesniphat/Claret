@@ -158,6 +158,7 @@ Namespace DataItem
         Public PurgeDate As String
         Public PurgeStaff As String
         Public Status As String
+        Public VisitDate As String
 
         Public Shared Function WithCollection(ByVal item As DataItem.DonationVisitItem) As SQLCollection
             Dim param As New SQLCollection()
@@ -224,6 +225,7 @@ Namespace DataItem
                 param.Add(":purge_staff", DbType.Int64, .PurgeStaff)
                 param.Add(":status", DbType.String, .Status)
                 param.Add(":create_staff", DbType.Int64, H2G.Login.ID)
+                param.Add(":visit_date", DbType.DateTime, H2G.BE2AC(H2G.Convert(Of DateTime)(.VisitDate.Replace("/", "-"))).ToString("dd-MM-yyyy HH:mm"))
 
             End With
 
@@ -422,6 +424,7 @@ Namespace DataItem
         Public DonationToID As String
         Public VisitDateTimeText As String
         Public VisitDateText As String
+        Public VisitDate As String
 
         Public DuplicateTransaction As String
 
@@ -476,6 +479,7 @@ Namespace DataItem
                 .DonationToID = dRow("donation_to_id").ToString()
                 .VisitDateTimeText = dRow("visit_date_time_text").ToString().Replace(",", ":")
                 .VisitDateText = dRow("visit_date_text").ToString().Replace(",", ":")
+                .VisitDate = dRow("visit_date").ToString().Replace(",", ":")
 
             End With
             Return item

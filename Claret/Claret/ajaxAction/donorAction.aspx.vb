@@ -26,7 +26,6 @@ Public Class donorAction
                         DonorItem.ID = Cbase.QueryField(H2G.nextVal("DONOR"))
                         Cbase.Execute("SQL::donor/InsertMasterDonor", DonorItem.WithCollection(DonorItem))
 
-
                         'INSERT INTO DONNEUR (DONN_NUMERO, DONN_SEXE, DONN_NOM, DONN_PRENOM, DONN_DNAISS, PTITRE_CD, DONN_ADRESSE, DONN_CPOST, PPAYS_CD, PPAYS_NAT_CD, DONN_TELP_NO, DONN_TELT_NO, DONN_TELT_POSTE, DONN_TELA_TYPE, DONN_TELA_NO, PPROF_CD, ASSOC_CD, DONN_DTE_VISITE, DONN_POIDS, DONN_DTE_POIDS, DONN_GRPRH, DONN_SX, DONN_DTE_TYPDONN )
                         'VALUES(DONOR.DONOR_NUMBER, ถ้าผู้ชายใส่ '1’ ผู้หญิงใส่ ‘2’, DONER.NAME, DONER.SURNAME, DONOR.BIRTHDAY, TITLE.HIIG_CODE, DONOR.ADDRESS + ‘ ‘ + DONOR.SUB_DISTRICT + ‘ ‘ + DONOR.DISTRICT, DONOR.ZIPCODE, COUNTRY.HIIG_CODE, COUNTRY.HIIG_CODE, DONOR.TEL_MOBILE1, DONOR.TEL_OFFICE, DONOR.TEL_OFFICE_EXT, ‘M’, DONOR.TEL_MOBILE2, OCCUPATION.HIIG_CODE, ASSOCICATION.HIIG_CODE, DONOR_VISIT.CREATE_DATE, DONOR.WEIGHT, DONOR_VISIT.CREATE_DATE, RH_GROUP.HIIG_CODE, DONER.GENDER, TO_CHAR(DONOR_VISIT.CREATE_DATE,’yyyymmdd’))
 
@@ -595,7 +594,7 @@ Public Class donorAction
                     , to_char(dn.lab_date, 'DD MON YYYY HH24,MI', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as lab_date
                     from (
                         Select dv.id as visit_id, dr.DONATION_NUMBER, nvl(DV.VISIT_DATE, dv.create_date) As VISIT_DATE, DT.DESCRIPTION As DONATION_TYPE
-                        , ba.description as bag, si.name as site, cp.name as COLLECTION_POINT, crs.name || ' ' || crs.surname as CREATE_STAFF
+                        , ba.description as bag, si.code as site, cp.code as COLLECTION_POINT, crs.name || ' ' || crs.surname as CREATE_STAFF
                         , ins.name || ' ' || ins.surname as INTEVIEW_STAFF, dv.INTEVIEW_STATUS, dr.lab_date, dv.sample_number
                         From DONATION_VISIT dv
                         Left Join DONATION_RECORD dr on dr.DONATION_VISIT_id = dv.id
@@ -606,9 +605,14 @@ Public Class donorAction
                         Left Join STAFF crs on crs.id = dv.CREATE_STAFF
                         Left Join STAFF ins on ins.id = dv.INTEVIEW_STAFF
                         where dv.donor_id = '" & _REQUEST("id") & "'
-                        ORDER BY nvl(dv.VISIT_DATE, dv.create_date) desc
-                    ) dn "
-                    For Each dRow As DataRow In Cbase.QueryTable(sqlRecord).Rows
+                    ) dn 
+                    ORDER BY dn./*#SORT_ORDER*/ /*#SORT_DIRECTION*/
+                    "
+                    param.Add(":id", _REQUEST("id"))
+                    param.Add("#SORT_ORDER", _REQUEST("so"))
+                    param.Add("#SORT_DIRECTION", _REQUEST("sd"))
+
+                    For Each dRow As DataRow In Cbase.QueryTable(sqlRecord, param).Rows
                         Item = New VisitHistoryItem
                         Item.VisitID = dRow("visit_id").ToString()
                         Item.Bag = dRow("bag").ToString()

@@ -181,6 +181,7 @@
     <Content Include="Login.aspx" />
     <Content Include="main.aspx" />
     <Content Include="mobile\main.aspx" />
+    <Content Include="quality\labRegister.aspx" />
     <Content Include="resources\css\bootflat.css" />
     <Content Include="resources\css\bootstrap-select.css" />
     <Content Include="resources\css\donateStyle.css" />
@@ -189,6 +190,7 @@
     <Content Include="resources\javascript\donateScript.js" />
     <Content Include="resources\javascript\donateScriptEdit.js" />
     <Content Include="resources\javascript\jquery-date.js" />
+    <Content Include="resources\javascript\page\registerScript.js" />
     <Content Include="resources\jquery\jquery-latest.js" />
     <Content Include="resources\jquery\jquery.blockUI.js" />
     <Content Include="resources\jquery\jquery.metadata.js" />
@@ -256,6 +258,13 @@
     </Compile>
     <Compile Include="ajaxAction\masterAction.aspx.vb">
       <DependentUpon>masterAction.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="quality\labRegister.aspx.designer.vb">
+      <DependentUpon>labRegister.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="quality\labRegister.aspx.vb">
+      <DependentUpon>labRegister.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Content Include="App_Code\donor.vb" />

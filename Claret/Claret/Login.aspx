@@ -156,10 +156,10 @@
                     <span>ภาค</span>
                 </div>
                 <div class="col-md-6" style="text-align:right;padding-right: 0;">
-                    <input id="txtRegion" type="text" class="form-control required" placeholder="ภาค" /><%-- value="1000"--%>
+                    <input id="txtRegion" type="text" class="form-control required" placeholder="ภาค" />
                 </div>
                 <div class="col-md-18" style="padding-left: 5px;">
-                    <select id="ddlRegion" class="required text-left" tabindex="-1">
+                    <select id="ddlRegion" class="required text-left" style="width:100%;" tabindex="-1">
                         <option value="0">Loading...</option>
                     </select>
                 </div>
@@ -169,10 +169,10 @@
                     <span>หน่วยงาน</span>
                 </div>
                 <div class="col-md-6" style="text-align:right;padding-right: 0;">
-                    <input id="txtDepartment" type="text" class="form-control required" placeholder="หน่วยงาน" /><%-- value="0A0000"--%>
+                    <input id="txtDepartment" type="text" class="form-control required" placeholder="หน่วยงาน" />
                 </div>
                 <div class="col-md-18" style="padding-left: 5px;">
-                    <select id="ddlDepartment" class="required text-left" tabindex="-1">
+                    <select id="ddlDepartment" class="required text-left" style="width:100%;" tabindex="-1">
                         <option value="0">Loading...</option>
                     </select>
                 </div>

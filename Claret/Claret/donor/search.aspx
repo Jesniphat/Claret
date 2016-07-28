@@ -415,7 +415,7 @@
                     <div id="post-content-one" style="padding-left:15px; padding-bottom: 20px;">
                         <div class="row">
                             <div class="col-md-36 text-center">
-                                <span id="spQueueHeader"></span>
+                                <span id="spQueueHeader" style="font-size: larger;"></span>
                             </div>
                         </div>
                         <div class="row">
