@@ -525,7 +525,7 @@ Public Class donateAction
                                 INNER JOIN DONATION_RECORD DR ON D.ID = DR.DONOR_ID AND DV.ID = DR.DONATION_VISIT_ID
                                 INNER JOIN DONATION_TYPE DT ON DV.DONATION_TYPE_ID = DT.ID
                                 INNER JOIN BAG G ON DV.BAG_ID = G.ID INNER JOIN Donation_To DTT ON DV.DONATION_TO_ID = DTT.ID
-                                WHERE DV.STATUS IN ('WAIT RESULT','WAIT COLLECTION')"
+                                WHERE DV.STATUS IN ('WAIT RESULT')"
             Dim dt As DataTable = Cbase.QueryTable(sql)
             Dim DonationLists = New List(Of DonationList)
             For Each dr As DataRow In dt.Rows
