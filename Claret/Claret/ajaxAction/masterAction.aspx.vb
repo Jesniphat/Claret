@@ -27,7 +27,7 @@ Public Class masterAction
                         CountryItem = New KeyCodeItem
                         CountryItem.id = dr("id").ToString()
                         CountryItem.code = dr("code").ToString()
-                        CountryItem.name = dr("name").ToString()
+                        CountryItem.value = dr("name").ToString()
                         countryList.Add(CountryItem)
                     Next
                     JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeItem))(countryList))
@@ -40,7 +40,7 @@ Public Class masterAction
                         CountryItem = New KeyCodeItem
                         CountryItem.id = dr("id").ToString()
                         CountryItem.code = dr("code").ToString()
-                        CountryItem.name = dr("name").ToString()
+                        CountryItem.value = dr("name").ToString()
                         countryList.Add(CountryItem)
                     Next
                     JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeItem))(countryList))
@@ -56,7 +56,7 @@ Public Class masterAction
                         CountryItem = New KeyCodeItem
                         CountryItem.id = dr("id").ToString()
                         CountryItem.code = dr("id").ToString()
-                        CountryItem.name = dr("description").ToString()
+                        CountryItem.value = dr("description").ToString()
                         countryList.Add(CountryItem)
                     Next
                     JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeItem))(countryList))
@@ -85,7 +85,7 @@ Public Class masterAction
                         DataItem = New KeyCodeItem
                         DataItem.id = dr("id").ToString()
                         DataItem.code = dr("id").ToString()
-                        DataItem.name = dr("title_name").ToString()
+                        DataItem.value = dr("title_name").ToString()
                         DataList.Add(DataItem)
                     Next
                     JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeItem))(DataList))
@@ -99,7 +99,7 @@ Public Class masterAction
                         DataItem = New KeyCodeItem
                         DataItem.id = dr("id").ToString()
                         DataItem.code = dr("id").ToString()
-                        DataItem.name = dr("description").ToString()
+                        DataItem.value = dr("description").ToString()
                         DataList.Add(DataItem)
                     Next
                     JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeItem))(DataList))
@@ -114,7 +114,7 @@ Public Class masterAction
                             DataItem = New KeyCodeItem
                             DataItem.id = dr("id").ToString()
                             DataItem.code = dr("id").ToString()
-                            DataItem.name = dr("description").ToString()
+                            DataItem.value = dr("description").ToString()
                             DataList.Add(DataItem)
                         Next
                     Else
@@ -142,7 +142,7 @@ Public Class masterAction
                 Case "hospital"
                     Dim DataList As New List(Of KeyCodeItem)
                     Dim DataItem As KeyCodeItem
-                    Dim sql As String = "select id, code, name from hospital ORDER BY name "
+                    Dim sql As String = "select id, trim(code) as code, name from hospital ORDER BY name "
                     Dim dt As DataTable = Cbase.QueryTable(sql)
 
                     If dt.Rows.Count > 0 Then
@@ -150,17 +150,22 @@ Public Class masterAction
                             DataItem = New KeyCodeItem
                             DataItem.id = dr("id").ToString()
                             DataItem.code = dr("code").ToString()
-                            DataItem.name = dr("name").ToString()
+                            DataItem.value = dr("name").ToString()
                             DataList.Add(DataItem)
                         Next
                     Else
                         Throw New Exception("No data found.", New Exception("Hospital has no record"))
                     End If
                     JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeItem))(DataList))
-                Case "lab"
+                Case "department"
                     Dim DataList As New List(Of KeyCodeItem)
                     Dim DataItem As KeyCodeItem
-                    Dim sql As String = "select id, code, description from lab ORDER BY code "
+                    Dim sql As String = "select dep.id, trim(dep.code) as code, dep.name 
+                                        from department dep
+                                        inner join HOSPITAL_DEPARTMENT hdp on HDP.DEPARTMENT_ID = dep.id
+                                        inner join hospital hos on HOS.id = hdp.hospital_id
+                                        where trim(hos.code) = '" & _REQUEST("hcode") & "'
+                                        ORDER BY dep.name "
                     Dim dt As DataTable = Cbase.QueryTable(sql)
 
                     If dt.Rows.Count > 0 Then
@@ -168,7 +173,25 @@ Public Class masterAction
                             DataItem = New KeyCodeItem
                             DataItem.id = dr("id").ToString()
                             DataItem.code = dr("code").ToString()
-                            DataItem.name = dr("description").ToString()
+                            DataItem.value = dr("name").ToString()
+                            DataList.Add(DataItem)
+                        Next
+                    Else
+                        Throw New Exception("No data found.", New Exception("Department has no record"))
+                    End If
+                    JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeItem))(DataList))
+                Case "lab"
+                    Dim DataList As New List(Of KeyCodeItem)
+                    Dim DataItem As KeyCodeItem
+                    Dim sql As String = "select id, trim(code) as code, description from lab ORDER BY code "
+                    Dim dt As DataTable = Cbase.QueryTable(sql)
+
+                    If dt.Rows.Count > 0 Then
+                        For Each dr As DataRow In dt.Rows()
+                            DataItem = New KeyCodeItem
+                            DataItem.id = dr("id").ToString()
+                            DataItem.code = dr("code").ToString()
+                            DataItem.value = dr("description").ToString()
                             DataList.Add(DataItem)
                         Next
                     Else
@@ -179,9 +202,9 @@ Public Class masterAction
                     Dim DataList As New List(Of KeyCodeItem)
                     Dim DataItem As KeyCodeItem
                     Dim sql As String = "select * from (
-                                            select id, description, 'E' as exam_type from EXAMINATION 
+                                            select trim(code) as code, trim(code) || ' : ' || description as description, 'E' as exam_type from EXAMINATION 
                                             union ALL
-                                            select id, description, 'G' as exam_type from EXAMINATION_GROUP 
+                                            select trim(code) as code, trim(code) || ' : ' || description as description, 'G' as exam_type from EXAMINATION_GROUP 
                                          ) dn order by description "
                     Dim dt As DataTable = Cbase.QueryTable(sql)
 
@@ -189,12 +212,66 @@ Public Class masterAction
                         For Each dr As DataRow In dt.Rows()
                             DataItem = New KeyCodeItem
                             DataItem.id = dr("exam_type").ToString()
-                            DataItem.code = dr("id").ToString()
-                            DataItem.name = dr("description").ToString()
+                            DataItem.code = dr("code").ToString()
+                            DataItem.value = dr("description").ToString()
                             DataList.Add(DataItem)
                         Next
                     Else
                         Throw New Exception("No data found.", New Exception("Examination has no record"))
+                    End If
+                    JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeItem))(DataList))
+                Case "reason"
+                    Dim DataList As New List(Of KeyCodeItem)
+                    Dim DataItem As KeyCodeItem
+                    Dim sql As String = "select id, description from REASON where used_module = 'TEST REQUEST REASON' order by description "
+                    Dim dt As DataTable = Cbase.QueryTable(sql)
+
+                    If dt.Rows.Count > 0 Then
+                        For Each dr As DataRow In dt.Rows()
+                            DataItem = New KeyCodeItem
+                            DataItem.id = dr("id").ToString()
+                            DataItem.code = dr("id").ToString()
+                            DataItem.value = dr("description").ToString()
+                            DataList.Add(DataItem)
+                        Next
+                    Else
+                        Throw New Exception("No data found.", New Exception("Reason has no record"))
+                    End If
+                    JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeItem))(DataList))
+                Case "donationto"
+                    Dim DataList As New List(Of KeyCodeItem)
+                    Dim DataItem As KeyCodeItem
+                    Dim sql As String = "select id, description from DONATION_TO where used_module like '%H,%' order by description "
+                    Dim dt As DataTable = Cbase.QueryTable(sql)
+
+                    If dt.Rows.Count > 0 Then
+                        For Each dr As DataRow In dt.Rows()
+                            DataItem = New KeyCodeItem
+                            DataItem.id = dr("id").ToString()
+                            DataItem.code = dr("id").ToString()
+                            DataItem.value = dr("description").ToString()
+                            DataList.Add(DataItem)
+                        Next
+                    Else
+                        Throw New Exception("No data found.", New Exception("Donation To has no record"))
+                    End If
+                    JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeItem))(DataList))
+                Case "staff"
+                    Dim DataList As New List(Of KeyCodeItem)
+                    Dim DataItem As KeyCodeItem
+                    Dim sql As String = "select id, code, code || ' - ' || name || ' ' || surname as name from staff order by code || ' - ' || name || ' ' || surname "
+                    Dim dt As DataTable = Cbase.QueryTable(sql)
+
+                    If dt.Rows.Count > 0 Then
+                        For Each dr As DataRow In dt.Rows()
+                            DataItem = New KeyCodeItem
+                            DataItem.id = dr("id").ToString()
+                            DataItem.code = dr("id").ToString()
+                            DataItem.value = dr("name").ToString()
+                            DataList.Add(DataItem)
+                        Next
+                    Else
+                        Throw New Exception("No data found.", New Exception("Staff has no record"))
                     End If
                     JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeItem))(DataList))
             End Select
@@ -208,8 +285,8 @@ End Class
 
 Public Structure KeyCodeItem
     Public id As String
-    Public name As String
     Public code As String
+    Public value As String
 
 End Structure
 Public Structure ExCardItem

@@ -62,7 +62,6 @@
         disable: function (option) {
             return $(this).each(function (i, input) {
                 var data = $(input).parent(".selecter").data("selecter");
-
                 if (data) {
                     if (typeof option !== "undefined") {
                         var index = data.$items.index(data.$items.filter("[data-value=" + option + "]"));
@@ -73,7 +72,6 @@
                         if (data.$selecter.hasClass("open")) {
                             data.$selecter.find(".selecter-selected").trigger("click.selecter");
                         }
-
                         data.$selecter.addClass("disabled");
                         data.$select.prop("disabled", true);
                     }

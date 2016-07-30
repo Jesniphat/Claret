@@ -234,6 +234,46 @@ Namespace DataItem
 
     End Class
 
+    Public Class DonationHospitalItem
+        Public ID As String
+        Public CreateStaff As String
+        Public ReceiptHospitalID As String
+        Public OrderNumber As String
+        Public DonorID As String
+        Public VisitDate As String
+        Public DonationToID As String
+        Public SiteID As String
+        Public CollectionPointID As String
+        Public HospitalID As String
+        Public DepartmentID As String
+        Public LabID As String
+        Public Status As String
+        Public Remark As String
+
+        Public Shared Function WithCollection(ByVal item As DataItem.DonationHospitalItem) As SQLCollection
+            Dim param As New SQLCollection()
+            With item
+                param.Add(":id", DbType.Int64, .ID)
+                param.Add(":create_staff", DbType.Int64, H2G.Login.ID)
+                param.Add(":receipt_hospital_id", DbType.Int64, .ReceiptHospitalID)
+                param.Add(":order_number", DbType.Int64, .OrderNumber)
+                param.Add(":donor_id", DbType.Int64, .DonorID)
+                param.Add(":visit_date", DbType.DateTime, H2G.BE2AC(H2G.Convert(Of DateTime)(.VisitDate.Replace("/", "-"))).ToString("dd-MM-yyyy HH:mm"))
+                param.Add(":donation_to_id", DbType.Int64, .DonationToID)
+                param.Add(":site_id", DbType.Int64, .SiteID)
+                param.Add(":collection_point_id", DbType.Int64, .CollectionPointID)
+                param.Add(":hospital_id", DbType.Int64, .HospitalID)
+                param.Add(":department_id", DbType.Int64, .DepartmentID)
+                param.Add(":lab_id", DbType.Int64, .LabID)
+                param.Add(":status", DbType.String, .Status)
+                param.Add(":remark", DbType.String, .Remark)
+
+            End With
+            Return param
+        End Function
+
+    End Class
+
     Public Class DonorExtCardItem
         Public ID As String
         Public DonorID As String

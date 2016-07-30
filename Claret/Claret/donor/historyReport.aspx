@@ -36,7 +36,7 @@
                 $("#txtPostQueue").focus();
             });
             
-            $("#ddlStatus").setDropdowList();
+            $("#ddlStatus").setDropdownList();
             $("#txtReportDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy"));
             postQueueSearch(true);
         });

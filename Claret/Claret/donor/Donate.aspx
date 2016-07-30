@@ -1,7 +1,7 @@
 ﻿<%@ Page Title="" Language="vb" AutoEventWireup="false" MasterPageFile="~/MasterPage.Master" CodeBehind="Donate.aspx.vb" Inherits="Claret.Donate" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <link href="../resources/css/donateStyle.css" rel="stylesheet" />
-    <script src="../resources/javascript/donateScript.js" type="text/javascript"></script>
+    <script src="../resources/javascript/page/donateScript.js" type="text/javascript"></script>
     <script>
         $(function () {
             $("#donateTab").tabs({
@@ -11,7 +11,7 @@
             getDonateBagTypeList();
             getDonateApplyList();
             
-            $("#donateStatus").setDropdowList();
+            $("#donateStatus").setDropdownList();
             $("#donateDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
                 maxDate: "0",
                 minDate: new Date(),

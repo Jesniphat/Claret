@@ -16,39 +16,6 @@
 	font-weight: normal;
 	font-style: normal;
 }
-/* icomoon config =========== */
-@font-face {
-    font-family: 'icomoon';
-    src:    url('../fonts/icomoon.eot?l9kr27');
-    src:    url('../fonts/icomoon.eot?l9kr27#iefix') format('embedded-opentype'),
-        url('../fonts/icomoon.ttf?l9kr27') format('truetype'),
-        url('../fonts/icomoon.woff?l9kr27') format('woff'),
-        url('../fonts/icomoon.svg?l9kr27#icomoon') format('svg');
-    font-weight: normal;
-    font-style: normal;
-}
-
-[class^="icon-"], [class*=" icon-"] {
-    /* use !important to prevent issues with browser extensions that change fonts */
-    font-family: 'icomoon' !important;
-    speak: none;
-    font-style: normal;
-    font-weight: normal;
-    font-variant: normal;
-    text-transform: none;
-    line-height: 1;
-    padding: 0px 0px;
-    vertical-align: sub;
-
-    /* Better Font Rendering =========== */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-.icon-blood-bag:before {
-    content: "\e900";
-}
-/* icomoon config =========== */
 html {
     overflow:hidden;
 }
@@ -71,6 +38,10 @@ span.glyphicon {
     height: 30px;
     padding: 0px 5px;
     color: #595959;/*89,89,89*/
+}
+select.form-control > option {
+    background-color:#FFFFFF;
+    cursor:pointer;
 }
 .required {
     background-color:#fff5f5 !important;
@@ -111,6 +82,10 @@ span.glyphicon {
     -moz-box-shadow: 0 0 8px rgba(0,0,0,.6);
     box-shadow: 0 0 8px rgba(0,0,0,.6);
 }
+.ui-corner-right {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
 .claret-page-header {
     font-size: larger;
     font-weight: bold;
@@ -147,7 +122,6 @@ a {
 }
 .noti {
     position:absolute; 
-    left:500px; 
     top:48px; 
     z-index:100;
     padding: 5px 30px;
@@ -225,7 +199,7 @@ table.table-bordered-excel > thead > tr > th > button > i {
     position: relative;
     display: inline-block;
 }
-.custom-combobox .custom-combobox-toggle {
+.custom-combobox .custom-combobox-toggle.ui-widget {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -234,9 +208,9 @@ table.table-bordered-excel > thead > tr > th > button > i {
     background: #ffffff;
     border: 1px solid #aab2bd;
     height: 30px;
-    width: 34px;
+    width: 30px;
 }
-.custom-combobox .custom-combobox-input {
+.custom-combobox .custom-combobox-input.ui-widget {
     margin: 0;
     font-family: THSarabunNew;
     padding: 0px 0px 0px 5px;
@@ -250,6 +224,21 @@ table.table-bordered-excel > thead > tr > th > button > i {
 .custom-combobox .custom-combobox-input.required {
     background: #fff5f5 !important;
 }
+.custom-combobox-input.disabled, .custom-combobox-input[disabled],
+.custom-combobox-toggle.disabled, .custom-combobox-toggle.ui-button-disabled, .custom-combobox-toggle[disabled] {
+    background-color: #e6e9ed !important;
+    border-color: #e6e9ed !important;
+    cursor: not-allowed !important;
+}
+.selecter.disabled > .selecter-selected {
+    cursor: not-allowed !important;
+    border-color: #e6e9ed !important;
+    color: #595959 !important;
+}
+.selecter.disabled.required > .selecter-selected {
+    background-color:#fff5f5 !important;
+}
+/*Adjust jquery ui*/
 .ui-menu .ui-menu-item {
     font-family: THSarabunNew;
     padding: 0px 0px 0px 5px;
@@ -271,7 +260,6 @@ table.table-bordered-excel > thead > tr > th > button > i {
     /* prevent horizontal scrollbar */
     overflow-x: hidden;
 }
-/*Adjust jquery ui tab*/
 .ui-datepicker {
     font-size:12px;
     font-family: Arial,sans-serif !important;
@@ -326,7 +314,7 @@ table.table-bordered-excel > thead > tr > th > button > i {
 .ui-widget-content {
     font-family: THSarabunNew;
 }
-.ui-widget input, .ui-widget select {
+.ui-widget input {
     font-family: THSarabunNew; 
     font-size: 20px;
 }
@@ -361,14 +349,15 @@ table.table-bordered-excel > thead > tr > th > button > i {
     border-bottom: 1px solid #ddd;
     
 }
-
+div > button > i[class^="icon-"]:hover, div > button > i[class*=" icon-"]:hover {
+    opacity: 0.7;
+}
 .selecte-box-custom {
     width:100%;
     height: 30px;
     border-radius: 3px;
     font-size: 20px;
 }
-
 .selecte-box-custom > option {
     background-color:#FFFFFF;
 }

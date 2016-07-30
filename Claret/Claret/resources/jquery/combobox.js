@@ -5,7 +5,7 @@
               .addClass("custom-combobox")
               .insertAfter(this.element);
 
-            this.element.hide();
+            this.element.attr('combobox', 'Y').hide();
             this._createAutocomplete();
             this._createShowAllButton();
         },
@@ -13,8 +13,8 @@
         _createAutocomplete: function () {
             var selected = this.element.children(":selected"),
               value = selected.val() ? selected.text() : "";
-            this.input = $("<input>", { class: this.element.attr("class"), placeholder: "กรุณาเลือก", tabindex: this.element.attr("tabindex") || "" })
-              .appendTo(this.wrapper)//.css({ width: $(this).parent().width() - 30 })
+            this.input = $("<input>", { class: this.element.attr("class"), placeholder: this.element.attr("placeholder") || "", tabindex: this.element.attr("tabindex") || "" })
+              .appendTo(this.wrapper)
               .val(value)
               .attr("title", "")
               .addClass("custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left")
@@ -41,8 +41,8 @@
         _createShowAllButton: function () {
             var input = this.input,
               wasOpen = false;
-
-            $("<a>", { class: this.element.attr("class") })
+            
+            this.button = $("<a>", { class: this.element.attr("class") })
               .attr("tabIndex", -1)
               .attr("title", "Show All Items")
               .appendTo(this.wrapper)
@@ -109,19 +109,24 @@
             this.input
               .val("")
               .attr("notiWarning", 'ไม่มี ' + value + ' ในตัวเลือก');
-              //.tooltip("open");
             this.element.val("");
-            //this._delay(function () {
-            //    //this.input.tooltip("close").attr("title", "");
-            //}, 2500);
             notiWarning(this.input.attr("notiWarning"));
             this.input.autocomplete("instance").term = "";
             this.input.focus();
         },
-
+        disable: function () {
+            this.input.prop('disabled',true);
+            this.button.button({ disabled: true }).prop("disabled", true);
+            this.input.autocomplete("disable");
+        },
+        enable: function() {
+            this.input.prop('disabled',false);
+            this.button.button({ disabled: false }).prop("disabled", false);
+            this.input.autocomplete("enable");
+        },
         _destroy: function () {
             this.wrapper.remove();
             this.element.show();
-        }
+        },
     });
 })(jQuery);

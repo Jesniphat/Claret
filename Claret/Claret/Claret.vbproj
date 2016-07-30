@@ -130,7 +130,13 @@
     <Import Include="System.Web.UI.HtmlControls" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="!SQLStore\donor\InsertDonationHospital.sql" />
     <Content Include="!SQLStore\donor\InsertDonationVisit.sql" />
+    <Content Include="!SQLStore\donor\SelectDonationHospital.sql" />
+    <Content Include="!SQLStore\donor\SelectHospitalPostQueue.sql" />
+    <Content Include="!SQLStore\donor\SelectHospitalPostQueueCount.sql" />
+    <Content Include="!SQLStore\donor\SelectVisitPostQueueCount.sql" />
+    <Content Include="!SQLStore\donor\SelectVisitPostQueue.sql" />
     <Content Include="!SQLStore\donor\SelectMasterDonorVisit.sql" />
     <Content Include="!SQLStore\donor\SelectMasterDonor.sql" />
     <Content Include="!SQLStore\donor\UpdateMasterDonor.sql" />
@@ -138,6 +144,7 @@
     <Content Include="ajaxAction\donateAction.aspx" />
     <Content Include="ajaxAction\donorAction.aspx" />
     <Content Include="ajaxAction\masterAction.aspx" />
+    <Content Include="ajaxAction\qualityAction.aspx" />
     <Content Include="ajaxAction\userAction.aspx" />
     <Content Include="Default.aspx" />
     <Content Include="donor\Collection.aspx" />
@@ -183,12 +190,13 @@
     <Content Include="mobile\main.aspx" />
     <Content Include="quality\labRegister.aspx" />
     <Content Include="resources\css\bootflat.css" />
+    <Content Include="resources\css\claret-font-icon.css" />
     <Content Include="resources\css\bootstrap-select.css" />
     <Content Include="resources\css\donateStyle.css" />
     <Content Include="resources\css\table-excel.css" />
     <Content Include="resources\javascript\bootstrap-select.js" />
-    <Content Include="resources\javascript\donateScript.js" />
-    <Content Include="resources\javascript\donateScriptEdit.js" />
+    <Content Include="resources\javascript\page\donateScript.js" />
+    <Content Include="resources\javascript\page\donateScriptEdit.js" />
     <Content Include="resources\javascript\jquery-date.js" />
     <Content Include="resources\javascript\page\registerScript.js" />
     <Content Include="resources\jquery\jquery-latest.js" />
@@ -258,6 +266,13 @@
     </Compile>
     <Compile Include="ajaxAction\masterAction.aspx.vb">
       <DependentUpon>masterAction.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="ajaxAction\qualityAction.aspx.designer.vb">
+      <DependentUpon>qualityAction.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ajaxAction\qualityAction.aspx.vb">
+      <DependentUpon>qualityAction.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Compile Include="quality\labRegister.aspx.designer.vb">

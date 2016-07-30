@@ -628,7 +628,7 @@ $.extend($.fn, {
             if (scrollTo) { e.preventDefault(); $(this).scrollTop(scrollTo + $(this).scrollTop()); }
         });
     },
-    setDropdowList: function () {
+    setDropdownList: function () {
         var dclass = "";
         if ($(this).attr("class") != undefined) {
             dclass = $(this).attr("class");

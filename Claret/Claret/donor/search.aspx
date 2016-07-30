@@ -18,10 +18,10 @@
                     $("#txtBloodGroup").focus();
                 },
                 onClose: function () {
-                    enterDatePicker($("#txtBirthday"),"close");
+                    enterDatePickerSearch($("#txtBirthday"),"close");
                 },
                 onEnterKey: function () {
-                    enterDatePicker($("#txtBirthday"), "enter");
+                    enterDatePickerSearch($("#txtBirthday"), "enter");
                 },
             });
             $("#txtName").H2GNamebox(37);
@@ -67,9 +67,30 @@
 
             $("#tbDonor thead button").click(function () { sortButton($(this), donorSearch); return false; });
             $("#tbPostQueue thead button").click(function () { sortButton($(this), postQueueSearch); return false; });
-            postQueueSearch(true);
-            donorSearch(true);
+            //postQueueSearch(true);
+            //donorSearch(true);
             $("#txtDonorNumber").focus();
+            if ($("#data").H2GAttr("receiptHospitalID")) {
+                $.ajax({
+                    url: '../../ajaxAction/qualityAction.aspx',
+                    data: {
+                        action: 'getreceipthospital'
+                        , receipthospitalid: $("#data").H2GAttr("receiptHospitalID")
+                    },
+                    type: "POST",
+                    dataType: "json",
+                    error: function (xhr, s, err) {
+                        console.log(s, err);
+                    },
+                    success: function (data) {
+                        if (!data.onError) {
+                            data.getItems = jQuery.parseJSON(data.getItems);
+                            $("#divReceiptHospital").show();
+                            $("#spReceiptHospital").H2GValue(data.getItems.HospitalName + " รายการที่ " + data.getItems.QueueCount + "/" + data.getItems.QueueCount);
+                        } 
+                    }
+                });    //End ajax
+            }
         });
         function validation() {
             if ($('#txtName').val() == "") {
@@ -176,6 +197,7 @@
                         , samplenumber: $("#txtPostSample").H2GValue()
                         , reportdate: formatDate(H2G.today(), "dd/MM/yyyy") //$("#txtReportDate").H2GValue()
                         , status: ""
+                        , receipthospitalid: $("#data").H2GAttr("receiptHospitalID")
                         , p: $("#tbPostQueue").attr("currentPage") || 1
                         , so: $("#tbPostQueue").attr("sortOrder") || "queue_number"
                         , sd: $("#tbPostQueue").attr("sortDirection") || "desc"
@@ -234,7 +256,24 @@
                 });    //End ajax
             }
         }
-
+        function enterDatePickerSearch(dateControl, action, doFunction) {
+            var doFun = doFunction || donorSearch;
+            var pattern = 'dd/MM/yyyy';
+            if ($(dateControl).H2GValue() != '') {
+                $(dateControl).H2GValue($(dateControl).H2GValue().replace(/\W+/g, ''));
+                $(dateControl).next().remove();
+                if (isDate($(dateControl).H2GValue(), pattern.replace(/\W+/g, ''))) {
+                    var isValue = new Date(getDateFromFormat($(dateControl).H2GValue(), pattern.replace(/\W+/g, '')));
+                    $(dateControl).H2GValue(formatDate(isValue, pattern))
+                    if (action == "enter") {
+                        doFun(true);
+                    }
+                } else {
+                    notiWarning("วันที่ไม่ถูกต้อง กรุณาตรวจสอบ");
+                    $(dateControl).focus();
+                }
+            } else { doFun(true); }
+        }
     </script>
     <style>
         #searchTab .border-box {
@@ -243,6 +282,22 @@
     </style>
 </asp:Content>
 <asp:Content ID="ctDonorSearch" ContentPlaceHolderID="cphMaster" runat="server">
+    <div id="divReceiptHospital" class="row" style="display:none; margin-top: 5px;">
+        <div class="col-md-6">
+            <div class="text-center border-box" style="background-color:#E5F5D7;">
+                <button style="border: 0; background-color: transparent;">
+                    <i class="icon-refresh" style="vertical-align: middle; font-size: 25px; color: #E77024;">
+                        <span style="font-family: THSarabunNew; font-size: 20px; color: #595959; vertical-align: text-bottom; font-weight: bold;">เปลี่ยนโรงพยาบาล</span>
+                    </i>
+                </button>
+            </div>
+        </div>
+        <div class="col-md-30">
+            <div class=" text-center border-box" style="background-color:#E5E0EC;">
+                <span id="spReceiptHospital" style="font-weight: bold;">โรงพยาบาลเชียงรายประชานุเคราะห์ รายการที่ 0/0</span>
+            </div>
+        </div>
+    </div>
     <div class="claret-page-header row">
         <div class="col-md-36" style="font-size:larger; font-weight:bold;">
             <span>ค้นหารายชื่อผู้บริจาค</span>
@@ -381,13 +436,6 @@
                                         <tr>
                                             <td align="right" colspan="7">
                                                 <div class="page">
-                                                    <%--<span style="vertical-align:text-top;">หน้าที่</span>
-                                                    <a><span class="glyphicon glyphicon-fast-backward"></span></a>
-                                                    <a><span class="glyphicon glyphicon-backward"></span></a>
-                                                    <input type="text" value="1" style="width: 20px; height: 20px; text-align: center;" />
-                                                    <span class="total-page" style="vertical-align:text-top;">/20</span>
-                                                    <a><span class="glyphicon glyphicon-forward"></span></a>
-                                                    <a><span class="glyphicon glyphicon-fast-forward"></span></a>--%>
                                                 </div>
                                             </td>
                                         </tr>

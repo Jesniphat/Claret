@@ -63,8 +63,6 @@ function saveDonorInfo() {
             AssociationID: $("#ddlAssociation").H2GValue(),
             DonateNumberExt: $("#spRegisNumber").H2GAttr("donateNumberExt"),
             VisitNumber: $("#spRegisNumber").H2GAttr("visitNumber"),
-
-
         };
         var DonorVisit = {
             ID: $("#spRegisNumber").H2GAttr("visitID"),
@@ -80,39 +78,16 @@ function saveDonorInfo() {
             VisitNumber: $("#spRegisNumber").H2GAttr("visitNumber"),
             Status: $("#spStatus").H2GValue(),
             VisitDate: $("#spVisitInfo").H2GAttr("visitDate"),
-            //RefuseDefferalID: '',
-            //Comment: '',
-            //SanpleNumber: '',
-            //Weight: '',
-            //PressureMax: '',
-            //PressureMin: '',
-            //HB: '',
-            //PLT: '',
-            //HBTest: '',
-            //HeartLung: '',
-            //HospitalID: '',
-            //DepartmentID: '',
-            //ExtSampleNumber: '',
-            //ExtComment: '',
-            //Volume: '',
-            //VolumeActual: '',
-            //DonationTime: '',
-            //Duration: '',
-            //CollectionDate: '',
-            //CollectionStaff: '',
-            //RefuseReasonID1: '',
-            //RefuseReasonID2: '',
-            //RefuseReasonID3: '',
-            //PurgeDate: '',
-            //PurgeStaff: '',
         };
-        var DonorComment = {
-            ID: '',
-            DornerID: '',
-            StartDate: '',
-            EndDate: '',
-            Description: '',
+        var DonorHospital = {
+            ID: "",
+            ReceiptHospitalID: "",
+            VisitDate: $("#spVisitInfo").H2GAttr("visitDate"),
         };
+        if ($("#data").H2GAttr("receiptHospitalID")) {
+            DonorHospital.ID = $("#spRegisNumber").H2GAttr("visitID");
+            DonorHospital.ReceiptHospitalID = $("#data").H2GAttr("receiptHospitalID");
+        }
         var DonorExtCard = [];
         var create = 0;
         $('#divCardNumber .row').each(function (i, e) {
@@ -151,7 +126,16 @@ function saveDonorInfo() {
 
         $.ajax({
             url: '../../ajaxAction/donorAction.aspx',
-            data: H2G.ajaxData({ action: 'savedonor', md: JSON.stringify(MasterDonor), dv: JSON.stringify(DonorVisit), dec: JSON.stringify(DonorExtCard), dc: JSON.stringify(DonorComment), dr: JSON.stringify(DonorRecord) }).config,
+            data: H2G.ajaxData({
+                action: 'savedonor',
+                md: JSON.stringify(MasterDonor),
+                dv: JSON.stringify(DonorVisit),
+                dec: JSON.stringify(DonorExtCard),
+                dc: JSON.stringify(DonorComment),
+                dr: JSON.stringify(DonorRecord),
+                dh: JSON.stringify(DonorHospital),
+                receipthospitalid: $("#data").H2GAttr("receiptHospitalID"),
+            }).config,
             type: "POST",
             dataType: "json",
             error: function (xhr, s, err) {
@@ -190,7 +174,7 @@ function validation() {
         notiWarning("กรุณากรอกข้อมูลบัตรผู้บริจาคอย่างน้อย 1 ใบ");
         return false;
     } else if ($('#ddlTitleName').H2GValue() == "") {
-        $("#ddlTitleName").focus();
+        $("#ddlTitleName").closest("div").focus();
         notiWarning("กรุณาเลือกคำนำหน้าชื่อผู้บริจาค");
         return false;
     } else if ($('#txtDonorName').H2GValue() == "") {
@@ -214,11 +198,11 @@ function validation() {
         notiWarning("กรุณากรอกวันเกิดผู้บริจาค");
         return false;
     } else if ($('#ddlOccupation').H2GValue() == "") {
-        $("#ddlOccupation").focus();
+        $("#ddlOccupation").closest("div").focus();
         notiWarning("กรุณาเลือกอาชีพผู้บริจาค");
         return false;
     } else if ($('#ddlNationality').H2GValue() == "") {
-        $("#ddlNationality").focus();
+        $("#ddlNationality").closest("div").focus();
         notiWarning("กรุณาเลือกสัญชาติผู้บริจาค");
         return false;
     } else if ($('#txtAddress').H2GValue() == "") {
@@ -257,7 +241,12 @@ function validation() {
 function showDonorData() {
     $.ajax({
         url: '../../ajaxAction/donorAction.aspx',
-        data: H2G.ajaxData({ action: 'selectregister', id: $("#data").H2GAttr("donorID"), visit_id: $("#spRegisNumber").H2GAttr("visitID") }).config,
+        data: H2G.ajaxData({
+            action: 'selectregister',
+            id: $("#data").H2GAttr("donorID"),
+            visit_id: $("#spRegisNumber").H2GAttr("visitID"), 
+            donationhospitalid: $("#data").H2GAttr("receiptHospitalID") ? $("#spRegisNumber").H2GAttr("visitID") : "",
+        }).config,
         type: "POST",
         dataType: "json",
         error: function (xhr, s, err) {
@@ -440,6 +429,9 @@ function setHistoricalFileDatas() {
         data: H2G.ajaxData({ action: 'historicalFileData', donn_numero: $("#spRegisNumber").H2GValue() }).config,
         type: "POST",
         dataType: "json",
+        beforeSend: function () {
+            $('body').block();
+        },
         error: function (xhr, s, err) {
             console.log(s, err);
         },
@@ -463,65 +455,99 @@ function setHistoricalFileDatas() {
                     $('#historicalFileTable > tbody').append(rows);
                 }
             }
+            $('body').unblock();
         }
     });
 }
+
+
 function setImmunohaemtologyFile() {
-    console.log("setImmunohaemtologyFile");
-    $.ajax({
-        url: '../../ajaxAction/donorAction.aspx',
-        data: H2G.ajaxData({ action: 'immunohaemtologyDataSet1', donn_numero: $("#spRegisNumber").H2GValue() }).config,
-        type: "POST",
-        dataType: "json",
-        error: function (xhr, s, err) {
-            console.log(s, err);
-        },
-        success: function (data) {
-            data.getItems = jQuery.parseJSON(data.getItems);
-            // console.log("Respondata exams = ", data.getItems);
-            if (!data.onError) {
-                var data = data.getItems;
-                if (data.length > 0) {
-                    for (var i = 0; i < data.length; i++) {
-                        data[i].Rsx_Lib = data[i].Rsx_Lib.replace(" ", "_");
-                        data[i].Rsx_Cd = data[i].Rsx_Cd.substring(0, 2);
+    function getSet1() {
+        //console.log("do set1");
+        var deferred = $.Deferred();
 
-                        $("#" + data[i].Rsx_Lib + "_" + data[i].Rsx_Cd).val(data[i].Dex_Res);
+        $('#blockImmunohaemtologyFile').block();
+
+        $.ajax({
+            url: '../../ajaxAction/donorAction.aspx',
+            data: H2G.ajaxData({ action: 'immunohaemtologyDataSet1', donn_numero: $("#spRegisNumber").H2GValue() }).config,
+            type: "POST",
+            dataType: "json",
+            error: function (xhr, s, err) {
+                console.log(s, err);
+                deferred.reject("Can't grt set 1");
+            },
+            success: function (data) {
+                data.getItems = jQuery.parseJSON(data.getItems);
+                //console.log("Respondata exams = ", data.getItems);
+                if (!data.onError) {
+                    var data = data.getItems;
+                    if (data.length > 0) {
+                        for (var i = 0; i < data.length; i++) {
+                            data[i].Rsx_Lib = data[i].Rsx_Lib.replace(" ", "_");
+                            data[i].Rsx_Cd = data[i].Rsx_Cd.substring(0, 2);
+
+                            $("#" + data[i].Rsx_Lib + "_" + data[i].Rsx_Cd).val(data[i].Dex_Res);
+                        }
                     }
-                }
-                // console.log(data);
-            }
-        }
-    });
-
-
-    $.ajax({
-        url: '../../ajaxAction/donorAction.aspx',
-        data: H2G.ajaxData({ action: 'immunohaemtologyDataSet2', donn_numero: $("#spRegisNumber").H2GValue() }).config,
-        type: "POST",
-        dataType: "json",
-        error: function (xhr, s, err) {
-            console.log(s, err);
-        },
-        success: function (data) {
-            data.getItems = jQuery.parseJSON(data.getItems);
-            // console.log("Respondata exams = ", data.getItems);
-            if (!data.onError) {
-                var dataz = data.getItems;
-                if (dataz.length > 0) {
-                    for (var i = 0; i < dataz.length; i++) {
-                        dataz[i].Rsx_Lib = dataz[i].Rsx_Lib.replace(" ", "_");
-
-                        $("#" + dataz[i].Rsx_Lib + "_NO").val(dataz[i].Rsx_Type);
-                        $("#" + dataz[i].Rsx_Lib + "_RESULT").val(dataz[i].Result_Decode);
-                    }
+                    deferred.resolve("Ok");
+                } else {
+                    console.log("Error = ", data.exMessage);
+                    deferred.reject("Can't grt set 1");
                 }
             }
-        }
+        });
+        return deferred.promise();
+    }
+    
+    
+    function getSet2() {
+        //console.log("do set2");
+        var deferred = $.Deferred();
+        $.ajax({
+            url: '../../ajaxAction/donorAction.aspx',
+            data: H2G.ajaxData({ action: 'immunohaemtologyDataSet2', donn_numero: $("#spRegisNumber").H2GValue() }).config,
+            type: "POST",
+            dataType: "json",
+            error: function (xhr, s, err) {
+                console.log(s, err);
+                $('#blockImmunohaemtologyFile').unblock();
+                deferred.reject("Can't grt set 2");
+            },
+            success: function (data) {
+                data.getItems = jQuery.parseJSON(data.getItems);
+                // console.log("Respondata exams = ", data.getItems);
+                if (!data.onError) {
+                    var dataz = data.getItems;
+                    if (dataz.length > 0) {
+                        for (var i = 0; i < dataz.length; i++) {
+                            dataz[i].Rsx_Lib = dataz[i].Rsx_Lib.replace(" ", "_");
+
+                            $("#" + dataz[i].Rsx_Lib + "_NO").val(dataz[i].Rsx_Type);
+                            $("#" + dataz[i].Rsx_Lib + "_RESULT").val(dataz[i].Result_Decode);
+                        }
+                        deferred.resolve("Ok");
+                    } else {
+                        console.log("Error = ", data.exMessage);
+                        deferred.reject("Can't grt set 2");
+                    }
+                }
+                $('#blockImmunohaemtologyFile').unblock();
+            }
+        });
+        return deferred.promise();
+    }
+
+    getSet1()
+    .done(getSet2)
+    .fail(function (err) {
+        console.log(err);
     });
+
 }
+
+
 function setExamsDatas() {
-    console.log("setExamsDatas");
     $("tr").remove(".exams-tab-table-row");
     var datas = [];
 
@@ -530,6 +556,9 @@ function setExamsDatas() {
         data: H2G.ajaxData({ action: 'examsData', donn_numero: $("#spRegisNumber").H2GValue() }).config,
         type: "POST",
         dataType: "json",
+        beforeSend: function () {
+            $('body').block();
+        },
         error: function (xhr, s, err) {
             console.log(s, err);
         },
@@ -556,10 +585,11 @@ function setExamsDatas() {
                 }
                 $("#exams-tab-table").tablesorter({ dateFormat: "uk" });
             }
+            $('body').unblock();
         }
     });
 }
-function enterDatePicker(dateControl, action) {
+function enterDatePickerDonateRecord(dateControl, action) {
     var pattern = 'dd/MM/yyyy';
     if ($(dateControl).H2GValue() != '') {
         $(dateControl).H2GValue($(dateControl).H2GValue().replace(/\W+/g, ''));
@@ -576,5 +606,60 @@ function enterDatePicker(dateControl, action) {
         }
     } else {
         $(dateControl).H2GAttr('donatedatetext', '');
+    }
+}
+function showVisitHistory() {
+    var dataView = $("#tbVisitHistory > tbody");
+    $(dataView).H2GValue($("#tbVisitHistory > thead > tr.more-loading").clone().show());
+    if ($(dataView).closest("table").H2GAttr("wStatus") != "working") {
+        $(dataView).closest("table").H2GAttr("wStatus", "working");
+        $.ajax({
+            url: '../../ajaxAction/donorAction.aspx',
+            data: H2G.ajaxData({
+                action: 'visithistory'
+                , id: $("#data").H2GAttr("donorID")
+                , so: $("#tbVisitHistory").attr("sortOrder") || "visit_date"
+                , sd: $("#tbVisitHistory").attr("sortDirection") || "desc"
+            }).config,
+            type: "POST",
+            dataType: "json",
+            error: function (xhr, s, err) {
+                console.log(s, err);
+                $(dataView).H2GValue($("#tbVisitHistory > thead > tr.no-transaction").clone().show());
+                $(dataView).closest("table").H2GAttr("wStatus", "error");
+            },
+            success: function (data) {
+                $(dataView).H2GValue('');
+                if (!data.onError) {
+                    data.getItems = jQuery.parseJSON(data.getItems);
+                    //### Visit History
+                    if (data.getItems.length > 0) {
+                        $.each((data.getItems), function (index, e) {
+                            var dataRow = $("#tbVisitHistory > thead > tr.template-data").clone().show();
+                            $(dataRow).H2GFill({ refID: e.VisitID });
+                            $(dataRow).find('.txt-donate-number').H2GValue(e.DonationNumber).H2GAttr("title", e.DonationNumber);
+                            $(dataRow).find('.txt-visit-date').H2GValue(e.VisitDate).H2GAttr("title", e.VisitDate);
+                            $(dataRow).find('.txt-donate-type').H2GValue(e.DonationType).H2GAttr("title", e.DonationType);
+                            $(dataRow).find('.txt-bag-type').H2GValue(e.Bag).H2GAttr("title", e.Bag);
+                            $(dataRow).find('.txt-site').H2GValue(e.Site).H2GAttr("title", e.Site);
+                            $(dataRow).find('.txt-collection-point').H2GValue(e.CollectionPoint).H2GAttr("title", e.CollectionPoint);
+                            $(dataRow).find('.txt-regis-by').H2GValue(e.CreateStaff).H2GAttr("title", e.CreateStaff);
+                            $(dataRow).find('.txt-collection-by').H2GValue(e.InterviewStaff).H2GAttr("title", e.InterviewStaff);
+                            $(dataRow).find('.txt-collection-result').H2GValue(e.InterviewStatus).H2GAttr("title", e.InterviewStatus);
+                            $(dataRow).find('.txt-lab-date').H2GValue(e.LabDate).H2GAttr("title", e.LabDate);
+                            $(dataRow).find('.txt-sample-number').H2GValue(e.SampleNumber).H2GAttr("title", e.SampleNumber);
+
+                            $(dataView).append(dataRow);
+                        });
+                    } else {
+                        $(dataView).H2GValue($("#tbVisitHistory > thead > tr.no-transaction").clone().show());
+                    }
+                } else {
+                    $(dataView).H2GValue($("#tbVisitHistory > thead > tr.no-transaction").clone().show());
+                }
+                $("#tbVisitHistory thead button").click(function () { sortButton($(this), showVisitHistory); return false; });
+                $(dataView).closest("table").H2GAttr("wStatus", "done");
+            }
+        });    //End ajax
     }
 }

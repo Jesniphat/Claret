@@ -89,7 +89,7 @@ var H2G = {
 }
 
 $.extend($.fn, {
-    setDropdowList: function () {
+    setDropdownList: function () {
         var dclass = "";
         if ($(this).attr("class") != undefined) {
             dclass = $(this).attr("class");
@@ -98,18 +98,20 @@ $.extend($.fn, {
         $(this).selecter();
         return this;
     },
-    setDropdowListValue: function (setting, defaultSelect) {
+    setDropdownListValue: function (setting, defaultSelect) {
         var self = this;
         var config = {
             url: '',
             data: {},
             type: "POST",
             dataType: "json",
+            enable: true,
+            defaultSelect: "",
         };
         $.extend(config, setting);
 
         $.ajax({
-            url: config.url,//'../../ajaxAction/donorAction.aspx',
+            url: config.url,
             data: config.data,
             type: config.type,
             dataType: config.dataType,
@@ -117,16 +119,21 @@ $.extend($.fn, {
                 console.log(s, err);
             },
             success: function (data) {
-                $(self).html('');//.selecter('destroy').setDropdowList();
+                $(self).html('');
                 $("<option>", { value: "" }).html("กรุณาเลือก").appendTo(self);
                 if (!data.onError) {
                     data.getItems = jQuery.parseJSON(data.getItems);
                     $.each((data.getItems), function (index, e) {
                         $("<option>", { value: e.code, valueID: e.id }).html(e.name).appendTo(self);
                     });
-                    $(self).setDropdowList().selecter("update");
-                    if (defaultSelect != undefined) { $(self).val(defaultSelect).change(); }
-                } else { $(self).setDropdowList().selecter("update"); }
+                    $(self).setDropdownList().selecter("update");
+
+                    config.defaultSelect = config.defaultSelect || defaultSelect || "";
+                    //$(self).val(config.defaultSelect).change();
+                    if (config.defaultSelect != "") { $(self).val(defaultSelect).change(); }
+                    
+                } else { $(self).setDropdownList().selecter("update"); }
+                if (config.enable) { $(self).H2GEnable(); } else { $(self).H2GDisable();}
             }
         });    //End ajax
         return this;
@@ -140,6 +147,8 @@ $.extend($.fn, {
             dataType: "json",
             selectItem: function () { },
             closeItem: function () { },
+            enable: true,
+            defaultSelect: "",
         };
         $.extend(config, setting);
 
@@ -152,20 +161,24 @@ $.extend($.fn, {
                 console.log(s, err);
             },
             success: function (data) {
-                $(self).html('');//.selecter('destroy').setDropdowList();
+                $(self).html('');//.selecter('destroy').setDropdownList();
                 //$("<option>", { value: "" }).html("กรุณาเลือก").appendTo(self);
                 if (!data.onError) {
                     data.getItems = jQuery.parseJSON(data.getItems);
                     $.each((data.getItems), function (index, e) {
                         $("<option>", { value: e.code }).html(e.name).appendTo(self);
                     });
-                    $(self).H2GValue(defaultSelect || "").combobox({ select: config.selectItem, close: function() { console.log("closeItem"); } });
+                    $(self).H2GValue(config.defaultSelect || defaultSelect || "").combobox({
+                        select: config.selectItem,
+                    });
                     $(self).parent().find("span").find("input").val($(self).find(":selected").text());
                 } else {
                     $(self).combobox({
-                        select: config.selectItem
+                        select: config.selectItem,
+                        placeholder: config.placeholder,
                     });
                 }
+                if (config.enable) { $(self).H2GEnable(); } else { $(self).H2GDisable(); }
             }
         });    //End ajax
         return this;
@@ -327,7 +340,6 @@ $.extend($.fn, {
     H2GThaibox: function (optionKey) {
         $(this).keypress(function (e) {
             var keyCode = e.keyCode || e.which;
-            console.log(keyCode);
             var ValueNullKey = ($.trim($(this).val()) === $(this).attr('pretext')) || ($.trim($(this).val()) === "");
             var OtherKey = ((e.ctrlKey && keyCode != 86) || e.ctrlKey || e.altKey || keyCode == 8 || keyCode == 45 || keyCode == 13);
             OtherKey = (OtherKey || keyCode == optionKey)
@@ -340,7 +352,6 @@ $.extend($.fn, {
     H2GEnglishbox: function (optionKey) {
         $(this).keypress(function (e) {
             var keyCode = e.keyCode || e.which;
-            console.log(keyCode);
             var ValueNullKey = ($.trim($(this).val()) === $(this).attr('pretext')) || ($.trim($(this).val()) === "");
             var OtherKey = ((e.ctrlKey && keyCode != 86) || e.ctrlKey || e.altKey || keyCode == 8 || keyCode == 45 || keyCode == 13);
             OtherKey = (OtherKey || keyCode == optionKey)
@@ -352,7 +363,6 @@ $.extend($.fn, {
     H2GNamebox: function (optionKey) {
         $(this).keypress(function (e) {
             var keyCode = e.keyCode || e.which;
-            console.log(keyCode);
             var ValueNullKey = ($.trim($(this).val()) === $(this).attr('pretext')) || ($.trim($(this).val()) === "");
             var OtherKey = ((e.ctrlKey && keyCode != 86) || e.ctrlKey || e.altKey || keyCode == 8 || keyCode == 45 || keyCode == 13);
             OtherKey = (OtherKey || keyCode == optionKey)
@@ -406,6 +416,45 @@ $.extend($.fn, {
             })
         })
     },
+    hasScrollBar: function() {
+        return this.get(0).scrollHeight > this.height();
+    },
+    H2GDisable: function () {
+        switch ($(this).prop('tagName')) {
+            case 'INPUT':
+                $(this).prop('disabled', true);
+                break;
+            case 'SELECT':
+                if ($(this).H2GAttr("combobox") == undefined) {
+                    $(this).selecter("disable");
+                } else {
+                    $(this).combobox("disable");
+                }
+                break;
+            default:
+                $(this).prop('disabled', true);
+                break;
+        }
+        return this;
+    },
+    H2GEnable: function () {
+        switch ($(this).prop('tagName')) {
+            case 'INPUT':
+                $(this).prop('disabled', false);
+                break;
+            case 'SELECT':
+                if ($(this).H2GAttr("combobox") == undefined) {
+                    $(this).selecter("enable");
+                } else {
+                    $(this).combobox("enable");
+                }
+                break;
+            default:
+                $(this).prop('disabled', false);
+                break;
+        }
+        return this;
+    },
 });
 
 $.extend(Number.prototype, {
@@ -435,7 +484,8 @@ function showNoti(value, type) {
     var windowWidth = parseInt($(window).width());
     $("#divNoti").find(".noti-message").html(value);
     $("#divNoti").find(".sign").addClass("glyphicon-" + type + "-sign");
-    $("#divNoti").addClass("noti-" + type).css({ left: parseInt(windowWidth) - ($("#divNoti").outerWidth() + 20) });
+    //$("#divNoti").addClass("noti-" + type).css({ left: parseInt(windowWidth) - ($("#divNoti").outerWidth() + 20) });
+    $("#divNoti").addClass("noti-" + type).css({ right: 20 });
     if ($("#divNoti").css('display') == 'none') {
         $("#divNoti").slideDown(function () {
             setTimeout(function () {
@@ -479,25 +529,6 @@ function genGridPage(tbData, doFunction) {
             $(divpage).find(".glyphicon-forward").closest("button").prop('disabled', true);
         }
     }
-}
-function enterDatePicker(dateControl, action, doFunction) {
-    var doFun = doFunction || donorSearch;
-
-    var pattern = 'dd/MM/yyyy';
-    if ($(dateControl).H2GValue() != '') {
-        $(dateControl).H2GValue($(dateControl).H2GValue().replace(/\W+/g, ''));
-        $(dateControl).next().remove();
-        if (isDate($(dateControl).H2GValue(), pattern.replace(/\W+/g, ''))) {
-            var isValue = new Date(getDateFromFormat($(dateControl).H2GValue(), pattern.replace(/\W+/g, '')));
-            $(dateControl).H2GValue(formatDate(isValue, pattern))
-            if (action == "enter") {
-                doFun(true);
-            }
-        } else {
-            notiWarning("วันที่ไม่ถูกต้อง กรุณาตรวจสอบ");
-            $(dateControl).focus();
-        }
-    } else { doFun(true); }
 }
 function changePage(xobj, doFunction) {
     if ($(xobj).closest("table").H2GAttr("wStatus") != "working") {

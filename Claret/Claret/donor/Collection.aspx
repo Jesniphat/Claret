@@ -1,7 +1,7 @@
 ﻿<%@ Page Title="" Language="vb" AutoEventWireup="false" MasterPageFile="~/MasterPage.Master" CodeBehind="Collection.aspx.vb" Inherits="Claret.Collection" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <link href="../resources/css/donateStyle.css" rel="stylesheet" />
-    <script src="../resources/javascript/donateScriptEdit.js" type="text/javascript"></script>
+    <script src="../resources/javascript/page/donateScriptEdit.js" type="text/javascript"></script>
     <script>
         $(function () {
             checkParam()
@@ -18,8 +18,10 @@
             //randerAddLabExamination();
 
             //$("#collectedProblem").selecter();
-            //$("#collectedProblemReason1").setDropdowList();
-            //$("#collectedProblemReason2").setDropdowList();
+            //$("#collectedProblemReason1").setDropdownList();
+            //$("#collectedProblemReason2").setDropdownList();
+
+            $("#donateDate").text($("#data").attr("donatedate"));
 
             $("#addLabExamination").click(addLabExamination);
             

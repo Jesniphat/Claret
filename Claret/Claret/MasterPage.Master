@@ -7,6 +7,7 @@
     <title>Claret System : ระบบบริจาคโลหิต</title>
     <link href="/resources/css/bootstrap.css?ver=20160119" rel="stylesheet" />
     <link href="/resources/css/bootflat.css?ver=20160119" rel="stylesheet" />
+    <link href="/resources/css/claret-font-icon.css?ver=20160119" rel="stylesheet" />
     <link href="/resources/css/jquery.fs.selecter.css?ver=20160119" rel="stylesheet" />
     <link href="/resources/jquery-ui/jquery-ui.css?ver=20160119" rel="stylesheet" />
     <link href="/resources/css/custom.css?ver=20160119" rel="stylesheet" />
@@ -82,6 +83,7 @@
         }
     </style>
     <script>
+        var hasScroll=false;
         $(function () {
             $(document).click(function () {
                 if ($("#subTopMenu").css('display') != "none" && $("#subTopMenu").H2GAttr('clickselector') == "N") {
@@ -90,12 +92,12 @@
                     $('#subTopMenu').H2GAttr('ClickSelector', 'N');
                 }
             });
-
             $(window).resize(function () { setWorkDesk(); });
             $("#topMenu").click(function () { toggleTopMenu(); });
             $("#subTopMenu div.col-md-36").click(function () { topMenuSelected(this, true); });
             $("#leftMenu .row div").click(function () { leftMenuSelected(this, true); });
             $("input[type=text]").H2GAttr("autocomplete", "off");
+            hasScroll = $("#mstContent").hasScrollBar();
             setWorkDesk();
             defaultMenu();
 
@@ -108,6 +110,22 @@
             var leftMenuHeight = windowHeight - topBarHeight;
             $("#leftMenu").css({ height: parseInt(leftMenuHeight) });
             $("#mstContent").css({ height: parseInt(leftMenuHeight) });
+
+            if ($("#mstContent").hasScrollBar()) {
+                if (!hasScroll) {
+                    $.each($(".custom-combobox-input.ui-widget"), function (index, e) {
+                        $(e).css({ width: parseInt($(e).outerWidth()) - 5 });
+                    });
+                    hasScroll = true;
+                }
+            } else {
+                if (hasScroll) {
+                    $.each($(".custom-combobox-input.ui-widget"), function (index, e) {
+                        $(e).css({ width: parseInt($(e).outerWidth()) + 5 });
+                    });
+                    hasScroll = false;
+                }
+            }
         }
         function toggleTopMenu() {
             if ($("#subTopMenu").css('display') == "none") {
@@ -123,9 +141,7 @@
             $(xobj).addClass("selected");
             if (postAction) {
                 $("#data").H2GAttr("lmenu", $(xobj).H2GAttr("id"));
-                 //console.log($('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: $(xobj).H2GAttr("targetUrl"), method: "post" }).html());
                 $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: $(xobj).H2GAttr("targetUrl"), method: "post" }).submit();
-                //}
             }
         }
         function topMenuSelected(xobj, postAction) {
@@ -133,13 +149,9 @@
             $("#leftMenu>div").hide();
 
             if (postAction) {
-                console.log(xobj);
-                console.log($(xobj).H2GAttr("id"));
 
                 $("#data").H2GFill({ tmenu: $(xobj).H2GAttr("id"), lmenu: $(xobj).H2GAttr("lmenu") });
                 $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: $(xobj).H2GAttr("targetUrl"), method: "post" }).submit();
-                //if ($("#data").attr("tmenu") != $(xobj).attr("id")) {
-                //}
             } else {
                 $("#" + $(xobj).H2GAttr("lmenu")).closest(".sub-left-menu").show();
             }
@@ -250,7 +262,7 @@
                 </div>
                 <div id="lmenuQuality" class="sub-left-menu row" style="display: none;">
                     <div id="lmenulabRegis" targeturl="../quality/labRegister.aspx" class="col-md-36">
-                        <span>ลงทะเบียนผู้บริจาค</span>
+                        <span>ลงทะเบียนขอตรวจ LAB</span>
                     </div>
                 </div>
             </div>

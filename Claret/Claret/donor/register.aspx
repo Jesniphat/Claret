@@ -14,10 +14,10 @@
                 $("#txtDonorSurName").H2GNamebox();
                 $("#txtDonorNameEng").H2GNamebox();
                 $("#txtDonorSurNameEng").H2GNamebox();
-                $("#ddlDefferal").setDropdowList().on('change', function () {
+                $("#ddlDefferal").setDropdownList().on('change', function () {
                     if ($(this).H2GValue() == 'ACTIVE') { $("#tbDefferal > thead > tr[status=INACTIVE]").hide(); } else { $("#tbDefferal > thead > tr[status=INACTIVE]").show(); }
                 });
-                $("#ddlVisit").setDropdowList();
+                $("#ddlVisit").setDropdownList();
                 $("#infoTab").tabs({
                     active: 1,
                     activate: function (event, ui) {
@@ -79,10 +79,10 @@
                         $("#spAddDonateRecord").focus();
                     },
                     onClose: function () {
-                        enterDatePicker($("#txtLastDonateDate"), "close");
+                        enterDatePickerDonateRecord($("#txtLastDonateDate"), "close");
                     },
                     onEnterKey: function () {
-                        enterDatePicker($("#txtLastDonateDate"), "enter");
+                        enterDatePickerDonateRecord($("#txtLastDonateDate"), "enter");
                     },
                 });
                 $("#txtCommentDateForm").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy"));
@@ -108,14 +108,11 @@
                     url: '../../ajaxAction/masterAction.aspx',
                     data: { action: 'externalcard' },
                     selectItem: function () {
-                        console.log("selectItem");
                         var cardNumber = $('#divCardNumber div[extID="' + $("#ddlExtCard").H2GValue() + '"]').H2GAttr('cardNumber');
                         $("#txtCardNumber").H2GValue(cardNumber || '');
                     },
                 }, "3");
                 $("#ddlExtCard").on('autocompleteselect', function () {
-                    console.log($(this).H2GValue());
-                    console.log($('#divCardNumber div[extID="' + $(this).H2GValue() + '"]').H2GAttr('cardNumber'));
                     var cardNumber = $('#divCardNumber div[extID="' + $(this).H2GValue() + '"]').H2GAttr('cardNumber');
                     $("#txtCardNumber").H2GValue(cardNumber || '').focus();
                 });
@@ -140,6 +137,28 @@
                 })
 
                 //#### Default donor info from id
+                if ($("#data").H2GAttr("receiptHospitalID")) {
+                    $.ajax({
+                        url: '../../ajaxAction/qualityAction.aspx',
+                        data: {
+                            action: 'getreceipthospital',
+                            receipthospitalid: $("#data").H2GAttr("receiptHospitalID"),
+                        },
+                        type: "POST",
+                        dataType: "json",
+                        error: function (xhr, s, err) {
+                            console.log(s, err);
+                        },
+                        success: function (data) {
+                            if (!data.onError) {
+                                data.getItems = jQuery.parseJSON(data.getItems);
+                                console.log(data.getItems);
+                                $("#divReceiptHospital").show();
+                                $("#spReceiptHospital").H2GValue(data.getItems.HospitalName + " รายการที่ " + data.getItems.QueueCount + "/" + data.getItems.QueueCount);
+                            }
+                        }
+                    });    //End ajax
+                }
                 if ($("#data").H2GAttr("donorID") != undefined) {
                     if ($("#data").H2GAttr("visitID") != undefined) { $("#spRegisNumber").H2GAttr("visitID", $("#data").H2GAttr("visitID")); }
                     showDonorData();
@@ -309,65 +328,16 @@
                 showVisitHistory();
                 //### extend
             });
-
-            function showVisitHistory() {
-                var dataView = $("#tbVisitHistory > tbody");
-                $(dataView).H2GValue($("#tbVisitHistory > thead > tr.more-loading").clone().show());
-                if ($(dataView).closest("table").H2GAttr("wStatus") != "working") {
-                    $(dataView).closest("table").H2GAttr("wStatus", "working");
-                    $.ajax({
-                        url: '../../ajaxAction/donorAction.aspx',
-                        data: H2G.ajaxData({
-                            action: 'visithistory'
-                            , id: $("#data").H2GAttr("donorID")
-                            , so: $("#tbVisitHistory").attr("sortOrder") || "visit_date"
-                            , sd: $("#tbVisitHistory").attr("sortDirection") || "desc"
-                        }).config,
-                        type: "POST",
-                        dataType: "json",
-                        error: function (xhr, s, err) {
-                            console.log(s, err);
-                            $(dataView).H2GValue($("#tbVisitHistory > thead > tr.no-transaction").clone().show());
-                            $(dataView).closest("table").H2GAttr("wStatus", "error");
-                        },
-                        success: function (data) {
-                            $(dataView).H2GValue('');
-                            if (!data.onError) {
-                                data.getItems = jQuery.parseJSON(data.getItems);
-                                //### Visit History
-                                if (data.getItems.length > 0) {
-                                    $.each((data.getItems), function (index, e) {
-                                        var dataRow = $("#tbVisitHistory > thead > tr.template-data").clone().show();
-                                        $(dataRow).H2GFill({ refID: e.VisitID });
-                                        $(dataRow).find('.txt-donate-number').H2GValue(e.DonationNumber).H2GAttr("title", e.DonationNumber);
-                                        $(dataRow).find('.txt-visit-date').H2GValue(e.VisitDate).H2GAttr("title", e.VisitDate);
-                                        $(dataRow).find('.txt-donate-type').H2GValue(e.DonationType).H2GAttr("title", e.DonationType);
-                                        $(dataRow).find('.txt-bag-type').H2GValue(e.Bag).H2GAttr("title", e.Bag);
-                                        $(dataRow).find('.txt-site').H2GValue(e.Site).H2GAttr("title", e.Site);
-                                        $(dataRow).find('.txt-collection-point').H2GValue(e.CollectionPoint).H2GAttr("title", e.CollectionPoint);
-                                        $(dataRow).find('.txt-regis-by').H2GValue(e.CreateStaff).H2GAttr("title", e.CreateStaff);
-                                        $(dataRow).find('.txt-collection-by').H2GValue(e.InterviewStaff).H2GAttr("title", e.InterviewStaff);
-                                        $(dataRow).find('.txt-collection-result').H2GValue(e.InterviewStatus).H2GAttr("title", e.InterviewStatus);
-                                        $(dataRow).find('.txt-lab-date').H2GValue(e.LabDate).H2GAttr("title", e.LabDate);
-                                        $(dataRow).find('.txt-sample-number').H2GValue(e.SampleNumber).H2GAttr("title", e.SampleNumber);
-
-                                        $(dataView).append(dataRow);
-                                    });
-                                } else {
-                                    $(dataView).H2GValue($("#tbVisitHistory > thead > tr.no-transaction").clone().show());
-                                }
-                            } else {
-                                $(dataView).H2GValue($("#tbVisitHistory > thead > tr.no-transaction").clone().show());
-                            }
-                            $("#tbVisitHistory thead button").click(function () { sortButton($(this), showVisitHistory); return false; });
-                            $(dataView).closest("table").H2GAttr("wStatus", "done");
-                        }
-                    });    //End ajax
-                }
-            }
     </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="cphMaster" runat="server">
+    <div id="divReceiptHospital" class="row" style="display:none; margin-top: 5px;">
+        <div class="col-md-36">
+            <div class=" text-center border-box" style="background-color:#E5E0EC;">
+                <span id="spReceiptHospital" style="font-weight: bold;">โรงพยาบาลเชียงรายประชานุเคราะห์ รายการที่ 0/0</span>
+            </div>
+        </div>
+    </div>
     <div class="claret-page-header row">
         <div>
             <span>ค้นหารายชื่อผู้บริจาค > ลงทะเบียนผู้บริจาค</span>
@@ -388,7 +358,7 @@
     <div class="row">
         <div class="border-box">
             <div class="col-md-7">
-                <select id="ddlExtCard" style="width: 219px;" tabindex="1">
+                <select id="ddlExtCard" style="width: 100%;" placeholder="กรุณาเลือก" tabindex="1">
                     <option value="0">Loading...</option>
                 </select>
             </div>
@@ -436,7 +406,7 @@
                         <span>คำนำหน้า</span>
                     </div>
                     <div class="col-md-5">
-                        <select id="ddlTitleName" class="required" style="width: 142px;" tabindex="1">
+                        <select id="ddlTitleName" class="required" style="width: 100%;" placeholder="กรุณาเลือก" tabindex="1">
                             <option value="0">Loading...</option>
                         </select>
                     </div>
@@ -485,7 +455,7 @@
                         <span>อาชีพ</span>
                     </div>
                     <div class="col-md-7">
-                        <select id="ddlOccupation" class="required" style="width: 200px;" tabindex="1">
+                        <select id="ddlOccupation" class="required" style="width: 100%;" placeholder="กรุณาเลือก" tabindex="1">
                             <option value="0">Loading...</option>
                         </select>
                     </div>
@@ -493,7 +463,7 @@
                         <span>สัญชาติ</span>
                     </div>
                     <div class="col-md-6">
-                        <select id="ddlNationality" class="required" style="width: 171px;" tabindex="1">
+                        <select id="ddlNationality" class="required" style="width: 100%;" placeholder="กรุณาเลือก" tabindex="1">
                             <option value="0">Loading...</option>
                         </select>
                     </div>
@@ -501,7 +471,7 @@
                         <span>เชื้อชาติ</span>
                     </div>
                     <div class="col-md-5">
-                        <select id="ddlRace" style="width: 142px;" tabindex="1">
+                        <select id="ddlRace" style="width: 100%;" placeholder="กรุณาเลือก" tabindex="1">
                             <option value="0">Loading...</option>
                         </select>
                     </div>
@@ -513,7 +483,7 @@
         <div class="border-box">
             <div class="row">
                 <div class="col-md-5">
-                    <span>Defferal/Permanance</span>
+                    <span>Defferal/Permanence</span>
                 </div>
                 <div class="col-md-3">
                     <select id="ddlDefferal">
@@ -760,7 +730,7 @@
                                                         <div class="col-md-3"></div>
                                                         <div class="col-md-5"><span>ประเทศ</span></div>
                                                         <div class="col-md-12">
-                                                            <select id="ddlCountry" class="required" style="width: 181px;" tabindex="1">
+                                                            <select id="ddlCountry" class="required" style="width: 100%;" placeholder="กรุณาเลือก" tabindex="1">
                                                                 <option value="0">Loading...</option>
                                                             </select>
                                                         </div>
@@ -823,7 +793,7 @@
                                                         รหัสเชื่อมโยงโรงพยาบาลในเครือ
                                                     </div>
                                                     <div class="col-md-24">
-                                                        <select id="ddlAssociation" style="width: 363px;" tabindex="3">
+                                                        <select id="ddlAssociation" style="width: 100%;" placeholder="กรุณาเลือก" tabindex="3">
                                                             <option value="0">Loading...</option>
                                                         </select>
                                                     </div>
@@ -942,7 +912,7 @@
                             </div>
                         </div>
                         <div id="immunohaemtologyFile">
-                            <div class="border-box">
+                            <div class="border-box" id="blockImmunohaemtologyFile">
                                 <div class="col-md-36" style="border:1px solid black">
                                     <%--<p><label>&nbsp;&nbsp; Doner No.</label> <label id="doner-label-no">123456789</label> <label id="doner-label-name">test</label></p>--%>
                                     <table class="col-md-36" id="label-set-1">
