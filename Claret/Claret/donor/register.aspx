@@ -687,6 +687,7 @@
                         <div id="infoTabToday">
                             <ul>
                                 <li><a href="#subHistoryPane" style="">ข้อมูลทั่วไป</a></li>
+                                <li><a href="#synthesis">Synthesis</a></li>
                             </ul>
                             <div id="subHistoryPane">
                                 <div class="border-box">
@@ -872,6 +873,14 @@
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="#synthesis">
+                                <div class="border-box">
+                                    <div class="col-md-18">
+                                        <div class="col-md-6"><h5>Synthesis</h5></div>
+                                        <div class="col-md-12"><input type="text" value="" /></div>
                                     </div>
                                 </div>
                             </div>
