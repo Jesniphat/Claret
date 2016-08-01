@@ -19,7 +19,6 @@ Public Class Login
         'user.CollectionPointID = "1" 'dtStaff.Rows(0)("wholesale_id").ToString
         'user.SiteID = "1" 'strTemp
         'H2G.Login = user
-
     End Sub
 
 

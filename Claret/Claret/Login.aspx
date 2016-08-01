@@ -32,10 +32,10 @@
     </style>
     <script>
         $(function () {
-            $("#ddlRegion").setDropdownListValue({ url: 'ajaxAction/masterAction.aspx', data: { action: 'site' } }, "1000").on("change", function () {
+            $("#ddlRegion").setDropdownListValue({ url: 'ajaxAction/masterAction.aspx', data: { action: 'site' }, defaultSelect: "1000" }).on("change", function () {
                 $("#txtRegion").H2GValue($("#ddlRegion").H2GValue());
             });
-            $("#ddlDepartment").setDropdownListValue({ url: 'ajaxAction/masterAction.aspx', data: { action: 'collection' } }, "0A0000").on("change", function () {
+            $("#ddlDepartment").setDropdownListValue({ url: 'ajaxAction/masterAction.aspx', data: { action: 'collection' }, defaultSelect: "0A0000" }).on("change", function () {
                 $("#txtDepartment").H2GValue($("#ddlDepartment").H2GValue());
             });
             $("#txtRegion").blur(function () { $("#ddlRegion").val($("#txtRegion").val().toUpperCase()).change(); });

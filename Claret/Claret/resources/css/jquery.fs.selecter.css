@@ -17,7 +17,6 @@
 .selecter:focus {
   box-shadow: none;
   outline: none;
-
 }
 .selecter,
 .selecter * {

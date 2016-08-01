@@ -24,23 +24,21 @@
                 $("#txtHospital").H2GValue($("#ddlHospital").H2GValue());
 
                 if ($("#txtHospital").H2GValue() == "") {
-                    $("#ddlDepartment").setDropdownListValue({
-                        url: '../ajaxAction/masterAction.aspx',
-                        data: {
-                            action: 'department',
-                            hcode: $("#txtHospital").H2GValue(),
-                        },
-                        enable:false,
-                    });
+                    $("#ddlDepartment").val("").change().H2GDisable();
                     $("#txtDepartment").H2GDisable().H2GValue('').focus();
                 } else {
-                    $("#ddlDepartment").setDropdownListValue({
-                        url: '../ajaxAction/masterAction.aspx',
-                        data: {
-                            action: 'department',
-                            hcode: $("#txtHospital").H2GValue(),
-                        }
-                    });
+                    var dataObj = [];
+                    var dataAll = $("#ddlDepartment").data("data-ddl");
+                    var create = 0;
+                    if (dataAll != undefined) {
+                        $.each((dataAll), function (index, e) {
+                            if ($("#ddlHospital option:selected").H2GAttr("departmentID").indexOf("," + e.valueID + ",") > -1) {
+                                dataObj[create] = e;
+                                create++;
+                            }
+                        });
+                    }
+                    $("#ddlDepartment").setDropdownListValue({ dataObject: dataObj, enable: true });
                     $("#txtDepartment").H2GEnable().H2GValue('').focus();
                 }
             });
@@ -74,11 +72,17 @@
 
             $("#txtExamCode").enterKey(function () { getExamination(); });
             
-            $("#ddlDepartment").setDropdownList().on("change", function () {
+            $("#txtDepartment").H2GDisable();
+            $("#ddlDepartment").setDropdownListValue({
+                url: '../ajaxAction/masterAction.aspx',
+                data: { action: 'department' },
+                tempData: true,
+                enable: false,
+            }).on("change", function () {
                 $("#txtDepartment").H2GValue($("#ddlDepartment").H2GValue());
                 $("#ddlStaff").closest("div").find("input").focus();
             });
-            $("#ddlDepartment").H2GDisable().getDepartment();
+            //$("#ddlDepartment").H2GDisable().getDepartment();
             $.extend($.fn, {
                 deleteExam: function (args) {
                     if (confirm("ต้องการจะลบ " + $(this).closest("tr").find(".td-exam").html() + " ใช่หรือไม่?")) {
@@ -103,9 +107,6 @@
                     } else { $(self).setDropdownList().selecter("update"); }
                 },
                 regisHospital: function () {
-                    $("#txtDepartment").H2GDisable();
-                    $("#ddlStaff").H2GDisable();
-                    $("#ddlDepartment").H2GDisable();
                     if (validation()) {
                         $("#btnNewRegis").prop("disabled", true);
                         var ReceiptHospital = {

@@ -98,7 +98,7 @@ $.extend($.fn, {
         $(this).selecter();
         return this;
     },
-    setDropdownListValue: function (setting, defaultSelect) {
+    setDropdownListValue: function (setting) {
         var self = this;
         var config = {
             url: '',
@@ -107,35 +107,62 @@ $.extend($.fn, {
             dataType: "json",
             enable: true,
             defaultSelect: "",
+            dataObject:[],
+            tempData:false,
         };
         $.extend(config, setting);
 
-        $.ajax({
-            url: config.url,
-            data: config.data,
-            type: config.type,
-            dataType: config.dataType,
-            error: function (xhr, s, err) {
-                console.log(s, err);
-            },
-            success: function (data) {
-                $(self).html('');
-                $("<option>", { value: "" }).html("กรุณาเลือก").appendTo(self);
-                if (!data.onError) {
-                    data.getItems = jQuery.parseJSON(data.getItems);
-                    $.each((data.getItems), function (index, e) {
-                        $("<option>", { value: e.code, valueID: e.id }).html(e.name).appendTo(self);
-                    });
-                    $(self).setDropdownList().selecter("update");
+        var compile = function (data) {
+            if (config.tempData) { $(self).data("data-ddl", data); }
 
-                    config.defaultSelect = config.defaultSelect || defaultSelect || "";
-                    //$(self).val(config.defaultSelect).change();
-                    if (config.defaultSelect != "") { $(self).val(defaultSelect).change(); }
+            $(self).html('');
+            var placeholder = $(self).H2GAttr("placeholder") || "กรุณาเลือก";
+            $("<option>", { value: "" }).html(placeholder).appendTo(self);
+            $.each((data), function (index, e) {
+                $("<option>", {}).H2GFill(e).appendTo(self);
+            });
+            $(self).setDropdownList().selecter("update");
+            if (config.defaultSelect != "") { $(self).val(config.defaultSelect).change(); }
+
+            if (config.enable) { $(self).H2GEnable(); } else { $(self).H2GDisable(); }
+        }
+
+
+        if (config.dataObject.length == 0) {
+            $.ajax({
+                url: config.url,
+                data: config.data,
+                type: config.type,
+                dataType: config.dataType,
+                error: function (xhr, s, err) {
+                    console.log(s, err);
+                },
+                success: function (data) {
+
+                    if (!data.onError) {
+                        data.getItems = jQuery.parseJSON(data.getItems);
+                        if (config.tempData) { $(self).data("data-ddl", data.getItems); }
+                        compile(data.getItems);
+                    } else { $(self).setDropdownList().selecter("update"); }
                     
-                } else { $(self).setDropdownList().selecter("update"); }
-                if (config.enable) { $(self).H2GEnable(); } else { $(self).H2GDisable();}
-            }
-        });    //End ajax
+                }
+            });    //End ajax
+        } else {
+            compile(config.dataObject);
+
+            //$(self).html('');
+            //var placeholder = $(self).H2GAttr("placeholder") || "กรุณาเลือก";
+            //$("<option>", { value: "" }).html(placeholder).appendTo(self);
+            //if (config.tempData) { $(self).data("data-ddl", config.dataObject); }
+            //$.each((config.dataObject), function (index, e) {
+            //    $("<option>", {}).H2GFill(e).appendTo(self);
+            //});
+            //$(self).setDropdownList().selecter("update");
+            //if (config.defaultSelect != "") { $(self).val(config.defaultSelect).change(); }
+
+            //if (config.enable) { $(self).H2GEnable(); } else { $(self).H2GDisable(); }
+        }
+
         return this;
     },
     setAutoListValue: function (setting, defaultSelect) {
@@ -149,6 +176,8 @@ $.extend($.fn, {
             closeItem: function () { },
             enable: true,
             defaultSelect: "",
+            dataObject: [],
+            tempData: false,
         };
         $.extend(config, setting);
 
@@ -165,8 +194,10 @@ $.extend($.fn, {
                 //$("<option>", { value: "" }).html("กรุณาเลือก").appendTo(self);
                 if (!data.onError) {
                     data.getItems = jQuery.parseJSON(data.getItems);
+                    if (config.tempData) { $(self).data("data-ddl", data.getItems); }
+
                     $.each((data.getItems), function (index, e) {
-                        $("<option>", { value: e.code }).html(e.name).appendTo(self);
+                        $("<option>", {}).H2GFill(e).appendTo(self);
                     });
                     $(self).H2GValue(config.defaultSelect || defaultSelect || "").combobox({
                         select: config.selectItem,
@@ -261,6 +292,9 @@ $.extend($.fn, {
                     if (typeof (value) == 'number') $(this).prop('selectedIndex', value); else $(this).val(value);
                     $(this).change();
                     break;
+                case 'OPTION':
+                    $(this).val(value);
+                    break;
                 default:
                     $(this).html(value).val(value);
                     break;
@@ -278,7 +312,6 @@ $.extend($.fn, {
                         result = $(this).val();
                     }
                     break;
-                case 'SELECT': result = $(this).val(); break;
                 case 'SELECT': result = $(this).val(); break;
                 case 'TEXTAREA': result = $.trim($(this).val()); break;
                 default: result = $(this).html(); break;
@@ -308,7 +341,12 @@ $.extend($.fn, {
             switch (prop) {
                 case 'value':
                     $(this).attr('default-data', value);
-                    $(this).MBOSValue(value, e);
+                    $(this).H2GValue(value, e);
+                    break;
+                case 'text':
+                    if ($(this).prop('tagName') == "OPTION") {
+                        $(this).html(value);
+                    }
                     break;
                 default: $(this).attr(prop, value); break;
             }

@@ -238,6 +238,10 @@ table.table-bordered-excel > thead > tr > th > button > i {
 .selecter.disabled.required > .selecter-selected {
     background-color:#fff5f5 !important;
 }
+.selecter.focus {
+  color: #FFFFFF;
+  background-color: #cccccc !important;
+}
 /*Adjust jquery ui*/
 .ui-menu .ui-menu-item {
     font-family: THSarabunNew;

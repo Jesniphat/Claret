@@ -1,35 +1,80 @@
-﻿function donorSelectDDL() {
+﻿function lookupControl() {
+    $("#txtCardNumber").focus();
+    $("#txtDonorName").H2GNamebox();
+    $("#txtDonorSurName").H2GNamebox();
+    $("#txtDonorNameEng").H2GNamebox();
+    $("#txtDonorSurNameEng").H2GNamebox();
+    $("#ddlVisit").setDropdownList();
+    $("#togDeferal").toggleSlide();
+    $("#togVisitInfo").toggleSlide();
+    $("#txtStmRegisDate").setCalendar().H2GDatebox();
+    $("#txtOuterDonate").H2GNumberbox();
+    $("#txtMobile1").H2GPhonebox();
+    $("#txtMobile2").H2GPhonebox();
+    $("#txtHomeTel").H2GPhonebox();
+    $("#txtTel").H2GPhonebox();
+    $("#txtTelExt").H2GPhonebox();
+
+    $("#labPaneTab").click(setHistoricalFileDatas);
+    $("#exams-tab").click(setExamsDatas);
+    $("#immunohaemtology-tab").click(setImmunohaemtologyFile);
+
+}
+function donorSelectDDL() {
     if ($("#ddlTitleName option").length > 1) { $("#ddlTitleName").H2GValue($("#ddlTitleName").H2GAttr("selectItem")).change(); } else {
-        $("#ddlTitleName").setAutoListValue({ url: '../../ajaxAction/masterAction.aspx', data: { action: 'titlename', gender: $("#rbtM").is(':checked') == true ? "M" : "F" } }, $("#ddlTitleName").H2GAttr("selectItem")).on('autocompleteselect', function () {
+        $("#ddlTitleName").setAutoListValue({
+            url: '../../ajaxAction/masterAction.aspx',
+            data: { action: 'titlename', gender: $("#rbtM").is(':checked') == true ? "M" : "F" },
+            defaultSelect: $("#ddlTitleName").H2GAttr("selectItem"),
+        }).on('autocompleteselect', function () {
             $("#txtDonorName").focus();
         });
     }
     if ($("#ddlCountry option").length > 1) { $("#ddlCountry").H2GValue($("#ddlCountry").H2GAttr("selectItem")).change(); } else {
-        $("#ddlCountry").setAutoListValue({ url: '../../ajaxAction/masterAction.aspx', data: { action: 'country' } }, $("#ddlCountry").H2GAttr("selectItem") || "64").on('autocompleteselect', function () {
+        $("#ddlCountry").setAutoListValue({
+            url: '../../ajaxAction/masterAction.aspx',
+            data: { action: 'country' },
+            defaultSelect: $("#ddlCountry").H2GAttr("selectItem") || "64",
+        }).on('autocompleteselect', function () {
             $("#txtMobile1").focus();
         });
     }
     if ($("#ddlOccupation option").length > 1) { $("#ddlOccupation").H2GValue($("#ddlOccupation").H2GAttr("selectItem")).change(); } else {
-        $("#ddlOccupation").setAutoListValue({ url: '../../ajaxAction/masterAction.aspx', data: { action: 'occupation' } }, $("#ddlOccupation").H2GAttr("selectItem")).on('autocompleteselect', function () {
+        $("#ddlOccupation").setAutoListValue({
+            url: '../../ajaxAction/masterAction.aspx',
+            data: { action: 'occupation' },
+            defaultSelect: $("#ddlOccupation").H2GAttr("selectItem"),
+        }).on('autocompleteselect', function () {
             $("#ddlNationality").closest("div").focus();
         });
     }
     if ($("#ddlNationality option").length > 1) { $("#ddlNationality").H2GValue($("#ddlNationality").H2GAttr("selectItem")).change(); } else {
-        $("#ddlNationality").setAutoListValue({ url: '../../ajaxAction/masterAction.aspx', data: { action: 'nationality' } }, $("#ddlNationality").H2GAttr("selectItem") || "1").on('autocompleteselect', function () {
+        $("#ddlNationality").setAutoListValue({
+            url: '../../ajaxAction/masterAction.aspx',
+            data: { action: 'nationality' },
+            defaultSelect: $("#ddlNationality").H2GAttr("selectItem") || "1",
+        }).on('autocompleteselect', function () {
             $("#ddlRace").closest("div").focus();
         });
     }
     if ($("#ddlRace option").length > 1) { $("#ddlRace").H2GValue($("#ddlRace").H2GAttr("selectItem")).change(); } else {
-        $("#ddlRace").setAutoListValue({ url: '../../ajaxAction/masterAction.aspx', data: { action: 'nationality' } }, $("#ddlRace").H2GAttr("selectItem") || "1").on('autocompleteselect', function () {
+        $("#ddlRace").setAutoListValue({
+            url: '../../ajaxAction/masterAction.aspx',
+            data: { action: 'nationality' },
+            defaultSelect: $("#ddlRace").H2GAttr("selectItem") || "1",
+        }).on('autocompleteselect', function () {
             $("#txtAddress").focus();
         });
     }
     if ($("#ddlAssociation option").length > 1) { $("#ddlAssociation").H2GValue($("#ddlAssociation").H2GAttr("selectItem")).change(); } else {
-        $("#ddlAssociation").setAutoListValue({ url: '../../ajaxAction/masterAction.aspx', data: { action: 'association' } }, $("#ddlAssociation").H2GAttr("selectItem")).on('autocompleteselect', function () {
+        $("#ddlAssociation").setAutoListValue({
+            url: '../../ajaxAction/masterAction.aspx',
+            data: { action: 'association' },
+            defaultSelect: $("#ddlAssociation").H2GAttr("selectItem"),
+        }).on('autocompleteselect', function () {
             $("#txtOuterDonate").focus();
         });
     }
-    $("#txtCardNumber").focus();
 
 }
 function saveDonorInfo() {
@@ -466,7 +511,10 @@ function setImmunohaemtologyFile() {
         //console.log("do set1");
         var deferred = $.Deferred();
 
-        $('#blockImmunohaemtologyFile').block();
+        $('#blockImmunohaemtologyFile').block({
+            centerX: false,
+            centerY: false
+        });
 
         $.ajax({
             url: '../../ajaxAction/donorAction.aspx',
@@ -661,5 +709,22 @@ function showVisitHistory() {
                 $(dataView).closest("table").H2GAttr("wStatus", "done");
             }
         });    //End ajax
+    }
+}
+
+function selecterTable(even){
+    console.log("Select Table = ", $("#chackType").val());
+    if ($("#chackType").val() == "standard") {
+        $("#synthesisStandard").css({ "display": "block" });
+        $("#synthesisVirology").css({ "display": "none" });
+        $("#synthesisImmunohematology").css({ "display": "none" });
+    } else if ($("#chackType").val() == "virology") {
+        $("#synthesisStandard").css({ "display": "none" });
+        $("#synthesisVirology").css({ "display": "block" });
+        $("#synthesisImmunohematology").css({ "display": "none" });
+    } else if ($("#chackType").val() == "immunohematology") {
+        $("#synthesisStandard").css({ "display": "none" });
+        $("#synthesisVirology").css({ "display": "none" });
+        $("#synthesisImmunohematology").css({ "display": "block" });
     }
 }
