@@ -712,8 +712,36 @@ function showVisitHistory() {
     }
 }
 
+function loadSynthesisLink() {
+    // console.log("Yessss");
+
+    $.ajax({
+        url: '../../ajaxAction/donorAction.aspx',
+        data: H2G.ajaxData({ action: 'loadSynthesisSet1',donn_numero: $("#spRegisNumber").H2GValue() }).config,
+        type: "POST",
+        dataType: "json",
+        beforeSend: function () {
+            $('body').block();
+        },
+        error: function (xhr, s, err) {
+            console.log(s, err);
+        },
+        success: function (data) {
+            // console.log("xxxx = ", data);
+            data.getItems = jQuery.parseJSON(data.getItems);
+            if (!data.onError) {
+                datas = data.getItems;
+                for (var i = 0; i < datas.length; i++) {
+                    
+                }
+            }
+            $('body').unblock();
+        }
+    });
+}
+
 function selecterTable(even){
-    console.log("Select Table = ", $("#chackType").val());
+    // console.log("Select Table = ", $("#chackType").val());
     if ($("#chackType").val() == "standard") {
         $("#synthesisStandard").css({ "display": "block" });
         $("#synthesisVirology").css({ "display": "none" });

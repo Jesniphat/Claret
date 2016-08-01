@@ -686,6 +686,46 @@ Public Class donorAction
                     Next
 
                     JSONResponse.setItems(Of List(Of VisitHistoryItem))(HistoryList)
+
+                Case "loadSynthesisSet1"
+
+                    Dim donn_numero As String = _REQUEST("donn_numero")
+                    Dim sql As String = "select donate_date, dornor_type, deferral_code, dornor_rank, pressure from 
+                                        (
+                                        select 
+                                        to_char(don.don_date, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') donate_date, 
+                                        trim(don.pcatd_cd)||'/'||trim(don.ptypp_cd)||'/'||trim(don.putd_cd) dornor_type,
+                                        '' deferral_code,
+                                        to_char(don.don_incr) dornor_rank,
+                                        decode(dossmed.dmed_tmax,null,'',dossmed.dmed_tmax||'/'||dossmed.dmed_tmin) pressure
+                                        from donneur inner join don on donneur.donn_numero = don.donn_numero
+                                        left join dossmed on don.prel_no = dossmed.prel_no
+                                        where donneur.donn_numero = '1005602187'
+                                        union all
+                                        select to_char(cids.cids_dtcre, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') donate_date,
+                                        'Refused' dornor_type,
+                                        cids.pcids_cd deferral_code,
+                                        '' rank,
+                                        decode(dossmed.dmed_tmax,null,'',dossmed.dmed_tmax||'/'||dossmed.dmed_tmin) pressure
+                                        from cids left join dossmed
+                                        on cids.donn_numero = dossmed.donn_numero and to_char(cids.cids_dtcre ,'ddmmyyyy') = to_char(dossmed.dmed_dte,'ddmmyyyy')
+                                        where cids.donn_numero ='1005602187'
+                                        ) order by to_date(donate_date,'dd-mm-yyyy') desc"
+
+                    Dim dt As DataTable = Hbase.QueryTable(sql)
+                    Dim loadSynthesisSet1DataList As New List(Of SynthesisStatement1)
+                    For Each dr As DataRow In dt.Rows
+                        Dim Item As New SynthesisStatement1
+                        Item.donate_date = dr("DONATE_DATE").ToString
+                        Item.dornor_type = dr("DORNOR_TYPE").ToString
+                        Item.deferral_code = dr("DEFERRAL_CODE").ToString
+                        Item.dornor_rank = dr("DORNOR_RANK").ToString
+                        Item.pressure = dr("PRESSURE").ToString
+
+                        loadSynthesisSet1DataList.Add(Item)
+                    Next
+                    JSONResponse.setItems(Of List(Of SynthesisStatement1))(loadSynthesisSet1DataList)
+
             End Select
 
         Catch ex As Exception
@@ -860,4 +900,12 @@ Public Structure ImmunohaemtologyDataSet2
     Public Rsx_Lib As String
     Public Rsx_Type As String
     Public Result_Decode As String
+End Structure
+
+Public Structure SynthesisStatement1
+    Public donate_date As String
+    Public dornor_type As String
+    Public deferral_code As String
+    Public dornor_rank As String
+    Public pressure As String
 End Structure
