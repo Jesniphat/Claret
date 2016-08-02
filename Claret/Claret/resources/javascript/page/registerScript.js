@@ -725,19 +725,123 @@ function loadSynthesisLink() {
         },
         error: function (xhr, s, err) {
             console.log(s, err);
+            $('body').unblock();
         },
         success: function (data) {
-            // console.log("xxxx = ", data);
-            data.getItems = jQuery.parseJSON(data.getItems);
             if (!data.onError) {
-                datas = data.getItems;
+                $("tr").remove(".synthesisStandard-row");
+                $("tr").remove(".synthesisVirology-row");
+                $("tr").remove(".synthesisImmunohematology-row");
+                data.getItems = jQuery.parseJSON(data.getItems);
+                datas = data.getItems.SynthesisSet1;
+                console.log("xxxx = ", datas);
+                var lastIndexdate = datas.length - 1;
+                $(".firstDonateTime").text("บริจาคครั้งแรกเมื่อ " + datas[lastIndexdate].donate_date);
+                $(".lastDonateTime").text("บริจาคครั้งสุดท้ายเมื่อ " + datas[0].donate_date);
                 for (var i = 0; i < datas.length; i++) {
+                    //if (datas[i].dornor_rank == "" || datas[i].dornor_rank == null) {
+                    //    datas[i].dornor_rank = "0";
+                    //}
+                    var rows = "<tr class='synthesisStandard-row'>" +
+                                    "<td class='text-center td-date-excel date-" + datas[i].dornor_rank + "'>" + datas[i].donate_date + "</td>" +
+                                    "<td class='text-center td-text-excel type-" + datas[i].dornor_rank + "'>" + datas[i].dornor_type + "</td>" +
+                                    "<td class='text-center td-text-excel donateat-" + datas[i].dornor_rank + "'>" + datas[i].dmed_coll + "</td>" +
+                                    "<td class='text-left td-text-excel cantdonate-" + datas[i].dornor_rank + "'>" + datas[i].dmed_refus + "</td>" +
+                                    "<td class='text-left td-text-excel rank-" + datas[i].dornor_rank + "'>" + datas[i].dornor_rank + "</td>" +
+                                    "<td class='text-left td-text-excel pressure-" + datas[i].dornor_rank + "'>" + datas[i].pressure + "</td>" +
+                                    "<td class='text-left td-text-excel ABOD-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel DAT-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel DATF-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel Anti-HBs-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel Lipemic-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel DAbsp-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel HBsAg-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel Anti-HCV-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel Syph-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel COMNAT-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel Albumin-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel Protein-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel Ag-C-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel Ag-c-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel Ag-E-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel Ag-e-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel Ag-K-" + datas[i].dornor_rank + "'></td>" +
+                               "</tr>";
+                    // console.log("Row = ", rows);
+                    $('#synthesisStandard > tbody').append(rows);
+
+
+
+                    var rows2 = "<tr class='synthesisVirology-row'>" +
+                                    "<td class='text-center td-date-excel date-" + datas[i].dornor_rank + "'>" + datas[i].donate_date + "</td>" +
+                                    "<td class='text-center td-text-excel type-" + datas[i].dornor_rank + "'>" + datas[i].dornor_type + "</td>" +
+                                    "<td class='text-center td-text-excel donateat-" + datas[i].dornor_rank + "'>" + datas[i].dmed_coll + "</td>" +
+                                    "<td class='text-left td-text-excel cantdonate-" + datas[i].dornor_rank + "'>" + datas[i].dmed_refus + "</td>" +
+                                    "<td class='text-left td-text-excel rank-" + datas[i].dornor_rank + "'>" + datas[i].dornor_rank + "</td>" +
+                                    "<td class='text-left td-text-excel pressure-" + datas[i].dornor_rank + "'>" + datas[i].pressure + "</td>" +
+                                    "<td class='text-left td-text-excel ALAT-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel WB-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel Anti-HCV-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel Malaria-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel'></td>" +
+                                    "<td class='text-left td-text-excel'></td>" +
+                                    "<td class='text-left td-text-excel'></td>" +
+                                    "<td class='text-left td-text-excel'></td>" +
+                                    "<td class='text-left td-text-excel'></td>" +
+                                    "<td class='text-left td-text-excel'></td>" +
+                                    "<td class='text-left td-text-excel'></td>" +
+                                    "<td class='text-left td-text-excel'></td>" +
+                                    "<td class='text-left td-text-excel'></td>" +
+                                    "<td class='text-left td-text-excel'></td>" +
+                                    "<td class='text-left td-text-excel'></td>" +
+                                    "<td class='text-left td-text-excel'></td>" +
+                                    "<td class='text-left td-text-excel'></td>" +
+                               "</tr>";
+                    // console.log("Row = ", rows);
+                    $('#synthesisVirology > tbody').append(rows2);
+
+
+                    var rows3 = "<tr class='synthesisImmunohematology-row'>" +
+                                    "<td class='text-center td-date-excel date-" + datas[i].dornor_rank + "'>" + datas[i].donate_date + "</td>" +
+                                    "<td class='text-center td-text-excel type-" + datas[i].dornor_rank + "'>" + datas[i].dornor_type + "</td>" +
+                                    "<td class='text-center td-text-excel donateat-" + datas[i].dornor_rank + "'>" + datas[i].dmed_coll + "</td>" +
+                                    "<td class='text-left td-text-excel cantdonate-" + datas[i].dornor_rank + "'>" + datas[i].dmed_refus + "</td>" +
+                                    "<td class='text-left td-text-excel rank-" + datas[i].dornor_rank + "'>" + datas[i].dornor_rank + "</td>" +
+                                    "<td class='text-left td-text-excel pressure-" + datas[i].dornor_rank + "'>" + datas[i].pressure + "</td>" +
+                                    "<td class='text-left td-text-excel ABO-group-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel ABO-group-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel C-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel c-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel E-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel e-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel K-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel Ab-Sc-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel H-AB-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel Hem-A-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel Hb-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel BW-" + datas[i].dornor_rank + "'></td>" +
+                                    "<td class='text-left td-text-excel'></td>" +
+                                    "<td class='text-left td-text-excel'></td>" +
+                                    "<td class='text-left td-text-excel'></td>" +
+                                    "<td class='text-left td-text-excel'></td>" +
+                                    "<td class='text-left td-text-excel'></td>" +
+                               "</tr>";
                     
+                    $('#synthesisImmunohematology > tbody').append(rows3);
                 }
+                // $(".E-4").text("test");
+                displaySynthesisColData(data.getItems.SynthesisSet2);
             }
             $('body').unblock();
         }
     });
+}
+
+function displaySynthesisColData(datas) {
+    // console.log("displaySynthesisColData = ", datas);
+    for (var i = 0; i < datas.length; i++) {
+        $("." + datas[i].show_gen_label).text(datas[i].display_result);
+    }
 }
 
 function selecterTable(even){

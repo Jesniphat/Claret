@@ -502,11 +502,13 @@ Public Class donorAction
                             Dim ResultDecodeListI() As String = DecodeI.Split(New Char() {Chr(27)}, StringSplitOptions.RemoveEmptyEntries)
                             For Each ArI As String In ResultDecodeListI
                                 Dim sqlI As String = "select presultat.pres_dnageneric||pnmdp.pnmdp_cd 
-                                                      from dossex 
-                                                      inner join pexamen on dossex.dex_exam = pexamen.pex_cd
-                                                      inner join presultat on trim(presultat.pfres_cd) = trim(pexamen.pex_famres) and trim(presultat.pres_cd) = trim(substr(dossex.dex_res,0,instr(dossex.dex_res,chr(27))-1)) 
-                                                      inner join pnmdp on trim(pnmdp.pnmdp_alleles)= trim(replace(substr(dossex.dex_res,2,length(dossex.dex_res)-2),chr(27)||'*','/'))
-                                                      where dossex.donn_numero = '" & donn_numero & "' and dex_exam = '" & ArI & "'"
+                                                     from dossex 
+                                                     inner join pexamen on dossex.dex_exam = pexamen.pex_cd
+                                                     inner join presultat on presultat.pfres_cd = pexamen.pex_famres
+                                                     and presultat.pres_cd = cast(substr(dossex.dex_res,0,instr(dossex.dex_res,chr(27))-1)as char(10)) 
+                                                     inner join pnmdp on pnmdp.pnmdp_alleles= replace(substr(dossex.dex_res,2,length(dossex.dex_res)-2),chr(27)||'*','/')
+                                                     where dossex.donn_numero = '" & donn_numero & "' and dex_exam = '" & ArI & "'"
+
                                 Dim ResultData As String = Hbase.QueryField(sqlI)
                                 ResultDecode += ResultData
                             Next
@@ -689,15 +691,16 @@ Public Class donorAction
 
                 Case "loadSynthesisSet1"
 
+                    Dim SynthesisData As New SynthesisListData
                     Dim donn_numero As String = _REQUEST("donn_numero")
-                    Dim sql As String = "select donate_date, dornor_type, deferral_code, dornor_rank, pressure from 
+                    Dim sql As String = "select donate_date, dornor_type, deferral_code, dornor_rank, pressure, dmed_site, dmed_coll, dmed_refus from 
                                         (
                                         select 
                                         to_char(don.don_date, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') donate_date, 
                                         trim(don.pcatd_cd)||'/'||trim(don.ptypp_cd)||'/'||trim(don.putd_cd) dornor_type,
                                         '' deferral_code,
                                         to_char(don.don_incr) dornor_rank,
-                                        decode(dossmed.dmed_tmax,null,'',dossmed.dmed_tmax||'/'||dossmed.dmed_tmin) pressure
+                                        decode(dossmed.dmed_tmax,null,'',dossmed.dmed_tmax||'/'||dossmed.dmed_tmin) pressure, dossmed.dmed_site, dossmed.dmed_coll, dossmed.dmed_refus
                                         from donneur inner join don on donneur.donn_numero = don.donn_numero
                                         left join dossmed on don.prel_no = dossmed.prel_no
                                         where donneur.donn_numero = '1005602187'
@@ -706,14 +709,16 @@ Public Class donorAction
                                         'Refused' dornor_type,
                                         cids.pcids_cd deferral_code,
                                         '' rank,
-                                        decode(dossmed.dmed_tmax,null,'',dossmed.dmed_tmax||'/'||dossmed.dmed_tmin) pressure
+                                        decode(dossmed.dmed_tmax,null,'',dossmed.dmed_tmax||'/'||dossmed.dmed_tmin) pressure, dossmed.dmed_site, dossmed.dmed_coll, dossmed.dmed_refus
                                         from cids left join dossmed
                                         on cids.donn_numero = dossmed.donn_numero and to_char(cids.cids_dtcre ,'ddmmyyyy') = to_char(dossmed.dmed_dte,'ddmmyyyy')
                                         where cids.donn_numero ='1005602187'
                                         ) order by to_date(donate_date,'dd-mm-yyyy') desc"
 
                     Dim dt As DataTable = Hbase.QueryTable(sql)
-                    Dim loadSynthesisSet1DataList As New List(Of SynthesisStatement1)
+                    SynthesisData.SynthesisSet1 = New List(Of SynthesisStatement1)
+                    SynthesisData.SynthesisSet2 = New List(Of SynthesisStatement2)
+
                     For Each dr As DataRow In dt.Rows
                         Dim Item As New SynthesisStatement1
                         Item.donate_date = dr("DONATE_DATE").ToString
@@ -721,10 +726,41 @@ Public Class donorAction
                         Item.deferral_code = dr("DEFERRAL_CODE").ToString
                         Item.dornor_rank = dr("DORNOR_RANK").ToString
                         Item.pressure = dr("PRESSURE").ToString
+                        Item.dmed_coll = dr("DMED_COLL").ToString
+                        Item.dmed_refus = dr("DMED_REFUS").ToString
 
-                        loadSynthesisSet1DataList.Add(Item)
+                        SynthesisData.SynthesisSet1.Add(Item)
+
+                        If dr("DORNOR_RANK").ToString <> "" Then
+                            Dim subSql As String = "select to_char(d.prelx_date, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') display_date,pparecr.ppe_type,pparecr.rsx_cd show_value,pparecr.rsx_lib show_label,
+                                                    decode(d.exam_code,'ABODD',d.prelx_rqual||(select prelx_rqual from donexam 
+                                                    where donn_numero = '1005602187' and donn_incr = '" & dr("DORNOR_RANK").ToString & "' and trim(prelx_exam)='AGDTDM'),d.prelx_rqual) display_result
+                                                    from pparecr left join 
+                                                    (select decode(trim(prelx_exam),'DABO','ABODD',prelx_exam) exam_code,
+                                                     prelx_rqual,prelx_date 
+                                                     from donexam 
+                                                     where ((donexam.donn_numero = '1005602187') and (donexam.donn_incr = '" & dr("DORNOR_RANK").ToString & "'))) d
+                                                    on trim(pparecr.rsx_cd) = trim(d.exam_code)
+                                                    left join presumex on trim(pparecr.rsx_cd) = trim(presumex.rsx_cd)
+                                                    where ((pparecr.ppe_site = '9999') and (pparecr.ppe_masque IN ('PRELEM','PRELVI','PRELIH')))"
+
+                            Dim ct As DataTable = Hbase.QueryTable(subSql)
+                            For Each cr As DataRow In ct.Rows
+                                Dim ItemCol As New SynthesisStatement2
+                                ItemCol.display_date = cr("DISPLAY_DATE").ToString
+                                ItemCol.ppe_type = cr("PPE_TYPE").ToString
+                                ItemCol.show_value = cr("SHOW_VALUE").ToString
+                                ItemCol.show_label = cr("SHOW_LABEL").ToString
+                                ItemCol.show_gen_label = (cr("SHOW_LABEL").ToString).Replace(" ", "-") & "-" & dr("DORNOR_RANK").ToString
+                                ItemCol.display_result = cr("DISPLAY_RESULT").ToString
+
+                                SynthesisData.SynthesisSet2.Add(ItemCol)
+                            Next
+                        End If
+
                     Next
-                    JSONResponse.setItems(Of List(Of SynthesisStatement1))(loadSynthesisSet1DataList)
+
+                    JSONResponse.setItems(Of SynthesisListData)(SynthesisData)
 
             End Select
 
@@ -908,4 +944,20 @@ Public Structure SynthesisStatement1
     Public deferral_code As String
     Public dornor_rank As String
     Public pressure As String
+    Public dmed_coll As String
+    Public dmed_refus As String
+End Structure
+
+Public Structure SynthesisStatement2
+    Public display_date As String
+    Public ppe_type As String
+    Public show_value As String
+    Public show_label As String
+    Public show_gen_label As String
+    Public display_result As String
+End Structure
+
+Public Structure SynthesisListData
+    Public SynthesisSet1 As List(Of SynthesisStatement1)
+    Public SynthesisSet2 As List(Of SynthesisStatement2)
 End Structure

@@ -919,7 +919,7 @@
                                                             <th class="col-md-1">DAT</th>
                                                             <th class="col-md-1">DATF</th>
                                                             <th class="col-md-2">Anti HBs</th>
-                                                            <th class="col-md-2">Upemic</th>
+                                                            <th class="col-md-2">Lipemic</th>
                                                             <th class="col-md-1">Dabsp</th>
                                                             <th class="col-md-1">HBsAg</th>
                                                             <th class="col-md-2">Anti HCV</th>
@@ -941,55 +941,55 @@
 
                                                 <table class="table table-bordered-excel" id="synthesisVirology" style="display:none;">
                                                     <thead>
-                                                        <tr style="font-size: 16px; height:28px;">
-                                                            <th style="width:31%" colspan="6"><span class="firstDonateTime">xxx</span></th>
-                                                            <th style="width:5%" colspan="1">Pheno</th>
-                                                            <th style="width:52.5%; text-align:left;" colspan="16"><span class="phenoValue">C+E+</span></th>
+                                                        <tr style="font-size: 14px; height:28px;">
+                                                            <th style="width:25%" colspan="6"><span class="firstDonateTime">xxx</span></th>
+                                                            <th style="width:3.7%" colspan="1">Pheno</th>
+                                                            <th style="width:59.5%; text-align:left;" colspan="16"><span class="phenoValue">C+E+</span></th>
                                                         </tr>
-                                                        <tr style="font-size: 16px; height:28px;">
-                                                            <th style="width:31%" colspan="6"><span class="lastDonateTime">xxx</span></th>
-                                                            <th style="width:5%"><span class="ABOD">ABO group</span></th>
-                                                            <th style="width:5%"><span class="ABOD2">ABO group</span></th>
-                                                            <th style="width:5%"><span class="ABO_group_val">O</span></th>
-                                                            <th style="width:5%"></th>
-                                                            <th style="width:2.8%"></th>
-                                                            <th style="width:2.8%"></th>
-                                                            <th style="width:2.8%"></th>
-                                                            <th style="width:2.8%"></th>
-                                                            <th style="width:2.8%"></th>
-                                                            <th style="width:2.8%"></th>
-                                                            <th style="width:2.8%"></th>
-                                                            <th style="width:2.8%"></th>
-                                                            <th style="width:2.8%"></th>
-                                                            <th style="width:2.8%"></th>
-                                                            <th style="width:2.8%"></th>
-                                                            <th style="width:2.8%"></th>
-                                                            <th style="width:2.8%"></th>
+                                                        <tr style="font-size: 14px; height:28px;">
+                                                            <th style="width:25%" colspan="6"><span class="lastDonateTime">xxx</span></th>
+                                                            <th style="width:3.7%; font-size:10px;"><span class="ABOD">ABO group</span></th>
+                                                            <th style="width:3.7%; font-size:10px;"><span class="ABOD2">ABO group</span></th>
+                                                            <th style="width:3.7%"><span class="ABO_group_val">O</span></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
                                                         </tr>
-                                                        <tr style="font-size: 16px; height:28px;">
-                                                            <th style="width:5%">วันที่</th>
-                                                            <th style="width:5%">ประเภท</th>
-                                                            <th style="width:5%">บริจาคที่</th>
-                                                            <th style="width:6%">เหตุผลงดบริจาค</th>
-                                                            <th style="width:5%">ครั้งที่</th>
-                                                            <th style="width:5%">ความดัน</th>
-                                                            <th style="width:5%">ALAT</th>
-                                                            <th style="width:5%">WB</th>
-                                                            <th style="width:5%">Anti-HCV</th>
-                                                            <th style="width:5%">Malaria</th>
-                                                            <th style="width:2.8%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
-                                                            <th style="width:2.8%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
-                                                            <th style="width:2.8%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
-                                                            <th style="width:2.8%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
-                                                            <th style="width:2.8%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
-                                                            <th style="width:2.8%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
-                                                            <th style="width:2.8%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
-                                                            <th style="width:2.8%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
-                                                            <th style="width:2.8%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
-                                                            <th style="width:2.8%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
-                                                            <th style="width:2.8%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
-                                                            <th style="width:2.8%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
-                                                            <th style="width:2.8%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
+                                                        <tr style="font-size: 14px; height:28px;">
+                                                            <th style="width:3.7%">วันที่</th>
+                                                            <th style="width:3.7%">ประเภท</th>
+                                                            <th style="width:3.7%">บริจาคที่</th>
+                                                            <th style="width:5.1%">เหตุผลงดบริจาค</th>
+                                                            <th style="width:3.7%">ครั้งที่</th>
+                                                            <th style="width:3.7%">ความดัน</th>
+                                                            <th style="width:3.7%">ALAT</th>
+                                                            <th style="width:3.7%">WB</th>
+                                                            <th style="width:3.7%">Anti-HCV</th>
+                                                            <th style="width:3.7%">Malaria</th>
+                                                            <th style="width:3.7%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
+                                                            <th style="width:3.7%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
+                                                            <th style="width:3.7%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
+                                                            <th style="width:3.7%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
+                                                            <th style="width:3.7%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
+                                                            <th style="width:3.7%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
+                                                            <th style="width:3.7%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
+                                                            <th style="width:3.7%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
+                                                            <th style="width:3.7%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
+                                                            <th style="width:3.7%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
+                                                            <th style="width:3.7%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
+                                                            <th style="width:3.7%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
+                                                            <th style="width:3.7%"> &nbsp; &nbsp; &nbsp; &nbsp; </th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -999,55 +999,55 @@
 
                                                 <table class="table table-bordered-excel" id="synthesisImmunohematology" style="display:none;">
                                                     <thead>
-                                                        <tr style="font-size: 16px; height:28px;">
-                                                            <th style="width:31%" colspan="6"><span class="firstDonateTime">xxx</span></th>
-                                                            <th style="width:5.5%" colspan="1">Pheno</th>
-                                                            <th style="width:52%; text-align:left;" colspan="16"><span class="phenoValue">C+E+</span></th>
+                                                        <tr style="font-size: 14px; height:28px;">
+                                                            <th style="width:25%" colspan="6"><span class="firstDonateTime">xxx</span></th>
+                                                            <th style="width:3.7%" colspan="1">Pheno</th>
+                                                            <th style="width:59.5%; text-align:left;" colspan="16"><span class="phenoValue">C+E+</span></th>
                                                         </tr>
-                                                        <tr style="font-size: 16px; height:28px;">
-                                                            <th style="width:31%" colspan="6"><span class="lastDonateTime">xxx</span></th>
-                                                            <th style="width:5.5%"><span class="ABOD">AB</span></th>
-                                                            <th style="width:5.5%"><span class="zx">AB</span></th>
-                                                            <th style="width:3.1%"><span class="ddf">+</span></th>
-                                                            <th style="width:3.1%"><span class="po"></span></th>
-                                                            <th style="width:3.1%"></th>
-                                                            <th style="width:3.1%"></th>
-                                                            <th style="width:3.1%"></th>
-                                                            <th style="width:3.1%"></th>
-                                                            <th style="width:3.1%"></th>
-                                                            <th style="width:3.1%"></th>
-                                                            <th style="width:3.1%"></th>
-                                                            <th style="width:3.1%"></th>
-                                                            <th style="width:3.1%"></th>
-                                                            <th style="width:3.1%"></th>
-                                                            <th style="width:3.1%"></th>
-                                                            <th style="width:3.1%"></th>
-                                                            <th style="width:3.1%"></th>
+                                                        <tr style="font-size: 14px; height:28px;">
+                                                            <th style="width:25%" colspan="6"><span class="lastDonateTime">xxx</span></th>
+                                                            <th style="width:3.7%"><span class="ABOD">AB</span></th>
+                                                            <th style="width:3.7%"><span class="zx">AB</span></th>
+                                                            <th style="width:3.7%"><span class="ddf">+</span></th>
+                                                            <th style="width:3.7%"><span class="po"></span></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
                                                         </tr>
-                                                        <tr style="font-size: 16px; height:28px;">
-                                                            <th style="width:5%">วันที่</th>
-                                                            <th style="width:5%">ประเภท</th>
-                                                            <th style="width:5%">บริจาคที่</th>
-                                                            <th style="width:6%">เหตุผลงดบริจาค</th>
-                                                            <th style="width:5%">ครั้งที่</th>
-                                                            <th style="width:5%">ความดัน</th>
-                                                            <th style="width:5.5%">ABO group</th>
-                                                            <th style="width:5.5%">ABO group</th>
-                                                            <th style="width:3.1%">C</th>
-                                                            <th style="width:3.1%">c</th>
-                                                            <th style="width:3.1%">E</th>
-                                                            <th style="width:3.1%">e</th>
-                                                            <th style="width:3.1%">K</th>
-                                                            <th style="width:3.1%">Ab Sc</th>
-                                                            <th style="width:3.1%">H-AB</th>
-                                                            <th style="width:3.1%">Hem A</th>
-                                                            <th style="width:3.1%">Hb</th>
-                                                            <th style="width:3.1%">BW</th>
-                                                            <th style="width:3.1%"></th>
-                                                            <th style="width:3.1%"></th>
-                                                            <th style="width:3.1%"></th>
-                                                            <th style="width:3.1%"></th>
-                                                            <th style="width:3.1%"></th>
+                                                        <tr style="font-size: 14px; height:28px;">
+                                                            <th style="width:3.7%">วันที่</th>
+                                                            <th style="width:3.7%">ประเภท</th>
+                                                            <th style="width:3.7%">บริจาคที่</th>
+                                                            <th style="width:5.1%">เหตุผลงดบริจาค</th>
+                                                            <th style="width:3.7%">ครั้งที่</th>
+                                                            <th style="width:3.7%">ความดัน</th>
+                                                            <th style="width:3.7%">ABO group</th>
+                                                            <th style="width:3.7%">ABO group</th>
+                                                            <th style="width:3.7%">C</th>
+                                                            <th style="width:3.7%">c</th>
+                                                            <th style="width:3.7%">E</th>
+                                                            <th style="width:3.7%">e</th>
+                                                            <th style="width:3.7%">K</th>
+                                                            <th style="width:3.7%">Ab Sc</th>
+                                                            <th style="width:3.7%">H-AB</th>
+                                                            <th style="width:3.7%">Hem A</th>
+                                                            <th style="width:3.7%">Hb</th>
+                                                            <th style="width:3.7%">BW</th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
+                                                            <th style="width:3.7%"></th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
