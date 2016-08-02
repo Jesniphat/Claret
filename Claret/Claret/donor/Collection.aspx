@@ -52,6 +52,7 @@
             $("#sampleNumber").keydown(checkValidDonateNum);
             $("#sampleNumber").blur(checkSampleNumber);
             $("#btnSave").click(saveData);
+            $("#btnCancel").click(clareData);
         });
         
     </script>

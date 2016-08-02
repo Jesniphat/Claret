@@ -419,6 +419,7 @@ function checkDonateNum() {
                         $("#sampleNumber").val("");
                     } else {
                         getParam.donorID = data.getItems[0].donorId;
+                        $("#data").attr("donorid", data.getItems[0].donorId);
                         $("#sampleNumber").focus();
                         //notiSuccess("พบเลขผู้บริจาคนี้");
                     }
@@ -467,6 +468,7 @@ function checkSampleNumber() {
                         $("#sampleNumber").val("");
                     } else {
                         getParam.visitID = data.getItems[0].visitId;
+                        $("#data").attr("visitid", data.getItems[0].visitId);
                         //notiSuccess("พบเลข Sample Number นี้");
                     }
                     $('body').unblock();
@@ -481,6 +483,71 @@ function checkSampleNumber() {
 }
 
 function saveData() {
+    if ($("#donerNumber").val() == "") {
+        alert("กรุณากรอกเลขที่ผู้บริจาค");
+        $("#donerNumber").focus();
+        return;
+    }
+    if ($("#sampleNumber").val() == "") {
+        alert("กรุณากรอก Sample Number");
+        $("#sampleNumber").focus();
+        return;
+    }
+    if ($("#donateType").val() == "0") {
+        alert("กรุณาเลือกประเภทการบริจาค");
+        $("#donateType").focus();
+        return;
+    }
+    if ($("#donateBagType").val() == "0") {
+        alert("กรุณาเลือกประเภทถุง");
+        $("#donateBagType").focus();
+        return;
+    }
+    if ($("#donateApply").val() == "0") {
+        alert("กรุณาเลือกประเภทการใช้งาน");
+        $("#donateApply").focus();
+        return;
+    }
+    if ($("#vol").val() == "") {
+        alert("กรุณากรอก Valumn");
+        $("#vol").focus();
+        return;
+    }
+    if ($("#startDonateDate").val() == "" || $("#startDonateDate").val() == "0000-00-00") {
+        alert("กรุณาเลือกวันที่บริจาค");
+        $("#startDonateDate").focus();
+        return;
+    }
+    if ($("#donateTimes").val() == "" || $("#donateTimes").val() == "0000-00-00") {
+        alert("กรุณากรอกระยะเวลาบริการ");
+        $("#donateTimes").focus();
+        return;
+    }
+    if ($("#donateStaff").val() == "") {
+        alert("กรุณากรอกผู้จัดเก็บ");
+        $("#donateStaff").focus();
+        return;
+    }
+    if (labExaminationSaveList == 0 || labExaminationSaveList == "") {
+        alert("กรุณาเลือก LAB EXAMINATION");
+        $("#labExamination").focus();
+        return;
+    }
+    if (problemReason.collectedProblem == 0 || problemReason.collectedProblem == "") {
+        alert("กรุณากรอกปัญหาในการจัดเก็บ");
+        $("#collectedProblem").focus();
+        return;
+    }
+    if (problemReason.collectedProblemReason1 == 0 || problemReason.collectedProblemReason1 == "") {
+        alert("กรุณากรอกเหตุผลปัญหาในการจัดเก็บ 1");
+        $("#collectedProblemReason1").focus();
+        return;
+    }
+    if (problemReason.collectedProblemReason2 == 0 || problemReason.collectedProblemReason2 == "") {
+        alert("กรุณากรอกเหตุผลปัญหาในการจัดเก็บ 2");
+        $("#collectedProblemReason2").focus();
+        return;
+    }
     var saveData = {
         action: 'saveDonate',
         donateAction: getParam.donateAction,
@@ -631,4 +698,11 @@ function goEditIt(visitId, donorId) {
     .fail(function (err) {
         console.log(err);
     });
+}
+
+function clareData() {
+    console.log("clareData");
+    resetData();
+
+    randerAddLabExamination();
 }
