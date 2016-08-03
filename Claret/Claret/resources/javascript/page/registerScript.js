@@ -605,6 +605,18 @@ function setImmunohaemtologyFile() {
                         $("#ABOD_FIRST_DATE").val(dataz.abod[0].firstDate);
                         $("#ABOD_LAST_DATE").val(dataz.abod[0].lastDate);
                     }
+
+                    if (dataz.extPheno.length > 0) {
+                        $("#Ext_Pheno_NO").val(dataz.extPheno[0].no);
+                        $("#Ext_Pheno_FIRST_DATE").val(dataz.extPheno[0].firstDate);
+                        $("#Ext_Pheno_LAST_DATE").val(dataz.extPheno[0].lastDate);
+                    }
+
+                    if (dataz.extPheno.length > 0) {
+                        $("#Ab_Screen_NO").val(dataz.abScreen[0].no);
+                        $("#Ab_Screen_FIRST_DATE").val(dataz.abScreen[0].firstDate);
+                        $("#Ab_Screen_LAST_DATE").val(dataz.abScreen[0].lastDate);
+                    }
                     console.log("sdcg = ", dataz);
                     deferred.resolve("Ok");
                 } else {
