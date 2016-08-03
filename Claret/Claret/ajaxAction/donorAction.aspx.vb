@@ -39,7 +39,7 @@ Public Class donorAction
                         If String.IsNullOrEmpty(DVisitItem.ID) Then
                             DVisitItem.ID = Cbase.QueryField(H2G.nextVal("DONATION_VISIT"))
                             DVisitItem.DonorID = DonorItem.ID
-                            DVisitItem.Status = "WAIT INTEVIEW" 'สร้างใหม่ต้องเป็น WAIT INTEVIEW เสมอ
+                            DVisitItem.Status = "WAIT Interview" 'สร้างใหม่ต้องเป็น WAIT Interview เสมอ
                             DVisitItem.QueueNumber = Cbase.QueryField("select nvl(max(queue_number),0)+1 from donation_visit where create_date between to_date('" & Today.ToString("ddMMyyyy") & "','ddMMyyyy') and to_date('" & Today.AddDays(1).ToString("ddMMyyyy") & "','ddMMyyyy') ")
                             DVisitItem.VisitNumber = Cbase.QueryField("select nvl(max(visit_number),0)+1 from donation_visit where donor_id = " & DonorItem.ID & " ")
 
@@ -58,7 +58,7 @@ Public Class donorAction
                             End If
                             DHospitalItem.ID = Cbase.QueryField(H2G.nextVal("DONATION_HOSPITAL"))
                             DHospitalItem.DonorID = DonorItem.ID
-                            DHospitalItem.Status = "WAIT INTEVIEW" 'สร้างใหม่ต้องเป็น WAIT INTEVIEW เสมอ
+                            DHospitalItem.Status = "WAIT Interview" 'สร้างใหม่ต้องเป็น WAIT Interview เสมอ
                             DHospitalItem.OrderNumber = Cbase.QueryField("select nvl(max(order_number),0)+1 from donation_hospital where receipt_hospital_id = '" & DHospitalItem.ReceiptHospitalID & "' ")
                             DHospitalItem.ReceiptHospitalID = dtHospital.Rows(0)("id").ToString()
                             DHospitalItem.DonationToID = dtHospital.Rows(0)("donation_to_id").ToString()
@@ -480,6 +480,7 @@ Public Class donorAction
                         If dr("RSX_TYPE").ToString = "3" Then
                             Dim Decode As String = dr("RESULT_DECODE").ToString
                             Dim ResultDecodeList() As String = Decode.Split(New Char() {Chr(27)}, StringSplitOptions.RemoveEmptyEntries)
+
                             For Each Ar As String In ResultDecodeList
                                 Dim sql3 As String = "SELECT dex_res FROM DOSSEX WHERE DONN_NUMERO = '" & donn_numero & "' AND DEX_EXAM = '" & Ar & "'"
                                 Dim ResultData As String = Hbase.QueryField(sql3)
@@ -501,13 +502,14 @@ Public Class donorAction
                             Dim DecodeI As String = dr("RESULT_DECODE").ToString
                             Dim ResultDecodeListI() As String = DecodeI.Split(New Char() {Chr(27)}, StringSplitOptions.RemoveEmptyEntries)
                             For Each ArI As String In ResultDecodeListI
-                                Dim sqlI As String = "select presultat.pres_dnageneric||pnmdp.pnmdp_cd 
-                                                     from dossex 
-                                                     inner join pexamen on dossex.dex_exam = pexamen.pex_cd
-                                                     inner join presultat on presultat.pfres_cd = pexamen.pex_famres
-                                                     and presultat.pres_cd = cast(substr(dossex.dex_res,0,instr(dossex.dex_res,chr(27))-1)as char(10)) 
-                                                     inner join pnmdp on pnmdp.pnmdp_alleles= replace(substr(dossex.dex_res,2,length(dossex.dex_res)-2),chr(27)||'*','/')
-                                                     where dossex.donn_numero = '" & donn_numero & "' and dex_exam = '" & ArI & "'"
+                                Dim sqlI As String = "select presultat.pres_dnageneric||pnmdp.pnmdp_cd
+                                                        from dossex 
+                                                        inner join pexamen on dossex.dex_exam = pexamen.pex_cd
+                                                        inner join presultat on presultat.pfres_cd = pexamen.pex_famres
+                                                        and presultat.pres_cd = cast(substr(dossex.dex_res,0,instr(dossex.dex_res,chr(27))-1)as char(10)) 
+                                                        inner join pnmdp on ((pnmdp.pnmdp_alleles= replace(substr(dossex.dex_res,2,length(dossex.dex_res)-2),chr(27)||'*','/')) 
+                                                        or (pnmdp.pnmdp_alleles=replace(replace(substr(dossex.dex_res,2,length(dossex.dex_res)-2),chr(27)||'*','/'),substr(presultat.pres_dnageneric,instr(presultat.pres_dnageneric,'*')+1,length(presultat.pres_dnageneric))||':','')))
+                                                        where dossex.donn_numero = '" & donn_numero & "' and dex_exam = '" & ArI & "'"
 
                                 Dim ResultData As String = Hbase.QueryField(sqlI)
                                 ResultDecode += ResultData
@@ -627,8 +629,8 @@ Public Class donorAction
                         Item.Comment = dRow("COMMENT_TEXT").ToString()
                         Item.RegisTime = dRow("regis_time").ToString().Replace(",", ":")
                         Item.RegisStaff = dRow("regis_staff").ToString()
-                        Item.InteviewTime = dRow("INTEVIEW_time").ToString().Replace(",", ":")
-                        Item.InteviewStaff = dRow("INTEVIEW_STAFF").ToString()
+                        Item.InterviewTime = dRow("Interview_time").ToString().Replace(",", ":")
+                        Item.InterviewStaff = dRow("Interview_STAFF").ToString()
                         Item.CollectionTime = dRow("collection_time").ToString().Replace(",", ":")
                         Item.CollectionStaff = dRow("collection_staff").ToString()
                         Item.LabTime = dRow("lab_time").ToString().Replace(",", ":")
@@ -647,12 +649,12 @@ Public Class donorAction
                     Dim sqlRecord As String = "
                     select dn.visit_id, dn.DONATION_NUMBER, to_char(dn.VISIT_DATE, 'DD MON YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as VISIT_DATE 
                     , dn.DONATION_TYPE, dn.bag, dn.site, dn.COLLECTION_POINT, dn.CREATE_STAFF
-                    , dn.INTEVIEW_STAFF, dn.INTEVIEW_STATUS, dn.sample_number
+                    , dn.Interview_STAFF, dn.Interview_STATUS, dn.sample_number
                     , to_char(dn.lab_date, 'DD MON YYYY HH24,MI', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as lab_date
                     from (
                         Select dv.id as visit_id, dr.DONATION_NUMBER, nvl(DV.VISIT_DATE, dv.create_date) As VISIT_DATE, DT.DESCRIPTION As DONATION_TYPE
                         , ba.description as bag, si.code as site, cp.code as COLLECTION_POINT, crs.name || ' ' || crs.surname as CREATE_STAFF
-                        , ins.name || ' ' || ins.surname as INTEVIEW_STAFF, dv.INTEVIEW_STATUS, dr.lab_date, dv.sample_number
+                        , ins.name || ' ' || ins.surname as Interview_STAFF, dv.Interview_STATUS, dr.lab_date, dv.sample_number
                         From DONATION_VISIT dv
                         Left Join DONATION_RECORD dr on dr.DONATION_VISIT_id = dv.id
                         Left Join DONATION_TYPE dt on dt.id = dv.DONATION_TYPE_ID
@@ -660,7 +662,7 @@ Public Class donorAction
                         Left Join site si on si.id = dv.site_ID
                         Left Join COLLECTION_POINT cp on cp.id = dv.COLLECTION_POINT_ID
                         Left Join STAFF crs on crs.id = dv.CREATE_STAFF
-                        Left Join STAFF ins on ins.id = dv.INTEVIEW_STAFF
+                        Left Join STAFF ins on ins.id = dv.Interview_STAFF
                         where dv.donor_id = '" & _REQUEST("id") & "'
                     ) dn 
                     ORDER BY dn./*#SORT_ORDER*/ /*#SORT_DIRECTION*/
@@ -677,8 +679,8 @@ Public Class donorAction
                         Item.CreateStaff = dRow("CREATE_STAFF").ToString()
                         Item.DonationNumber = dRow("DONATION_NUMBER").ToString()
                         Item.DonationType = dRow("DONATION_TYPE").ToString()
-                        Item.InterviewStaff = dRow("INTEVIEW_STAFF").ToString()
-                        Item.InterviewStatus = dRow("INTEVIEW_STATUS").ToString()
+                        Item.InterviewStaff = dRow("Interview_STAFF").ToString()
+                        Item.InterviewStatus = dRow("Interview_STATUS").ToString()
                         Item.LabDate = dRow("lab_date").ToString().Replace(",", ":")
                         Item.SampleNumber = dRow("sample_number").ToString()
                         Item.Site = dRow("site").ToString()
@@ -728,6 +730,7 @@ Public Class donorAction
                         Item.pressure = dr("PRESSURE").ToString
                         Item.dmed_coll = dr("DMED_COLL").ToString
                         Item.dmed_refus = dr("DMED_REFUS").ToString
+                        Item.dmed_site = dr("DMED_SITE").ToString
 
                         SynthesisData.SynthesisSet1.Add(Item)
 
@@ -761,6 +764,52 @@ Public Class donorAction
                     Next
 
                     JSONResponse.setItems(Of SynthesisListData)(SynthesisData)
+
+
+                Case "getDonateSite"
+                    Dim siteCode As String = _REQUEST("siteCode")
+                    Dim sql As String = "select COLL_LIBELLE from collectivite where coll_cd = '" & siteCode & "'"
+                    Dim ResultData As String = Hbase.QueryField(sql)
+
+                    JSONResponse.setItems("{""site"" : """ & ResultData & """}")
+
+                Case "immunohaemtologyDataSetDate"
+                    Dim donn_numero As String = _REQUEST("donn_numero")
+                    'donn_numero = "1004230339"
+
+                    Dim DateList As New ImmunohaemtologyDateData
+
+                    Dim Sql1 As String = "select pexamen.pex_lib show_exam,
+                                            decode(substr(dossex.dex_res,1,1),'*',
+                                            presultat.pres_aff||replace(substr(dossex.dex_res,instr(dossex.dex_res,chr(27))),
+                                            chr(27)||substr(presultat.pres_aff,instr(presultat.pres_aff,'*'),
+                                            (length(presultat.pres_aff)-instr(presultat.pres_aff,':')+2)),'/'),presultat.pres_aff) show_result,
+                                            to_char(dossex.dex_dtpdet, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') show_firstdate,
+                                            to_char(dossex.dex_dtddet, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') show_lastdate,
+                                            dossex.dex_nbdet show_totaltest,
+                                            dossex.dex_numpdet show_firstsample,dossex.dex_numddet show_lastsample,
+                                            decode(plabo_first.plabo_lib,null,'',dossex.dex_labpdet||'-'||plabo_first.plabo_lib) show_firstlabolatory,
+                                            decode(plabo_last.plabo_lib,null,'',dossex.dex_labddet||'-'||plabo_last.plabo_lib) show_lastlabolatory,
+                                            pexamen.pex_unitres show_unit
+                                            from dossex inner join pexamen on trim(dossex.dex_exam) = trim(pexamen.pex_cd)
+                                            inner join presultat on  trim(presultat.pfres_cd) = trim(pexamen.pex_famres)
+                                            and nvl(trim(substr(dossex.dex_res,0,instr(dossex.dex_res,chr(27))-1)),trim(dossex.dex_res)) = trim(presultat.pres_cd)
+                                            left join plabo plabo_first  on dossex.dex_labpdet = plabo_first.plabo_cd
+                                            left join plabo plabo_last on dossex.dex_labddet = plabo_last.plabo_cd
+                                            where dossex.donn_numero = get_hiig_donor('" & donn_numero & "') AND pexamen.pex_lib = 'ABO grouping'
+                                            order by dex_exam"
+                    Dim ct As DataTable = Hbase.QueryTable(Sql1)
+                    DateList.abod = New List(Of DateDataList)
+                    For Each dr As DataRow In ct.Rows
+                        Dim Item As New DateDataList
+                        Item.no = dr("SHOW_TOTALTEST").ToString
+                        Item.firstDate = dr("SHOW_FIRSTDATE").ToString
+                        Item.lastDate = dr("SHOW_LASTDATE").ToString
+
+                        DateList.abod.Add(Item)
+                    Next
+
+                    JSONResponse.setItems(Of ImmunohaemtologyDateData)(DateList)
 
             End Select
 
@@ -848,8 +897,8 @@ Public Structure PostQueueItem
     Public Comment As String
     Public RegisTime As String
     Public RegisStaff As String
-    Public InteviewTime As String
-    Public InteviewStaff As String
+    Public InterviewTime As String
+    Public InterviewStaff As String
     Public CollectionTime As String
     Public CollectionStaff As String
     Public LabTime As String
@@ -946,6 +995,7 @@ Public Structure SynthesisStatement1
     Public pressure As String
     Public dmed_coll As String
     Public dmed_refus As String
+    Public dmed_site As String
 End Structure
 
 Public Structure SynthesisStatement2
@@ -960,4 +1010,16 @@ End Structure
 Public Structure SynthesisListData
     Public SynthesisSet1 As List(Of SynthesisStatement1)
     Public SynthesisSet2 As List(Of SynthesisStatement2)
+End Structure
+
+Public Structure ImmunohaemtologyDateData
+    Public abod As List(Of DateDataList)
+    Public extPheno As List(Of DateDataList)
+    Public abScreen As List(Of DateDataList)
+End Structure
+
+Public Structure DateDataList
+    Public no As String
+    Public firstDate As String
+    Public lastDate As String
 End Structure

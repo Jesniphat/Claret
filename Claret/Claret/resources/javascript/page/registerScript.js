@@ -571,7 +571,6 @@ function setImmunohaemtologyFile() {
                         for (var i = 0; i < dataz.length; i++) {
                             dataz[i].Rsx_Lib = dataz[i].Rsx_Lib.replace(" ", "_");
 
-                            $("#" + dataz[i].Rsx_Lib + "_NO").val(dataz[i].Rsx_Type);
                             $("#" + dataz[i].Rsx_Lib + "_RESULT").val(dataz[i].Result_Decode);
                         }
                         deferred.resolve("Ok");
@@ -586,8 +585,40 @@ function setImmunohaemtologyFile() {
         return deferred.promise();
     }
 
+    function getDateData() {
+        var deferred = $.Deferred();
+        $.ajax({
+            url: '../../ajaxAction/donorAction.aspx',
+            data: H2G.ajaxData({ action: 'immunohaemtologyDataSetDate', donn_numero: $("#spRegisNumber").H2GValue() }).config,
+            type: "POST",
+            dataType: "json",
+            error: function (xhr, s, err) {
+                console.log(s, err);
+                deferred.reject("Error getDateData");
+            },
+            success: function (data) {
+                data.getItems = jQuery.parseJSON(data.getItems);
+                if (!data.onError) {
+                    var dataz = data.getItems;
+                    if (dataz.abod.length > 0) {
+                        $("#ABOD_NO").val(dataz.abod[0].no);
+                        $("#ABOD_FIRST_DATE").val(dataz.abod[0].firstDate);
+                        $("#ABOD_LAST_DATE").val(dataz.abod[0].lastDate);
+                    }
+                    console.log("sdcg = ", dataz);
+                    deferred.resolve("Ok");
+                } else {
+                    console.log("Error = ", data.exMessage);
+                    deferred.reject("Error getDateData");
+                }
+            }
+        });
+        return deferred.promise();
+    }
+
     getSet1()
-    .done(getSet2)
+    .then(getSet2)
+    .done(getDateData)
     .fail(function (err) {
         console.log(err);
     });
@@ -735,13 +766,12 @@ function loadSynthesisLink() {
                 data.getItems = jQuery.parseJSON(data.getItems);
                 datas = data.getItems.SynthesisSet1;
                 console.log("xxxx = ", datas);
-                var lastIndexdate = datas.length - 1;
-                $(".firstDonateTime").text("บริจาคครั้งแรกเมื่อ " + datas[lastIndexdate].donate_date);
-                $(".lastDonateTime").text("บริจาคครั้งสุดท้ายเมื่อ " + datas[0].donate_date);
+                
+                var siteSet = []
                 for (var i = 0; i < datas.length; i++) {
-                    //if (datas[i].dornor_rank == "" || datas[i].dornor_rank == null) {
-                    //    datas[i].dornor_rank = "0";
-                    //}
+                    if (datas[i].dornor_type != "Refused") {
+                        siteSet.push(datas[i]);
+                    }
                     var rows = "<tr class='synthesisStandard-row'>" +
                                     "<td class='text-center td-date-excel date-" + datas[i].dornor_rank + "'>" + datas[i].donate_date + "</td>" +
                                     "<td class='text-center td-text-excel type-" + datas[i].dornor_rank + "'>" + datas[i].dornor_type + "</td>" +
@@ -831,6 +861,7 @@ function loadSynthesisLink() {
                 }
                 // $(".E-4").text("test");
                 displaySynthesisColData(data.getItems.SynthesisSet2);
+                siteAnddateSet(siteSet);
             }
             $('body').unblock();
         }
@@ -841,6 +872,59 @@ function displaySynthesisColData(datas) {
     // console.log("displaySynthesisColData = ", datas);
     for (var i = 0; i < datas.length; i++) {
         $("." + datas[i].show_gen_label).text(datas[i].display_result);
+    }
+}
+
+function siteAnddateSet(data) {
+    console.log("siteAnddateSet = ", data);
+    var lastIndexdate = data.length - 1;
+    $(".firstDonateWhen").text(data[lastIndexdate].donate_date);
+    $(".lastDonateWhen").text(data[0].donate_date);
+
+    // data[lastIndexdate].dmed_coll = '0A0000';
+    if (data[lastIndexdate].dmed_coll != "") {
+        $.ajax({
+            url: '../../ajaxAction/donorAction.aspx',
+            data: H2G.ajaxData({ action: 'getDonateSite', siteCode: data[lastIndexdate].dmed_coll }).config,
+            type: "POST",
+            dataType: "json",
+            beforeSend: function () {
+                $('body').block();
+            },
+            error: function (xhr, s, err) {
+                console.log(s, err);
+            },
+            success: function (data) {
+                data.getItems = jQuery.parseJSON(data.getItems);
+                if (!data.onError) {
+                    $(".firstDonateAt").text(data.getItems.site)
+                }
+                $('body').unblock();
+            }
+        });
+    }
+
+
+    if (data[0].dmed_coll != "") {
+        $.ajax({
+            url: '../../ajaxAction/donorAction.aspx',
+            data: H2G.ajaxData({ action: 'getDonateSite', siteCode: data[0].dmed_coll }).config,
+            type: "POST",
+            dataType: "json",
+            beforeSend: function () {
+                $('body').block();
+            },
+            error: function (xhr, s, err) {
+                console.log(s, err);
+            },
+            success: function (data) {
+                data.getItems = jQuery.parseJSON(data.getItems);
+                if (!data.onError) {
+                    $(".lastDonateAt").text(data.getItems.site)
+                }
+                $('body').unblock();
+            }
+        });
     }
 }
 

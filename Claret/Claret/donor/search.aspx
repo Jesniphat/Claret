@@ -230,8 +230,8 @@
 
                                         $(dataRow).find('.td-regis-staff').append(e.RegisStaff).H2GAttr("title", e.RegisStaff);
                                         $(dataRow).find('.td-regis-time').append(e.RegisTime).H2GAttr("title", e.RegisTime);
-                                        $(dataRow).find('.td-interview-staff').append(e.InteviewStaff).H2GAttr("title", e.InteviewStaff);
-                                        $(dataRow).find('.td-interview-time').append(e.InteviewTime).H2GAttr("title", e.InteviewTime);
+                                        $(dataRow).find('.td-interview-staff').append(e.InterviewStaff).H2GAttr("title", e.InterviewStaff);
+                                        $(dataRow).find('.td-interview-time').append(e.InterviewTime).H2GAttr("title", e.InterviewTime);
                                         $(dataRow).find('.td-collection-staff').append(e.CollectionStaff).H2GAttr("title", e.CollectionStaff);
                                         $(dataRow).find('.td-collection-time').append(e.CollectionTime).H2GAttr("title", e.CollectionTime);
                                         $(dataRow).find('.td-lab-staff').append(e.LabStaff).H2GAttr("title", e.LabStaff);

@@ -884,12 +884,12 @@
                                                 <table class="table table-bordered-excel" id="synthesisStandard" style="display:block;">
                                                     <thead>
                                                         <tr style="font-size: 16px; height:28px;">
-                                                            <th class="col-md-12" colspan="6"><span class="firstDonateTime">xxx</span></th>
+                                                            <th class="col-md-12" colspan="6">บริจาคครั้งแรกเมื่อ <span class="firstDonateWhen"></span> ที่ <span class="firstDonateAt"></span></th>
                                                             <th class="col-md-2" colspan="1">Pheno</th>
                                                             <th class="col-md-22" colspan="16" style="text-align:left;"><span class="phenoValue">C+E+</span></th>
                                                         </tr>
                                                         <tr style="font-size: 16px; height:28px;">
-                                                            <th class="col-md-12" colspan="6"><span class="lastDonateTime">xxx</span></th>
+                                                            <th class="col-md-12" colspan="6">บริจาคครั้งสุดท้ายเมื่อ <span class="lastDonateWhen"></span> ที่ <span class="lastDonateAt"></span></th>
                                                             <th class="col-md-2"><span class="ABOD"></span></th>
                                                             <th class="col-md-1"><span class="DAT_val"></span></th>
                                                             <th class="col-md-1"><span class="DATF_val"></span></th>
@@ -942,12 +942,12 @@
                                                 <table class="table table-bordered-excel" id="synthesisVirology" style="display:none;">
                                                     <thead>
                                                         <tr style="font-size: 14px; height:28px;">
-                                                            <th style="width:25%" colspan="6"><span class="firstDonateTime">xxx</span></th>
+                                                            <th style="width:25%" colspan="6">บริจาคครั้งแรกเมื่อ <span class="firstDonateWhen"></span> ที่ <span class="firstDonateAt"></span></th>
                                                             <th style="width:3.7%" colspan="1">Pheno</th>
                                                             <th style="width:59.5%; text-align:left;" colspan="16"><span class="phenoValue">C+E+</span></th>
                                                         </tr>
                                                         <tr style="font-size: 14px; height:28px;">
-                                                            <th style="width:25%" colspan="6"><span class="lastDonateTime">xxx</span></th>
+                                                            <th style="width:25%" colspan="6">บริจาคครั้งสุดท้ายเมื่อ <span class="lastDonateWhen"></span> ที่ <span class="lastDonateAt"></span></th>
                                                             <th style="width:3.7%; font-size:10px;"><span class="ABOD">ABO group</span></th>
                                                             <th style="width:3.7%; font-size:10px;"><span class="ABOD2">ABO group</span></th>
                                                             <th style="width:3.7%"><span class="ABO_group_val">O</span></th>
@@ -1000,12 +1000,12 @@
                                                 <table class="table table-bordered-excel" id="synthesisImmunohematology" style="display:none;">
                                                     <thead>
                                                         <tr style="font-size: 14px; height:28px;">
-                                                            <th style="width:25%" colspan="6"><span class="firstDonateTime">xxx</span></th>
+                                                            <th style="width:25%" colspan="6">บริจาคครั้งแรกเมื่อ <span class="firstDonateWhen"></span> ที่ <span class="firstDonateAt"></span></th>
                                                             <th style="width:3.7%" colspan="1">Pheno</th>
                                                             <th style="width:59.5%; text-align:left;" colspan="16"><span class="phenoValue">C+E+</span></th>
                                                         </tr>
                                                         <tr style="font-size: 14px; height:28px;">
-                                                            <th style="width:25%" colspan="6"><span class="lastDonateTime">xxx</span></th>
+                                                            <th style="width:25%" colspan="6">บริจาคครั้งสุดท้ายเมื่อ <span class="lastDonateWhen"></span> ที่ <span class="lastDonateAt"></span></th>
                                                             <th style="width:3.7%"><span class="ABOD">AB</span></th>
                                                             <th style="width:3.7%"><span class="zx">AB</span></th>
                                                             <th style="width:3.7%"><span class="ddf">+</span></th>
