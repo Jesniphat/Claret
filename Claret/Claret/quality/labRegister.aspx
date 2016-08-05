@@ -288,17 +288,21 @@
                 },
                 success: function (data) {
                     if (!data.onError) {
+                        $("tr").remove(".hospitalListCol");
                         data.getItems = jQuery.parseJSON(data.getItems);
-                        // console.log("List = ", data);
-                        var dataRow = data.getItems.getItems;
+                        var dataRow = data.getItems;
                         for (var i = 0; i < dataRow.length; i++) {
-                            var rows = "<tr>" +
-                                            "<td>" + i + "</td>" +
+                            var rows = "<tr class='hospitalListCol'>" +
+                                            "<td class='text-right'>" + (i + 1) + "</td>" +
                                             "<td>" + dataRow[i].name + "</td>" +
                                             "<td>" + dataRow[i].donor_amount + "</td>" +
                                             "<td>" + dataRow[i].regis_time + "</td>" +
                                             "<td>" + dataRow[i].staff + "</td>" +
-                                            "<td>" + "-" + "</td>" +
+                                            "<td class='text-center'>" +
+                                                "<button class='btn btn-icon' onclick='gotoSearch(" + dataRow[i].id + ");' tabindex='1'>" +
+                                                    "<i class='glyphicon glyphicon-circle-arrow-right'></i>" +
+                                                "</button>" +
+                                            "</td>" +
                                         "</tr>";
                             $('#hospitalList > tbody').append(rows);
                         }
@@ -308,6 +312,12 @@
                     }
                 }
             });
+        }
+
+        function gotoSearch(id) {
+            //console.log(id);
+            $("#data").H2GFill({ receiptHospitalID: id});
+            $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "../donor/search.aspx", method: "post", staffaction: "labregister" }).submit();
         }
     </script>
 </asp:Content>
@@ -450,39 +460,16 @@
             <table class="table table-bordered" id="hospitalList">
                 <thead class="table table-bordered">
                     <tr>
-                        <th class="col-md-2" style="border:1px solid #ddd; padding:0px 5px 0px 5px";>ลำดับ</th>
-                        <th class="col-md-18" style="border:1px solid #ddd; padding:0px 5px 0px 5px";">รายการโรงพยาบาล</th>
+                        <th class="col-md-2 text-center" style="border:1px solid #ddd; padding:0px 5px 0px 5px";>ลำดับ</th>
+                        <th class="col-md-17" style="border:1px solid #ddd; padding:0px 5px 0px 5px";">รายการโรงพยาบาล</th>
                         <th class="col-md-5" style="border:1px solid #ddd; padding:0px 5px 0px 5px";">จำนวนผู้บริจาค</th>
                         <th class="col-md-5" style="border:1px solid #ddd; padding:0px 5px 0px 5px";">เวลา</th>
                         <th class="col-md-5" style="border:1px solid #ddd; padding:0px 5px 0px 5px";">ผู้บันทึกข้อมูล</th>
-                        <th class="col-md-1" style="border:1px solid #ddd; padding:0px 5px 0px 5px";">Ax</th>
+                        <th class="col-md-2 text-center" style="border:1px solid #ddd; padding:0px 5px 0px 5px";"></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <th>1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                        <td>@mdo</td>
-                        <td>@</td>
-                    </tr>
-                    <tr>
-                        <th>2</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@TwBootstrap</td>
-                        <td>@TwBootstrap</td>
-                        <td>@</td>
-                    </tr>
-                    <tr>
-                        <th>3</th>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                        <td>@fat</td>
-                        <td>@</td>
-                    </tr>
+                    
                 </tbody>
             </table>
         </div>
