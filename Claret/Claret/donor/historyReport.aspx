@@ -38,7 +38,38 @@
             
             $("#ddlStatus").setDropdownList();
             $("#txtReportDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy"));
-            postQueueSearch(true);
+            //postQueueSearch(true);
+
+            // menu control
+            if ($("#data").H2GAttr("lmenu") == "lmenuHistoryReport") {
+                $(".claret-page-header span").H2GValue("รายงานย้อนหลัง");
+                $("#txtPostQueue").focus();
+
+            } else if ($("#data").H2GAttr("lmenu") == "lmenuInterview") {
+                $(".claret-page-header span").H2GValue("คัดกรอง");
+                $(".collection-page-header").show();
+                $("#ddlITVDonationType").setDropdownListValue({
+                    url: '../../ajaxAction/masterAction.aspx',
+                    data: { action: 'donationtype' },
+                }).on('change', function () {
+                    $("#ddlITVBag").closest("div").focus();
+                });
+                $("#ddlITVBag").setDropdownListValue({
+                    url: '../../ajaxAction/masterAction.aspx',
+                    data: { action: 'bag' },
+                }).on('change', function () {
+                    $("#ddlITVDonationTo").closest("div").focus();
+                });
+                $("#ddlITVDonationTo").setDropdownListValue({
+                    url: '../../ajaxAction/masterAction.aspx',
+                    data: { action: 'donationto' },
+                }).on('change', function () {
+                    $("#txtPostQueue").focus();
+                });
+                $("#ddlStatus").H2GValue("WAIT INTERVIEW").change().H2GDisable();
+                $("#txtReportDate").H2GDisable();
+                $("#ddlITVDonationType").closest("div").focus();
+            }
         });
         function postQueueSearch(newSearch) {
             var dataView = $("#tbPostQueue > tbody");
@@ -128,6 +159,41 @@
             <span>รายงานย้อนหลัง</span>
         </div>
     </div>
+    <div class="collection-page-header row" style="display:none;">
+        <div class="border-box" style="border-radius: 4px 4px 0px 0px;">
+            <div class="row">
+                <div class="col-md-36" style="font-size:larger; font-weight:bold;">
+                    <span>กำหนดประเภทของการรับบริจาคที่กำลังจะดำเนินงาน</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 text-right">
+                    <span>ประเภทการบริจาค</span>
+                </div>                                                        
+                <div class="col-md-7">
+                    <select id="ddlITVDonationType" class="text-left" style="width:100%;">
+                        <option value="0">Loading...</option>
+                    </select>
+                </div>
+                <div class="col-md-3 text-right">
+                    <span>ประเภทถุง</span>
+                </div>                                                        
+                <div class="col-md-7">
+                    <select id="ddlITVBag" class="text-left" style="width:100%;">
+                        <option value="0">Loading...</option>
+                    </select>
+                </div>
+                <div class="col-md-4 text-right">
+                    <span>การนำไปใช้งาน</span>
+                </div>                                                        
+                <div class="col-md-7">
+                    <select id="ddlITVDonationTo" class="text-left" style="width:100%;">
+                        <option value="0">Loading...</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row">
         <div class="border-box" style="border-radius: 4px 4px 0px 0px;">
             <div class="col-md-36" style="border-bottom:solid 1px #CCCCCC; padding-bottom: 5px;">
@@ -143,7 +209,7 @@
                 <div class="col-md-5">
                     <select id="ddlStatus">
                         <option value="" selected="selected">ALL</option>
-                        <option>WAIT INTEVEIW</option>
+                        <option>WAIT INTERVIEW</option>
                         <option>WAIT COLLECTION</option>
                         <option>WAIT RESULT</option>
                         <option>FINISH</option>

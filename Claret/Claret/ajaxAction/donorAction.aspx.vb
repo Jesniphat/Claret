@@ -39,7 +39,7 @@ Public Class donorAction
                         If String.IsNullOrEmpty(DVisitItem.ID) Then
                             DVisitItem.ID = Cbase.QueryField(H2G.nextVal("DONATION_VISIT"))
                             DVisitItem.DonorID = DonorItem.ID
-                            DVisitItem.Status = "WAIT Interview" 'สร้างใหม่ต้องเป็น WAIT Interview เสมอ
+                            DVisitItem.Status = "WAIT INTERVIEW" 'สร้างใหม่ต้องเป็น WAIT INTERVIEW เสมอ
                             DVisitItem.QueueNumber = Cbase.QueryField("select nvl(max(queue_number),0)+1 from donation_visit where create_date between to_date('" & Today.ToString("ddMMyyyy") & "','ddMMyyyy') and to_date('" & Today.AddDays(1).ToString("ddMMyyyy") & "','ddMMyyyy') ")
                             DVisitItem.VisitNumber = Cbase.QueryField("select nvl(max(visit_number),0)+1 from donation_visit where donor_id = " & DonorItem.ID & " ")
 
@@ -58,7 +58,7 @@ Public Class donorAction
                             End If
                             DHospitalItem.ID = Cbase.QueryField(H2G.nextVal("DONATION_HOSPITAL"))
                             DHospitalItem.DonorID = DonorItem.ID
-                            DHospitalItem.Status = "WAIT Interview" 'สร้างใหม่ต้องเป็น WAIT Interview เสมอ
+                            DHospitalItem.Status = "WAIT INTERVIEW" 'สร้างใหม่ต้องเป็น WAIT INTERVIEW เสมอ
                             DHospitalItem.OrderNumber = Cbase.QueryField("select nvl(max(order_number),0)+1 from donation_hospital where receipt_hospital_id = '" & DHospitalItem.ReceiptHospitalID & "' ")
                             DHospitalItem.ReceiptHospitalID = dtHospital.Rows(0)("id").ToString()
                             DHospitalItem.DonationToID = dtHospital.Rows(0)("donation_to_id").ToString()
@@ -268,6 +268,7 @@ Public Class donorAction
                 Case "searchdonor"
                     Dim SearchItem As New SearchItem
                     SearchItem.GoNext = "N"
+                    SearchItem.Duplicate = ""
                     SearchItem.SearchList = New List(Of DonorSearchItem)
                     Dim DonorSearchItem As DonorSearchItem
                     Dim intItemPerPage As Integer = 20
@@ -357,6 +358,20 @@ Public Class donorAction
 
                         SearchItem.SearchList.Add(DonorSearchItem)
                     Next
+
+                    If (SearchItem.GoNext = "Y" And SearchItem.SearchList.Count > 0) Then
+                        sql = "select nvl(count(DV.id),0) as visit_count, dor.id, dor.Name, dor.Surname 
+                                        from donor dor
+                                        left join donation_visit dv on DV.donor_id = dor.id and to_char(dv.create_date,'yyyyMMdd') = to_char(sysdate,'yyyyMMdd')
+                                        where dor.id = '" & SearchItem.SearchList(0).ID & "' 
+                                        GROUP BY dor.Name, dor.Surname, dor.id "
+                        Dim dt As DataTable = Cbase.QueryTable(sql, param)
+                        If dt.Rows.Count > 0 Then
+                            If dt.Rows(0)("visit_count").ToString() <> "0" Then
+                                SearchItem.Duplicate = "วันนี้คุณ " & dt.Rows(0)("name").ToString() & " " & dt.Rows(0)("surname").ToString() & " ทำการลงทะเบียนไปแล้ว"
+                            End If
+                        End If
+                    End If
 
                     JSONResponse.setItems(Of SearchItem)(SearchItem)
                     'Response.Write(JSONResponse.ToJSON())
@@ -629,8 +644,8 @@ Public Class donorAction
                         Item.Comment = dRow("COMMENT_TEXT").ToString()
                         Item.RegisTime = dRow("regis_time").ToString().Replace(",", ":")
                         Item.RegisStaff = dRow("regis_staff").ToString()
-                        Item.InterviewTime = dRow("Interview_time").ToString().Replace(",", ":")
-                        Item.InterviewStaff = dRow("Interview_STAFF").ToString()
+                        Item.InterviewTime = dRow("INTERVIEW_time").ToString().Replace(",", ":")
+                        Item.InterviewStaff = dRow("INTERVIEW_STAFF").ToString()
                         Item.CollectionTime = dRow("collection_time").ToString().Replace(",", ":")
                         Item.CollectionStaff = dRow("collection_staff").ToString()
                         Item.LabTime = dRow("lab_time").ToString().Replace(",", ":")
@@ -649,12 +664,12 @@ Public Class donorAction
                     Dim sqlRecord As String = "
                     select dn.visit_id, dn.DONATION_NUMBER, to_char(dn.VISIT_DATE, 'DD MON YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as VISIT_DATE 
                     , dn.DONATION_TYPE, dn.bag, dn.site, dn.COLLECTION_POINT, dn.CREATE_STAFF
-                    , dn.Interview_STAFF, dn.Interview_STATUS, dn.sample_number
+                    , dn.INTERVIEW_STAFF, dn.INTERVIEW_STATUS, dn.sample_number
                     , to_char(dn.lab_date, 'DD MON YYYY HH24,MI', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as lab_date
                     from (
                         Select dv.id as visit_id, dr.DONATION_NUMBER, nvl(DV.VISIT_DATE, dv.create_date) As VISIT_DATE, DT.DESCRIPTION As DONATION_TYPE
                         , ba.description as bag, si.code as site, cp.code as COLLECTION_POINT, crs.name || ' ' || crs.surname as CREATE_STAFF
-                        , ins.name || ' ' || ins.surname as Interview_STAFF, dv.Interview_STATUS, dr.lab_date, dv.sample_number
+                        , ins.name || ' ' || ins.surname as INTERVIEW_STAFF, dv.INTERVIEW_STATUS, dr.lab_date, dv.sample_number
                         From DONATION_VISIT dv
                         Left Join DONATION_RECORD dr on dr.DONATION_VISIT_id = dv.id
                         Left Join DONATION_TYPE dt on dt.id = dv.DONATION_TYPE_ID
@@ -662,7 +677,7 @@ Public Class donorAction
                         Left Join site si on si.id = dv.site_ID
                         Left Join COLLECTION_POINT cp on cp.id = dv.COLLECTION_POINT_ID
                         Left Join STAFF crs on crs.id = dv.CREATE_STAFF
-                        Left Join STAFF ins on ins.id = dv.Interview_STAFF
+                        Left Join STAFF ins on ins.id = dv.INTERVIEW_STAFF
                         where dv.donor_id = '" & _REQUEST("id") & "'
                     ) dn 
                     ORDER BY dn./*#SORT_ORDER*/ /*#SORT_DIRECTION*/
@@ -679,8 +694,8 @@ Public Class donorAction
                         Item.CreateStaff = dRow("CREATE_STAFF").ToString()
                         Item.DonationNumber = dRow("DONATION_NUMBER").ToString()
                         Item.DonationType = dRow("DONATION_TYPE").ToString()
-                        Item.InterviewStaff = dRow("Interview_STAFF").ToString()
-                        Item.InterviewStatus = dRow("Interview_STATUS").ToString()
+                        Item.InterviewStaff = dRow("INTERVIEW_STAFF").ToString()
+                        Item.InterviewStatus = dRow("INTERVIEW_STATUS").ToString()
                         Item.LabDate = dRow("lab_date").ToString().Replace(",", ":")
                         Item.SampleNumber = dRow("sample_number").ToString()
                         Item.Site = dRow("site").ToString()
@@ -875,6 +890,31 @@ Public Class donorAction
 
                     JSONResponse.setItems(Of ImmunohaemtologyDateData)(DateList)
 
+                Case "checkvisited"
+                    Dim strReturn As String = ""
+                    Dim strReturnID As String = ""
+                    If Not String.IsNullOrEmpty(_REQUEST("id")) Then param.Add("#ID", " and dor.id = '" & _REQUEST("id") & "' ")
+                    If Not String.IsNullOrEmpty(_REQUEST("name")) Then param.Add("#NAME", " and UPPER(dor.name) = UPPER('" & _REQUEST("name") & "')  ")
+                    If Not String.IsNullOrEmpty(_REQUEST("surname")) Then param.Add("#SURNAME", " and UPPER(dor.surname) = UPPER('" & _REQUEST("surname") & "') ")
+                    If Not String.IsNullOrEmpty(_REQUEST("birthday")) Then param.Add("#BIRTHDAY", "and to_char(dor.birthday, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("birthday") & "' ")
+
+                    Dim sql As String = "select nvl(count(DV.id),0) as visit_count, dor.id, dor.Name, dor.Surname 
+                                        from donor dor
+                                        left join donation_visit dv on DV.donor_id = dor.id and to_char(dv.create_date,'yyyyMMdd') = to_char(sysdate,'yyyyMMdd')
+                                        where 1=1  /*#ID*/ /*#NAME*/ /*#SURNAME*/ /*#BIRTHDAY*/ 
+                                        GROUP BY dor.Name, dor.Surname, dor.id "
+
+                    Dim dt As DataTable = Cbase.QueryTable(sql, param)
+                    If dt.Rows.Count > 0 Then
+                        If dt.Rows(0)("visit_count").ToString() <> "0" Then
+                            strReturn = "วันนี้คุณ " & dt.Rows(0)("name").ToString() & " " & dt.Rows(0)("surname").ToString() & " ทำการลงทะเบียนไปแล้ว"
+                        End If
+                        strReturnID = dt.Rows(0)("id").ToString()
+
+                    End If
+
+                    JSONResponse.setItems("{""Duplicate"" : """ & strReturn & """, ""DonorID"" : """ & strReturnID & """ }")
+
             End Select
 
         Catch ex As Exception
@@ -930,6 +970,7 @@ End Structure
 
 Public Structure SearchItem
     Public GoNext As String
+    Public Duplicate As String
     Public TotalPage As String
     Public SearchList As List(Of DonorSearchItem)
 End Structure

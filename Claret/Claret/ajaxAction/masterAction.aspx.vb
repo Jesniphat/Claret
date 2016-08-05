@@ -177,14 +177,15 @@ Public Class masterAction
                     End If
                     JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeIDItem))(DataList))
                 Case "lab"
-                    Dim DataList As New List(Of KeyCodeItem)
-                    Dim DataItem As KeyCodeItem
+                    Dim DataList As New List(Of KeyCodeIDItem)
+                    Dim DataItem As KeyCodeIDItem
                     Dim sql As String = "select id, trim(code) as code, description from lab ORDER BY code "
                     Dim dt As DataTable = Cbase.QueryTable(sql)
 
                     If dt.Rows.Count > 0 Then
                         For Each dr As DataRow In dt.Rows()
-                            DataItem = New KeyCodeItem
+                            DataItem = New KeyCodeIDItem
+                            DataItem.valueID = dr("id").ToString()
                             DataItem.value = dr("code").ToString()
                             DataItem.text = dr("description").ToString()
                             DataList.Add(DataItem)
@@ -192,7 +193,7 @@ Public Class masterAction
                     Else
                         Throw New Exception("No data found.", New Exception("Hospital has no record"))
                     End If
-                    JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeItem))(DataList))
+                    JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeIDItem))(DataList))
                 Case "examination"
                     Dim DataList As New List(Of KeyCodeItem)
                     Dim DataItem As KeyCodeItem
@@ -215,14 +216,15 @@ Public Class masterAction
                     End If
                     JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeItem))(DataList))
                 Case "reason"
-                    Dim DataList As New List(Of KeyCodeItem)
-                    Dim DataItem As KeyCodeItem
+                    Dim DataList As New List(Of KeyCodeIDItem)
+                    Dim DataItem As KeyCodeIDItem
                     Dim sql As String = "select id, description from REASON where used_module = 'TEST REQUEST REASON' order by description "
                     Dim dt As DataTable = Cbase.QueryTable(sql)
 
                     If dt.Rows.Count > 0 Then
                         For Each dr As DataRow In dt.Rows()
-                            DataItem = New KeyCodeItem
+                            DataItem = New KeyCodeIDItem
+                            DataItem.valueID = dr("id").ToString()
                             DataItem.value = dr("id").ToString()
                             DataItem.text = dr("description").ToString()
                             DataList.Add(DataItem)
@@ -230,16 +232,17 @@ Public Class masterAction
                     Else
                         Throw New Exception("No data found.", New Exception("Reason has no record"))
                     End If
-                    JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeItem))(DataList))
+                    JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeIDItem))(DataList))
                 Case "donationto"
-                    Dim DataList As New List(Of KeyCodeItem)
-                    Dim DataItem As KeyCodeItem
+                    Dim DataList As New List(Of KeyCodeIDItem)
+                    Dim DataItem As KeyCodeIDItem
                     Dim sql As String = "select id, description from DONATION_TO where used_module like '%H,%' order by description "
                     Dim dt As DataTable = Cbase.QueryTable(sql)
 
                     If dt.Rows.Count > 0 Then
                         For Each dr As DataRow In dt.Rows()
-                            DataItem = New KeyCodeItem
+                            DataItem = New KeyCodeIDItem
+                            DataItem.valueID = dr("id").ToString()
                             DataItem.value = dr("id").ToString()
                             DataItem.text = dr("description").ToString()
                             DataList.Add(DataItem)
@@ -248,7 +251,7 @@ Public Class masterAction
                     Else
                         Throw New Exception("No data found.", New Exception("Donation To has no record"))
                     End If
-                    JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeItem))(DataList))
+                    JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeIDItem))(DataList))
                 Case "staff"
                     Dim DataList As New List(Of KeyCodeItem)
                     Dim DataItem As KeyCodeItem
@@ -267,6 +270,70 @@ Public Class masterAction
                         Throw New Exception("No data found.", New Exception("Staff has no record"))
                     End If
                     JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeItem))(DataList))
+                Case "deferral"
+                    Dim DataList As New List(Of DeferralItem)
+                    Dim DataItem As DeferralItem
+                    Dim sql As String = "select DEF.ID, DEF.CODE, DEF.DESCRIPTION, nvl(DED.DURATION,'') as DURATION, DED.DONATION_TYPE_ID
+                                        , DED.DEFERRAL_TYPE, DEF.CODE || ' : ' || DEF.DESCRIPTION as text
+                                        from DEFERRAL def
+                                        inner join DEFERRAL_DETAIL ded on ded.DEFERRAL_ID = DEF.id
+                                        where GENDER = '" & _REQUEST("gender") & "' "
+                    Dim dt As DataTable = Cbase.QueryTable(sql)
+
+                    If dt.Rows.Count > 0 Then
+                        For Each dr As DataRow In dt.Rows()
+                            DataItem = New DeferralItem
+                            DataItem.valueID = dr("id").ToString()
+                            DataItem.value = dr("CODE").ToString()
+                            DataItem.desc = dr("DESCRIPTION").ToString()
+                            DataItem.duration = dr("DURATION").ToString()
+                            DataItem.donationID = dr("DONATION_TYPE_ID").ToString()
+                            DataItem.deferralType = dr("DEFERRAL_TYPE").ToString()
+                            DataItem.text = dr("text").ToString()
+                            DataList.Add(DataItem)
+                        Next
+                    Else
+                        Throw New Exception("No data found.", New Exception("Staff has no record"))
+                    End If
+                    JSONResponse.setItems(JSON.Serialize(Of List(Of DeferralItem))(DataList))
+                Case "donationtype"
+                    Dim DataList As New List(Of KeyCodeIDItem)
+                    Dim DataItem As KeyCodeIDItem
+                    Dim sql As String = "select id, description from DONATION_TYPE order by description "
+                    Dim dt As DataTable = Cbase.QueryTable(sql)
+
+                    If dt.Rows.Count > 0 Then
+                        For Each dr As DataRow In dt.Rows()
+                            DataItem = New KeyCodeIDItem
+                            DataItem.valueID = dr("id").ToString()
+                            DataItem.value = dr("id").ToString()
+                            DataItem.text = dr("description").ToString()
+                            DataList.Add(DataItem)
+
+                        Next
+                    Else
+                        Throw New Exception("No data found.", New Exception("Donation To has no record"))
+                    End If
+                    JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeIDItem))(DataList))
+                Case "bag"
+                    Dim DataList As New List(Of KeyCodeIDItem)
+                    Dim DataItem As KeyCodeIDItem
+                    Dim sql As String = "select id, description from bag order by description "
+                    Dim dt As DataTable = Cbase.QueryTable(sql)
+
+                    If dt.Rows.Count > 0 Then
+                        For Each dr As DataRow In dt.Rows()
+                            DataItem = New KeyCodeIDItem
+                            DataItem.valueID = dr("id").ToString()
+                            DataItem.value = dr("id").ToString()
+                            DataItem.text = dr("description").ToString()
+                            DataList.Add(DataItem)
+
+                        Next
+                    Else
+                        Throw New Exception("No data found.", New Exception("Donation To has no record"))
+                    End If
+                    JSONResponse.setItems(JSON.Serialize(Of List(Of KeyCodeIDItem))(DataList))
             End Select
 
         Catch ex As Exception
@@ -295,6 +362,16 @@ Public Structure LabHospitalItem
     Public valueID As String
     Public departmentID As String
 
+End Structure
+
+Public Structure DeferralItem
+    Public value As String
+    Public text As String
+    Public valueID As String
+    Public desc As String
+    Public duration As String
+    Public donationID As String
+    Public deferralType As String
 End Structure
 
 

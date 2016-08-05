@@ -2,8 +2,8 @@
     $("#txtCardNumber").focus();
     $("#txtDonorName").H2GNamebox();
     $("#txtDonorSurName").H2GNamebox();
-    $("#txtDonorNameEng").H2GNamebox();
-    $("#txtDonorSurNameEng").H2GNamebox();
+    $("#txtDonorNameEng").H2GNamebox().H2GDisable();
+    $("#txtDonorSurNameEng").H2GNamebox().H2GDisable();
     $("#ddlVisit").setDropdownList();
     $("#togDeferal").toggleSlide();
     $("#togVisitInfo").toggleSlide();
@@ -230,14 +230,14 @@ function validation() {
         $("#txtDonorSurName").focus();
         notiWarning("กรุณากรอกนามสกุลผู้บริจาค");
         return false;
-    } else if ($('#txtDonorNameEng').H2GValue() == "") {
-        $("#txtDonorNameEng").focus();
-        notiWarning("กรุณากรอกชื่อภาษาอังกฤษผู้บริจาค");
-        return false;
-    } else if ($('#txtDonorSurNameEng').H2GValue() == "") {
-        $("#txtDonorSurNameEng").focus();
-        notiWarning("กรุณากรอกนามสกุลภาษาอังกฤษผู้บริจาค");
-        return false;
+    //} else if ($('#txtDonorNameEng').H2GValue() == "") {
+    //    $("#txtDonorNameEng").focus();
+    //    notiWarning("กรุณากรอกชื่อภาษาอังกฤษผู้บริจาค");
+    //    return false;
+    //} else if ($('#txtDonorSurNameEng').H2GValue() == "") {
+    //    $("#txtDonorSurNameEng").focus();
+    //    notiWarning("กรุณากรอกนามสกุลภาษาอังกฤษผู้บริจาค");
+    //    return false;
     } else if ($('#txtBirthday').H2GValue() == "") {
         $("#txtBirthday").focus();
         notiWarning("กรุณากรอกวันเกิดผู้บริจาค");
@@ -331,12 +331,22 @@ function showDonorData() {
 
                 $("#spRegisNumber").H2GValue(data.getItems.Donor.DonorNumber);
                 $("#spQueue").H2GValue(data.getItems.Donor.QueueNumber == "" ? "-" : "คิวที่ " + data.getItems.Donor.QueueNumber).H2GAttr("queueNumber", data.getItems.Donor.QueueNumber);
+                if ($("#data").H2GAttr("receiptHospitalID")) { $("#spQueue").H2GValue($("#spQueue").H2GValue().replace("คิวที่", "ลำดับที่"));}
                 $("#spStatus").H2GValue(data.getItems.Donor.Status);
                 $("input:radio[name=gender]").prop("checked", false);
                 if (data.getItems.Donor.Gender == "M") { $("#rbtM").prop("checked", true); } else { $("#rbtF").prop("checked", true); }
                 $("#divBloodType").H2GValue(data.getItems.Donor.RHGroup);
                 $("#txtDonorName").H2GValue(data.getItems.Donor.Name);
                 $("#txtDonorSurName").H2GValue(data.getItems.Donor.Surname);
+                if (data.getItems.Donor.NameE == "" && data.getItems.Donor.SurnameE == "") {
+                    $("#txtDonorNameEng").H2GDisable();
+                    $("#txtDonorSurNameEng").H2GDisable();
+                    $("#chbLatinName").prop("checked",false);
+                } else {
+                    $("#txtDonorNameEng").H2GEnable();
+                    $("#txtDonorSurNameEng").H2GEnable();
+                    $("#chbLatinName").prop("checked", true);
+                }
                 $("#txtDonorNameEng").H2GValue(data.getItems.Donor.NameE);
                 $("#txtDonorSurNameEng").H2GValue(data.getItems.Donor.SurnameE);
                 $("#txtBirthDay").H2GValue(data.getItems.Donor.Birthday);
@@ -370,9 +380,9 @@ function showDonorData() {
 
                 //### Deferral
                 if (data.getItems.Deferral.length > 0) {
-                    var dataView = $("#tbDefferal").H2GValue('');
+                    var dataView = $("#tbDeferral").H2GValue('');
                     $.each((data.getItems.Deferral), function (index, e) {
-                        var dataRow = $("#tbDefferal > thead > tr.template-data").clone().show();
+                        var dataRow = $("#tbDeferral > thead > tr.template-data").clone().show();
                         if (e.Status == "INACTIVE") { dataRow.hide(); }
                         $(dataRow).H2GAttr('status', e.Status);
                         $(dataRow).find('.td-def-code').append(e.Code).H2GAttr("title", e.Code);
@@ -505,7 +515,6 @@ function setHistoricalFileDatas() {
     });
 }
 
-
 function setImmunohaemtologyFile() {
     function getSet1() {
         //console.log("do set1");
@@ -636,7 +645,6 @@ function setImmunohaemtologyFile() {
     });
 
 }
-
 
 function setExamsDatas() {
     $("tr").remove(".exams-tab-table-row");

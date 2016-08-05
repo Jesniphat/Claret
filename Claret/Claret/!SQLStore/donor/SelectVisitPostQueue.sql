@@ -1,13 +1,13 @@
 SELECT DN.rn as row_num, dn.visit_id, dn.donor_id, dn.QUEUE_NUMBER, dn.name, dn.SAMPLE_NUMBER, dn.COMMENT_TEXT, dn.regis_time
-, dn.regis_staff, dn.Interview_time, dn.Interview_STAFF, dn.collection_time, dn.collection_staff, dn.lab_time, dn.lab_staff
+, dn.regis_staff, dn.INTERVIEW_time, dn.INTERVIEW_STAFF, dn.collection_time, dn.collection_staff, dn.lab_time, dn.lab_staff
 FROM (
     SELECT ROWNUM AS rn, dn.* 
         FROM (
             SELECT dn.* 
                 FROM (
-						select DV.id as visit_id, DN.id as donor_id, DV.QUEUE_NUMBER, DN.name || ' '  || DN.SURNAME as name
+		select DV.id as visit_id, DN.id as donor_id, DV.QUEUE_NUMBER, DN.name || ' '  || DN.SURNAME as name
                         , DV.SAMPLE_NUMBER, DV.COMMENT_TEXT, to_char(nvl(DV.VISIT_DATE,dv.create_date),'HH24,MI') as regis_time
-                        , st.code as regis_staff, to_char(dv.Interview_DATE,'HH24,MI') as Interview_time, dv.Interview_STAFF
+                        , st.code as regis_staff, to_char(dv.INTERVIEW_DATE,'HH24,MI') as INTERVIEW_time, dv.INTERVIEW_STAFF
                         , '' as collection_time, '' as collection_staff, '' as lab_time, '' as lab_staff
                         from DONATION_VISIT dv
                         inner join donor dn on DN.id = DV.DONOR_ID

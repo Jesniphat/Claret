@@ -124,6 +124,13 @@
             this.button.button({ disabled: false }).prop("disabled", false);
             this.input.autocomplete("enable");
         },
+        setvalue: function (value) {
+            this.element.val(value);
+
+            var selected = this.element.children(":selected"),
+                    value = selected.val() ? selected.text() : "";
+            this.input.val(value);
+        },
         _destroy: function () {
             this.wrapper.remove();
             this.element.show();

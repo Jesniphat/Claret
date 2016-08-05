@@ -7,6 +7,10 @@
             border-bottom-color: transparent;
             background-color: white;
         }
+
+        .setBorderTable {
+            border:1px solid #ddd;
+        }
     </style>
     <script type="text/javascript">
         var departmentData;
@@ -82,7 +86,6 @@
                 $("#txtDepartment").H2GValue($("#ddlDepartment").H2GValue());
                 $("#ddlStaff").closest("div").find("input").focus();
             });
-            //$("#ddlDepartment").H2GDisable().getDepartment();
             $.extend($.fn, {
                 deleteExam: function (args) {
                     if (confirm("ต้องการจะลบ " + $(this).closest("tr").find(".td-exam").html() + " ใช่หรือไม่?")) {
@@ -161,27 +164,21 @@
 
                     }
                 },
-                getDepartment: function () {
-                    var self = this;
-                    $.ajax({
-                        url: "../ajaxAction/masterAction.aspx",
-                        data: H2G.ajaxData({
-                            action: 'department',
-                        }).config,
-                        type: "POST",
-                        dataType: "json",
-                        error: function (xhr, s, err) {
-                            console.log(s, err);
-                        },
-                        success: function (data) {
-                            if (!data.onError) {
-                                departmentData = jQuery.parseJSON(data.getItems);
-                                $(self).data("ddlValue", departmentData);
-                            }
-                        }
-                    });    //End ajax
+            });
+
+
+            $("#dateList").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
+                // maxDate: new Date(),
+                minDate: "-100y",
+                yearRange: "c-100:c+0",
+                onSelect: function (selectedDate, objDate) {
+                    // $("#txtHospital").focus();
+                    getDornorHospitalList(selectedDate);
                 },
             });
+            
+            var hospitalListDate = $("#dateList").val();
+            getDornorHospitalList(hospitalListDate);
         });
 
         function getExamination() {
@@ -243,27 +240,6 @@
                 notiWarning("กรุณากรอกหรือเลือก Examination");
             }
         }
-        function getDepartment() {
-            $.ajax({
-                url: "../ajaxAction/masterAction.aspx",
-                data: H2G.ajaxData({
-                    action: 'department',
-                }).config,
-                type: "POST",
-                dataType: "json",
-                error: function (xhr, s, err) {
-                    console.log(s, err);
-                },
-                success: function (data) {
-                    if (!data.onError) {
-                        departmentData = jQuery.parseJSON(data.getItems);
-                    }
-                }
-            });    //End ajax
-        }
-        function findDepartmentByHotel() {
-
-        }
         function validation() {
             if ($('#txtDate').val() == "") {
                 $("#txtDate").focus();
@@ -295,6 +271,43 @@
                 return false;
             }
             return true;
+        }
+
+        function getDornorHospitalList(hospitalListDate) {
+            // console.log("hospitalListDate = ", hospitalListDate);
+            $.ajax({
+                url: "../ajaxAction/qualityAction.aspx",
+                data: H2G.ajaxData({
+                    action: 'getDornorHospitalList',
+                    whereDate: hospitalListDate,
+                }).config,
+                type: "POST",
+                dataType: "json",
+                error: function (xhr, s, err) {
+                    console.log(s, err);
+                },
+                success: function (data) {
+                    if (!data.onError) {
+                        data.getItems = jQuery.parseJSON(data.getItems);
+                        // console.log("List = ", data);
+                        var dataRow = data.getItems.getItems;
+                        for (var i = 0; i < dataRow.length; i++) {
+                            var rows = "<tr>" +
+                                            "<td>" + i + "</td>" +
+                                            "<td>" + dataRow[i].name + "</td>" +
+                                            "<td>" + dataRow[i].donor_amount + "</td>" +
+                                            "<td>" + dataRow[i].regis_time + "</td>" +
+                                            "<td>" + dataRow[i].staff + "</td>" +
+                                            "<td>" + "-" + "</td>" +
+                                        "</tr>";
+                            $('#hospitalList > tbody').append(rows);
+                        }
+                        
+                    } else {
+                        
+                    }
+                }
+            });
         }
     </script>
 </asp:Content>
@@ -415,6 +428,63 @@
                 <span>2. กดปุ่มเพื่อเริ่มลงทะเบียน</span>
                 <input id="btnNewRegis" type="button" class="btn btn-success" targetUrl="hospitalRegister.aspx" value="ลงทะเบียน" onclick="return $(this).regisHospital();" />
             </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-36" style="font-size:larger; font-weight:bold;">
+            <span>รายการที่บันทึกไปแล้ว</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-36">
+            <div style="background-color: #CCCCCC; height: 2px;"></div>
+        </div>
+    </div>
+    <div class="row" style="margin-top:5px;">
+        <div class="col-md-36" style="text-align:center;">
+            รายการวันที่ <input type="text" id="dateList" value="" class="form-control required text-center" style="width:143px; display:inline;" />
+        </div>
+    </div>
+    <div class="row" style="margin-top:5px;">
+        <div class="col-md-36">
+            <table class="table table-bordered" id="hospitalList">
+                <thead class="table table-bordered">
+                    <tr>
+                        <th class="col-md-2" style="border:1px solid #ddd; padding:0px 5px 0px 5px";>ลำดับ</th>
+                        <th class="col-md-18" style="border:1px solid #ddd; padding:0px 5px 0px 5px";">รายการโรงพยาบาล</th>
+                        <th class="col-md-5" style="border:1px solid #ddd; padding:0px 5px 0px 5px";">จำนวนผู้บริจาค</th>
+                        <th class="col-md-5" style="border:1px solid #ddd; padding:0px 5px 0px 5px";">เวลา</th>
+                        <th class="col-md-5" style="border:1px solid #ddd; padding:0px 5px 0px 5px";">ผู้บันทึกข้อมูล</th>
+                        <th class="col-md-1" style="border:1px solid #ddd; padding:0px 5px 0px 5px";">Ax</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>1</th>
+                        <td>Mark</td>
+                        <td>Otto</td>
+                        <td>@mdo</td>
+                        <td>@mdo</td>
+                        <td>@</td>
+                    </tr>
+                    <tr>
+                        <th>2</th>
+                        <td>Mark</td>
+                        <td>Otto</td>
+                        <td>@TwBootstrap</td>
+                        <td>@TwBootstrap</td>
+                        <td>@</td>
+                    </tr>
+                    <tr>
+                        <th>3</th>
+                        <td>Jacob</td>
+                        <td>Thornton</td>
+                        <td>@fat</td>
+                        <td>@fat</td>
+                        <td>@</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </asp:Content>

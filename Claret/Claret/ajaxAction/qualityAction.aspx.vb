@@ -26,6 +26,7 @@ Public Class qualityAction
             Case "getexamination" : getExamination()
             Case "savereceipthospital" : saveReceiptHospital()
             Case "getreceipthospital" : getReceiptHospital()
+            Case "getDornorHospitalList" : getDornorHospitalList()
             Case Else
                 Dim exMsg As String = IIf(String.IsNullOrEmpty(_REQUEST("action")), "", _REQUEST("action"))
                 Throw New Exception("Not found action [" & exMsg & "].", New Exception("Please check your action name"))
@@ -104,21 +105,52 @@ Public Class qualityAction
     Private Sub getReceiptHospital()
 
         Dim DataItem As New RecHospitalHeadItem
-        sqlMain = "select reh.id as receipt_id, hpt.name as hospital, 0 as queue_count
+        sqlMain = "select reh.id as receipt_id, hpt.name as hospital, nvl(count(dh.id),1) as queue_count
                     from RECEIPT_HOSPITAL reh 
                     inner join HOSPITAL hpt on hpt.id = reh.hospital_id
-                    where reh.id = '" & _REQUEST("receipthospitalid") & "' "
+                    LEFT JOIN DONATION_HOSPITAL dh on dh.receipt_hospital_id = reh.id
+                    where reh.id = '" & _REQUEST("receipthospitalid") & "'
+                    GROUP BY reh.id, hpt.name "
         Dim dt As DataTable = Cbase.QueryTable(sqlMain)
 
         If dt.Rows.Count > 0 Then
             For Each dr As DataRow In dt.Rows()
                 DataItem.ID = dr("receipt_id").ToString()
                 DataItem.HospitalName = dr("hospital").ToString()
-                DataItem.QueueCount = dr("queue_count").ToString()
+                DataItem.QueueTotal = dr("queue_count").ToString()
+                DataItem.QueueCount = Cbase.QueryField("select order_number from DONATION_HOSPITAL where id = '" & _REQUEST("donatehospitalid") & "' ", DataItem.QueueTotal)
             Next
         End If
 
+        If String.IsNullOrEmpty(_REQUEST("issearch")) And String.IsNullOrEmpty(_REQUEST("donatehospitalid")) Then
+            DataItem.QueueTotal = CInt(DataItem.QueueTotal) + 1
+            DataItem.QueueCount = CInt(DataItem.QueueCount) + 1
+        End If
+
         JSONResponse.setItems(Of RecHospitalHeadItem)(DataItem)
+    End Sub
+
+    Private Sub getDornorHospitalList()
+        Dim HospitalList As New List(Of getDornorHospitalListData)
+
+        Dim sql As String = "select r.id, h.name, count(d.id) donor_amount, to_char(r.create_date,'hh:mi') regis_time, r.register_staff staff, r.create_date
+                            from receipt_hospital r, hospital h, donation_hospital d
+                            where r.hospital_id = h.id and r.id = d.receipt_hospital_id 
+                            and to_char(r.create_date, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("whereDate") & "'
+                            group by r.id, h.name, r.create_date, r.register_staff"
+        Dim dt As DataTable = Cbase.QueryTable(sql)
+        For Each dr As DataRow In dt.Rows
+            Dim Item As New getDornorHospitalListData
+            Item.id = dr("ID").ToString
+            Item.name = dr("NAME").ToString
+            Item.donor_amount = dr("DONOR_AMOUNT").ToString
+            Item.regis_time = dr("REGIS_TIME").ToString
+            Item.staff = dr("STAFF").ToString
+            Item.create_date = dr("CREATE_DATE").ToString
+
+            HospitalList.Add(Item)
+        Next
+        JSONResponse.setItems(Of List(Of getDornorHospitalListData))(HospitalList)
     End Sub
 
 End Class
@@ -197,5 +229,15 @@ Public Structure RecHospitalHeadItem
     Public ID As String
     Public HospitalName As String
     Public QueueCount As String
+    Public QueueTotal As String
 
+End Structure
+
+Public Structure getDornorHospitalListData
+    Public id As String
+    Public name As String
+    Public donor_amount As String
+    Public regis_time As String
+    Public staff As String
+    Public create_date As String
 End Structure

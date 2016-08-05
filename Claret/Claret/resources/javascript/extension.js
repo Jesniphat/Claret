@@ -86,6 +86,13 @@ var H2G = {
         retToday = new Date();
         return new Date(retToday.setFullYear(retToday.getFullYear() + 543));
     },
+    addDays: function(date, days) {
+        var result = new Date(date);
+        console.log("in date",result);
+        result.setDate(result.getDate() + days);
+        console.log("out date", result);
+        return result;
+    },
 }
 
 $.extend($.fn, {
@@ -127,7 +134,6 @@ $.extend($.fn, {
             if (config.enable) { $(self).H2GEnable(); } else { $(self).H2GDisable(); }
         }
 
-
         if (config.dataObject.length == 0) {
             $.ajax({
                 url: config.url,
@@ -149,18 +155,6 @@ $.extend($.fn, {
             });    //End ajax
         } else {
             compile(config.dataObject);
-
-            //$(self).html('');
-            //var placeholder = $(self).H2GAttr("placeholder") || "กรุณาเลือก";
-            //$("<option>", { value: "" }).html(placeholder).appendTo(self);
-            //if (config.tempData) { $(self).data("data-ddl", config.dataObject); }
-            //$.each((config.dataObject), function (index, e) {
-            //    $("<option>", {}).H2GFill(e).appendTo(self);
-            //});
-            //$(self).setDropdownList().selecter("update");
-            //if (config.defaultSelect != "") { $(self).val(config.defaultSelect).change(); }
-
-            //if (config.enable) { $(self).H2GEnable(); } else { $(self).H2GDisable(); }
         }
 
         return this;
@@ -181,37 +175,48 @@ $.extend($.fn, {
         };
         $.extend(config, setting);
 
-        $.ajax({
-            url: config.url,
-            data: config.data,
-            type: config.type,
-            dataType: config.dataType,
-            error: function (xhr, s, err) {
-                console.log(s, err);
-            },
-            success: function (data) {
-                $(self).html('');//.selecter('destroy').setDropdownList();
-                //$("<option>", { value: "" }).html("กรุณาเลือก").appendTo(self);
-                if (!data.onError) {
-                    data.getItems = jQuery.parseJSON(data.getItems);
-                    if (config.tempData) { $(self).data("data-ddl", data.getItems); }
+        var compile = function (data) {
+            if (config.tempData) { $(self).data("data-ddl", data); }
 
-                    $.each((data.getItems), function (index, e) {
-                        $("<option>", {}).H2GFill(e).appendTo(self);
-                    });
-                    $(self).H2GValue(config.defaultSelect || defaultSelect || "").combobox({
-                        select: config.selectItem,
-                    });
-                    $(self).parent().find("span").find("input").val($(self).find(":selected").text());
-                } else {
-                    $(self).combobox({
-                        select: config.selectItem,
-                        placeholder: config.placeholder,
-                    });
+            $(self).html('');
+            $.each((data), function (index, e) {
+                $("<option>", {}).H2GFill(e).appendTo(self);
+            });
+            $(self).H2GValue(config.defaultSelect || defaultSelect || "").combobox({
+                select: config.selectItem,
+            });
+            $(self).parent().find("span").find("input").val($(self).find(":selected").text());
+
+            if (config.enable) { $(self).H2GEnable(); } else { $(self).H2GDisable(); }
+        }
+
+        if (config.dataObject.length == 0) {
+            $.ajax({
+                url: config.url,
+                data: config.data,
+                type: config.type,
+                dataType: config.dataType,
+                error: function (xhr, s, err) {
+                    console.log(s, err);
+                },
+                success: function (data) {
+                    if (!data.onError) {
+                        data.getItems = jQuery.parseJSON(data.getItems);
+                        if (config.tempData) { $(self).data("data-ddl", data.getItems); }
+                        compile(data.getItems);
+                    } else {
+                        $(self).combobox({
+                            select: config.selectItem,
+                            placeholder: config.placeholder,
+                        });
+                    }
                 }
-                if (config.enable) { $(self).H2GEnable(); } else { $(self).H2GDisable(); }
-            }
-        });    //End ajax
+            });    //End ajax
+        } else {
+            console.log("retrive data");
+            compile(config.dataObject);
+        }
+
         return this;
     },
     setCalendar: function (setting) {
@@ -431,7 +436,6 @@ $.extend($.fn, {
                 } else if ($.trim($(this).val()) !== "") {
                     $(this).focus();
                     notiWarning("วันที่ไม่ถูกต้องกรุณาตรวจสอบ");
-                    //$(this).data('error', true).css({ 'border': _TXTBORDER_ERROR + ' solid 1px', 'color': _TXTBORDER_ERROR });
                 }
                 if (focusOutFun != undefined) { focusOutFun(); }
             }

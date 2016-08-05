@@ -9,20 +9,41 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <_PublishTargetUrl>D:\#Publish\ClaretSystem</_PublishTargetUrl>
   </PropertyGroup>
   <ItemGroup>
+    <File Include="!SQLStore/donor/InsertDonationHospital.sql">
+      <publishTime>07/28/2016 09:53:11</publishTime>
+    </File>
     <File Include="!SQLStore/donor/InsertDonationVisit.sql">
-      <publishTime>07/21/2016 14:28:48</publishTime>
+      <publishTime>07/28/2016 09:53:11</publishTime>
     </File>
     <File Include="!SQLStore/donor/InsertMasterDonor.sql">
       <publishTime>07/01/2016 03:30:13</publishTime>
+    </File>
+    <File Include="!SQLStore/donor/SelectDonationHospital.sql">
+      <publishTime>07/28/2016 09:53:11</publishTime>
+    </File>
+    <File Include="!SQLStore/donor/SelectHospitalPostQueue.sql">
+      <publishTime>08/04/2016 09:38:41</publishTime>
+    </File>
+    <File Include="!SQLStore/donor/SelectHospitalPostQueueCount.sql">
+      <publishTime>07/28/2016 09:53:11</publishTime>
     </File>
     <File Include="!SQLStore/donor/SelectMasterDonor.sql">
       <publishTime>07/07/2016 16:35:26</publishTime>
     </File>
     <File Include="!SQLStore/donor/SelectMasterDonorVisit.sql">
-      <publishTime>07/21/2016 14:43:54</publishTime>
+      <publishTime>07/28/2016 09:53:11</publishTime>
+    </File>
+    <File Include="!SQLStore/donor/SelectVisitPostQueue.sql">
+      <publishTime>08/04/2016 09:39:48</publishTime>
+    </File>
+    <File Include="!SQLStore/donor/SelectVisitPostQueueCount.sql">
+      <publishTime>07/28/2016 09:53:11</publishTime>
     </File>
     <File Include="!SQLStore/donor/UpdateMasterDonor.sql">
       <publishTime>07/01/2016 02:30:10</publishTime>
+    </File>
+    <File Include="ajaxAction/donateAction.aspx">
+      <publishTime>07/28/2016 09:53:11</publishTime>
     </File>
     <File Include="ajaxAction/donorAction.aspx">
       <publishTime>06/15/2016 00:40:35</publishTime>
@@ -30,8 +51,11 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="ajaxAction/masterAction.aspx">
       <publishTime>06/15/2016 02:09:50</publishTime>
     </File>
+    <File Include="ajaxAction/qualityAction.aspx">
+      <publishTime>07/28/2016 09:53:11</publishTime>
+    </File>
     <File Include="ajaxAction/userAction.aspx">
-      <publishTime>07/12/2016 14:11:16</publishTime>
+      <publishTime>07/28/2016 09:53:11</publishTime>
     </File>
     <File Include="ApplicationInsights.config">
       <publishTime>06/03/2016 10:46:50</publishTime>
@@ -43,10 +67,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/03/2016 10:46:50</publishTime>
     </File>
     <File Include="bin/Claret.dll">
-      <publishTime>07/21/2016 15:46:11</publishTime>
+      <publishTime>08/04/2016 16:32:14</publishTime>
     </File>
     <File Include="bin/Claret.xml">
-      <publishTime>07/21/2016 15:46:11</publishTime>
+      <publishTime>08/04/2016 16:32:14</publishTime>
     </File>
     <File Include="bin/commons-logging.dll">
       <publishTime>01/04/2016 09:31:55</publishTime>
@@ -61,7 +85,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>01/04/2016 09:31:55</publishTime>
     </File>
     <File Include="bin/H2GEngine.dll">
-      <publishTime>07/21/2016 15:46:06</publishTime>
+      <publishTime>08/01/2016 11:45:13</publishTime>
     </File>
     <File Include="bin/ICSharpCode.SharpZipLib.dll">
       <publishTime>01/04/2016 09:31:54</publishTime>
@@ -148,37 +172,37 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>07/26/2012 19:08:06</publishTime>
     </File>
     <File Include="Default.aspx">
-      <publishTime>07/15/2016 09:28:43</publishTime>
+      <publishTime>08/04/2016 15:56:53</publishTime>
     </File>
     <File Include="donor/Collection.aspx">
-      <publishTime>07/21/2016 08:56:15</publishTime>
+      <publishTime>08/04/2016 09:37:10</publishTime>
     </File>
     <File Include="donor/Donate.aspx">
-      <publishTime>07/21/2016 08:56:15</publishTime>
+      <publishTime>08/01/2016 09:06:56</publishTime>
     </File>
     <File Include="donor/historyReport.aspx">
-      <publishTime>07/20/2016 18:07:21</publishTime>
+      <publishTime>08/04/2016 16:33:58</publishTime>
     </File>
     <File Include="donor/main.aspx">
       <publishTime>06/09/2016 13:29:29</publishTime>
     </File>
     <File Include="donor/register.aspx">
-      <publishTime>07/21/2016 15:33:22</publishTime>
+      <publishTime>08/04/2016 17:01:51</publishTime>
     </File>
     <File Include="donor/search.aspx">
-      <publishTime>07/21/2016 09:49:47</publishTime>
+      <publishTime>08/04/2016 17:15:32</publishTime>
     </File>
     <File Include="image/bg/asc.gif">
-      <publishTime>07/12/2016 13:32:36</publishTime>
+      <publishTime>07/28/2016 09:53:11</publishTime>
     </File>
     <File Include="image/bg/bg-header-bar.png">
       <publishTime>06/06/2016 15:19:25</publishTime>
     </File>
     <File Include="image/bg/bg.gif">
-      <publishTime>07/12/2016 13:32:36</publishTime>
+      <publishTime>07/28/2016 09:53:11</publishTime>
     </File>
     <File Include="image/bg/desc.gif">
-      <publishTime>07/12/2016 13:32:36</publishTime>
+      <publishTime>07/28/2016 09:53:11</publishTime>
     </File>
     <File Include="image/icon/Blood-24x24.png">
       <publishTime>06/22/2016 11:41:41</publishTime>
@@ -220,13 +244,13 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/13/2016 14:35:30</publishTime>
     </File>
     <File Include="image/icon/Donor-24x24.png">
-      <publishTime>07/14/2016 13:50:50</publishTime>
+      <publishTime>07/28/2016 09:53:11</publishTime>
     </File>
     <File Include="image/icon/Donor-32x32.png">
-      <publishTime>07/14/2016 13:50:51</publishTime>
+      <publishTime>07/28/2016 09:53:11</publishTime>
     </File>
     <File Include="image/icon/Donor-48x48.png">
-      <publishTime>07/14/2016 13:50:51</publishTime>
+      <publishTime>07/28/2016 09:53:11</publishTime>
     </File>
     <File Include="image/icon/menu-24x24.png">
       <publishTime>06/07/2016 16:02:16</publishTime>
@@ -259,31 +283,37 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/30/2016 18:17:55</publishTime>
     </File>
     <File Include="image/icon/user-32x32.png">
-      <publishTime>07/14/2016 13:51:38</publishTime>
+      <publishTime>07/28/2016 09:53:11</publishTime>
     </File>
     <File Include="image/logo/NBC-logo.png">
       <publishTime>06/22/2016 18:24:41</publishTime>
     </File>
     <File Include="Login.aspx">
-      <publishTime>07/21/2016 14:09:57</publishTime>
+      <publishTime>08/04/2016 15:56:53</publishTime>
     </File>
     <File Include="main.aspx">
       <publishTime>06/17/2016 15:34:36</publishTime>
     </File>
     <File Include="MasterPage.Master">
-      <publishTime>07/21/2016 15:45:15</publishTime>
+      <publishTime>08/04/2016 15:56:59</publishTime>
     </File>
     <File Include="mobile/main.aspx">
-      <publishTime>07/12/2016 13:05:57</publishTime>
+      <publishTime>07/28/2016 09:53:11</publishTime>
     </File>
     <File Include="packages.config">
       <publishTime>06/17/2016 13:00:30</publishTime>
     </File>
+    <File Include="quality/labRegister.aspx">
+      <publishTime>08/03/2016 10:32:07</publishTime>
+    </File>
     <File Include="resources/css/bootflat.css">
       <publishTime>06/15/2016 03:34:12</publishTime>
     </File>
+    <File Include="resources/css/bootstrap-select.css">
+      <publishTime>07/28/2016 09:53:43</publishTime>
+    </File>
     <File Include="resources/css/bootstrap.css">
-      <publishTime>07/21/2016 14:06:13</publishTime>
+      <publishTime>07/28/2016 09:53:11</publishTime>
     </File>
     <File Include="resources/css/bootstrap.css.map">
       <publishTime>06/12/2016 17:17:53</publishTime>
@@ -291,17 +321,20 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="resources/css/checkbox.css">
       <publishTime>06/13/2016 14:44:22</publishTime>
     </File>
+    <File Include="resources/css/claret-font-icon.css">
+      <publishTime>07/28/2016 09:53:11</publishTime>
+    </File>
     <File Include="resources/css/custom.css">
-      <publishTime>07/21/2016 13:48:44</publishTime>
+      <publishTime>07/29/2016 17:47:19</publishTime>
     </File>
     <File Include="resources/css/donateStyle.css">
-      <publishTime>07/20/2016 09:14:43</publishTime>
+      <publishTime>07/28/2016 09:53:43</publishTime>
     </File>
     <File Include="resources/css/jquery.fs.selecter.css">
-      <publishTime>06/15/2016 18:27:27</publishTime>
+      <publishTime>07/29/2016 17:47:01</publishTime>
     </File>
     <File Include="resources/css/table-excel.css">
-      <publishTime>07/20/2016 18:01:23</publishTime>
+      <publishTime>07/28/2016 09:53:11</publishTime>
     </File>
     <File Include="resources/fonts/glyphicons-halflings-regular.eot">
       <publishTime>06/03/2016 17:29:47</publishTime>
@@ -319,13 +352,13 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/08/2016 10:26:56</publishTime>
     </File>
     <File Include="resources/fonts/icomoon.eot">
-      <publishTime>07/20/2016 15:33:28</publishTime>
+      <publishTime>07/28/2016 09:53:11</publishTime>
     </File>
     <File Include="resources/fonts/icomoon.ttf">
-      <publishTime>07/20/2016 15:33:28</publishTime>
+      <publishTime>07/28/2016 09:53:11</publishTime>
     </File>
     <File Include="resources/fonts/icomoon.woff">
-      <publishTime>07/20/2016 15:33:28</publishTime>
+      <publishTime>07/28/2016 09:53:11</publishTime>
     </File>
     <File Include="resources/fonts/THSarabunNew/THSarabunNew.ttf">
       <publishTime>06/03/2016 14:04:31</publishTime>
@@ -339,6 +372,9 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="resources/fonts/THSarabunNew/THSarabunNew_Italic.ttf">
       <publishTime>06/03/2016 14:04:31</publishTime>
     </File>
+    <File Include="resources/javascript/bootstrap-select.js">
+      <publishTime>07/28/2016 09:53:43</publishTime>
+    </File>
     <File Include="resources/javascript/donateScript.js">
       <publishTime>07/21/2016 08:56:15</publishTime>
     </File>
@@ -346,19 +382,25 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>07/21/2016 08:56:15</publishTime>
     </File>
     <File Include="resources/javascript/extension.js">
-      <publishTime>07/21/2016 11:28:15</publishTime>
+      <publishTime>08/04/2016 16:50:31</publishTime>
     </File>
     <File Include="resources/javascript/jquery-date.js">
       <publishTime>06/29/2016 15:37:06</publishTime>
     </File>
     <File Include="resources/javascript/MBOS-Initialize.js">
-      <publishTime>07/01/2016 02:01:51</publishTime>
+      <publishTime>07/28/2016 09:53:12</publishTime>
     </File>
     <File Include="resources/javascript/MBOS-UI.js">
       <publishTime>06/08/2016 15:48:59</publishTime>
     </File>
+    <File Include="resources/javascript/page/donateScript.js">
+      <publishTime>08/04/2016 09:37:10</publishTime>
+    </File>
+    <File Include="resources/javascript/page/donateScriptEdit.js">
+      <publishTime>08/04/2016 09:37:10</publishTime>
+    </File>
     <File Include="resources/javascript/page/registerScript.js">
-      <publishTime>07/21/2016 14:46:07</publishTime>
+      <publishTime>08/04/2016 15:58:41</publishTime>
     </File>
     <File Include="resources/jquery-ui/external/jquery/jquery.js">
       <publishTime>06/03/2016 11:44:35</publishTime>
@@ -397,7 +439,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/15/2016 03:33:46</publishTime>
     </File>
     <File Include="resources/jquery-ui/jquery-ui.js">
-      <publishTime>07/11/2016 13:43:41</publishTime>
+      <publishTime>07/28/2016 09:53:12</publishTime>
     </File>
     <File Include="resources/jquery-ui/jquery-ui.min.css">
       <publishTime>06/03/2016 11:44:35</publishTime>
@@ -418,7 +460,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/03/2016 11:44:35</publishTime>
     </File>
     <File Include="resources/jquery/bootstrap.js">
-      <publishTime>07/14/2016 17:32:37</publishTime>
+      <publishTime>07/28/2016 09:53:12</publishTime>
     </File>
     <File Include="resources/jquery/bootstrap.min.js">
       <publishTime>06/06/2016 17:01:39</publishTime>
@@ -427,25 +469,31 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/13/2016 14:13:42</publishTime>
     </File>
     <File Include="resources/jquery/combobox.js">
-      <publishTime>07/15/2016 09:07:01</publishTime>
+      <publishTime>08/03/2016 15:00:03</publishTime>
     </File>
     <File Include="resources/jquery/jquery-latest.js">
-      <publishTime>07/12/2016 13:32:36</publishTime>
+      <publishTime>07/28/2016 09:53:12</publishTime>
+    </File>
+    <File Include="resources/jquery/jquery.blockUI.js">
+      <publishTime>07/28/2016 09:53:43</publishTime>
     </File>
     <File Include="resources/jquery/jquery.fs.selecter.js">
-      <publishTime>07/11/2016 09:41:43</publishTime>
+      <publishTime>07/28/2016 18:06:30</publishTime>
     </File>
     <File Include="resources/jquery/jquery.js">
       <publishTime>06/03/2016 14:56:23</publishTime>
     </File>
     <File Include="resources/jquery/jquery.metadata.js">
-      <publishTime>07/12/2016 13:32:36</publishTime>
+      <publishTime>07/28/2016 09:53:12</publishTime>
     </File>
     <File Include="resources/jquery/jquery.slimscroll.min.js">
       <publishTime>06/13/2016 11:12:55</publishTime>
     </File>
     <File Include="resources/jquery/jquery.tablesorter.js">
-      <publishTime>07/12/2016 13:32:36</publishTime>
+      <publishTime>07/28/2016 09:53:12</publishTime>
+    </File>
+    <File Include="resources/jquery/jquery.ui.timepicker.js">
+      <publishTime>07/28/2016 09:53:43</publishTime>
     </File>
     <File Include="resources/jquery/tabable.js">
       <publishTime>07/04/2016 10:37:48</publishTime>

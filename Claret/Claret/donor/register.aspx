@@ -5,15 +5,30 @@
         .table-deferal > tbody > tr > td {
             border-bottom: 0;
         }
+        #tbDefInterview > tbody > tr > td:last-child {
+            border-top-color: transparent;
+            border-right-color: transparent;
+            border-bottom-color: transparent;
+            background-color: white;
+        }
+        #tbDefInterview > tbody > tr > td:first-child {
+            border-right-color: transparent;
+        }
+        #tbExam > tbody > tr > td:last-child {
+            border-top-color: transparent;
+            border-right-color: transparent;
+            border-bottom-color: transparent;
+            background-color: white;
+        }
     </style>
-    <script src="../resources/javascript/page/registerScript.js?var=20160101" type="text/javascript"></script>
+    <script src="../resources/javascript/page/registerScript.js?ver=20160121" type="text/javascript"></script>
     <script>
         $(function () {
             lookupControl();
             $("#txtCardNumber").enterKey(function () { $(this).addExtCard(); }).focus();
             $("#ddlDefferal").setDropdownList().on('change', function () {
-                if ($(this).H2GValue() == 'ACTIVE') { $("#tbDefferal > thead > tr[status=INACTIVE]").hide(); }
-                else { $("#tbDefferal > thead > tr[status=INACTIVE]").show(); }
+                if ($(this).H2GValue() == 'ACTIVE') { $("#tbDeferral > thead > tr[status=INACTIVE]").hide(); }
+                else { $("#tbDeferral > thead > tr[status=INACTIVE]").show(); }
             });
             $("#infoTab").tabs({
                 active: 1,
@@ -38,7 +53,7 @@
             $("#txtBirthDay").H2GDatebox().setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
-                yearRange: "c-100:c+0",
+                yearRange: "c-100:c+70",
                 onSelect: function (selectedDate, objDate) {
                     if (selectedDate != '') { $("#txtAge").H2GValue(H2G.calAge(selectedDate) + ' ปี'); } else { $("#txtAge").H2GValue(''); }
                     $("#ddlOccupation").closest("div").focus();
@@ -61,7 +76,7 @@
             $("#txtLastDonateDate").H2GDatebox().setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
-                yearRange: "c-100:c+0",
+                yearRange: "c-100:c+70",
                 onSelect: function (selectedDate, objDate) {
                     if (selectedDate != '') { $(this).H2GAttr('donatedatetext', formatDate($(this).datepicker("getDate"),"dd MMM yyyy")); } else { $(this).H2GAttr('donatedatetext', ''); }
                     $("#spAddDonateRecord").focus();
@@ -75,9 +90,9 @@
             });
             $("#txtCommentDateForm").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy"));
             $("#txtCommentDateTo").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
-                maxDate: "+10y",
+                maxDate: "+100y",
                 minDate: new Date(),
-                yearRange: "c-100:c+0",
+                yearRange: "c-50:c+50",
                 onSelect: function (selectedDate, objDate) { $("#txtDonorComment").focus(); },
             });
             $("#txtDonorComment").enterKey(function () { $(this).addComment(); }).focus();
@@ -105,6 +120,8 @@
             $("input:radio[name=gender]").change(function (e) {
                 $("#ddlTitleName").setAutoListValue({ url: '../../ajaxAction/masterAction.aspx', data: { action: 'titlename', gender: $("#rbtM").is(':checked') == true ? "M" : "F" } });
             });
+            $("#txtDefDateFrom").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy"));
+            
             $("#btnSave").click(function () {
                 saveDonorInfo();
             });
@@ -123,11 +140,13 @@
 
             //#### Default donor info from id
             if ($("#data").H2GAttr("receiptHospitalID")) {
+                console.log($("#data").H2GAttr("receiptHospitalID"), $("#data").H2GAttr("visitID"));
                 $.ajax({
                     url: '../../ajaxAction/qualityAction.aspx',
                     data: {
                         action: 'getreceipthospital',
                         receipthospitalid: $("#data").H2GAttr("receiptHospitalID"),
+                        donatehospitalid: $("#data").H2GAttr("visitID"),
                     },
                     type: "POST",
                     dataType: "json",
@@ -139,7 +158,7 @@
                             data.getItems = jQuery.parseJSON(data.getItems);
                             console.log(data.getItems);
                             $("#divReceiptHospital").show();
-                            $("#spReceiptHospital").H2GValue(data.getItems.HospitalName + " รายการที่ " + data.getItems.QueueCount + "/" + data.getItems.QueueCount);
+                            $("#spReceiptHospital").H2GValue(data.getItems.HospitalName + " รายการที่ " + data.getItems.QueueCount + "/" + data.getItems.QueueTotal);
                         }
                     }
                 });    //End ajax
@@ -305,6 +324,41 @@
                         $(this).closest("div.row").find("input.txt-reward-date[rewardID='" + $(this).closest("label").H2GAttr("rewardID") + "']").H2GValue("");
                     }
                 },
+                deleteExam: function (args) {
+                    if (confirm("ต้องการจะลบ " + $(this).closest("tr").find(".td-exam").html() + " ใช่หรือไม่?")) {
+                        $(this).closest("tr").remove();
+                    }
+                },
+                latinNameChange: function (args) {
+                    if ($(this).is(':checked')) {
+                        $("#txtDonorNameEng").H2GEnable();
+                        $("#txtDonorSurNameEng").H2GEnable();
+                    } else {
+                        $("#txtDonorNameEng").H2GDisable();
+                        $("#txtDonorSurNameEng").H2GDisable();
+                    }
+                },
+                addDeferral: function (args) {
+                    if (deferralValidation()) {
+                        var dataRow = $("#tbDefInterview > thead > tr.template-data").clone().show();
+                        $(dataRow).H2GFill({
+                            defID: $("#ddlITVDeferral option:selected").H2GAttr("valueID"),
+                            defType: $("#ddlDeferralType").H2GValue(),
+                            defDuration: $("#txtDuration").H2GValue(),
+                            defStartDate: $("#txtDefDateFrom").H2GValue(),
+                            defEndDate: $("#txtDefDateTo").H2GValue(),
+                            defRemarks: $("#txtDefRemarks").H2GValue(),
+                        });
+                        $(dataRow).find('.td-description').append($("#ddlITVDeferral option:selected").H2GAttr("desc")).H2GAttr("title", $("#ddlITVDeferral option:selected").H2GAttr("desc"));                        
+                        $(dataRow).find('.td-enddate').append('วันที่สิ้นสุด ' + formatDate(new Date(getDateFromFormat($('#txtDefDateTo').val(), 'dd/mm/yyyy')), "dd MON yyyy")).H2GAttr("title", 'วันที่สิ้นสุด ' + formatDate(new Date(getDateFromFormat($('#txtDefDateTo').val(), 'dd/mm/yyyy')), "dd MON yyyy"));
+                        $("#tbDefInterview > tbody").append(dataRow);
+                    }
+                },
+                deleteDeferral: function (args) {
+                    if (confirm("ต้องการจะลบ " + $(this).closest("tr").find(".td-exam").html() + " ใช่หรือไม่?")) {
+                        $(this).closest("tr").remove();
+                    }
+                },
             });
 
             showVisitHistory();
@@ -315,8 +369,206 @@
             $("#chackType").change(function () {
                 selecterTable(this);
             });
-        });
 
+            // menu control
+            if ($("#data").H2GAttr("lmenu") == "lmenuDonorRegis") {
+                $("#infoTabToday").tabs("option", "disabled", [1]);
+            } else if ($("#data").H2GAttr("lmenu") == "lmenuInterview") {
+                lookupTabQuestionaire();
+
+            } else if ($("#data").H2GAttr("lmenu") == "lmenuDonate") {
+                $("#infoTabToday").tabs("option", "disabled", [1]);
+            } else if ($("#data").H2GAttr("lmenu") == "lmenuHistoryReport") {
+                $("#infoTabToday").tabs("option", "disabled", [1]);
+            }
+        });
+        function lookupTabQuestionaire() {
+            $("#ddlDeferralType").setDropdownList();
+            $("#ddlITVResult").setDropdownList();
+            $("#ddlHbTest").setDropdownList();
+            $("#txtWeight").H2GNumberbox();
+            $("#txtHeartRate").H2GNumberbox();
+            $("#txtPresureMin").H2GNumberbox();
+            $("#txtPresureMax").H2GNumberbox();
+            $("#txtDuration").H2GNumberbox();
+
+            $("#txtDefDateTo").H2GDatebox().setCalendar({
+                maxDate: "+100y",
+                minDate: new Date(),
+                yearRange: "c50:c+50",
+                onSelect: function (selectedDate, objDate) { $("#txtDefRemarks").focus(); },
+            });
+
+            $("#txtExamCode").enterKey(function () { getExamination(); });
+            $("#ddlExam").setAutoListValue({
+                url: '../ajaxAction/masterAction.aspx', data: { action: 'examination' },
+                selectItem: function () {
+                    $("#txtExamCode").H2GValue($("#ddlExam").H2GValue());
+                    getExamination();
+                },
+            });
+
+            if ($("#ddlITVDonationType option").length > 1) { $("#ddlITVDonationType").H2GValue($("#ddlITVDonationType").H2GAttr("selectItem")).change(); } else {
+                $("#ddlITVDonationType").setDropdownListValue({
+                    url: '../../ajaxAction/masterAction.aspx',
+                    data: { action: 'donationtype' },
+                    defaultSelect: $("#ddlITVDonationType").H2GAttr("selectItem"),
+                }).on('change', function () {
+                    $("#ddlITVBag").closest("div").focus();
+
+                    var dataObj = [];
+                    var dataAll = $("#ddlITVDeferral").data("data-ddl");
+                    var create = 0;
+                    if (dataAll != undefined) {
+                        $.each((dataAll), function (index, e) {
+                            if ($("#ddlITVDonationType option:selected").H2GAttr("valueID") == e.donationID) {
+                                dataObj[create] = e;
+                                create++;
+                            }
+                        });
+                    }
+                    $("#ddlITVDeferral").combobox("destroy").setAutoListValue({
+                        dataObject: dataObj,
+                        selectItem: function () {
+                        $("#txtDefCode").H2GValue($("#ddlITVDeferral").H2GValue());
+                        $("#ddlDeferralType").H2GValue($("#ddlITVDeferral option:selected").H2GAttr("deferralType")).change()
+                        var duration = $("#ddlITVDeferral option:selected").H2GAttr("duration");
+                        $("#txtDuration").H2GValue(duration);
+
+                        if (duration == "") { $("#txtDefDateTo").H2GValue("31/12/2899"); }
+                        else { $("#txtDefDateTo").H2GValue(H2G.addDays(H2G.today(), duration)); }
+                    }, });
+                });
+            }
+            if ($("#ddlITVBag option").length > 1) { $("#ddlITVBag").H2GValue($("#ddlITVBag").H2GAttr("selectItem")).change(); } else {
+                $("#ddlITVBag").setDropdownListValue({
+                    url: '../../ajaxAction/masterAction.aspx',
+                    data: { action: 'bag' },
+                    defaultSelect: $("#ddlITVBag").H2GAttr("selectItem"),
+                }).on('change', function () {
+                    $("#ddlITVDonationTo").closest("div").focus();
+                });
+            }
+            if ($("#ddlITVDonationTo option").length > 1) { $("#ddlITVDonationTo").H2GValue($("#ddlITVDonationTo").H2GAttr("selectItem")).change(); } else {
+                $("#ddlITVDonationTo").setDropdownListValue({
+                    url: '../../ajaxAction/masterAction.aspx',
+                    data: { action: 'donationto' },
+                    defaultSelect: $("#ddlITVDonationTo").H2GAttr("selectItem"),
+                }).on('change', function () {
+                    $("#txtDefCode").focus();
+                });
+            }
+
+            if ($("#ddlITVDeferral option").length > 1) { $("#ddlITVDonationTo").H2GValue($("#ddlITVDonationTo").H2GAttr("selectItem")).change(); } else {
+                $("#ddlITVDeferral").setAutoListValue({
+                    url: '../../ajaxAction/masterAction.aspx',
+                    data: { action: 'deferral', gender: $("#rbtM").is(':checked') == true ? "M" : "F" },
+                    defaultSelect: $("#ddlITVDeferral").H2GAttr("selectItem"),
+                    tempData: true,
+                    selectItem: function () {
+                        $("#txtDefCode").H2GValue($("#ddlITVDeferral").H2GValue());
+                        $("#ddlDeferralType").H2GValue($("#ddlITVDeferral option:selected").H2GAttr("deferralType")).change()
+                        var duration = $("#ddlITVDeferral option:selected").H2GAttr("duration");
+                        $("#txtDuration").H2GValue(duration);
+
+                        if (duration == "") { $("#txtDefDateTo").H2GValue("31/12/2899"); }
+                        else { $("#txtDefDateTo").H2GValue(H2G.addDays(H2G.today(), duration)); }
+                    },
+                });
+            }
+            $("#txtDefCode").enterKey(function () {
+                $("#ddlITVDeferral").combobox("setvalue", $("#txtDefCode").val().toUpperCase()).change();
+                if ($("#ddlITVDeferral").H2GValue() == null) {
+                    $("#txtDuration").H2GValue("");
+                    $("#txtDefDateTo").H2GValue("");
+                    $("#ddlDeferralType").H2GValue("DEFINITIVE");
+                    $("#txtDefRemarks").H2GValue("");
+                } else {
+                    $("#txtDefCode").H2GValue($("#ddlITVDeferral").H2GValue());
+                    $("#ddlDeferralType").H2GValue($("#ddlITVDeferral option:selected").H2GAttr("deferralType")).change()
+                    var duration = $("#ddlITVDeferral option:selected").H2GAttr("duration");
+                    $("#txtDuration").H2GValue(duration);
+
+                    if (duration == "") { $("#txtDefDateTo").H2GValue("31/12/2899"); }
+                    else { $("#txtDefDateTo").H2GValue(H2G.addDays(H2G.today(), duration)); }
+                }
+            });
+            $("#txtDefRemarks").enterKey(function () {
+                addDeferral();
+            });
+            $("#spAddDeferral").click(function () { $(this).addDeferral(); });
+        }
+        function getExamination() {
+            if ($("#txtExamCode").H2GValue() != "") {
+                var dataView = $("#tbExam > tbody");
+                $(dataView).closest("table").H2GAttr("wStatus", "working");
+                $.ajax({
+                    url: "../ajaxAction/qualityAction.aspx",
+                    data: H2G.ajaxData({
+                        action: 'getexamination',
+                        excode: $("#txtExamCode").H2GValue(),
+                    }).config,
+                    type: "POST",
+                    dataType: "json",
+                    error: function (xhr, s, err) {
+                        console.log(s, err);
+                        $(dataView).closest("table").H2GAttr("wStatus", "error");
+                    },
+                    success: function (data) {
+                        var notiReject = "";
+                        var notiInject = "";
+                        if (!data.onError) {
+                            data.getItems = jQuery.parseJSON(data.getItems);
+                            $.each((data.getItems), function (index, e) {
+                                if ($("#tbExam > tbody > tr.template-data[examCode='" + e.Code + "']").length > 0) {
+                                    // 1 ถ้า exam ที่เพิ่มเข้ามาซ้ำ และไม่มีกลุ่มจะไม่เพิ่มและแจ้งซ้ำ
+                                    if (e.GroupID == null) {
+                                        notiReject += e.Code + ", ";
+                                    } else {
+                                        // 2 ถ้า exam ที่เพิ่มเข้ามาซ้ำ แต่มีกลุ่มจะเพิ่มให้และลบตัวเก่าเสมอ
+                                        notiInject += e.Code + ", ";
+                                        $("#tbExam > tbody > tr.template-data[examCode='" + e.Code + "']").remove();
+                                        var dataRow = $("#tbExam > thead > tr.template-data").clone().show();
+                                        $(dataRow).H2GFill({ refID: e.ID, examCode: e.Code, desc: e.Description, groupID: e.GroupID, groupCode: e.GroupCode, groupDesc: e.GroupDescription });
+                                        $(dataRow).find('.td-exam').append(e.Code + ' : ' + e.Description).H2GAttr("title", e.Code + ' : ' + e.Description);
+                                        $(dataView).append(dataRow);
+                                    }
+                                } else {
+                                    var dataRow = $("#tbExam > thead > tr.template-data").clone().show();
+                                    $(dataRow).H2GFill({ refID: e.ID, examCode: e.Code, desc: e.Description, groupID: e.GroupID, groupCode: e.GroupCode, groupDesc: e.GroupDescription });
+                                    $(dataRow).find('.td-exam').append(e.Code + ' : ' + e.Description).H2GAttr("title", e.Code + ' : ' + e.Description);
+                                    $(dataView).append(dataRow);
+                                }
+                            });
+
+                            $("#txtExamCode").H2GValue("");
+                            $("#ddlExam").closest("div").find("input").val("");
+                            if (notiReject != "") { notiWarning(notiReject.substring(0, notiReject.length - 2) + " มีการเพิ่มไปแล้ว") }
+                            if (notiInject != "") { notiWarning(notiInject.substring(0, notiInject.length - 2) + " ถูกแทนที่ด้วยกลุ่ม " + data.getItems[0].GroupCode) }
+                        } else {
+                            $("#txtExamCode").focus();
+                            notiError(data.exMessage);
+                        }
+                        $(dataView).closest("table").H2GAttr("wStatus", "done");
+                    }
+                });    //End ajax
+            } else {
+                $("#txtExamCode").focus();
+                notiWarning("กรุณากรอกหรือเลือก Examination");
+            }
+        }
+        function deferralValidation() {
+            if ($('#divCardNumber > div').length == 0) {
+                $("#txtExtNumber").focus();
+                notiWarning("กรุณากรอกข้อมูลบัตรผู้บริจาคอย่างน้อย 1 ใบ");
+                return false;
+            } else if ($('#ddlTitleName').H2GValue() == "") {
+                $("#ddlTitleName").closest("div").focus();
+                notiWarning("กรุณาเลือกคำนำหน้าชื่อผู้บริจาค");
+                return false;
+            }
+            return true;
+        }
     </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="cphMaster" runat="server">
@@ -413,7 +665,9 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-12 text-right">
+                        <label style="cursor: pointer; font-weight: normal; margin-bottom: 0px;">
+                            <input id="chbLatinName" name="latinName" type="checkbox" tabindex="-1" onchange="return $(this).latinNameChange();" />Latin Name</label>
                     </div>
                     <div class="col-md-2 text-right">
                         <span>Name</span>
@@ -486,7 +740,7 @@
                     <a class="icon"><span id="togDeferal" targettoggle="divDeferal" class="glyphicon glyphicon-menu-down" aria-hidden="true"></span></a>
                 </div>
                 <div id="divDeferal" class="col-md-36" style="padding-top: 10px; display: none;">
-                    <table id="tbDefferal" class="table table-hover table-striped table-deferal">
+                    <table id="tbDeferral" class="table table-hover table-striped table-deferal">
                         <thead>
                             <tr>
                                 <th style="width: 10%;">รหัสอ้างอิง
@@ -676,6 +930,7 @@
                         <div id="infoTabToday">
                             <ul>
                                 <li><a href="#subHistoryPane" style="">ข้อมูลทั่วไป</a></li>
+                                <li><a href="#subInterview" style="">คัดกรอง</a></li>
                                 <li><a href="#synthesis" style="" id="synthesisLink">Synthesis</a></li>
                             </ul>
                             <div id="subHistoryPane">
@@ -859,6 +1114,396 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="subInterview">
+                                <div class="border-box">
+                                    <div class="col-md-21">
+                                        <div class="row">
+                                            <div class="col-md-36">
+                                                <div class="row" style="border-top: solid 1px #CCCCCC; border-left: solid 1px #CCCCCC; border-right: solid 1px #CCCCCC; margin: 0; background-color:#DBEEF3;">
+                                                    <div class="col-md-18 text-left" style="padding-left:5px;">
+                                                        Questionnaire NBC
+                                                    </div>
+                                                    <div class="col-md-18 text-right" style="padding-right:25px;">
+                                                        วันที่ดำเนินการ 12 พ.ค. 2559 10:15
+                                                    </div>
+                                                </div>
+                                                <div class="border-box" style="padding:0; height:375px;overflow-y:scroll;overflow-x:hidden;">
+                                                    <table id="tbQuestionnaire" class="table table-hover table-striped">
+                                                        <thead style="display:none;">
+                                                            <tr class="no-transaction" style="display: none;">
+                                                                <td align="center" colspan="2">ไม่พบข้อมูล</td>
+                                                            </tr>
+                                                            <tr class="more-loading" style="display: none;">
+                                                                <td align="center" colspan="2">Loading detail...</td>
+                                                            </tr>
+                                                            <tr class="template-data" style="display: none;">
+                                                                <td class="td-question"></td>
+                                                                <td class="td-answer"></td>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr class="template-data">
+                                                                <td class="td-question col-md-27">
+                                                                    <span>1. แบบสอบถามการบริจาคโลหิตมีความผิดปกติ?</span>
+                                                                </td>
+                                                                <td class="td-answer col-md-9">
+                                                                    <input type="text" class="form-control" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr class="template-data">
+                                                                <td class="td-question col-md-27">
+                                                                    <span>2. ต้องการบริจาค?</span>
+                                                                </td>
+                                                                <td class="td-answer col-md-9">
+                                                                    <input type="text" class="form-control" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr class="template-data">
+                                                                <td class="td-question col-md-27">
+                                                                    <span>3. บริจาค STEM CELL?</span>
+                                                                </td>
+                                                                <td class="td-answer col-md-9">
+                                                                    <input type="text" class="form-control" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr class="template-data">
+                                                                <td class="td-question col-md-27">
+                                                                    <span>3. บริจาค STEM CELL?</span>
+                                                                </td>
+                                                                <td class="td-answer col-md-9">
+                                                                    <input type="text" class="form-control" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr class="template-data">
+                                                                <td class="td-question col-md-27">
+                                                                    <span>3. บริจาค STEM CELL?</span>
+                                                                </td>
+                                                                <td class="td-answer col-md-9">
+                                                                    <input type="text" class="form-control" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr class="template-data">
+                                                                <td class="td-question col-md-27">
+                                                                    <span>3. บริจาค STEM CELL?</span>
+                                                                </td>
+                                                                <td class="td-answer col-md-9">
+                                                                    <input type="text" class="form-control" />
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                        <tfoot>
+                                                            <tr>
+                                                                <td colspan="2" style="border-top:solid 1px #cccccc;border-bottom:none;"></td>
+                                                            </tr>
+                                                        </tfoot>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-15">
+                                        <div class="row">
+                                            <div class="col-md-36">
+                                                <div class="border-box">
+                                                    <div class="row">
+                                                        <div class="col-md-36">
+                                                            <span style="font-weight:bold;">ตรวจสุขภาพเบื้องต้น</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6 text-right">
+                                                            <span>น้ำหนัก (kg)</span>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input id="txtWeight" type="text" class="form-control required text-right" />
+                                                        </div>
+                                                        <div class="col-md-2"></div>
+                                                        <div class="col-md-4 text-center">
+                                                            <span id="spLastWeight">62 KG</span>
+                                                        </div>
+                                                        <div class="col-md-9 text-center">
+                                                            <span id="spLastDateWeight">เมื่อ 09 พ.ค. 2559</span>
+                                                        </div>
+                                                        <div class="col-md-6 text-right">
+                                                            <span>อัตราชีพจร</span>
+                                                        </div>
+                                                        <div class="col-md-5 text-right">
+                                                            <input id="txtHeartRate" type="text" class="form-control required text-right" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6 text-right">
+                                                            <span>ความดัน</span>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input id="txtPresureMin" type="text" class="form-control required text-right" />
+                                                        </div>
+                                                        <div class="col-md-2 text-center">
+                                                            <span>/</span>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input id="txtPresureMax" type="text" class="form-control required text-right" />
+                                                        </div>
+                                                        <div class="col-md-15 text-right">
+                                                            <span>การตรวจหัวใจและปอด</span>
+                                                        </div>
+                                                        <div class="col-md-5 text-right">
+                                                            <input id="txtHeartLung" type="text" class="form-control" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-36">
+                                                <div class="border-box">
+                                                    <div class="row">
+                                                        <div class="col-md-36">
+                                                            <span style="font-weight:bold;">ตรวจความเข้มโลหิต</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-11 text-right">
+                                                            <span>Hb Test</span>
+                                                        </div>
+                                                        <div class="col-md-4 text-right">
+                                                            <select id="ddlHbTest" class="required text-center" style="width:100%;">
+                                                                <option value="N">N</option>
+                                                                <option value="P">P</option>
+                                                                <option value="Y">Y</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-2 text-center">
+                                                            <span>Hb</span>
+                                                        </div>
+                                                        <div class="col-md-4 text-right">
+                                                            <input id="txtHb" type="text" class="form-control text-center required" />
+                                                        </div>
+                                                        <div class="col-md-2 text-center">
+                                                            <span>Pit</span>
+                                                        </div>
+                                                        <div class="col-md-4 text-right">
+                                                            <input id="txtPit" type="text" class="form-control" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-36">
+                                                <div class="border-box">
+                                                    <div class="row">
+                                                        <div class="col-md-36">
+                                                            <span style="font-weight:bold;">ผลการตรวจคัดกรอง</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-16 col-md-offset-11">
+                                                            <select id="ddlITVResult" class="required" style="width:100%;">
+                                                                <option value="DONATION">DONATION</option>
+                                                                <option value="REFUSED">REFUSED</option>
+                                                                <option value="SAMPLE">SAMPLE</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-36">
+                                                <div class="border-box">
+                                                    <div class="row">
+                                                        <div class="col-md-36">
+                                                            <span style="font-weight:bold;">รายละเอียดการบริจาค</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-11 text-right">
+                                                            <span>ประเภทการบริจาค</span>
+                                                        </div>                                                        
+                                                        <div class="col-md-25">
+                                                            <select id="ddlITVDonationType" class="text-left" style="width:100%;">
+                                                                <option value="0">Loading...</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-11 text-right">
+                                                            <span>ประเภทถุง</span>
+                                                        </div>                                                        
+                                                        <div class="col-md-25">
+                                                            <select id="ddlITVBag" class="text-left" style="width:100%;">
+                                                                <option value="0">Loading...</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-11 text-right">
+                                                            <span>การนำไปใช้งาน</span>
+                                                        </div>                                                        
+                                                        <div class="col-md-25">
+                                                            <select id="ddlITVDonationTo" class="text-left" style="width:100%;">
+                                                                <option value="0">Loading...</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-21">
+                                        <div class="row">
+                                            <div class="col-md-36">
+                                                <div class="border-box" style="height:279px;">
+                                                    <div class="row">
+                                                        <div class="col-md-36">
+                                                            <span style="font-weight:bold;">เหตุผลที่งดบริจาคโลหิต</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-5 col-md-offset-1"><input id="txtDefCode" type="text" class="form-control" /></div>
+                                                        <div class="col-md-27">
+                                                            <select id="ddlITVDeferral" class="text-left" style="width:484px;" tabindex="-1">
+                                                                <option value="0">Loading...</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-5 col-md-offset-1">
+                                                            <span>ประเภท</span>
+                                                        </div>
+                                                        <div class="col-md-11">
+                                                            <select id="ddlDeferralType">
+                                                                <option value="DEFINITIVE">DEFINITIVE</option>
+                                                                <option value="UNDETERMINATED">UNDETERMINATED</option>
+                                                                <option value="TEMPORARY">TEMPORARY</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <span>ระยะเวลา(วัน)</span>
+                                                        </div>
+                                                        <div class="col-md-11">
+                                                            <input id="txtDuration" type="text" class="form-control" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-5 col-md-offset-1">
+                                                            <span>วันที่เริ่ม</span>
+                                                        </div>
+                                                        <div class="col-md-11">
+                                                            <input id="txtDefDateFrom" type="text" class="form-control text-center" disabled />
+                                                        </div>
+                                                        <div class="col-md-5 text-center">
+                                                            <span>วันที่สิ้นสุด</span>
+                                                        </div>
+                                                        <div class="col-md-11">
+                                                            <input id="txtDefDateTo" type="text" class="form-control text-center" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-5 col-md-offset-1">
+                                                            <span>หมายเหตุ</span>
+                                                        </div>
+                                                        <div class="col-md-27">
+                                                            <input id="txtDefRemarks" type="text" class="form-control" />
+                                                        </div>
+                                                        <div class="col-md-2 text-center">
+                                                            <button id="spAddDeferral" class="btn btn-icon" style="padding: 0;" onclick="return false;">
+                                                                <i class="glyphicon glyphicon-circle-arrow-down" style="vertical-align: text-top;"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-35 col-md-offset-1" style="height: 88px; overflow-y: scroll;">
+                                                            <table id="tbDefInterview" class="table table-bordered table-striped" totalPage="1" 
+                                                                currentPage="1" sortDirection="desc" sortOrder="queue_number">
+                                                                <thead>
+                                                                    <tr class="no-transaction" style="display:none;">
+                                                                        <td class="col-md-34" align="center">ไม่มีข้อมูล</td>
+                                                                        <td class="col-md-2"></td></tr>
+                                                                    <tr class="more-loading" style="display:none;">
+                                                                        <td class="col-md-34" align="center">Loading detail...</td>
+                                                                        <td class="col-md-2"></td></tr>
+                                                                    <tr class="template-data" style="display:none;" refID="NEW">
+                                                                        <td class="col-md-23 td-description">
+                                                                        </td>
+                                                                        <td class="col-md-11 td-enddate">
+                                                                        </td>
+                                                                        <td class="col-md-2">
+                                                                            <div class="text-center">
+                                                                                <a class="icon">
+                                                                                    <span class="glyphicon glyphicon-remove" aria-hidden="true" 
+                                                                                        onclick="return $(this).deleteExam();"></span></a>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr class="template-data" refID="NEW">
+                                                                        <td class="col-md-23 td-def">1. สาเหตุ xxxxxxxxxxxxxxxxxxx
+                                                                        </td>
+                                                                        <td class="col-md-11 td-def-date">วันที่สิ้นสุด 01 ธ.ค. 2559
+                                                                        </td>
+                                                                        <td class="col-md-2">
+                                                                            <div class="text-center">
+                                                                                <a class="icon">
+                                                                                    <span class="glyphicon glyphicon-remove" aria-hidden="true" 
+                                                                                        onclick="return $(this).deleteExam();"></span></a>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-15">
+                                        <div class="border-box">
+                                            <div class="row">
+                                                <div class="col-md-35 col-md-offset-1" style="font-weight:bold;">LAB EXAMINATION</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-7 col-md-offset-1"><input id="txtExamCode" type="text" class="form-control" /></div>
+                                                <div class="col-md-26">
+                                                    <select id="ddlExam" class="text-left" placeholder="" style="width:336px;" tabindex="-1">
+                                                        <option value="0">Loading...</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-35 col-md-offset-1" style="height: 204px; overflow-y: scroll;">
+                                                    <table id="tbExam" class="table table-bordered table-striped" totalPage="1" currentPage="1" 
+                                                        sortDirection="desc" sortOrder="queue_number">
+                                                        <thead>
+                                                            <tr class="no-transaction" style="display:none;">
+                                                                <td class="col-md-34" align="center">ไม่มีข้อมูล</td>
+                                                                <td class="col-md-2"></td></tr>
+                                                            <tr class="more-loading" style="display:none;">
+                                                                <td class="col-md-34" align="center">Loading detail...</td>
+                                                                <td class="col-md-2"></td></tr>
+                                                            <tr class="template-data" style="display:none;" refID="NEW">
+                                                                <td class="col-md-34 td-exam">
+                                                                </td>
+                                                                <td class="col-md-2">
+                                                                    <div class="text-center">
+                                                                        <a class="icon"><span class="glyphicon glyphicon-remove" aria-hidden="true" 
+                                                                            onclick="return $(this).deleteExam();"></span></a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        </tbody>
+                                                    </table>
                                                 </div>
                                             </div>
                                         </div>
@@ -1362,5 +2007,5 @@
         </div>
     </div>
     <div style="display: none;">
-        <input id="data" runat="server" /></div>
+    <input id="data" runat="server" /></div>
 </asp:Content>
