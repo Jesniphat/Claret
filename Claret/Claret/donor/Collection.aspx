@@ -225,7 +225,8 @@
         </div>
         <div class="col-md-36">
             <table class="table table-bordered-excel tablesorter" id="donate-table">
-                <thead>
+                <thead style="color:gray">
+                <%--<thead style="color:#a2a2a2">--%>
                     <tr>
                         <th class="col-md-5">Sample No</th>
                         <th class="col-md-5">รหัสผู้บริจาค</th>

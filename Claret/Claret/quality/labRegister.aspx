@@ -458,7 +458,7 @@
     <div class="row" style="margin-top:5px;">
         <div class="col-md-36">
             <table class="table table-bordered" id="hospitalList">
-                <thead class="table table-bordered">
+                <thead class="table table-bordered" style="color:gray">
                     <tr>
                         <th class="col-md-2 text-center" style="border:1px solid #ddd; padding:0px 5px 0px 5px";>ลำดับ</th>
                         <th class="col-md-17" style="border:1px solid #ddd; padding:0px 5px 0px 5px";">รายการโรงพยาบาล</th>
