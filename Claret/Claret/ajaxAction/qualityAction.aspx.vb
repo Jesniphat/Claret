@@ -106,11 +106,12 @@ Public Class qualityAction
 
         Dim DataItem As New RecHospitalHeadItem
         sqlMain = "select reh.id as receipt_id, hpt.name as hospital, nvl(count(dh.id),1) as queue_count
+                    , to_char(REH.CREATE_DATE, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') CREATE_DATE
                     from RECEIPT_HOSPITAL reh 
                     inner join HOSPITAL hpt on hpt.id = reh.hospital_id
                     LEFT JOIN DONATION_HOSPITAL dh on dh.receipt_hospital_id = reh.id
                     where reh.id = '" & _REQUEST("receipthospitalid") & "'
-                    GROUP BY reh.id, hpt.name "
+                    GROUP BY reh.id, hpt.name, REH.CREATE_DATE "
         Dim dt As DataTable = Cbase.QueryTable(sqlMain)
 
         If dt.Rows.Count > 0 Then
@@ -118,6 +119,7 @@ Public Class qualityAction
                 DataItem.ID = dr("receipt_id").ToString()
                 DataItem.HospitalName = dr("hospital").ToString()
                 DataItem.QueueTotal = dr("queue_count").ToString()
+                DataItem.CreateDate = dr("CREATE_DATE").ToString()
                 DataItem.QueueCount = Cbase.QueryField("select order_number from DONATION_HOSPITAL where id = '" & _REQUEST("donatehospitalid") & "' ", DataItem.QueueTotal)
             Next
         End If
@@ -230,6 +232,7 @@ Public Structure RecHospitalHeadItem
     Public HospitalName As String
     Public QueueCount As String
     Public QueueTotal As String
+    Public CreateDate As String
 
 End Structure
 

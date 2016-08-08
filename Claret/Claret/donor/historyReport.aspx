@@ -5,6 +5,13 @@
             $.extend($.fn, {
                 queueSelect: function () {
                     $("#data").H2GFill({ donorID: $(this).closest("tr").H2GAttr("donorID"), visitID: $(this).closest("tr").H2GAttr("refID") });
+
+                    if ($("#data").H2GAttr("lmenu") == "lmenuInterview") {
+                        $("#data").H2GFill({ donationTypeID: $("#ddlDonationType").H2GValue(), bagID: $("#ddlBag").H2GValue(), donationToID: $("#ddlDonationTo").H2GValue() });
+                    } else {
+                        $("#data").removeAttr("");
+                    }
+
                     $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "register.aspx", method: "post", staffaction: "register" }).submit();
                 },
             });
@@ -48,19 +55,19 @@
             } else if ($("#data").H2GAttr("lmenu") == "lmenuInterview") {
                 $(".claret-page-header span").H2GValue("คัดกรอง");
                 $(".collection-page-header").show();
-                $("#ddlITVDonationType").setDropdownListValue({
+                $("#ddlDonationType").setDropdownListValue({
                     url: '../../ajaxAction/masterAction.aspx',
                     data: { action: 'donationtype' },
                 }).on('change', function () {
-                    $("#ddlITVBag").closest("div").focus();
+                    $("#ddlBag").closest("div").focus();
                 });
-                $("#ddlITVBag").setDropdownListValue({
+                $("#ddlBag").setDropdownListValue({
                     url: '../../ajaxAction/masterAction.aspx',
                     data: { action: 'bag' },
                 }).on('change', function () {
-                    $("#ddlITVDonationTo").closest("div").focus();
+                    $("#ddlDonationTo").closest("div").focus();
                 });
-                $("#ddlITVDonationTo").setDropdownListValue({
+                $("#ddlDonationTo").setDropdownListValue({
                     url: '../../ajaxAction/masterAction.aspx',
                     data: { action: 'donationto' },
                 }).on('change', function () {
@@ -68,7 +75,7 @@
                 });
                 $("#ddlStatus").H2GValue("WAIT INTERVIEW").change().H2GDisable();
                 $("#txtReportDate").H2GDisable();
-                $("#ddlITVDonationType").closest("div").focus();
+                $("#ddlDonationType").closest("div").focus();
             }
         });
         function postQueueSearch(newSearch) {
@@ -171,7 +178,7 @@
                     <span>ประเภทการบริจาค</span>
                 </div>                                                        
                 <div class="col-md-7">
-                    <select id="ddlITVDonationType" class="text-left" style="width:100%;">
+                    <select id="ddlDonationType" class="text-left" style="width:100%;">
                         <option value="0">Loading...</option>
                     </select>
                 </div>
@@ -179,7 +186,7 @@
                     <span>ประเภทถุง</span>
                 </div>                                                        
                 <div class="col-md-7">
-                    <select id="ddlITVBag" class="text-left" style="width:100%;">
+                    <select id="ddlBag" class="text-left" style="width:100%;">
                         <option value="0">Loading...</option>
                     </select>
                 </div>
@@ -187,7 +194,7 @@
                     <span>การนำไปใช้งาน</span>
                 </div>                                                        
                 <div class="col-md-7">
-                    <select id="ddlITVDonationTo" class="text-left" style="width:100%;">
+                    <select id="ddlDonationTo" class="text-left" style="width:100%;">
                         <option value="0">Loading...</option>
                     </select>
                 </div>

@@ -3,7 +3,7 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <script>
         $(function () {
-            $("#spQueueHeader").H2GValue("คิวประจำวันที่ " + formatDate(H2G.today(), " dd MMM พ.ศ. yyyy"));
+            $("#spQueueHeader").H2GValue("คิวประจำวันที่ " + formatDate(H2G.today(), " dd MMM พ.ศ. yyyy")).H2GAttr("reportDate", formatDate(H2G.today(), "dd/MM/yyyy"));
             $("#searchTab").tabs({
                 active: 0,
                 activate: function (event, ui) {
@@ -74,6 +74,10 @@
                     $("#data").H2GFill({ donorID: $(this).closest("tr").H2GAttr("donorID"), visitID: $(this).closest("tr").H2GAttr("refID")});
                     $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "register.aspx", method: "post", staffaction: "register" }).submit();
                 },
+                backToLabRegis: function () {
+                    $("#data").H2GRemoveAttr("receiptHospitalID");
+                    $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "../quality/labRegister.aspx", method: "post" }).submit();
+                },
             });
 
             $("#tbDonor thead button").click(function () { sortButton($(this), donorSearch); return false; });
@@ -97,6 +101,7 @@
                             data.getItems = jQuery.parseJSON(data.getItems);
                             $("#divReceiptHospital").show();
                             $("#spReceiptHospital").H2GValue(data.getItems.HospitalName + " รายการที่ " + data.getItems.QueueCount + "/" + data.getItems.QueueTotal);
+                            $("#spQueueHeader").H2GValue("คิวประจำวันที่ " + formatDate(new Date(getDateFromFormat(data.getItems.CreateDate, "dd/MM/yyyy")), " dd MMM พ.ศ. yyyy")).H2GAttr("reportDate", data.getItems.CreateDate);
                         } 
                     }
                 });    //End ajax
@@ -244,7 +249,7 @@
                         , birthday: $("#txtPostBirthday").H2GValue()
                         , bloodgroup: $("#txtPostBloodGroup").H2GValue()
                         , samplenumber: $("#txtPostSample").H2GValue()
-                        , reportdate: formatDate(H2G.today(), "dd/MM/yyyy") //$("#txtReportDate").H2GValue()
+                        , reportdate: $("#spQueueHeader").H2GAttr("reportDate") //formatDate(H2G.today(), "dd/MM/yyyy") //$("#txtReportDate").H2GValue()
                         , status: ""
                         , receipthospitalid: $("#data").H2GAttr("receiptHospitalID")
                         , p: $("#tbPostQueue").attr("currentPage") || 1
@@ -334,7 +339,7 @@
     <div id="divReceiptHospital" class="row" style="display:none; margin-top: 5px;">
         <div class="col-md-6">
             <div class="text-center border-box" style="background-color:#E5F5D7;">
-                <button style="border: 0; background-color: transparent;">
+                <button style="border: 0; background-color: transparent;" onclick="return $(this).backToLabRegis();">
                     <i class="icon-refresh" style="vertical-align: middle; font-size: 25px; color: #E77024;">
                         <span style="font-family: THSarabunNew; font-size: 20px; color: #595959; vertical-align: text-bottom; font-weight: bold;">เปลี่ยนโรงพยาบาล</span>
                     </i>

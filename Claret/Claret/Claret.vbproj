@@ -187,7 +187,7 @@
     <Content Include="image\logo\NBC-logo.png" />
     <Content Include="Login.aspx" />
     <Content Include="main.aspx" />
-    <Content Include="mobile\main.aspx" />
+    <Content Include="mobile\planningInfo.aspx" />
     <Content Include="quality\labRegister.aspx" />
     <Content Include="resources\css\bootflat.css" />
     <Content Include="resources\css\claret-font-icon.css" />
@@ -360,11 +360,11 @@
       <DependentUpon>MasterPage.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="mobile\main.aspx.designer.vb">
-      <DependentUpon>main.aspx</DependentUpon>
+    <Compile Include="mobile\planningInfo.aspx.designer.vb">
+      <DependentUpon>planningInfo.aspx</DependentUpon>
     </Compile>
-    <Compile Include="mobile\main.aspx.vb">
-      <DependentUpon>main.aspx</DependentUpon>
+    <Compile Include="mobile\planningInfo.aspx.vb">
+      <DependentUpon>planningInfo.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />

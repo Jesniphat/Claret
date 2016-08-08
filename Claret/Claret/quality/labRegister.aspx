@@ -291,6 +291,12 @@
                         $("tr").remove(".hospitalListCol");
                         data.getItems = jQuery.parseJSON(data.getItems);
                         var dataRow = data.getItems;
+                        if (dataRow.length > 0) {
+                            $("tr").remove(".no-transactionHospitalList");
+                        } else {
+                            $("tr").remove(".no-transactionHospitalList");
+                            $('#hospitalList > tbody').append("<tr class='no-transactionHospitalList'><td align='center' colspan='6'>ไม่พบข้อมูล</td></tr>");
+                        }
                         for (var i = 0; i < dataRow.length; i++) {
                             var rows = "<tr class='hospitalListCol'>" +
                                             "<td class='text-right'>" + (i + 1) + "</td>" +
@@ -469,8 +475,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                    
+                    <%--<tr class="no-transactionHospitalList"><td align="center" colspan="6">ไม่พบข้อมูล</td></tr>--%>
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <td align="right" colspan="6">
+                            <div class="page">
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>

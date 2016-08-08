@@ -668,8 +668,8 @@ Public Class donorAction
                     , to_char(dn.lab_date, 'DD MON YYYY HH24,MI', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as lab_date
                     from (
                         Select dv.id as visit_id, dr.DONATION_NUMBER, nvl(DV.VISIT_DATE, dv.create_date) As VISIT_DATE, DT.DESCRIPTION As DONATION_TYPE
-                        , ba.description as bag, si.code as site, cp.code as COLLECTION_POINT, crs.name || ' ' || crs.surname as CREATE_STAFF
-                        , ins.name || ' ' || ins.surname as INTERVIEW_STAFF, dv.INTERVIEW_STATUS, dr.lab_date, dv.sample_number
+                        , ba.description as bag, si.code as site, cp.code as COLLECTION_POINT, crs.firstname || ' ' || crs.lastname as CREATE_STAFF
+                        , ins.firstname || ' ' || ins.lastname as INTERVIEW_STAFF, dv.INTERVIEW_STATUS, dr.lab_date, dv.sample_number
                         From DONATION_VISIT dv
                         Left Join DONATION_RECORD dr on dr.DONATION_VISIT_id = dv.id
                         Left Join DONATION_TYPE dt on dt.id = dv.DONATION_TYPE_ID

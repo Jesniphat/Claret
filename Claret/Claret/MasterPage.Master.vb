@@ -14,7 +14,7 @@ Public Class MasterPage
         strUserInfo = "หน่วย " & Cbase.QueryField("select name as name from collection_point where id = '" & H2G.Login.CollectionPointID & "'", "")
         strUserInfo &= " : แผน " & DateTime.Today.ToString("dd MMMM yyyy")
         spCollectionPoint.InnerText = strUserInfo
-        spUserName.InnerText = Cbase.QueryField("select name || ' ' || surname || ' (' || code || ')' as name from staff where id = '" & H2G.Login.ID & "'")
+        spUserName.InnerText = Cbase.QueryField("select firstname || ' ' || lastname || ' (' || code || ')' as name from staff where id = '" & H2G.Login.ID & "'")
 
     End Sub
 

@@ -88,9 +88,7 @@ var H2G = {
     },
     addDays: function(date, days) {
         var result = new Date(date);
-        console.log("in date",result);
-        result.setDate(result.getDate() + days);
-        console.log("out date", result);
+        result.setDate(result.getDate() + parseInt(days));
         return result;
     },
 }
@@ -159,7 +157,7 @@ $.extend($.fn, {
 
         return this;
     },
-    setAutoListValue: function (setting, defaultSelect) {
+    setAutoListValue: function (setting) {
         var self = this;
         var config = {
             url: '',
@@ -182,7 +180,7 @@ $.extend($.fn, {
             $.each((data), function (index, e) {
                 $("<option>", {}).H2GFill(e).appendTo(self);
             });
-            $(self).H2GValue(config.defaultSelect || defaultSelect || "").combobox({
+            $(self).H2GValue(config.defaultSelect).combobox({
                 select: config.selectItem,
             });
             $(self).parent().find("span").find("input").val($(self).find(":selected").text());
@@ -190,7 +188,7 @@ $.extend($.fn, {
             if (config.enable) { $(self).H2GEnable(); } else { $(self).H2GDisable(); }
         }
 
-        if (config.dataObject.length == 0) {
+        if (config.url != "") {
             $.ajax({
                 url: config.url,
                 data: config.data,
@@ -213,7 +211,6 @@ $.extend($.fn, {
                 }
             });    //End ajax
         } else {
-            console.log("retrive data");
             compile(config.dataObject);
         }
 
@@ -495,6 +492,13 @@ $.extend($.fn, {
                 $(this).prop('disabled', false);
                 break;
         }
+        return this;
+    },
+    H2GRemoveAttr: function (nameList) {
+        var nameList = nameList.split(",")
+        $.each((nameList), function (index, e) {
+            $(this).removeAttr(e);
+        });
         return this;
     },
 });

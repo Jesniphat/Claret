@@ -25,7 +25,7 @@
             font-weight:normal;
         }
     </style>
-    <script src="../resources/javascript/page/registerScript.js?ver=20160121" type="text/javascript"></script>
+    <script src="../resources/javascript/page/registerScript.js?ver=20160122" type="text/javascript"></script>
     <script>
         $(function () {
             lookupControl();
@@ -329,8 +329,12 @@
                     }
                 },
                 deleteExam: function (args) {
-                    if (confirm("ต้องการจะลบ " + $(this).closest("tr").find(".td-exam").html() + " ใช่หรือไม่?")) {
+                    if ($(this).closest("tr").H2GAttr("refID") == "NEW") {
                         $(this).closest("tr").remove();
+                    } else {
+                        if (confirm("ต้องการจะลบ " + $(this).closest("tr").find(".td-exam").html() + " ใช่หรือไม่?")) {
+                            $(this).closest("tr").hide().H2GAttr("refID", "D#" + $(this).closest("tr").H2GAttr("refID"));
+                        }
                     }
                 },
                 latinNameChange: function (args) {
@@ -354,13 +358,23 @@
                             defRemarks: $("#txtDefRemarks").H2GValue(),
                         });
                         $(dataRow).find('.td-description').append($("#ddlITVDeferral option:selected").H2GAttr("desc")).H2GAttr("title", $("#ddlITVDeferral option:selected").H2GAttr("desc"));                        
-                        $(dataRow).find('.td-enddate').append('วันที่สิ้นสุด ' + formatDate(new Date(getDateFromFormat($('#txtDefDateTo').val(), 'dd/mm/yyyy')), "dd MON yyyy")).H2GAttr("title", 'วันที่สิ้นสุด ' + formatDate(new Date(getDateFromFormat($('#txtDefDateTo').val(), 'dd/mm/yyyy')), "dd MON yyyy"));
+                        $(dataRow).find('.td-enddate').append('วันที่สิ้นสุด ' + formatDate(new Date(getDateFromFormat($('#txtDefDateTo').val(), 'dd/mm/yyyy')), "dd NNN yyyy")).H2GAttr("title", 'วันที่สิ้นสุด ' + formatDate(new Date(getDateFromFormat($('#txtDefDateTo').val(), 'dd/mm/yyyy')), "dd NNN yyyy"));
                         $("#tbDefInterview > tbody").append(dataRow);
+                        
+                        $("#txtDefCode").H2GValue("");
+                        $("#ddlITVDeferral").closest("div").find("input").val("");
+                        $("#txtDuration").H2GValue("");
+                        $("#txtDefDateTo").H2GValue("");
+                        $("#txtDefRemarks").H2GValue("");
                     }
                 },
                 deleteDeferral: function (args) {
-                    if (confirm("ต้องการจะลบ " + $(this).closest("tr").find(".td-exam").html() + " ใช่หรือไม่?")) {
+                    if ($(this).closest("tr").H2GAttr("refID") == "NEW") {
                         $(this).closest("tr").remove();
+                    } else {
+                        if (confirm("ต้องการจะลบ " + $(this).closest("tr").find(".td-description").html() + " ใช่หรือไม่?")) {
+                            $(this).closest("tr").hide().H2GAttr("refID", "D#" + $(this).closest("tr").H2GAttr("refID"));
+                        }
                     }
                 },
             });
@@ -386,6 +400,7 @@
                 $("#infoTabToday").tabs("option", "disabled", [1]);
             }
         });
+
         function lookupTabQuestionaire() {
             $("#ddlDeferralType").setDropdownList();
             $("#ddlITVResult").setDropdownList();
@@ -403,14 +418,18 @@
                 onSelect: function (selectedDate, objDate) { $("#txtDefRemarks").focus(); },
             });
 
-            $("#txtExamCode").enterKey(function () { getExamination(); });
+            $("#txtExamCode").enterKey(function () { getExamination($(this).H2GValue()); });
             $("#ddlExam").setAutoListValue({
                 url: '../ajaxAction/masterAction.aspx', data: { action: 'examination' },
                 selectItem: function () {
                     $("#txtExamCode").H2GValue($("#ddlExam").H2GValue());
-                    getExamination();
+                    getExamination($("#txtExamCode").H2GValue());
                 },
             });
+
+            $("#ddlITVDonationType").H2GAttr("selectItem", $("#data").H2GAttr("donationTypeID"));
+            $("#ddlITVBag").H2GAttr("selectItem", $("#data").H2GAttr("bagID"));
+            $("#ddlITVDonationTo").H2GAttr("selectItem", $("#data").H2GAttr("donationToID"));
 
             if ($("#ddlITVDonationType option").length > 1) { $("#ddlITVDonationType").H2GValue($("#ddlITVDonationType").H2GAttr("selectItem")).change(); } else {
                 $("#ddlITVDonationType").setDropdownListValue({
@@ -419,29 +438,7 @@
                     defaultSelect: $("#ddlITVDonationType").H2GAttr("selectItem"),
                 }).on('change', function () {
                     $("#ddlITVBag").closest("div").focus();
-
-                    var dataObj = [];
-                    var dataAll = $("#ddlITVDeferral").data("data-ddl");
-                    var create = 0;
-                    if (dataAll != undefined) {
-                        $.each((dataAll), function (index, e) {
-                            if ($("#ddlITVDonationType option:selected").H2GAttr("valueID") == e.donationID) {
-                                dataObj[create] = e;
-                                create++;
-                            }
-                        });
-                    }
-                    $("#ddlITVDeferral").combobox("destroy").setAutoListValue({
-                        dataObject: dataObj,
-                        selectItem: function () {
-                        $("#txtDefCode").H2GValue($("#ddlITVDeferral").H2GValue());
-                        $("#ddlDeferralType").H2GValue($("#ddlITVDeferral option:selected").H2GAttr("deferralType")).change()
-                        var duration = $("#ddlITVDeferral option:selected").H2GAttr("duration");
-                        $("#txtDuration").H2GValue(duration);
-
-                        if (duration == "") { $("#txtDefDateTo").H2GValue("31/12/2899"); }
-                        else { $("#txtDefDateTo").H2GValue(H2G.addDays(H2G.today(), duration)); }
-                    }, });
+                    setDeferralData($("#ddlITVDonationType option:selected").H2GAttr("valueID"));
                 });
             }
             if ($("#ddlITVBag option").length > 1) { $("#ddlITVBag").H2GValue($("#ddlITVBag").H2GAttr("selectItem")).change(); } else {
@@ -462,24 +459,49 @@
                     $("#txtDefCode").focus();
                 });
             }
+            
+            $.ajax({
+                url: '../../ajaxAction/masterAction.aspx',
+                data: {
+                    action: 'deferral',
+                    gender: $("#rbtM").is(':checked') == true ? "M" : "F",
+                },
+                type: "POST",
+                dataType: "json",
+                error: function (xhr, s, err) {
+                    console.log(s, err);
+                },
+                success: function (data) {
+                    if (!data.onError) {
+                        data.getItems = jQuery.parseJSON(data.getItems);
+                        $("#ddlITVDeferral").data("data-ddl",data.getItems)
+                        setDeferralData($("#ddlITVDonationType").H2GAttr("selectItem"));
+                    }
+                }
+            });
 
-            if ($("#ddlITVDeferral option").length > 1) { $("#ddlITVDonationTo").H2GValue($("#ddlITVDonationTo").H2GAttr("selectItem")).change(); } else {
-                $("#ddlITVDeferral").setAutoListValue({
-                    url: '../../ajaxAction/masterAction.aspx',
-                    data: { action: 'deferral', gender: $("#rbtM").is(':checked') == true ? "M" : "F" },
-                    defaultSelect: $("#ddlITVDeferral").H2GAttr("selectItem"),
-                    tempData: true,
-                    selectItem: function () {
-                        $("#txtDefCode").H2GValue($("#ddlITVDeferral").H2GValue());
-                        $("#ddlDeferralType").H2GValue($("#ddlITVDeferral option:selected").H2GAttr("deferralType")).change()
-                        var duration = $("#ddlITVDeferral option:selected").H2GAttr("duration");
-                        $("#txtDuration").H2GValue(duration);
-
-                        if (duration == "") { $("#txtDefDateTo").H2GValue("31/12/2899"); }
-                        else { $("#txtDefDateTo").H2GValue(H2G.addDays(H2G.today(), duration)); }
-                    },
-                });
-            }
+            $.ajax({
+                url: '../../ajaxAction/masterAction.aspx',
+                data: {
+                    action: 'questionnaire',
+                },
+                type: "POST",
+                dataType: "json",
+                error: function (xhr, s, err) {
+                    console.log(s, err);
+                },
+                success: function (data) {
+                    if (!data.onError) {
+                        data.getItems = jQuery.parseJSON(data.getItems);
+                        console.log(data.getItems);
+                        $("#tbQuestionnaire").data("data-questionnaire", data.getItems.QuestionItem)
+                        $("#tbQuestionnaire").data("data-answer", data.getItems.AnswerItem)
+                        // initial question
+                        genQuestion('3');
+                    }
+                }
+            });
+            
             $("#txtDefCode").enterKey(function () {
                 $("#ddlITVDeferral").combobox("setvalue", $("#txtDefCode").val().toUpperCase()).change();
                 if ($("#ddlITVDeferral").H2GValue() == null) {
@@ -501,78 +523,197 @@
                 addDeferral();
             });
             $("#spAddDeferral").click(function () { $(this).addDeferral(); });
+
         }
-        function getExamination() {
-            if ($("#txtExamCode").H2GValue() != "") {
+        function getExamination(examCode, questID) {
+            if (examCode != "") {
+                questID = questID || "";
                 var dataView = $("#tbExam > tbody");
-                $(dataView).closest("table").H2GAttr("wStatus", "working");
-                $.ajax({
-                    url: "../ajaxAction/qualityAction.aspx",
-                    data: H2G.ajaxData({
-                        action: 'getexamination',
-                        excode: $("#txtExamCode").H2GValue(),
-                    }).config,
-                    type: "POST",
-                    dataType: "json",
-                    error: function (xhr, s, err) {
-                        console.log(s, err);
-                        $(dataView).closest("table").H2GAttr("wStatus", "error");
-                    },
-                    success: function (data) {
-                        var notiReject = "";
-                        var notiInject = "";
-                        if (!data.onError) {
-                            data.getItems = jQuery.parseJSON(data.getItems);
-                            $.each((data.getItems), function (index, e) {
-                                if ($("#tbExam > tbody > tr.template-data[examCode='" + e.Code + "']").length > 0) {
-                                    // 1 ถ้า exam ที่เพิ่มเข้ามาซ้ำ และไม่มีกลุ่มจะไม่เพิ่มและแจ้งซ้ำ
-                                    if (e.GroupID == null) {
-                                        notiReject += e.Code + ", ";
+                if ($(dataView).closest("table").H2GAttr("wStatus") != "working") {
+                    $(dataView).closest("table").H2GAttr("wStatus", "working");
+                    $.ajax({
+                        url: "../ajaxAction/qualityAction.aspx",
+                        data: H2G.ajaxData({
+                            action: 'getexamination',
+                            excode: examCode,
+                        }).config,
+                        type: "POST",
+                        dataType: "json",
+                        error: function (xhr, s, err) {
+                            console.log(s, err);
+                            $(dataView).closest("table").H2GAttr("wStatus", "error");
+                        },
+                        success: function (data) {
+                            var notiReject = "";
+                            var notiInject = "";
+                            if (!data.onError) {
+                                data.getItems = jQuery.parseJSON(data.getItems);
+                                $.each((data.getItems), function (index, e) {
+                                    if ($("#tbExam > tbody > tr.template-data[examCode='" + e.Code + "']").length > 0) {
+                                        // 1 ถ้า exam ที่เพิ่มเข้ามาซ้ำ และไม่มีกลุ่มจะไม่เพิ่มและแจ้งซ้ำ
+                                        if (e.GroupID == null) {
+                                            notiReject += e.Code + ", ";
+                                        } else {
+                                            // 2 ถ้า exam ที่เพิ่มเข้ามาซ้ำ แต่มีกลุ่มจะเพิ่มให้และลบตัวเก่าเสมอ
+                                            notiInject += e.Code + ", ";
+                                            $("#tbExam > tbody > tr.template-data[examCode='" + e.Code + "']").remove();
+                                            var dataRow = $("#tbExam > thead > tr.template-data").clone().show();
+                                            $(dataRow).H2GFill({ refID: e.ID, examCode: e.Code, desc: e.Description, groupID: e.GroupID, groupCode: e.GroupCode, groupDesc: e.GroupDescription, questID: questID });
+                                            $(dataRow).find('.td-exam').append(e.Code + ' : ' + e.Description).H2GAttr("title", e.Code + ' : ' + e.Description);
+                                            $(dataView).append(dataRow);
+                                        }
                                     } else {
-                                        // 2 ถ้า exam ที่เพิ่มเข้ามาซ้ำ แต่มีกลุ่มจะเพิ่มให้และลบตัวเก่าเสมอ
-                                        notiInject += e.Code + ", ";
-                                        $("#tbExam > tbody > tr.template-data[examCode='" + e.Code + "']").remove();
                                         var dataRow = $("#tbExam > thead > tr.template-data").clone().show();
-                                        $(dataRow).H2GFill({ refID: e.ID, examCode: e.Code, desc: e.Description, groupID: e.GroupID, groupCode: e.GroupCode, groupDesc: e.GroupDescription });
+                                        $(dataRow).H2GFill({ refID: e.ID, examCode: e.Code, desc: e.Description, groupID: e.GroupID, groupCode: e.GroupCode, groupDesc: e.GroupDescription, questID: questID });
                                         $(dataRow).find('.td-exam').append(e.Code + ' : ' + e.Description).H2GAttr("title", e.Code + ' : ' + e.Description);
                                         $(dataView).append(dataRow);
                                     }
-                                } else {
-                                    var dataRow = $("#tbExam > thead > tr.template-data").clone().show();
-                                    $(dataRow).H2GFill({ refID: e.ID, examCode: e.Code, desc: e.Description, groupID: e.GroupID, groupCode: e.GroupCode, groupDesc: e.GroupDescription });
-                                    $(dataRow).find('.td-exam').append(e.Code + ' : ' + e.Description).H2GAttr("title", e.Code + ' : ' + e.Description);
-                                    $(dataView).append(dataRow);
-                                }
-                            });
+                                });
 
-                            $("#txtExamCode").H2GValue("");
-                            $("#ddlExam").closest("div").find("input").val("");
-                            if (notiReject != "") { notiWarning(notiReject.substring(0, notiReject.length - 2) + " มีการเพิ่มไปแล้ว") }
-                            if (notiInject != "") { notiWarning(notiInject.substring(0, notiInject.length - 2) + " ถูกแทนที่ด้วยกลุ่ม " + data.getItems[0].GroupCode) }
-                        } else {
-                            $("#txtExamCode").focus();
-                            notiError(data.exMessage);
+                                $("#txtExamCode").H2GValue("");
+                                $("#ddlExam").closest("div").find("input").val("");
+                                if (notiReject != "") { notiWarning(notiReject.substring(0, notiReject.length - 2) + " มีการเพิ่มไปแล้ว") }
+                                if (notiInject != "") { notiWarning(notiInject.substring(0, notiInject.length - 2) + " ถูกแทนที่ด้วยกลุ่ม " + data.getItems[0].GroupCode) }
+                            } else {
+                                $("#txtExamCode").focus();
+                                notiError(data.exMessage);
+                            }
+                            $(dataView).closest("table").H2GAttr("wStatus", "done");
                         }
-                        $(dataView).closest("table").H2GAttr("wStatus", "done");
-                    }
-                });    //End ajax
+                    });    //End ajax
+                } else {
+                    setTimeout(function () { getExamination(examCode); }, 1000);
+                }
             } else {
                 $("#txtExamCode").focus();
                 notiWarning("กรุณากรอกหรือเลือก Examination");
             }
         }
         function deferralValidation() {
-            if ($('#divCardNumber > div').length == 0) {
-                $("#txtExtNumber").focus();
-                notiWarning("กรุณากรอกข้อมูลบัตรผู้บริจาคอย่างน้อย 1 ใบ");
+            if ($("#ddlITVDeferral").H2GValue() == null) {
+                $("#txtDefCode").focus();
+                notiWarning("กรุณากรอกเหตุผลที่งดบริจาคโลหิต");
                 return false;
-            } else if ($('#ddlTitleName').H2GValue() == "") {
-                $("#ddlTitleName").closest("div").focus();
-                notiWarning("กรุณาเลือกคำนำหน้าชื่อผู้บริจาค");
+            } else if ($('#txtDefDateTo').H2GValue() == "") {
+                $("#txtDefDateTo").focus();
+                notiWarning("กรุณากรอกวันที่สิ้นสุด");
                 return false;
             }
             return true;
         }
+        function setDeferralData(donationTypeID) {
+            var dataObj = [];
+            var dataAll = $("#ddlITVDeferral").data("data-ddl");
+            var create = 0;
+            if (dataAll != undefined) {
+                $.each((dataAll), function (index, e) {
+                    if (donationTypeID == e.donationID) {
+                        dataObj[create] = e;
+                        create++;
+                    }
+                });
+            }
+            if ($("#ddlITVDeferral").next().length > 0) { $("#ddlITVDeferral").combobox("destroy"); }
+            $("#ddlITVDeferral").setAutoListValue({
+                dataObject: dataObj,
+                selectItem: function () {
+                    $("#txtDefCode").H2GValue($("#ddlITVDeferral").H2GValue());
+                    $("#ddlDeferralType").H2GValue($("#ddlITVDeferral option:selected").H2GAttr("deferralType")).change()
+                    var duration = $("#ddlITVDeferral option:selected").H2GAttr("duration");
+                    $("#txtDuration").H2GValue(duration);
+
+                    if (duration == "") { $("#txtDefDateTo").H2GValue("31/12/2899"); }
+                    else { $("#txtDefDateTo").H2GValue(formatDate(H2G.addDays(H2G.today(), duration), "dd/MM/yyyy")); }
+                    
+                },
+            });
+        }
+        function genQuestion(questID, fromQuestion) {
+            var QID = questID || ""
+            if (QID != "") {
+                var QID = QID.split(",");
+                var QuestData = $("#tbQuestionnaire").data("data-questionnaire")
+
+                $.each((QID), function (index, e) {
+                    $.each((QuestData), function (indexr, er) {
+                        if (e == er.QuestionID) {
+                            var dataRow = $("#tbQuestionnaire > thead > tr.template-data").clone().show();                     
+                            $(dataRow).H2GFill({
+                                questID: er.QuestionID,
+                                questCode: er.Code,
+                                questRequired: er.Required,
+                                questAnswerType: er.AnswerType,
+                                questPreset: er.Preset,
+                                fromQuestion: fromQuestion,
+                            });
+                            $(dataRow).find(".td-question span").H2GValue(er.Description);
+                            if (er.AnswerType == "PRESET") {
+                                var selectPreset = $(dataRow).find(".td-answer select").show();
+                                var preset = er.Preset.split(",");
+                                preset.sort();
+                                $("<option>", { value: '', text: 'กรุณาเลือก' }).appendTo(selectPreset);
+                                $.each((preset), function (indexs, es) {
+                                    $("<option>", { value: es, text: es }).appendTo(selectPreset);
+                                });
+                                $(selectPreset).setDropdownList().on('change', function () {
+                                    //ก่อนสร้างคำถามถัดไปให้ทำการลบคำถามเก่าก่อน
+                                    deleteQuestion($(this).closest("tr").H2GAttr("questID"));
+                                    //ให้เอาคำตอบไปหาคำถามต่อไป
+                                    selectNextQuestion($(this).closest("tr").H2GAttr("questID"), $(this).H2GValue());
+                                });
+                            } else {
+                                $(dataRow).find(".td-answer input").show();
+                                if (er.AnswerType == "DATE") {
+                                    $(dataRow).find(".td-answer input").setCalendar({
+                                        maxDate: "+100y",
+                                        minDate: "-100y",
+                                        yearRange: "c-50:c+50",
+                                    });
+                                }
+                            }
+                            $("#tbQuestionnaire > tbody").append(dataRow);
+                            return false;
+                        }
+                    });
+                });
+            }
+        }
+        function selectNextQuestion(questID, presetAnswer) {
+            var AnswerData = $("#tbQuestionnaire").data("data-answer");
+            $.each((AnswerData), function (index, e) {
+                if (e.QuestionID == questID && e.Code == presetAnswer && e.ToQuestID != "") {
+                    genQuestion(e.ToQuestID, e.QuestionID);
+                }
+            });
+        }
+        function deleteQuestion(questID) {
+            var questDelete = $("#tbQuestionnaire > tbody tr[fromQuestion=" + questID + "]");
+            $.each((questDelete), function (index, e) {
+                deleteQuestion($(e).H2GAttr("questID"));
+                if ($(e).H2GAttr("refID") == "NEW") {
+                    $(e).remove();
+                } else {
+                    $(e).hide().H2GAttr("refID", "D#" + $(e).H2GAttr("refID").replace('D#', ''));
+                }
+            });
+        }
+        function addDefByQuestion(defID) {
+            defID = defID || "";
+            if (defID != "") {
+                var dataAll = $("#ddlITVDeferral").data("data-ddl");
+                defID = defID.split(",");
+                if (dataAll != undefined) {
+                    $.each((defID), function (index, e) {
+                        $.each((dataAll), function (indexr, er) {
+                            if (e == er.valueID) {
+
+                            }
+                        });
+                    });
+                }
+            }         
+        }
+
     </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="cphMaster" runat="server">
@@ -677,13 +818,13 @@
                         <span>Name</span>
                     </div>
                     <div class="col-md-10">
-                        <input id="txtDonorNameEng" type="text" class="form-control required" tabindex="1" />
+                        <input id="txtDonorNameEng" type="text" class="form-control" tabindex="1" />
                     </div>
                     <div class="col-md-2 text-center">
                         <span>Surname</span>
                     </div>
                     <div class="col-md-10">
-                        <input id="txtDonorSurNameEng" type="text" class="form-control required" tabindex="1" />
+                        <input id="txtDonorSurNameEng" type="text" class="form-control" tabindex="1" />
                     </div>
                 </div>
                 <div class="row">
@@ -1141,69 +1282,30 @@
                                                     <table id="tbQuestionnaire" class="table table-hover table-striped">
                                                         <thead style="display:none;">
                                                             <tr class="no-transaction" style="display: none;">
-                                                                <td align="center" colspan="2">ไม่พบข้อมูล</td>
+                                                                <td align="center" colspan="3">ไม่พบข้อมูล</td>
                                                             </tr>
                                                             <tr class="more-loading" style="display: none;">
-                                                                <td align="center" colspan="2">Loading detail...</td>
+                                                                <td align="center" colspan="3">Loading detail...</td>
                                                             </tr>
                                                             <tr class="template-data" style="display: none;">
-                                                                <td class="td-question"></td>
-                                                                <td class="td-answer"></td>
+                                                                <td class="td-number col-md-1">
+                                                                    <span></span>
+                                                                </td>
+                                                                <td class="td-question col-md-29">
+                                                                    <span></span>
+                                                                </td>
+                                                                <td class="td-answer col-md-6">
+                                                                    <input type="text" class="form-control" style="display:none;" />
+                                                                    <select class="ddl-answer" style="display:none; width:100%;">
+                                                                    </select>
+                                                                </td>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr class="template-data">
-                                                                <td class="td-question col-md-27">
-                                                                    <span>1. แบบสอบถามการบริจาคโลหิตมีความผิดปกติ?</span>
-                                                                </td>
-                                                                <td class="td-answer col-md-9">
-                                                                    <input type="text" class="form-control" />
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="template-data">
-                                                                <td class="td-question col-md-27">
-                                                                    <span>2. ต้องการบริจาค?</span>
-                                                                </td>
-                                                                <td class="td-answer col-md-9">
-                                                                    <input type="text" class="form-control" />
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="template-data">
-                                                                <td class="td-question col-md-27">
-                                                                    <span>3. บริจาค STEM CELL?</span>
-                                                                </td>
-                                                                <td class="td-answer col-md-9">
-                                                                    <input type="text" class="form-control" />
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="template-data">
-                                                                <td class="td-question col-md-27">
-                                                                    <span>3. บริจาค STEM CELL?</span>
-                                                                </td>
-                                                                <td class="td-answer col-md-9">
-                                                                    <input type="text" class="form-control" />
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="template-data">
-                                                                <td class="td-question col-md-27">
-                                                                    <span>3. บริจาค STEM CELL?</span>
-                                                                </td>
-                                                                <td class="td-answer col-md-9">
-                                                                    <input type="text" class="form-control" />
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="template-data">
-                                                                <td class="td-question col-md-27">
-                                                                    <span>3. บริจาค STEM CELL?</span>
-                                                                </td>
-                                                                <td class="td-answer col-md-9">
-                                                                    <input type="text" class="form-control" />
-                                                                </td>
-                                                            </tr>
                                                         </tbody>
                                                         <tfoot>
                                                             <tr>
-                                                                <td colspan="2" style="border-top:solid 1px #cccccc;border-bottom:none;"></td>
+                                                                <td colspan="3" style="border-top:solid 1px #cccccc;border-bottom:none;"></td>
                                                             </tr>
                                                         </tfoot>
                                                     </table>
@@ -1311,8 +1413,8 @@
                                                         <div class="col-md-16 col-md-offset-11">
                                                             <select id="ddlITVResult" class="required" style="width:100%;">
                                                                 <option value="DONATION">DONATION</option>
-                                                                <option value="REFUSED">REFUSED</option>
                                                                 <option value="SAMPLE">SAMPLE</option>
+                                                                <option value="REFUSED">REFUSED</option>
                                                             </select>
                                                         </div>
                                                     </div>
@@ -1443,25 +1545,12 @@
                                                                             <div class="text-center">
                                                                                 <a class="icon">
                                                                                     <span class="glyphicon glyphicon-remove" aria-hidden="true" 
-                                                                                        onclick="return $(this).deleteExam();"></span></a>
+                                                                                        onclick="return $(this).deleteDeferral();"></span></a>
                                                                             </div>
                                                                         </td>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
-                                                                    <tr class="template-data" refID="NEW">
-                                                                        <td class="col-md-23 td-def">1. สาเหตุ xxxxxxxxxxxxxxxxxxx
-                                                                        </td>
-                                                                        <td class="col-md-11 td-def-date">วันที่สิ้นสุด 01 ธ.ค. 2559
-                                                                        </td>
-                                                                        <td class="col-md-2">
-                                                                            <div class="text-center">
-                                                                                <a class="icon">
-                                                                                    <span class="glyphicon glyphicon-remove" aria-hidden="true" 
-                                                                                        onclick="return $(this).deleteExam();"></span></a>
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr>
                                                                 </tbody>
                                                             </table>
                                                         </div>

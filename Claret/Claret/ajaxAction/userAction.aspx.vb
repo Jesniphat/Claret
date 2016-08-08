@@ -21,7 +21,7 @@ Public Class userAction
             Select Case _REQUEST("action")
                 Case "selectstaff"
                     Dim StaffItem As New StaffItem
-                    sqlMain = "select id, code, name, surname from staff where UPPER(code) = UPPER('" & _REQUEST("user") & "') and password = '" & _REQUEST("password") & "' "
+                    sqlMain = "select id, trim(code) as code, firstname as name, lastname as surname from staff where UPPER(trim(code)) = UPPER('" & _REQUEST("user") & "') and trim(pass) = '" & _REQUEST("password") & "' "
                     Dim dt As DataTable = Cbase.QueryTable(sqlMain)
                     ' Login ได้
                     If dt.Rows.Count > 0 Then
