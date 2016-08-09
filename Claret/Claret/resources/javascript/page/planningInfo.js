@@ -16,7 +16,7 @@
                 , planstatus: $("#txtPlanStatus").H2GValue()
                 , plantype: $("#txtPlanType").H2GValue()
                 , p: $("#tbDonor").attr("currentPage") || 1
-                , so: $("#tbDonor").attr("sortOrder") || "SITE_ID"
+                , so: $("#tbDonor").attr("sortOrder") || "site_id"
                 , sd: $("#tbDonor").attr("sortDirection") || "desc"
             },
             type: "POST",
@@ -30,6 +30,7 @@
                 $(dataView).H2GValue('');
                 if (!data.onError) {
                     data.getItems = jQuery.parseJSON(data.getItems);
+                    console.log("data = ", data);
                     if (data.getItems.SearchList.length > 0) {
                         $.each((data.getItems.SearchList), function (index, e) {
                             var dataRow = $("#tbDonor > thead > tr.template-data").clone().show();

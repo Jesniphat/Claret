@@ -16,7 +16,7 @@
                 yearRange: "c-100:c+0",
                 onSelect: function (selectedDate, objDate) {
                     // $("#txtHospital").focus();
-                    getDornorHospitalList(selectedDate);
+                    //getDornorHospitalList(selectedDate);
                 },
             });
 
@@ -125,7 +125,7 @@
 
         <div class="row" style="padding-left: 15px;">
             <div class="col-md-36">
-                <table id="tbDonor" class="table table-hover table-striped" totalPage="1" currentPage="1" sortDirection="desc" sortOrder="donor_number">
+                <table id="tbDonor" class="table table-hover table-striped" totalPage="1" currentPage="1" sortDirection="desc" sortOrder="SITE_ID">
                     <thead>
                         <tr>
                             <th class="col-md-5">
@@ -176,9 +176,9 @@
                             <td class="td-birthday">
                             </td>
                             <td class="td-blood-group">
-                                <div class="text-right" style="padding-left: 2px; display: inline-table; float: right;">
+                                <%--<div class="text-right" style="padding-left: 2px; display: inline-table; float: right;">
                                     <a class="icon"><span class="glyphicon glyphicon-arrow-right" aria-hidden="true" onclick="return $(this).donorSelect();"></span></a>
-                                </div>
+                                </div>--%>
                             </td>
                         </tr>
                     </thead>
