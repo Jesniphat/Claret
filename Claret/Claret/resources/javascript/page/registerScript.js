@@ -274,14 +274,64 @@ function validation() {
         $("#txtMobile1").focus();
         notiWarning("กรุณากรอกเบอร์โทรศัพท์มือถือผู้บริจาค");
         return false;
-    } else if ($('#txtEmail').H2GValue() != "") {
+    } else if (checkEmail()) {
+        notiWarning("กรุณากรอกอีเมลให้ถูกต้อง");
+        $("#txtEmail").focus();
+        return false;
+    } else if (interviewValidation()) {
+        // ไม่ผ่านการตรวจสอบ tab คัดกรอง
+        return false;
+    }
+
+    return true;
+}
+function checkEmail() {
+    if ($('#txtEmail').H2GValue() != "") {
         if (!H2G.IsEmail($('#txtEmail').H2GValue())) {
-            $("#txtEmail").focus();
-            notiWarning("กรุณากรอกอีเมลให้ถูกต้อง");
-            return false;
+            return true;
         }
     }
-    return true;
+}
+function interviewValidation() {
+    if ($("#subInterview").is(":visible")) {
+        if (notAllAnswer()) {
+            $("#tbQuestionnaire > tbody > tr select:first").closest("div").focus();
+            alert("กรุณาตอบคำถามให้ครบทุกข้อ");
+            return true;
+        } else if ($("#txtWeight").H2GValue() == "") {
+            $("#txtWeight").focus()
+            alert("กรุณากรอกน้ำหนัก");
+            return true;
+        } else if ($("#txtHeartRate").H2GValue() == "") {
+            $("#txtHeartRate").focus()
+            alert("กรุณากรอกอัตราชีพจร");
+            return true;
+        } else if ($("#txtPresureMax").H2GValue() == "") {
+            $("#txtPresureMax").focus()
+            alert("กรุณากรอกความดันสูงสุด");
+            return true;
+        } else if ($("#txtPresureMin").H2GValue() == "") {
+            $("#txtPresureMin").focus()
+            alert("กรุณากรอกความดันต่ำสุด");
+            return true;
+        } else if ($("#txtHb").H2GValue() == "") {
+            $("#txtHb").focus()
+            alert("กรุณากรอก Hb");
+            return true;
+        }
+    }
+    return false;
+}
+function notAllAnswer() {
+    var quest = $("#tbQuestionnaire > tbody > tr");
+    var notanswer = false;
+    $.each((quest), function (index, e) {
+        if ($(e).find("input").H2GValue() == "" && $(e).find("select").H2GValue() == "") {
+            notanswer = true;
+            return false; // brake loop
+        }
+    });
+    return notanswer;
 }
 function showDonorData() {
     $.ajax({
@@ -485,7 +535,7 @@ function setHistoricalFileDatas() {
         type: "POST",
         dataType: "json",
         beforeSend: function () {
-            $('body').block();
+            //$('body').block();
         },
         error: function (xhr, s, err) {
             console.log(s, err);
@@ -495,6 +545,12 @@ function setHistoricalFileDatas() {
             // console.log("Respondata = ", data.getItems);
             if (!data.onError) {
                 datas = data.getItems;
+                if (datas.length > 0) {
+                    $("tr").remove(".no-transactionHistoricalFile");
+                } else {
+                    $("tr").remove(".no-transactionHistoricalFile");
+                    $('#historicalFileTable > tbody').append("<tr class='no-transactionHistoricalFile'><td align='center' colspan='9'>ไม่พบข้อมูล</td></tr>");
+                }
                 for (var i = 0; i < datas.length; i++) {
                     var rows = "<tr class='historicalFileTableRows'>" +
                                     "<td><input type='text' class='text-left' readonly value='" + datas[i].Exams + "' /></td>" +
@@ -509,8 +565,9 @@ function setHistoricalFileDatas() {
                                "</tr>";
                     $('#historicalFileTable > tbody').append(rows);
                 }
+                $("#historicalFileTable").tablesorter({ dateFormat: "uk" });
             }
-            $('body').unblock();
+            //$('body').unblock();
         }
     });
 }
@@ -520,10 +577,10 @@ function setImmunohaemtologyFile() {
         //console.log("do set1");
         var deferred = $.Deferred();
 
-        $('#blockImmunohaemtologyFile').block({
-            centerX: false,
-            centerY: false
-        });
+        //$('#blockImmunohaemtologyFile').block({
+        //    centerX: false,
+        //    centerY: false
+        //});
 
         $.ajax({
             url: '../../ajaxAction/donorAction.aspx',
@@ -568,7 +625,7 @@ function setImmunohaemtologyFile() {
             dataType: "json",
             error: function (xhr, s, err) {
                 console.log(s, err);
-                $('#blockImmunohaemtologyFile').unblock();
+                //$('#blockImmunohaemtologyFile').unblock();
                 deferred.reject("Can't grt set 2");
             },
             success: function (data) {
@@ -588,7 +645,7 @@ function setImmunohaemtologyFile() {
                         deferred.reject("Can't grt set 2");
                     }
                 }
-                $('#blockImmunohaemtologyFile').unblock();
+                //$('#blockImmunohaemtologyFile').unblock();
             }
         });
         return deferred.promise();
@@ -656,7 +713,7 @@ function setExamsDatas() {
         type: "POST",
         dataType: "json",
         beforeSend: function () {
-            $('body').block();
+            //$('body').block();
         },
         error: function (xhr, s, err) {
             console.log(s, err);
@@ -667,6 +724,12 @@ function setExamsDatas() {
             // console.log("Respondata exams = ", data.getItems);
             if (!data.onError) {
                 datas = data.getItems;
+                if (datas.length > 0) {
+                    $("tr").remove(".no-transactionExams");
+                } else {
+                    $("tr").remove(".no-transactionExams");
+                    $('#exams-tab-table > tbody').append("<tr class='no-transactionExams'><td align='center' colspan='10'>ไม่พบข้อมูล</td></tr>");
+                }
                 for (var i = 0; i < datas.length; i++) {
                     var rows = "<tr class='exams-tab-table-row'>" +
                                     "<td class='text-right td-number-excel'>" + datas[i].DonnIncr + "</td>" +
@@ -684,7 +747,7 @@ function setExamsDatas() {
                 }
                 $("#exams-tab-table").tablesorter({ dateFormat: "uk" });
             }
-            $('body').unblock();
+            //$('body').unblock();
         }
     });
 }
@@ -787,101 +850,118 @@ function loadSynthesisLink() {
                 datas = data.getItems.SynthesisSet1;
                 console.log("xxxx = ", datas);
                 
-                var siteSet = []
-                for (var i = 0; i < datas.length; i++) {
-                    if (datas[i].dornor_type != "Refused") {
-                        siteSet.push(datas[i]);
+                if (datas.length > 0) {
+                    $("tr").remove(".no-transactionSynthesisStandard");
+                    $("tr").remove(".no-transactionSynthesisVirology");
+                    $("tr").remove(".no-transactionSynthesisImmunohematology");
+
+                    var siteSet = []
+
+                    for (var i = 0; i < datas.length; i++) {
+                        if (datas[i].dornor_type != "Refused") {
+                            siteSet.push(datas[i]);
+                        }
+                        var rows = "<tr class='synthesisStandard-row'>" +
+                                        "<td class='text-center td-date-excel date-" + datas[i].dornor_rank + "'>" + datas[i].donate_date + "</td>" +
+                                        "<td class='text-center td-text-excel type-" + datas[i].dornor_rank + "'>" + datas[i].dornor_type + "</td>" +
+                                        "<td class='text-center td-text-excel donateat-" + datas[i].dornor_rank + "'>" + datas[i].dmed_coll + "</td>" +
+                                        "<td class='text-left td-text-excel cantdonate-" + datas[i].dornor_rank + "'>" + datas[i].dmed_refus + "</td>" +
+                                        "<td class='text-left td-text-excel rank-" + datas[i].dornor_rank + "'>" + datas[i].dornor_rank + "</td>" +
+                                        "<td class='text-left td-text-excel pressure-" + datas[i].dornor_rank + "'>" + datas[i].pressure + "</td>" +
+                                        "<td class='text-left td-text-excel ABOD-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel DAT-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel DATF-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel Anti-HBs-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel Lipemic-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel DAbsp-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel HBsAg-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel Anti-HCV-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel Syph-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel COMNAT-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel Albumin-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel Protein-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel Ag-C-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel Ag-c-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel Ag-E-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel Ag-e-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel Ag-K-" + datas[i].dornor_rank + "'></td>" +
+                                   "</tr>";
+                        // console.log("Row = ", rows);
+                        $('#synthesisStandard > tbody').append(rows);
+
+
+
+                        var rows2 = "<tr class='synthesisVirology-row'>" +
+                                        "<td class='text-center td-date-excel date-" + datas[i].dornor_rank + "'>" + datas[i].donate_date + "</td>" +
+                                        "<td class='text-center td-text-excel type-" + datas[i].dornor_rank + "'>" + datas[i].dornor_type + "</td>" +
+                                        "<td class='text-center td-text-excel donateat-" + datas[i].dornor_rank + "'>" + datas[i].dmed_coll + "</td>" +
+                                        "<td class='text-left td-text-excel cantdonate-" + datas[i].dornor_rank + "'>" + datas[i].dmed_refus + "</td>" +
+                                        "<td class='text-left td-text-excel rank-" + datas[i].dornor_rank + "'>" + datas[i].dornor_rank + "</td>" +
+                                        "<td class='text-left td-text-excel pressure-" + datas[i].dornor_rank + "'>" + datas[i].pressure + "</td>" +
+                                        "<td class='text-left td-text-excel ALAT-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel WB-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel Anti-HCV-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel Malaria-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel'></td>" +
+                                        "<td class='text-left td-text-excel'></td>" +
+                                        "<td class='text-left td-text-excel'></td>" +
+                                        "<td class='text-left td-text-excel'></td>" +
+                                        "<td class='text-left td-text-excel'></td>" +
+                                        "<td class='text-left td-text-excel'></td>" +
+                                        "<td class='text-left td-text-excel'></td>" +
+                                        "<td class='text-left td-text-excel'></td>" +
+                                        "<td class='text-left td-text-excel'></td>" +
+                                        "<td class='text-left td-text-excel'></td>" +
+                                        "<td class='text-left td-text-excel'></td>" +
+                                        "<td class='text-left td-text-excel'></td>" +
+                                        "<td class='text-left td-text-excel'></td>" +
+                                   "</tr>";
+                        // console.log("Row = ", rows);
+                        $('#synthesisVirology > tbody').append(rows2);
+
+
+                        var rows3 = "<tr class='synthesisImmunohematology-row'>" +
+                                        "<td class='text-center td-date-excel date-" + datas[i].dornor_rank + "'>" + datas[i].donate_date + "</td>" +
+                                        "<td class='text-center td-text-excel type-" + datas[i].dornor_rank + "'>" + datas[i].dornor_type + "</td>" +
+                                        "<td class='text-center td-text-excel donateat-" + datas[i].dornor_rank + "'>" + datas[i].dmed_coll + "</td>" +
+                                        "<td class='text-left td-text-excel cantdonate-" + datas[i].dornor_rank + "'>" + datas[i].dmed_refus + "</td>" +
+                                        "<td class='text-left td-text-excel rank-" + datas[i].dornor_rank + "'>" + datas[i].dornor_rank + "</td>" +
+                                        "<td class='text-left td-text-excel pressure-" + datas[i].dornor_rank + "'>" + datas[i].pressure + "</td>" +
+                                        "<td class='text-left td-text-excel ABO-group-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel ABO-group-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel C-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel c-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel E-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel e-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel K-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel Ab-Sc-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel H-AB-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel Hem-A-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel Hb-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel BW-" + datas[i].dornor_rank + "'></td>" +
+                                        "<td class='text-left td-text-excel'></td>" +
+                                        "<td class='text-left td-text-excel'></td>" +
+                                        "<td class='text-left td-text-excel'></td>" +
+                                        "<td class='text-left td-text-excel'></td>" +
+                                        "<td class='text-left td-text-excel'></td>" +
+                                   "</tr>";
+
+                        $('#synthesisImmunohematology > tbody').append(rows3);
                     }
-                    var rows = "<tr class='synthesisStandard-row'>" +
-                                    "<td class='text-center td-date-excel date-" + datas[i].dornor_rank + "'>" + datas[i].donate_date + "</td>" +
-                                    "<td class='text-center td-text-excel type-" + datas[i].dornor_rank + "'>" + datas[i].dornor_type + "</td>" +
-                                    "<td class='text-center td-text-excel donateat-" + datas[i].dornor_rank + "'>" + datas[i].dmed_coll + "</td>" +
-                                    "<td class='text-left td-text-excel cantdonate-" + datas[i].dornor_rank + "'>" + datas[i].dmed_refus + "</td>" +
-                                    "<td class='text-left td-text-excel rank-" + datas[i].dornor_rank + "'>" + datas[i].dornor_rank + "</td>" +
-                                    "<td class='text-left td-text-excel pressure-" + datas[i].dornor_rank + "'>" + datas[i].pressure + "</td>" +
-                                    "<td class='text-left td-text-excel ABOD-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel DAT-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel DATF-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel Anti-HBs-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel Lipemic-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel DAbsp-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel HBsAg-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel Anti-HCV-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel Syph-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel COMNAT-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel Albumin-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel Protein-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel Ag-C-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel Ag-c-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel Ag-E-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel Ag-e-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel Ag-K-" + datas[i].dornor_rank + "'></td>" +
-                               "</tr>";
-                    // console.log("Row = ", rows);
-                    $('#synthesisStandard > tbody').append(rows);
+                    // $(".E-4").text("test");
+                    displaySynthesisColData(data.getItems.SynthesisSet2);
+                    siteAnddateSet(siteSet);
+                } else {
+                    $("tr").remove(".no-transactionSynthesisStandard");
+                    $('#synthesisStandard > tbody').append("<tr class='no-transactionSynthesisStandard'><td align='center' colspan='23'>ไม่พบข้อมูล</td></tr>");
 
+                    $("tr").remove(".no-transactionSynthesisVirology");
+                    $('#synthesisVirology > tbody').append("<tr class='no-transactionSynthesisVirology'><td align='center' colspan='23'>ไม่พบข้อมูล</td></tr>");
 
-
-                    var rows2 = "<tr class='synthesisVirology-row'>" +
-                                    "<td class='text-center td-date-excel date-" + datas[i].dornor_rank + "'>" + datas[i].donate_date + "</td>" +
-                                    "<td class='text-center td-text-excel type-" + datas[i].dornor_rank + "'>" + datas[i].dornor_type + "</td>" +
-                                    "<td class='text-center td-text-excel donateat-" + datas[i].dornor_rank + "'>" + datas[i].dmed_coll + "</td>" +
-                                    "<td class='text-left td-text-excel cantdonate-" + datas[i].dornor_rank + "'>" + datas[i].dmed_refus + "</td>" +
-                                    "<td class='text-left td-text-excel rank-" + datas[i].dornor_rank + "'>" + datas[i].dornor_rank + "</td>" +
-                                    "<td class='text-left td-text-excel pressure-" + datas[i].dornor_rank + "'>" + datas[i].pressure + "</td>" +
-                                    "<td class='text-left td-text-excel ALAT-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel WB-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel Anti-HCV-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel Malaria-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel'></td>" +
-                                    "<td class='text-left td-text-excel'></td>" +
-                                    "<td class='text-left td-text-excel'></td>" +
-                                    "<td class='text-left td-text-excel'></td>" +
-                                    "<td class='text-left td-text-excel'></td>" +
-                                    "<td class='text-left td-text-excel'></td>" +
-                                    "<td class='text-left td-text-excel'></td>" +
-                                    "<td class='text-left td-text-excel'></td>" +
-                                    "<td class='text-left td-text-excel'></td>" +
-                                    "<td class='text-left td-text-excel'></td>" +
-                                    "<td class='text-left td-text-excel'></td>" +
-                                    "<td class='text-left td-text-excel'></td>" +
-                                    "<td class='text-left td-text-excel'></td>" +
-                               "</tr>";
-                    // console.log("Row = ", rows);
-                    $('#synthesisVirology > tbody').append(rows2);
-
-
-                    var rows3 = "<tr class='synthesisImmunohematology-row'>" +
-                                    "<td class='text-center td-date-excel date-" + datas[i].dornor_rank + "'>" + datas[i].donate_date + "</td>" +
-                                    "<td class='text-center td-text-excel type-" + datas[i].dornor_rank + "'>" + datas[i].dornor_type + "</td>" +
-                                    "<td class='text-center td-text-excel donateat-" + datas[i].dornor_rank + "'>" + datas[i].dmed_coll + "</td>" +
-                                    "<td class='text-left td-text-excel cantdonate-" + datas[i].dornor_rank + "'>" + datas[i].dmed_refus + "</td>" +
-                                    "<td class='text-left td-text-excel rank-" + datas[i].dornor_rank + "'>" + datas[i].dornor_rank + "</td>" +
-                                    "<td class='text-left td-text-excel pressure-" + datas[i].dornor_rank + "'>" + datas[i].pressure + "</td>" +
-                                    "<td class='text-left td-text-excel ABO-group-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel ABO-group-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel C-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel c-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel E-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel e-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel K-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel Ab-Sc-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel H-AB-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel Hem-A-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel Hb-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel BW-" + datas[i].dornor_rank + "'></td>" +
-                                    "<td class='text-left td-text-excel'></td>" +
-                                    "<td class='text-left td-text-excel'></td>" +
-                                    "<td class='text-left td-text-excel'></td>" +
-                                    "<td class='text-left td-text-excel'></td>" +
-                                    "<td class='text-left td-text-excel'></td>" +
-                               "</tr>";
-                    
-                    $('#synthesisImmunohematology > tbody').append(rows3);
+                    $("tr").remove(".no-transactionSynthesisImmunohematology");
+                    $('#synthesisImmunohematology > tbody').append("<tr class='no-transactionSynthesisImmunohematology'><td align='center' colspan='23'>ไม่พบข้อมูล</td></tr>");
                 }
-                // $(".E-4").text("test");
-                displaySynthesisColData(data.getItems.SynthesisSet2);
-                siteAnddateSet(siteSet);
+                
             }
             $('body').unblock();
         }

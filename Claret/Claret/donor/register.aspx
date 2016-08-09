@@ -493,7 +493,6 @@
                 success: function (data) {
                     if (!data.onError) {
                         data.getItems = jQuery.parseJSON(data.getItems);
-                        console.log(data.getItems);
                         $("#tbQuestionnaire").data("data-questionnaire", data.getItems.QuestionItem)
                         $("#tbQuestionnaire").data("data-answer", data.getItems.AnswerItem)
                         // initial question
@@ -548,6 +547,7 @@
                             var notiInject = "";
                             if (!data.onError) {
                                 data.getItems = jQuery.parseJSON(data.getItems);
+                                console.log(data.getItems);
                                 $.each((data.getItems), function (index, e) {
                                     if ($("#tbExam > tbody > tr.template-data[examCode='" + e.Code + "']").length > 0) {
                                         // 1 ถ้า exam ที่เพิ่มเข้ามาซ้ำ และไม่มีกลุ่มจะไม่เพิ่มและแจ้งซ้ำ
@@ -558,13 +558,13 @@
                                             notiInject += e.Code + ", ";
                                             $("#tbExam > tbody > tr.template-data[examCode='" + e.Code + "']").remove();
                                             var dataRow = $("#tbExam > thead > tr.template-data").clone().show();
-                                            $(dataRow).H2GFill({ refID: e.ID, examCode: e.Code, desc: e.Description, groupID: e.GroupID, groupCode: e.GroupCode, groupDesc: e.GroupDescription, questID: questID });
+                                            $(dataRow).H2GFill({ examID: e.ID, examCode: e.Code, desc: e.Description, groupID: e.GroupID, groupCode: e.GroupCode, groupDesc: e.GroupDescription, questID: questID });
                                             $(dataRow).find('.td-exam').append(e.Code + ' : ' + e.Description).H2GAttr("title", e.Code + ' : ' + e.Description);
                                             $(dataView).append(dataRow);
                                         }
                                     } else {
                                         var dataRow = $("#tbExam > thead > tr.template-data").clone().show();
-                                        $(dataRow).H2GFill({ refID: e.ID, examCode: e.Code, desc: e.Description, groupID: e.GroupID, groupCode: e.GroupCode, groupDesc: e.GroupDescription, questID: questID });
+                                        $(dataRow).H2GFill({ examID: e.ID, examCode: e.Code, desc: e.Description, groupID: e.GroupID, groupCode: e.GroupCode, groupDesc: e.GroupDescription, questID: questID });
                                         $(dataRow).find('.td-exam').append(e.Code + ' : ' + e.Description).H2GAttr("title", e.Code + ' : ' + e.Description);
                                         $(dataView).append(dataRow);
                                     }
@@ -582,7 +582,7 @@
                         }
                     });    //End ajax
                 } else {
-                    setTimeout(function () { getExamination(examCode); }, 1000);
+                    setTimeout(function () { getExamination(examCode, questID); }, 1000);
                 }
             } else {
                 $("#txtExamCode").focus();
@@ -633,9 +633,8 @@
             if (QID != "") {
                 var QID = QID.split(",");
                 var QuestData = $("#tbQuestionnaire").data("data-questionnaire")
-
-                $.each((QID), function (index, e) {
-                    $.each((QuestData), function (indexr, er) {
+                $.each((QuestData), function (indexr, er) {
+                    $.each((QID), function (index, e) {
                         if (e == er.QuestionID) {
                             var dataRow = $("#tbQuestionnaire > thead > tr.template-data").clone().show();                     
                             $(dataRow).H2GFill({
@@ -656,8 +655,6 @@
                                     $("<option>", { value: es, text: es }).appendTo(selectPreset);
                                 });
                                 $(selectPreset).setDropdownList().on('change', function () {
-                                    //ก่อนสร้างคำถามถัดไปให้ทำการลบคำถามเก่าก่อน
-                                    deleteQuestion($(this).closest("tr").H2GAttr("questID"));
                                     //ให้เอาคำตอบไปหาคำถามต่อไป
                                     selectNextQuestion($(this).closest("tr").H2GAttr("questID"), $(this).H2GValue());
                                 });
@@ -680,14 +677,28 @@
         }
         function selectNextQuestion(questID, presetAnswer) {
             var AnswerData = $("#tbQuestionnaire").data("data-answer");
+            deleteQuestion(questID);
             $.each((AnswerData), function (index, e) {
-                if (e.QuestionID == questID && e.Code == presetAnswer && e.ToQuestID != "") {
-                    genQuestion(e.ToQuestID, e.QuestionID);
+                if (e.QuestionID == questID && e.Code == presetAnswer) {
+                    //ก่อนสร้างคำถามถัดไปให้ทำการลบคำถามเก่าก่อน
+                    if (e.ToQuestID != "") {
+                        genQuestion(e.ToQuestID, e.QuestionID);
+                    }
+                    if (e.DeferralID != "") {
+                        // เพิ่ม deferral ตามคำตอบ
+                        addDefByQuestion(e.DeferralID, e.QuestionID);
+                    }
+                    if (e.GroupExamID != "" || e.ExamID != "") {
+                        // เพิ่ม Examination ตามคำตอบ
+                        addExamByQuestion(e.GroupExamID + "," + e.ExamID, e.QuestionID);
+                    }
                 }
             });
         }
         function deleteQuestion(questID) {
             var questDelete = $("#tbQuestionnaire > tbody tr[fromQuestion=" + questID + "]");
+            deleteDefByQuestion(questID);
+            deleteExamByQuestion(questID);
             $.each((questDelete), function (index, e) {
                 deleteQuestion($(e).H2GAttr("questID"));
                 if ($(e).H2GAttr("refID") == "NEW") {
@@ -697,7 +708,7 @@
                 }
             });
         }
-        function addDefByQuestion(defID) {
+        function addDefByQuestion(defID, questID) {
             defID = defID || "";
             if (defID != "") {
                 var dataAll = $("#ddlITVDeferral").data("data-ddl");
@@ -706,12 +717,61 @@
                     $.each((defID), function (index, e) {
                         $.each((dataAll), function (indexr, er) {
                             if (e == er.valueID) {
+                                var duration = er.duration;
+                                if (er.duration == "") { duration = "31/12/2899"; }
+                                else { duration = formatDate(H2G.addDays(H2G.today(), duration), "dd/MM/yyyy"); }
+                                
+                                var dataRow = $("#tbDefInterview > thead > tr.template-data").clone().show();
+                                $(dataRow).H2GFill({
+                                    defID: er.valueID,
+                                    defType: er.deferralType,
+                                    defDuration: er.duration,
+                                    defStartDate: $("#txtDefDateFrom").H2GValue(),
+                                    defEndDate: duration,
+                                    defRemarks: "Questionnaire",
+                                    questID: questID,
+                                });
 
+                                $(dataRow).find('.td-description').append(er.desc).H2GAttr("title", er.desc);
+                                $(dataRow).find('.td-enddate').append('วันที่สิ้นสุด ' + formatDate(new Date(getDateFromFormat(duration, 'dd/mm/yyyy')), "dd NNN yyyy")).H2GAttr("title", 'วันที่สิ้นสุด ' + formatDate(new Date(getDateFromFormat(duration, 'dd/mm/yyyy')), "dd NNN yyyy"));
+                                $("#tbDefInterview > tbody").append(dataRow);
                             }
                         });
                     });
                 }
             }         
+        }
+        function deleteDefByQuestion(questID) {
+            var questDelete = $("#tbDefInterview > tbody tr[questID=" + questID + "]");
+            $.each((questDelete), function (index, e) {
+                if ($(e).H2GAttr("refID") == "NEW") {
+                    $(e).remove();
+                } else {
+                    $(e).hide().H2GAttr("refID", "D#" + $(e).H2GAttr("refID").replace('D#', ''));
+                }
+            });
+        }
+        function addExamByQuestion(examID, questID) {
+            examID = examID || "";
+            if (examID != "") {
+                console.log(examID);
+                examID = examID.split(",");
+                $.each((examID), function (index, e) {
+                    if (e != "") {
+                        getExamination(e, questID);
+                    }
+                });
+            }
+        }
+        function deleteExamByQuestion(questID) {
+            var questDelete = $("#tbExam > tbody tr[questID=" + questID + "]");
+            $.each((questDelete), function (index, e) {
+                if ($(e).H2GAttr("refID") == "NEW") {
+                    $(e).remove();
+                } else {
+                    $(e).hide().H2GAttr("refID", "D#" + $(e).H2GAttr("refID").replace('D#', ''));
+                }
+            });
         }
 
     </script>
@@ -1287,7 +1347,7 @@
                                                             <tr class="more-loading" style="display: none;">
                                                                 <td align="center" colspan="3">Loading detail...</td>
                                                             </tr>
-                                                            <tr class="template-data" style="display: none;">
+                                                            <tr class="template-data" style="display: none;" refID="NEW">
                                                                 <td class="td-number col-md-1">
                                                                     <span></span>
                                                                 </td>
@@ -1348,13 +1408,13 @@
                                                             <span>ความดัน</span>
                                                         </div>
                                                         <div class="col-md-4">
-                                                            <input id="txtPresureMin" type="text" class="form-control required text-right" />
+                                                            <input id="txtPresureMax" type="text" class="form-control required text-right" />
                                                         </div>
                                                         <div class="col-md-2 text-center">
                                                             <span>/</span>
                                                         </div>
                                                         <div class="col-md-4">
-                                                            <input id="txtPresureMax" type="text" class="form-control required text-right" />
+                                                            <input id="txtPresureMin" type="text" class="form-control required text-right" />
                                                         </div>
                                                         <div class="col-md-15 text-right">
                                                             <span>การตรวจหัวใจและปอด</span>
@@ -1813,7 +1873,7 @@
                         <div id="historicalFile">
                             <div class="border-box">
                                 <div class="col-md-36">
-                                    <table class="table table-bordered-excel" id="historicalFileTable">
+                                    <table class="table table-bordered-excel tablesorter" id="historicalFileTable">
                                         <thead style="color:gray">
                                             <tr>
                                                 <th class="col-md-8">Exams</th>
@@ -2005,7 +2065,9 @@
                         </div>
                         <div id="exams">
                             <div class="border-box">
-                                <div class="col-md-36 tableHeadDiv" style="color:gray"><b>Donation examinations</b></div>
+                                <div class="col-md-36" style="color:gray; padding-right:2px;">
+                                    <div class="border-box" style="text-align:center; background-color: #F2F2F2; height:28px; padding:0px;"><b>Donation examinations</b></div>
+                                </div>
                                 <div class="col-md-36">
                                     <table class="table table-bordered-excel tablesorter" id="exams-tab-table">
                                         <thead style="color:gray">

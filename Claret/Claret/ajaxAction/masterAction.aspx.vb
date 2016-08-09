@@ -342,7 +342,8 @@ Public Class masterAction
                                         , wmsys.wm_concat(qa.code) as preset
                                         from QUESTIONNAIRE_QUESTION qq
                                         LEFT JOIN QUESTIONNAIRE_ANSWER qa on qa.QUESTIONNAIRE_QUESTION_ID = qq.id
-                                        GROUP BY qq.id, qq.code, qq.description, qq.required, qq.answer_type  "
+                                        GROUP BY qq.id, qq.code, qq.description, qq.required, qq.answer_type 
+                                        order by qq.code"
                     Dim dt As DataTable = Cbase.QueryTable(sql)
                     If dt.Rows.Count > 0 Then
                         Dim QuestItem = New QuestionItem

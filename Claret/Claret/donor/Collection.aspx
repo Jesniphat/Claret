@@ -4,6 +4,7 @@
     <script src="../resources/javascript/page/donateScriptEdit.js" type="text/javascript"></script>
     <script>
         $(function () {
+            $("#donerNumber").focus()
             checkParam()
             .then(getDonateTypeList)
             .then(getDonateBagTypeList)
@@ -240,7 +241,7 @@
                     </tr>
                 </thead>
                 <tbody>
-
+                    
                 </tbody>
             </table>
         </div>

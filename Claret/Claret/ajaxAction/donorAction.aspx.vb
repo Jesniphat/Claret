@@ -478,7 +478,7 @@ Public Class donorAction
 
                 Case "immunohaemtologyDataSet2"
                     Dim donn_numero As String = _REQUEST("donn_numero")
-                    donn_numero = "1004230339"
+                    'donn_numero = "1004230339"
                     Dim sql As String = "select  pparecr.rsx_lib,presumex.rsx_type,
                                         replace(rsx_liste,chr(0),'') result_decode
                                         from pparecr inner join presumex on pparecr.rsx_cd = presumex.rsx_cd 
@@ -720,7 +720,7 @@ Public Class donorAction
                                         decode(dossmed.dmed_tmax,null,'',dossmed.dmed_tmax||'/'||dossmed.dmed_tmin) pressure, dossmed.dmed_site, dossmed.dmed_coll, dossmed.dmed_refus
                                         from donneur inner join don on donneur.donn_numero = don.donn_numero
                                         left join dossmed on don.prel_no = dossmed.prel_no
-                                        where donneur.donn_numero = '1005602187'
+                                        where donneur.donn_numero = '" & donn_numero & "'
                                         union all
                                         select to_char(cids.cids_dtcre, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') donate_date,
                                         'Refused' dornor_type,
@@ -729,7 +729,7 @@ Public Class donorAction
                                         decode(dossmed.dmed_tmax,null,'',dossmed.dmed_tmax||'/'||dossmed.dmed_tmin) pressure, dossmed.dmed_site, dossmed.dmed_coll, dossmed.dmed_refus
                                         from cids left join dossmed
                                         on cids.donn_numero = dossmed.donn_numero and to_char(cids.cids_dtcre ,'ddmmyyyy') = to_char(dossmed.dmed_dte,'ddmmyyyy')
-                                        where cids.donn_numero ='1005602187'
+                                        where cids.donn_numero ='" & donn_numero & "'
                                         ) order by to_date(donate_date,'dd-mm-yyyy') desc"
 
                     Dim dt As DataTable = Hbase.QueryTable(sql)
@@ -752,15 +752,15 @@ Public Class donorAction
                         If dr("DORNOR_RANK").ToString <> "" Then
                             Dim subSql As String = "select to_char(d.prelx_date, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') display_date,pparecr.ppe_type,pparecr.rsx_cd show_value,pparecr.rsx_lib show_label,
                                                     decode(d.exam_code,'ABODD',d.prelx_rqual||(select prelx_rqual from donexam 
-                                                    where donn_numero = '1005602187' and donn_incr = '" & dr("DORNOR_RANK").ToString & "' and trim(prelx_exam)='AGDTDM'),d.prelx_rqual) display_result
+                                                    where donn_numero = '" & donn_numero & "' and donn_incr = '" & dr("DORNOR_RANK").ToString & "' and trim(prelx_exam)='AGDTDM'),d.prelx_rqual) display_result
                                                     from pparecr left join 
                                                     (select decode(trim(prelx_exam),'DABO','ABODD',prelx_exam) exam_code,
                                                      prelx_rqual,prelx_date 
                                                      from donexam 
-                                                     where ((donexam.donn_numero = '1005602187') and (donexam.donn_incr = '" & dr("DORNOR_RANK").ToString & "'))) d
+                                                     where ((donexam.donn_numero = '" & donn_numero & "') and (donexam.donn_incr = '" & dr("DORNOR_RANK").ToString & "'))) d
                                                     on trim(pparecr.rsx_cd) = trim(d.exam_code)
                                                     left join presumex on trim(pparecr.rsx_cd) = trim(presumex.rsx_cd)
-                                                    where ((pparecr.ppe_site = '9999') and (pparecr.ppe_masque IN ('PRELEM','PRELVI','PRELIH')))"
+                                                    where ((pparecr.ppe_site = '" & dr("DMED_SITE").ToString & "') and (pparecr.ppe_masque IN ('PRELEM','PRELVI','PRELIH')))"
 
                             Dim ct As DataTable = Hbase.QueryTable(subSql)
                             For Each cr As DataRow In ct.Rows

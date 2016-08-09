@@ -144,6 +144,7 @@
     <Content Include="ajaxAction\donateAction.aspx" />
     <Content Include="ajaxAction\donorAction.aspx" />
     <Content Include="ajaxAction\masterAction.aspx" />
+    <Content Include="ajaxAction\planningAction.aspx" />
     <Content Include="ajaxAction\qualityAction.aspx" />
     <Content Include="ajaxAction\userAction.aspx" />
     <Content Include="Default.aspx" />
@@ -198,6 +199,7 @@
     <Content Include="resources\javascript\page\donateScript.js" />
     <Content Include="resources\javascript\page\donateScriptEdit.js" />
     <Content Include="resources\javascript\jquery-date.js" />
+    <Content Include="resources\javascript\page\planningInfo.js" />
     <Content Include="resources\javascript\page\registerScript.js" />
     <Content Include="resources\jquery\jquery-latest.js" />
     <Content Include="resources\jquery\jquery.blockUI.js" />
@@ -266,6 +268,13 @@
     </Compile>
     <Compile Include="ajaxAction\masterAction.aspx.vb">
       <DependentUpon>masterAction.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="ajaxAction\planningAction.aspx.designer.vb">
+      <DependentUpon>planningAction.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ajaxAction\planningAction.aspx.vb">
+      <DependentUpon>planningAction.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Compile Include="ajaxAction\qualityAction.aspx.designer.vb">

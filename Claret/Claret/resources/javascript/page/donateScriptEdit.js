@@ -402,7 +402,7 @@ function checkDonateNum() {
             type: "POST",
             dataType: "json",
             beforeSend: function(){
-                $('body').block();
+                //$('body').block();
             },
             error: function (xhr, s, err) {
                 console.log(s, err);
@@ -411,7 +411,7 @@ function checkDonateNum() {
                 if (!data.onError) {
                     data.getItems = jQuery.parseJSON(data.getItems);
                     if (data.getItems.length == 0) {
-                        $("#donerNumber").focus();
+                        //$("#donerNumber").focus();
                         getParam.donorID = "0";
                         getParam.visitID = "0";
                         notiWarning("ไม่พบเลขผู้บริจาคนี้");
@@ -439,8 +439,8 @@ function checkValidDonateNum() {
         $("#donerNumber").focus();
         notiWarning("กรุณากรอกเลขผู้บริจาคก่อน");
     } else if (getParam.donorID == "0") {
-        console.log("dddd");
-        $("#donerNumber").focus();
+        //console.log("dddd");
+        //$("#donerNumber").focus();
         notiWarning("ไม่พบเลขผู้บริจาคนี้");
     }
 }
@@ -644,6 +644,12 @@ function getDonationList() {
             if (!data.onError) {
                 data.getItems = jQuery.parseJSON(data.getItems);
                 console.log(data.getItems);
+                if (data.getItems.length > 0) {
+                    $("tr").remove(".no-transactionDonate");
+                } else {
+                    $("tr").remove(".no-transactionDonate");
+                    $('#donate-table > tbody').append("<tr class='no-transactionDonate'><td align='center' colspan='9'>ไม่พบข้อมูล</td></tr>");
+                }
                 for (var i = 0; i < data.getItems.length; i++) {
                     var rows = "<tr class='donate-table-rows'>" +
                                     "<td class='col-md-5'><input value = '" + data.getItems[i].sample_number + "' /></td>" +
@@ -666,6 +672,9 @@ function getDonationList() {
             } else {
                 console.log("Error = ", data.exMessage);
                 deferred.reject("Error");
+
+                $("tr").remove(".no-transactionDonate");
+                $('#donate-table > tbody').append("<tr class='no-transactionDonate'><td align='center' colspan='9'>ไม่พบข้อมูล</td></tr>");
             }
             $("#donate-table").tablesorter({ dateFormat: "uk" });
         }

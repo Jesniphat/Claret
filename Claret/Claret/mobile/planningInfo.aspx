@@ -1,8 +1,29 @@
 ﻿<%@ Page Title="" Language="vb" AutoEventWireup="false" MasterPageFile="~/MasterPage.Master" CodeBehind="planningInfo.aspx.vb" Inherits="Claret.planning_info" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
+    <script src="../resources/javascript/page/planningInfo.js" type="text/javascript"></script>
     <script>
         $(function () {
             $("#btnTest").button();
+
+            $("#ddlRegion").setAutoListValue({ url: '../ajaxAction/masterAction.aspx', data: { action: 'site' }, defaultSelect: "1000" }).on("change", function () {
+                //next focus
+                //$("#txtRegion").focus());
+            });
+
+            $("#txtPlanDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
+                // maxDate: new Date(),
+                minDate: "-100y",
+                yearRange: "c-100:c+0",
+                onSelect: function (selectedDate, objDate) {
+                    // $("#txtHospital").focus();
+                    getDornorHospitalList(selectedDate);
+                },
+            });
+
+            $("#spSearch").click(function () {
+                donorSearch(true);
+            });
+
         });
     </script>
 </asp:Content>
@@ -21,7 +42,9 @@
                 <input id="btnPlan" type="button" class="btn btn-success btn-block" value="เพิ่มแผนงานรับบริจาคใหม่" />
             </div>
         </div>
-        <br />
+        <div class="row">
+            <div class="col-md-36" style="height:20px;"></div>
+        </div>
         <div class="row">
             <div class="col-md-5">
                 <span><b>2. ค้นหาแผนงานเก่า</b></span>
@@ -66,10 +89,21 @@
                 <input id="txtPlanDate" class="form-control" type="text" />
             </div>
             <div class="col-md-5">
-                <input id="txtPlanStatus" class="form-control" type="text" />
+                <%--<input id="txtPlanStatus" class="form-control" type="text" />--%>
+                <select id="txtPlanStatus" class="selecte-box-custom">
+                    <option value="" >ALL</option>
+                    <option value="ACTIVE">ACTIVE</option>
+                    <option value="INACTIVE">INACTIVE</option>
+                </select>
             </div>
             <div class="col-md-3">
-                <input id="txtPlanType" class="form-control text-center" type="text" />
+                <%--<input id="txtPlanType" class="form-control text-center" type="text" />--%>
+                <select id="txtPlanType" class="selecte-box-custom">
+                    <option value="" >ALL</option>
+                    <option value="MOBILE SITE">MOBILE SITE</option>
+                    <option value="FIXED SITE">FIXED SITE</option>
+                    <option value="T">T</option>
+                </select>
             </div>
             <div class="col-md-2">
                 <div class="col-md-36">
@@ -78,6 +112,11 @@
                 </div>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-md-36" style="height:20px;"></div>
+        </div>
+
         <div class="row">
             <div class="col-md-36">
                 <span><b>3. กรุณาเลือกแผนการดำเนินงาน</b></span>
@@ -90,12 +129,12 @@
                     <thead>
                         <tr>
                             <th class="col-md-5">
-                                <button sortOrder="donor_number">
+                                <button sortOrder="SITE_ID">
                                     <span>รหัสภาค<i class="glyphicon glyphicon-triangle-bottom"></i></span>
                                 </button>
                             </th>
                             <th class="col-md-5">
-                                <button sortOrder="nation_number">
+                                <button sortOrder="Collection_Point_ID">
                                     <span>รหัสหน่วย</span>
                                 </button>
                             </th>
@@ -105,17 +144,17 @@
                                 </button>
                             </th>
                             <th class="col-md-5">
-                                <button sortOrder="name">
+                                <button sortOrder="PLAN_DATE">
                                     <span>แผนงานวันที่</span>
                                 </button>
                             </th>
                             <th class="col-md-5">
-                                <button sortOrder="surname">
+                                <button sortOrder="Status">
                                     <span>สถานะ</span>
                                 </button>
                             </th>
                             <th class="col-md-3">
-                                <button sortOrder="birthday">
+                                <button sortOrder="Collection_Type">
                                     <span>ประเภทงาน</span>
                                 </button>
                             </th>
