@@ -1,4 +1,11 @@
-﻿function donorSearch(newSearch) {
+﻿function newPlanning() {
+    // $("#data").H2GRemoveAttr("planID");
+    
+    $("#data").H2GFill({ planID: "0", planningaction: "new" });
+    $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "planning.aspx", method: "post" }).submit();
+}
+
+function donorSearch(newSearch) {
     // console.log("planstatus:", $("#txtPlanStatus").H2GValue(), "plantype:", $("#txtPlanType").H2GValue())
     var dataView = $("#tbDonor > tbody");
     $(dataView).H2GValue($("#tbDonor > thead > tr.more-loading").clone().show());

@@ -45,8 +45,8 @@ Public Class planningAction
 
             'If Not String.IsNullOrEmpty(_REQUEST("reportdate")) Then param.Add("#REPORT_DATE", "and to_char(nvl(dv.VISIT_DATE,dv.CREATE_DATE), 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("reportdate") & "' ")
 
-            If Not String.IsNullOrEmpty(_REQUEST("txtPlanStatus")) Then param.Add("#STATUS", " and cp.STATUS = '" & _REQUEST("txtPlanStatus") & "' ")
-            If Not String.IsNullOrEmpty(_REQUEST("txtPlanType")) Then param.Add("#COLLECTION_TYPE", " and cp.COLLECTION_TYPE = '" & _REQUEST("txtPlanType") & "' ")
+            If Not String.IsNullOrEmpty(_REQUEST("planstatus")) Then param.Add("#STATUS", " and cp.STATUS = '" & _REQUEST("planstatus") & "' ")
+            If Not String.IsNullOrEmpty(_REQUEST("plantype")) Then param.Add("#COLLECTION_TYPE", " and cp.COLLECTION_TYPE = '" & _REQUEST("plantype") & "' ")
 
             Dim sqlRecord As String = "SELECT DN.rn as row_num, dn.* 
                                 FROM (
@@ -56,8 +56,8 @@ Public Class planningAction
                                                 FROM (
 									                    select cp.ID, cp.SITE_ID, cp.COLLECTION_POINT_ID, cpo.NAME, cp.PLAN_DATE, cp.STATUS, cp.COLLECTION_TYPE from COLLECTION_PLAN cp 
                                                         LEFT JOIN COLLECTION_POINT cpo on cp.COLLECTION_POINT_ID = cpo.ID
-                                                        where 1=1 /*#SITE_ID*/ /*#STATUS*/
-                                                        /*#COLLECTION_POINT_ID*/ /*#PLAN_DATE*/ /*#NAME*/ /*COLLECTION_TYPE*/ 
+                                                        where 1=1 /*#SITE_ID*/ /*#STATUS*/ /*#COLLECTION_TYPE*/ 
+                                                        /*#COLLECTION_POINT_ID*/ /*#PLAN_DATE*/ /*#NAME*/  
 									                ) dn
                                             ORDER BY dn./*#SORT_ORDER*/ /*#SORT_DIRECTION*/
                                             ) dn
@@ -66,8 +66,8 @@ Public Class planningAction
 
             Dim sqlTotal As String = "SELECT nvl(count(COLLECTION_POINT_ID),0) from ( select cp.SITE_ID, cp.COLLECTION_POINT_ID, cpo.NAME, cp.PLAN_DATE, cp.STATUS, cp.COLLECTION_TYPE from COLLECTION_PLAN cp 
                                                         LEFT JOIN COLLECTION_POINT cpo on cp.COLLECTION_POINT_ID = cpo.ID
-                                                        where 1=1 /*#SITE_ID*/ /*#STATUS*/
-                                                        /*#COLLECTION_POINT_ID*/ /*#PLAN_DATE*/ /*#NAME*/ /*COLLECTION_TYPE*/  ) dn"
+                                                        where 1=1 /*#SITE_ID*/ /*#STATUS*/ /*#COLLECTION_TYPE*/ 
+                                                        /*#COLLECTION_POINT_ID*/ /*#PLAN_DATE*/ /*#NAME*/ ) dn"
 
 
             param.Add(":start_row", DbType.String, (intItemPerPage * _REQUEST("p")) - (intItemPerPage - 1))

@@ -24,6 +24,30 @@
                 donorSearch(true);
             });
 
+            $("#spClear").click(function () {
+                $("#divCriteria input").H2GValue('');
+                $("#txtDonorNumber").focus();
+            });
+
+            $.extend($.fn, {
+                donorSelect: function () {
+                    //validation("", "", "", $(this).closest("tr").H2GAttr("refID"));
+                    $("#data").H2GFill({ planID: $(this).closest("tr").H2GAttr("refID"), planningaction: "edit" });
+                    $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "planning.aspx", method: "post" }).submit();
+                },
+                queueSelect: function () {
+                    $("#data").H2GFill({ planID: $(this).closest("tr").H2GAttr("refID") });
+                    $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "planning.aspx", method: "post", planningaction: "edit" }).submit();
+                },
+                backToLabRegis: function () {
+                    $("#data").H2GRemoveAttr("receiptHospitalID");
+                    $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "../quality/labRegister.aspx", method: "post" }).submit();
+                },
+            });
+
+            $("#tbDonor thead button").click(function () { sortButton($(this), donorSearch); return false; });
+            $("#tbPostQueue thead button").click(function () { sortButton($(this), postQueueSearch); return false; });
+
         });
     </script>
 </asp:Content>
@@ -39,7 +63,7 @@
                 <span><b>1. เพิ่มแผนรับบริจาคใหม่</b></span>
             </div>
             <div class="col-md-5">
-                <input id="btnPlan" type="button" class="btn btn-success btn-block" value="เพิ่มแผนงานรับบริจาคใหม่" />
+                <input id="btnPlan" type="button" class="btn btn-success btn-block" value="เพิ่มแผนงานรับบริจาคใหม่" onclick="newPlanning()" />
             </div>
         </div>
         <div class="row">
@@ -77,10 +101,10 @@
         </div>
         <div id="divCriteria" class="row" style="padding-top: 3px; padding-bottom: 3px; padding-left:15px;">
             <div class="col-md-5">
-                <input id="txtSectorCode" class="form-control color-yellow" type="text" />
+                <input id="txtSectorCode" class="form-control" type="text" />
             </div>
             <div class="col-md-5">
-                <input id="txtDepartmentCode" class="form-control color-yellow" type="text" />
+                <input id="txtDepartmentCode" class="form-control" type="text" />
             </div>
             <div class="col-md-11">
                 <input id="txtDepartmentName" class="form-control" type="text" />
@@ -176,9 +200,9 @@
                             <td class="td-birthday">
                             </td>
                             <td class="td-blood-group">
-                                <%--<div class="text-right" style="padding-left: 2px; display: inline-table; float: right;">
+                                <div class="text-right" style="padding-left: 2px; display: inline-table; float: right;">
                                     <a class="icon"><span class="glyphicon glyphicon-arrow-right" aria-hidden="true" onclick="return $(this).donorSelect();"></span></a>
-                                </div>--%>
+                                </div>
                             </td>
                         </tr>
                     </thead>

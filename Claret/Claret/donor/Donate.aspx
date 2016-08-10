@@ -57,7 +57,7 @@
         <div id="donateTab">
             <ul>
                 <li><a href="#donatePane" style="">Donate</a></li>
-                <li><a href="#postQueuePane" style="">Post Queue</a></li>
+                <%--<li><a href="#postQueuePane" style="">Post Queue</a></li>--%>
             </ul>
             <div id="donatePane">
                 <div class="border-box">
@@ -266,9 +266,9 @@
                     </div>
                 </div>
             </div>
-            <div id="postQueuePane">
+            <%--<div id="postQueuePane">
                 <h2>XXXMM</h2>
-            </div>
+            </div>--%>
         </div>
     </div>
 </asp:Content>

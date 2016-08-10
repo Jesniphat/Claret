@@ -188,6 +188,7 @@
     <Content Include="image\logo\NBC-logo.png" />
     <Content Include="Login.aspx" />
     <Content Include="main.aspx" />
+    <Content Include="mobile\planning.aspx" />
     <Content Include="mobile\planningInfo.aspx" />
     <Content Include="quality\labRegister.aspx" />
     <Content Include="resources\css\bootflat.css" />
@@ -199,6 +200,7 @@
     <Content Include="resources\javascript\page\donateScript.js" />
     <Content Include="resources\javascript\page\donateScriptEdit.js" />
     <Content Include="resources\javascript\jquery-date.js" />
+    <Content Include="resources\javascript\page\planning.js" />
     <Content Include="resources\javascript\page\planningInfo.js" />
     <Content Include="resources\javascript\page\registerScript.js" />
     <Content Include="resources\jquery\jquery-latest.js" />
@@ -282,6 +284,13 @@
     </Compile>
     <Compile Include="ajaxAction\qualityAction.aspx.vb">
       <DependentUpon>qualityAction.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="mobile\planning.aspx.designer.vb">
+      <DependentUpon>planning.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="mobile\planning.aspx.vb">
+      <DependentUpon>planning.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Compile Include="quality\labRegister.aspx.designer.vb">
