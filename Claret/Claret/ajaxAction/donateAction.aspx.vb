@@ -645,7 +645,7 @@ Public Structure InitalData
     Public refuse_reason3_id As String
 End Structure
 
-Public Structure DonationExamination
+Public Class DonationExamination
     Public id As String
     Public create_date As String
     Public create_staff As String
@@ -656,7 +656,28 @@ Public Structure DonationExamination
     Public examination_group_desc As String
     Public examination_id As String
     Public examination_desc As String
-End Structure
+    Public question_id As String
+
+    Public Shared Function WithCollection(ByVal item As DonationExamination) As SQLCollection
+        Dim param As New SQLCollection()
+        With item
+            'id, create_date, create_staff, donation_visit_id, donation_hospital_id, donation_form
+            ', examination_group_id, examination_group_desc, examination_id, examination_desc, questionnaire_question_id
+            param.Add(":id", DbType.Int64, .id)
+            param.Add(":create_staff", DbType.Int64, .create_staff)
+            param.Add(":donation_visit_id", DbType.Int64, IIf(String.IsNullOrEmpty(.donation_visit_id), Nothing, .donation_visit_id))
+            param.Add(":donation_hospital_id", DbType.Int64, IIf(String.IsNullOrEmpty(.donation_hospital_id), Nothing, .donation_hospital_id))
+            param.Add(":donation_form", DbType.String, .donation_from)
+            param.Add(":examination_group_id", DbType.Int64, IIf(String.IsNullOrEmpty(.examination_group_id), Nothing, .examination_group_id))
+            param.Add(":examination_group_desc", DbType.String, .examination_group_desc)
+            param.Add(":examination_id", DbType.Int64, .examination_id)
+            param.Add(":examination_desc", DbType.String, .examination_desc)
+            param.Add(":questionnaire_question_id", DbType.Int64, IIf(String.IsNullOrEmpty(.question_id), Nothing, .question_id))
+
+        End With
+        Return param
+    End Function
+End Class
 
 Public Structure InitalDataList
     Public doner As List(Of CheckDonorId)

@@ -1,0 +1,2 @@
+insert into donor_deferral_detail (id, donor_deferral_id, donation_type_id, deferral_type, duration, end_date, note )
+values(:id, :donor_deferral_id, :donation_type_id, :deferral_type, :duration, :end_date, :note)

@@ -130,7 +130,11 @@
     <Import Include="System.Web.UI.HtmlControls" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="!SQLStore\donor\InsertDonationExam.sql" />
     <Content Include="!SQLStore\donor\InsertDonationHospital.sql" />
+    <Content Include="!SQLStore\donor\InsertDonorDeferralDetail.sql" />
+    <Content Include="!SQLStore\donor\InsertDonorDeferral.sql" />
+    <Content Include="!SQLStore\donor\InsertDonationQuestion.sql" />
     <Content Include="!SQLStore\donor\InsertDonationVisit.sql" />
     <Content Include="!SQLStore\donor\SelectDonationHospital.sql" />
     <Content Include="!SQLStore\donor\SelectHospitalPostQueue.sql" />

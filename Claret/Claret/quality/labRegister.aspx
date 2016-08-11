@@ -466,12 +466,12 @@
             <table class="table table-bordered" id="hospitalList">
                 <thead class="table table-bordered" style="color:gray">
                     <tr>
-                        <th class="col-md-2 text-center" style="border:1px solid #ddd; padding:0px 5px 0px 5px";>ลำดับ</th>
-                        <th class="col-md-17" style="border:1px solid #ddd; padding:0px 5px 0px 5px";">รายการโรงพยาบาล</th>
-                        <th class="col-md-5" style="border:1px solid #ddd; padding:0px 5px 0px 5px";">จำนวนผู้บริจาค</th>
-                        <th class="col-md-5" style="border:1px solid #ddd; padding:0px 5px 0px 5px";">เวลา</th>
-                        <th class="col-md-5" style="border:1px solid #ddd; padding:0px 5px 0px 5px";">ผู้บันทึกข้อมูล</th>
-                        <th class="col-md-2 text-center" style="border:1px solid #ddd; padding:0px 5px 0px 5px";"></th>
+                        <th class="col-md-2 text-center" style="border:1px solid #ddd; padding:0px 5px 0px 5px;">ลำดับ</th>
+                        <th class="col-md-17" style="border:1px solid #ddd; padding:0px 5px 0px 5px;">รายการโรงพยาบาล</th>
+                        <th class="col-md-5" style="border:1px solid #ddd; padding:0px 5px 0px 5px;">จำนวนผู้บริจาค</th>
+                        <th class="col-md-5" style="border:1px solid #ddd; padding:0px 5px 0px 5px;">เวลา</th>
+                        <th class="col-md-5" style="border:1px solid #ddd; padding:0px 5px 0px 5px;">ผู้บันทึกข้อมูล</th>
+                        <th class="col-md-2 text-center" style="border:1px solid #ddd; padding:0px 5px 0px 5px;"></th>
                     </tr>
                 </thead>
                 <tbody>

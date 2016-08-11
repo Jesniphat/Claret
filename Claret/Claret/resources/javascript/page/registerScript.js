@@ -155,19 +155,70 @@ function saveDonorInfo() {
             };
             create++;
         });
+
         var DonorRecord = [];
-        create = 0;
-        $('#divDonateRecord .row').each(function (i, e) {
-            DonorRecord[create] = {
-                ID: $(e).H2GAttr('refID'),
-                DonateDate: $(e).H2GAttr('donatedate'),
-                DonateNumber: $(e).H2GAttr('donatenumber'),
-                DonateFrom: $(e).H2GAttr('donatefrom'),
-                DonateReward: getReward(e),
-            };
-            create++;
-        });
-        DonorRecord.sort(H2G.keysrt('DonateNumber'));
+        if ($("#subInterview").is(":visible") && $("#todayPane").is(":visible")) {
+            create = 0;
+            $('#divDonateRecord .row').each(function (i, e) {
+                DonorRecord[create] = {
+                    ID: $(e).H2GAttr('refID'),
+                    DonateDate: $(e).H2GAttr('donatedate'),
+                    DonateNumber: $(e).H2GAttr('donatenumber'),
+                    DonateFrom: $(e).H2GAttr('donatefrom'),
+                    DonateReward: getReward(e),
+                };
+                create++;
+            });
+            DonorRecord.sort(H2G.keysrt('DonateNumber'));
+        }
+
+        var DonorQuestionItem = [];
+        var DonorDeferralItem = [];
+        var DonationExamination = [];
+        // ถ้าไม่ใช่ลงทะเบียนให้เก็บ Questionnaire, Deferral และ Examination
+        if ($("#data").H2GAttr("lmenu") != "lmenuDonorRegis") {
+            create = 0;
+            $('#tbQuestionnaire > tbody > tr').each(function (i, e) {
+                DonorQuestionItem[create] = {
+                    ID: $(e).H2GAttr('refID'),
+                    QuestionID: $(e).H2GAttr('questID'),
+                    QuestionCode: $(e).H2GAttr('questCode'),
+                    QuestionDesc: $(e).H2GAttr('questDesc'),
+                    QuestionDescTH: $(e).H2GAttr('questDescTH'),
+                    Answer: $(e).H2GAttr('questAnswerType') == "PRESET" ? $(e).find(".td-answer select").H2GValue() : $(e).find(".td-answer input").H2GValue(),
+                    ParentID: $(e).H2GAttr('fromQuestion'),
+                };
+                create++;
+            });
+            create = 0;
+            $('#tbDefInterview > tbody > tr').each(function (i, e) {
+                DonorDeferralItem[create] = {
+                    ID: $(e).H2GAttr('refID'),
+                    DetailID: $(e).H2GAttr('detailID'),
+                    DeferralID: $(e).H2GAttr('defID'),
+                    StartDate: $(e).H2GAttr("defStartDate"),
+                    EndDate: $(e).H2GAttr('defEndDate'),
+                    Note: $(e).H2GAttr('defRemarks'),
+                    DonationTypeID: $("#ddlITVDonationType").H2GValue(),
+                    DeferralType: $(e).H2GAttr('defType'),
+                    Duration: $(e).H2GAttr('defDuration'),
+                    QuestionID: $(e).H2GAttr('questID'),
+                };
+                create++;
+            });
+            create = 0;
+            $('#tbExam > tbody > tr').each(function (i, e) {
+                DonationExamination[create] = {
+                    id: $(e).H2GAttr('refID'),
+                    examination_group_id: $(e).H2GAttr('groupID'),
+                    examination_group_desc: $(e).H2GAttr('groupDesc'),
+                    examination_id: $(e).H2GAttr("examID"),
+                    examination_desc: $(e).H2GAttr('examDesc'),
+                    question_id: $(e).H2GAttr('questID'),
+                };
+                create++;
+            });
+        }
 
         $.ajax({
             url: '../../ajaxAction/donorAction.aspx',
@@ -179,6 +230,9 @@ function saveDonorInfo() {
                 dc: JSON.stringify(DonorComment),
                 dr: JSON.stringify(DonorRecord),
                 dh: JSON.stringify(DonorHospital),
+                dq: JSON.stringify(DonorQuestionItem),
+                dd: JSON.stringify(DonorDeferralItem),
+                de: JSON.stringify(DonationExamination),
                 receipthospitalid: $("#data").H2GAttr("receiptHospitalID"),
             }).config,
             type: "POST",
@@ -293,7 +347,8 @@ function checkEmail() {
     }
 }
 function interviewValidation() {
-    if ($("#subInterview").is(":visible")) {
+    // ตรวจสอบการกรอกข้อมูล
+    if ($("#data").H2GAttr("lmenu") == "lmenuInterview") {
         if (notAllAnswer()) {
             $("#tbQuestionnaire > tbody > tr select:first").closest("div").focus();
             alert("กรุณาตอบคำถามให้ครบทุกข้อ");

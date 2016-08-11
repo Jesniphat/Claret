@@ -243,6 +243,22 @@ Public Class oraDBQuery
             Throw New Exception("SQL Query file", New Exception("SQL query file path is not exists."))
         End Try
 
+        Dim id As String = H2G.Login.ID
+        Dim code As String = H2G.Login.Code
+        If (Not String.IsNullOrEmpty(id) And Not String.IsNullOrEmpty(code)) Then
+            Dim logs As String = String.Format("$&/* {0}|{1} */ ", id, code)
+            Dim regexInsert As String = "^\W*?insert\W+?into\W+?"
+            Dim regexUpdate As String = "^\W*?update\W+?"
+            Dim regexDelete As String = "^\W*?delete\W+?"
+            If (Regex.IsMatch(query, regexInsert, RegexOptions.IgnoreCase)) Then
+                query = Regex.Replace(query, regexInsert, logs, RegexOptions.IgnoreCase)
+            ElseIf (Regex.IsMatch(query, regexUpdate, RegexOptions.IgnoreCase)) Then
+                query = Regex.Replace(query, regexUpdate, logs, RegexOptions.IgnoreCase)
+            ElseIf (Regex.IsMatch(query, regexDelete, RegexOptions.IgnoreCase)) Then
+                query = Regex.Replace(query, regexDelete, logs, RegexOptions.IgnoreCase)
+            End If
+        End If
+
         Dim mbosCommand As New OracleCommand(query, mbosConn)
         mbosCommand.CommandTimeout = _DB_TIMEOUT
         For Each para As Match In Regex.Matches(query, "\:\w+", RegexOptions.IgnoreCase)
@@ -283,9 +299,12 @@ Public Class oraDBQuery
                                     mbosCommand.Parameters.Item(para.Name).Value = H2G.Dec(para.DefaultValue)
                                 End If
                             Case DbType.Int16, DbType.Int32, DbType.Int64, DbType.VarNumeric
-                                If (para.DefaultValue IsNot Nothing) Then
+                                If (Not String.IsNullOrEmpty(para.DefaultValue)) Then
                                     mbosCommand.Parameters.Item(para.Name).OracleDbType = OracleDbType.Int64
                                     mbosCommand.Parameters.Item(para.Name).Value = H2G.Int(para.DefaultValue)
+                                Else
+                                    mbosCommand.Parameters.Item(para.Name).OracleDbType = OracleDbType.Int64
+                                    mbosCommand.Parameters.Item(para.Name).Value = Nothing
                                 End If
                             Case DbType.Date, DbType.DateTime, DbType.DateTime2
                                 If (Not String.IsNullOrEmpty(para.DefaultValue)) Then

@@ -193,6 +193,7 @@ Public Class H2G
         ElseIf (TypeOf type Is DateTime) Or (TypeOf type Is Date) Then
             Try
                 Dim FormatDateTime As String = "dd-MM-yyyy HH:mm:ss"
+                value = value.Replace("/", "-")
                 If (FormatDateTime.Length <> value.Trim.Length) Then
                     Select Case value.Trim.Length
                         Case 10 : value = value.Trim & " 00:00:00"

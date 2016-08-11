@@ -34,8 +34,11 @@ Public Class donorAction
 
                     End If
 
+                    '### donation visit
+                    Dim DVisitItem As DonationVisitItem = JSON.Deserialize(Of DonationVisitItem)(_REQUEST("dv"))
+                    '### donation hospital
+                    Dim DHospitalItem As DonationHospitalItem = JSON.Deserialize(Of DonationHospitalItem)(_REQUEST("dh"))
                     If String.IsNullOrEmpty(_REQUEST("receipthospitalid")) Then
-                        Dim DVisitItem As DonationVisitItem = JSON.Deserialize(Of DonationVisitItem)(_REQUEST("dv"))
                         If String.IsNullOrEmpty(DVisitItem.ID) Then
                             DVisitItem.ID = Cbase.QueryField(H2G.nextVal("DONATION_VISIT"))
                             DVisitItem.DonorID = DonorItem.ID
@@ -49,7 +52,6 @@ Public Class donorAction
                         End If
                         DonorItem.VisitID = DVisitItem.ID
                     Else
-                        Dim DHospitalItem As DonationHospitalItem = JSON.Deserialize(Of DonationHospitalItem)(_REQUEST("dh"))
 
                         If String.IsNullOrEmpty(DHospitalItem.ID) Then
                             Dim dtHospital As DataTable = Cbase.QueryTable("select id, donation_to_id, hospital_id, department_id, lab_id from receipt_hospital where id = '" & DHospitalItem.ReceiptHospitalID & "'")
@@ -75,7 +77,7 @@ Public Class donorAction
                         DonorItem.VisitID = DHospitalItem.ID
                     End If
 
-
+                    '### donor external card
                     Dim DonorExtCardList As List(Of DonorExtCardItem) = JSON.Deserialize(Of List(Of DonorExtCardItem))(_REQUEST("dec"))
                     For Each item In DonorExtCardList
                         If item.ID = "NEW" Then
@@ -89,6 +91,7 @@ Public Class donorAction
                         End If
                     Next
 
+                    '### donor comment
                     Dim DonorCommentList As List(Of DonorCommentItem) = JSON.Deserialize(Of List(Of DonorCommentItem))(_REQUEST("dc"))
                     For Each item In DonorCommentList
                         If item.ID = "NEW" Then
@@ -100,6 +103,7 @@ Public Class donorAction
                         End If
                     Next
 
+                    '### donation record
                     Dim DRecordList As List(Of DonationRecordItem) = JSON.Deserialize(Of List(Of DonationRecordItem))(_REQUEST("dr"))
                     For Each item In DRecordList
                         If item.ID = "NEW" Then
@@ -158,6 +162,55 @@ Public Class donorAction
                         End If
                     Next
 
+                    '### donation question
+                    Dim QuestionList As List(Of DonorQuestionItem) = JSON.Deserialize(Of List(Of DonorQuestionItem))(_REQUEST("dq"))
+                    For Each item In QuestionList
+                        If item.ID = "NEW" Then
+                            item.ID = Cbase.QueryField(H2G.nextVal("DONATION_QUESTIONNAIRE"))
+                            item.CreateStaff = H2G.Login.ID
+                            item.VisitID = IIf(String.IsNullOrEmpty(DVisitItem.ID), DHospitalItem.ID, DVisitItem.ID)
+                            Cbase.Execute("SQL::donor/InsertDonationQuestion", DonorQuestionItem.WithCollection(item))
+                        ElseIf item.ID.ToUpper().Contains("D#") Then
+                            Cbase.Execute("delete from donation_questionnaire where id = '" & item.ID.Replace("D#", "") & "' ")
+                        Else
+
+                        End If
+                    Next
+
+                    '### donor deferral
+                    Dim DonorDeferralList As List(Of DonorDeferralItem) = JSON.Deserialize(Of List(Of DonorDeferralItem))(_REQUEST("dd"))
+                    For Each item In DonorDeferralList
+                        If item.ID = "NEW" Then
+                            item.ID = Cbase.QueryField(H2G.nextVal("DONOR_DEFERRAL"))
+                            item.DetailID = Cbase.QueryField(H2G.nextVal("DONOR_DEFERRAL_DETAIL"))
+                            item.CreateStaff = H2G.Login.ID
+                            item.VisitID = DVisitItem.ID
+                            item.DonorID = DonorItem.ID
+
+                            Cbase.Execute("SQL::donor/InsertDonorDeferral", DonorDeferralItem.WithCollection(item))
+                            Cbase.Execute("SQL::donor/InsertDonorDeferralDetail", DonorDeferralItem.WithCollectionDetail(item))
+                        ElseIf item.ID.ToUpper().Contains("D#") Then
+                            Cbase.Execute("delete from donor_deferral_detail where donor_deferral_id = '" & item.ID.Replace("D#", "") & "' ")
+                            Cbase.Execute("delete from donor_deferral where id = '" & item.ID.Replace("D#", "") & "' ")
+                        End If
+                    Next
+
+                    '### donation examination
+                    Dim DonationExamlList As List(Of DonationExamination) = JSON.Deserialize(Of List(Of DonationExamination))(_REQUEST("de"))
+                    For Each item In DonationExamlList
+                        If item.id = "NEW" Then
+                            item.id = Cbase.QueryField(H2G.nextVal("DONATION_EXAMINATION"))
+                            item.create_staff = H2G.Login.ID
+                            item.donation_visit_id = DVisitItem.ID
+                            item.donation_hospital_id = DHospitalItem.ID
+                            item.donation_from = IIf(String.IsNullOrEmpty(DVisitItem.ID), "HOSPITAL", "INTERNAL")
+
+                            Cbase.Execute("SQL::donor/InsertDonationExam", DonationExamination.WithCollection(item))
+                        ElseIf item.id.ToUpper().Contains("D#") Then
+                            Cbase.Execute("delete from donation_examination where id = '" & item.id.Replace("D#", "") & "' ")
+                        End If
+                    Next
+
                     Cbase.Apply()
 
                     JSONResponse.setItems(Of DonorItem)(DonorItem)
@@ -199,10 +252,10 @@ Public Class donorAction
                     Next
 
                     '### DeferralItem
-                    DonorMainItem.Deferral = New List(Of DonorDeferralItem)
+                    DonorMainItem.Deferral = New List(Of DataItem.DeferralItem)
                     For Each dRow As DataRow In Cbase.QueryTable("
-                        select deferal_code as deferal_code, end_date, description, deferral_type, status from (
-                            select f.code as deferal_code, f.description, DDF.DEFERRAL_TYPE
+                        select deferral_code as deferral_code, end_date, description, deferral_type, status from (
+                            select f.code as deferral_code, f.description, DDF.DEFERRAL_TYPE
                             , to_char(DDF.END_DATE, 'DD MON YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as END_DATE
                             , CASE WHEN DDF.END_DATE < SYSDATE THEN 'INACTIVE' ELSE 'ACTIVE' END as status
                             from DONOR_DEFERRAL df
@@ -210,7 +263,7 @@ Public Class donorAction
                             inner join DEFERRAL f on f.id = df.deferral_id
                             where df.DONOR_ID = :id 
                         ) tmp order by status, end_date", param).Rows
-                        DonorMainItem.Deferral.Add(DonorDeferralItem.WithItems(New DonorDeferralItem, dRow))
+                        DonorMainItem.Deferral.Add(DataItem.DeferralItem.WithItems(New DataItem.DeferralItem, dRow))
                     Next
 
                     '### DonationTypeItem
@@ -261,6 +314,12 @@ Public Class donorAction
                         Next
 
                         DonorMainItem.DonationRecord.Add(drItem)
+                    Next
+
+                    '### donation question
+                    Dim QuestionList As New List(Of DonorQuestionItem)
+                    For Each dRow As DataRow In Cbase.QueryTable("").Rows
+
                     Next
 
                     JSONResponse.setItems(Of DonorMainItem)(DonorMainItem)
@@ -962,7 +1021,7 @@ End Class
 Public Structure DonorMainItem
     Public Donor As DTransaction
     Public ExtCard As List(Of DonorExtCardItem)
-    Public Deferral As List(Of DonorDeferralItem)
+    Public Deferral As List(Of DataItem.DeferralItem)
     Public DonationType As List(Of DonationTypeItem)
     Public DonorComment As List(Of DonorCommentItem)
     Public DonationRecord As List(Of DonationRecordItem)
@@ -1127,4 +1186,83 @@ Public Structure DateDataList
     Public no As String
     Public firstDate As String
     Public lastDate As String
+End Structure
+
+Public Structure DonorQuestionItem
+    Public ID As String
+    Public CreateStaff As String
+    Public VisitID As String
+    Public QuestionID As String
+    Public QuestionCode As String
+    Public QuestionDesc As String
+    Public QuestionDescTH As String
+    Public Answer As String
+    Public ParentID As String
+
+    Public Shared Function WithCollection(ByVal item As DonorQuestionItem) As SQLCollection
+        Dim param As New SQLCollection()
+        With item
+            param.Add(":id", DbType.Int64, .ID)
+            param.Add(":create_staff", DbType.Int64, .CreateStaff)
+            param.Add(":donation_visit_id", DbType.Int64, .VisitID)
+            param.Add(":questionnaire_question_id", DbType.Int64, .QuestionID)
+            param.Add(":questionnaire_question_code", DbType.String, .QuestionCode)
+            param.Add(":questionnaire_question_desc", DbType.String, .QuestionDesc)
+            param.Add(":questionnaire_question_desc_th", DbType.String, .QuestionDescTH)
+            param.Add(":answer", DbType.String, .Answer)
+            param.Add(":parent_id", DbType.Int64, IIf(String.IsNullOrEmpty(.ParentID), Nothing, .ParentID))
+        End With
+        Return param
+    End Function
+
+End Structure
+
+Public Structure DonorDeferralItem
+    Public ID As String
+    Public DetailID As String
+    Public DonorID As String
+    Public DeferralID As String
+    Public VisitID As String
+    Public CreateStaff As String
+    Public StartDate As String
+    Public EndDate As String
+    Public Note As String
+    Public DonationTypeID As String
+    Public DeferralType As String
+    Public Duration As String
+    Public QuestionID As String
+
+    Public Shared Function WithCollection(ByVal item As DonorDeferralItem) As SQLCollection
+        Dim param As New SQLCollection()
+        With item
+            'id, donor_id, deferral_id, create_date, create_staff, start_date
+            ', note, questionnaire_question_id, donation_visit_id 
+            param.Add(":id", DbType.Int64, .ID)
+            param.Add(":create_staff", DbType.Int64, .CreateStaff)
+            param.Add(":donor_id", DbType.Int64, .DonorID)
+            param.Add(":deferral_id", DbType.Int64, .DeferralID)
+            param.Add(":start_date", DbType.Date, H2G.BE2AC(H2G.Convert(Of DateTime)(.StartDate)).ToString("dd-MM-yyyy"))
+            param.Add(":note", DbType.String, .Note)
+            param.Add(":questionnaire_question_id", DbType.Int64, IIf(String.IsNullOrEmpty(.QuestionID), Nothing, .QuestionID))
+            param.Add(":donation_visit_id", DbType.Int64, .VisitID)
+        End With
+        Return param
+    End Function
+
+    Public Shared Function WithCollectionDetail(ByVal item As DonorDeferralItem) As SQLCollection
+        Dim param As New SQLCollection()
+        With item
+            'id, donor_deferral_id, donation_type_id, deferral_type, duration, end_date, note
+            param.Add(":id", DbType.Int64, .DetailID)
+            param.Add(":donor_deferral_id", DbType.Int64, .ID)
+            param.Add(":donation_type_id", DbType.Int64, .DonationTypeID)
+            param.Add(":deferral_type", DbType.String, .DeferralType)
+            param.Add(":duration", DbType.Int64, IIf(String.IsNullOrEmpty(.Duration), Nothing, .Duration))
+            param.Add(":end_date", DbType.Date, H2G.BE2AC(H2G.Convert(Of DateTime)(.EndDate)).ToString("dd-MM-yyyy"))
+            param.Add(":note", DbType.String, .Note)
+
+        End With
+        Return param
+    End Function
+
 End Structure

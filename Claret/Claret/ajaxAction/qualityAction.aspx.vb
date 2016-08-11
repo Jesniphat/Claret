@@ -164,6 +164,7 @@ Public Structure ExamLabItem
     Public GroupID As String
     Public GroupCode As String
     Public GroupDescription As String
+    Public QuestionID As String
 
 End Structure
 

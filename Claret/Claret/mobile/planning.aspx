@@ -4,6 +4,9 @@
         .colour-pink {
             background-color: #FFF5F5;
         }
+        .table > tbody > tr > td {
+            padding: 7px 5px;
+        }
     </style>
     <script src="../resources/javascript/page/planning.js" type="text/javascript"></script>
     <script>
@@ -68,7 +71,7 @@
     <div class="row" id="seccenRow">
         <div class="col-md-20">
             <div class="row border-box" style="padding-left:8px;">
-                <div class="row">
+                <div class="row" style="margin-bottom:4px;">
                     <div class="col-md-29" style="border-bottom:solid 1px #cccccc"><span>ข้อมูลทั่วไป</span></div>
                     <div class="col-md-7" style="border-bottom:solid 1px #cccccc">
                         <label class="checkbox-inline" style="padding-bottom: 2px;"><input id="masterPlan" type="checkbox" value="" />แผนงานต้นแบบ</label>
@@ -136,7 +139,7 @@
                 </div>
             </div>
             <div class="row border-box" style="margin-top:2px;">
-                <div class="row">
+                <div class="row" style="margin-bottom:4px;">
                     <div class="col-md-36" style="border-bottom:solid 1px #cccccc"><span>ช่องทางติดต่อหน่วยงาน</span></div>
                 </div>
                 <div class="row">
@@ -169,11 +172,92 @@
         </div>
         <div class="col-md-16">
             <div class="row border-box">
+                <div class="row" style="margin-bottom:4px;">
+                    <div class="col-md-36" style="border-bottom:solid 1px #cccccc"><span>ประเภทของงาน</span></div>
+                </div>
                 <div class="row">
                     <div class="col-md-9"><span>ประเภทงาน</span></div>
                     <div class="col-md-27">
-                        <input class="form-control" id="workType" type="text" value="" readonly/>
+                        <%--<input class="form-control" id="workType" type="text" value="" readonly/>--%>
+                        <select id="workType" class="selecte-box-custom" style="background-color: #eeeeee;" disabled>
+                            <option value="" >ALL</option>
+                            <option value="MOBILE SITE">MOBILE SITE</option>
+                            <option value="FIXED SITE">FIXED SITE</option>
+                            <option value="T">T</option>
+                        </select>
                     </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-9"><span>ประหน่วยงาน</span></div>
+                    <div class="col-md-27">
+                        <%--<input class="form-control" id="workType" type="text" value="" readonly/>--%>
+                        <select id="departmentType" class="selecte-box-custom" style="background-color: #eeeeee;" disabled>
+                            <option value="" >ALL</option>
+                            <option value="MOBILE SITE" selected>MOBILE SITE</option>
+                            <option value="FIXED SITE">FIXED SITE</option>
+                            <option value="T">T</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-9"><span>ประรถ</span></div>
+                    <div class="col-md-27">
+                        <%--<input class="form-control" id="workType" type="text" value="" readonly/>--%>
+                        <select id="cartType" class="selecte-box-custom" style="background-color: #eeeeee;" disabled>
+                            <option value="" >ALL</option>
+                            <option value="MOBILE SITE">MOBILE SITE</option>
+                            <option value="FIXED SITE" selected>FIXED SITE</option>
+                            <option value="T">T</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row border-box" style="margin-top:2px;">
+                <div class="row" style="margin-bottom:4px;">
+                    <div class="col-md-36" style="border-bottom:solid 1px #cccccc"><span>ช่วงเวลารับบริจาค</span></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-11"><span>เวลารับบริจาค</span></div>
+                    <div class="col-md-7">
+                        <input class="form-control required" id="donationTime" type="text" value="" />
+                    </div>
+                    <div class="col-md-11" style="padding-left: 32px;"><span>เวลาสิ้นสุดรับบริจาค</span></div>
+                    <div class="col-md-7">
+                        <input class="form-control required" id="donationTimeUse" type="text" value="" />
+                    </div>
+                </div>
+            </div>
+            <div class="row border-box" style="margin-top:2px;">
+                <div class="row" style="margin-bottom:4px;">
+                    <div class="col-md-36" style="border-bottom:solid 1px #cccccc; margin-bottom: 2px;"><span>แผนการดำเนินงาน</span></div>
+                </div>
+                <div class="row">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="col-md-18" style="border:1px solid #ddd; padding-left:2px;">หัวข้อแผนงาน</th>
+                                <th class="col-md-9 text-center" style="border:1px solid #ddd;">จำนวนที่คาดหวัง</th>
+                                <th class="col-md-9 text-center" style="border:1px solid #ddd;">จำนวนผู้บริจาค</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>จำนวนผู้บริจารที่ลงทะเบียน</td>
+                                <td><input class="form-control" id="regisDonateExpect" value="" readonly /></td>
+                                <td><input class="form-control" id="regisDonateAmount" value="" readonly /></td>
+                            </tr>
+                            <tr>
+                                <td>ผู้บริจาคที่สามารถบริจาคโลหิตได้</td>
+                                <td><input class="form-control" id="canRegisDonateExpect" value="" readonly /></td>
+                                <td><input class="form-control" id="canRegisDonateAmount" value="" readonly /></td>
+                            </tr>
+                            <tr>
+                                <td>ผู้บริจาคที่ไม่สามารถบริจาคได้</td>
+                                <td><input class="form-control" id="cantRegisDonateExpect" value="" readonly /></td>
+                                <td><input class="form-control" id="cantRegisDonateAmount" value="" readonly /></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

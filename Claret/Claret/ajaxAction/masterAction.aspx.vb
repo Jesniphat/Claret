@@ -339,7 +339,7 @@ Public Class masterAction
                     QuestionnaireItem.QuestionItem = New List(Of QuestionItem)
                     QuestionnaireItem.AnswerItem = New List(Of AnswerItem)
                     Dim sql As String = "select qq.id, qq.code, qq.description, qq.required, qq.answer_type 
-                                        , wmsys.wm_concat(qa.code) as preset
+                                        , wmsys.wm_concat(qa.code) as preset, qq.description_th
                                         from QUESTIONNAIRE_QUESTION qq
                                         LEFT JOIN QUESTIONNAIRE_ANSWER qa on qa.QUESTIONNAIRE_QUESTION_ID = qq.id
                                         GROUP BY qq.id, qq.code, qq.description, qq.required, qq.answer_type 
@@ -351,6 +351,7 @@ Public Class masterAction
                             QuestItem.QuestionID = dr("id").ToString()
                             QuestItem.Code = dr("code").ToString()
                             QuestItem.Description = dr("description").ToString()
+                            QuestItem.DescriptionTH = dr("description_th").ToString()
                             QuestItem.Required = dr("required").ToString()
                             QuestItem.AnswerType = dr("answer_type").ToString()
                             QuestItem.Preset = dr("preset").ToString()
@@ -447,6 +448,7 @@ Public Structure QuestionItem
     Public QuestionID As String
     Public Code As String
     Public Description As String
+    Public DescriptionTH As String
     Public Required As String
     Public AnswerType As String
     Public Preset As String

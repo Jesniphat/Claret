@@ -393,11 +393,12 @@
                 $("#infoTabToday").tabs("option", "disabled", [1]);
             } else if ($("#data").H2GAttr("lmenu") == "lmenuInterview") {
                 lookupTabQuestionaire();
-
             } else if ($("#data").H2GAttr("lmenu") == "lmenuDonate") {
                 $("#infoTabToday").tabs("option", "disabled", [1]);
             } else if ($("#data").H2GAttr("lmenu") == "lmenuHistoryReport") {
                 $("#infoTabToday").tabs("option", "disabled", [1]);
+            } else if ($("#data").H2GAttr("lmenu") == "lmenulabRegis") {
+                $(".mandatory-interview").hide();
             }
         });
 
@@ -644,6 +645,8 @@
                                 questAnswerType: er.AnswerType,
                                 questPreset: er.Preset,
                                 fromQuestion: fromQuestion,
+                                questDesc: er.Description,
+                                questDescTH: er.DescriptionTH,
                             });
                             $(dataRow).find(".td-question span").H2GValue(er.Description);
                             if (er.AnswerType == "PRESET") {
@@ -1327,7 +1330,7 @@
                             </div>
                             <div id="subInterview">
                                 <div class="border-box">
-                                    <div class="col-md-21">
+                                    <div class="col-md-21 mandatory-interview">
                                         <div class="row">
                                             <div class="col-md-36">
                                                 <div class="row" style="border-top: solid 1px #CCCCCC; border-left: solid 1px #CCCCCC; border-right: solid 1px #CCCCCC; margin: 0; background-color:#DBEEF3;">
@@ -1373,7 +1376,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-15">
+                                    <div class="col-md-15 mandatory-interview">
                                         <div class="row">
                                             <div class="col-md-36">
                                                 <div class="border-box">
@@ -1452,10 +1455,10 @@
                                                             <input id="txtHb" type="text" class="form-control text-center required" />
                                                         </div>
                                                         <div class="col-md-2 text-center">
-                                                            <span>Pit</span>
+                                                            <span>Plt</span>
                                                         </div>
                                                         <div class="col-md-4 text-right">
-                                                            <input id="txtPit" type="text" class="form-control" />
+                                                            <input id="txtPlt" type="text" class="form-control" />
                                                         </div>
                                                     </div>
                                                 </div>

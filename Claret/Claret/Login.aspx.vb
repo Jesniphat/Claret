@@ -13,13 +13,8 @@ Public Class Login
         cookie.Write("CPID", "1") ': Session("hl") = dtStaff.Rows(0)("hotel_list").ToString
         cookie.Write("SID", "1") ': Session("whi") = dtStaff.Rows(0)("wholesale_id").ToString
 
-        'user.ID = "1" 'dtStaff.Rows(0)("id").ToString
-        'user.Code = "ST" 'dtStaff.Rows(0)("code").ToString
-        'user.Name = "Sittichai Habya" 'dtStaff.Rows(0)("name").ToString
-        'user.CollectionPointID = "1" 'dtStaff.Rows(0)("wholesale_id").ToString
-        'user.SiteID = "1" 'strTemp
-        'H2G.Login = user
     End Sub
+
 
 
 End Class

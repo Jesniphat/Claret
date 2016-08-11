@@ -305,19 +305,19 @@ Namespace DataItem
 
     End Class
 
-    Public Class DonorDeferralItem
+    Public Class DeferralItem
         Public Code As String
         Public EndDate As String
         Public Description As String
         Public DeferralType As String
         Public Status As String
 
-        Public Shared Function WithItems(ByVal item As DataItem.DonorDeferralItem, ByVal dRow As DataRow) As DataItem.DonorDeferralItem
+        Public Shared Function WithItems(ByVal item As DataItem.DeferralItem, ByVal dRow As DataRow) As DataItem.DeferralItem
             With item
-                .Code = dRow("deferal_code").ToString()
+                .Code = dRow("deferral_code").ToString()
                 .EndDate = dRow("end_date").ToString()
                 .Description = dRow("description").ToString()
-                .DeferralType = dRow("deferal_type").ToString()
+                .DeferralType = dRow("deferral_type").ToString()
                 .Status = dRow("status").ToString()
             End With
             Return item
