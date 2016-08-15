@@ -21,16 +21,31 @@
                     //getDornorHospitalList(selectedDate);
                 },
             });
+
+            $("#txtStartDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
+                // maxDate: new Date(),
+                minDate: "-100y",
+                yearRange: "c-100:c+0",
+                onSelect: function (selectedDate, objDate) {
+                    // $("#txtHospital").focus();
+                    //getDornorHospitalList(selectedDate);
+                },
+            });
+
+            $("#txtLastDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
+                // maxDate: new Date(),
+                minDate: "-100y",
+                yearRange: "c-100:c+0",
+                onSelect: function (selectedDate, objDate) {
+                    // $("#txtHospital").focus();
+                    //getDornorHospitalList(selectedDate);
+                },
+            });
+
+            innitalchack();
             
             $("#txtDepartment").blur(function () { $("#ddlDepartment").val($("#txtDepartment").val().toUpperCase()).change(); });
             $("#txtRegion").blur(function () { $("#ddlRegion").val($("#txtRegion").val().toUpperCase()).change(); });
-            
-            if ($("#data").attr("planningaction") == "new") {
-                setDDL(true);
-            } else {
-                $("#ddlDepartment").H2GAttr("selectItem", '5E0001')
-                setDDL(false);
-            }
 
         });
 
@@ -74,7 +89,7 @@
                 <div class="row" style="margin-bottom:4px;">
                     <div class="col-md-29" style="border-bottom:solid 1px #cccccc"><span>ข้อมูลทั่วไป</span></div>
                     <div class="col-md-7" style="border-bottom:solid 1px #cccccc">
-                        <label class="checkbox-inline" style="padding-bottom: 2px;"><input id="masterPlan" type="checkbox" value="" />แผนงานต้นแบบ</label>
+                        <label class="checkbox-inline" style="padding-bottom: 2px;"><input id="masterPlan" type="checkbox" disabled />แผนงานต้นแบบ</label>
                     </div>
                 </div>
                 <div class="row">
@@ -134,7 +149,10 @@
                 <div class="row">
                     <div class="col-md-7"><span>ประเทศ</span></div>
                     <div class="col-md-11">
-                        <input class="form-control" id="departmentCountry" type="text" value="" readonly/>
+                        <%--<input class="form-control" id="departmentCountry" type="text" value="" readonly/>--%>
+                        <select id="departmentCountry" class="selecte-box-custom" style="background-color: #eeeeee;" disabled>
+                            
+                        </select>
                     </div>
                 </div>
             </div>
@@ -178,13 +196,13 @@
                 <div class="row">
                     <div class="col-md-9"><span>ประเภทงาน</span></div>
                     <div class="col-md-27">
-                        <%--<input class="form-control" id="workType" type="text" value="" readonly/>--%>
-                        <select id="workType" class="selecte-box-custom" style="background-color: #eeeeee;" disabled>
+                        <input class="form-control" id="workType" type="text" value="" readonly/>
+                        <%--<select id="workType" class="selecte-box-custom" style="background-color: #eeeeee;" disabled>
                             <option value="" >ALL</option>
                             <option value="MOBILE SITE">MOBILE SITE</option>
                             <option value="FIXED SITE">FIXED SITE</option>
                             <option value="T">T</option>
-                        </select>
+                        </select>--%>
                     </div>
                 </div>
                 <div class="row">
@@ -192,23 +210,23 @@
                     <div class="col-md-27">
                         <%--<input class="form-control" id="workType" type="text" value="" readonly/>--%>
                         <select id="departmentType" class="selecte-box-custom" style="background-color: #eeeeee;" disabled>
-                            <option value="" >ALL</option>
+                            <%--<option value="" >ALL</option>
                             <option value="MOBILE SITE" selected>MOBILE SITE</option>
                             <option value="FIXED SITE">FIXED SITE</option>
-                            <option value="T">T</option>
+                            <option value="T">T</option>--%>
                         </select>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-9"><span>ประรถ</span></div>
                     <div class="col-md-27">
-                        <%--<input class="form-control" id="workType" type="text" value="" readonly/>--%>
-                        <select id="cartType" class="selecte-box-custom" style="background-color: #eeeeee;" disabled>
+                        <input class="form-control" id="carType" type="text" value="" readonly/>
+                        <%--<select id="cartType" class="selecte-box-custom" style="background-color: #eeeeee;" disabled>
                             <option value="" >ALL</option>
                             <option value="MOBILE SITE">MOBILE SITE</option>
                             <option value="FIXED SITE" selected>FIXED SITE</option>
                             <option value="T">T</option>
-                        </select>
+                        </select>--%>
                     </div>
                 </div>
             </div>
@@ -260,6 +278,121 @@
                     </table>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="row" id="tableLow" style="padding-right:2px;">
+        <div class="border-box">
+            <div class="row">
+                <div class="col-md-36" style="border-bottom:1px solid #ccc">
+                    <span>หน่วยงานย่อย</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8 text-left">
+                    ชื่อหน่วยงานย่อย
+                </div>
+                <div class="col-md-8 text-center">
+                    จำนวนผู้บริจาคที่ลงทะเบียน
+                </div>
+                <div class="col-md-8 text-center">
+                    ผู้บริจาคที่สามรถบริจาคโลหิตได้
+                </div>
+                <div class="col-md-8 text-center">
+                    ผู้บริจาคที่ไม่สามารถบริจาคโลหิตได้
+                </div>
+                <div class="col-md-4 text-center">
+                    
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8"></div>
+                <div class="col-md-4 text-center">จำนวนที่คาดหวัง</div>
+                <div class="col-md-4 text-center">ผู้บริจาค</div>
+                <div class="col-md-4 text-center">จำนวนที่คาดหวัง</div>
+                <div class="col-md-4 text-center">ผู้บริจาค</div>
+                <div class="col-md-4 text-center">จำนวนที่คาดหวัง</div>
+                <div class="col-md-4 text-center">ผู้บริจาค</div>
+                <div class="col-md-4 text-center"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-8"><input class="form-control" id="subDepartmentName" type="text" value="" /></div>
+                <div class="col-md-4 text-center"><input class="form-control" type="text" value="" /></div>
+                <div class="col-md-4 text-center"><input class="form-control" type="text" value="" /></div>
+                <div class="col-md-4 text-center"><input class="form-control" type="text" value="" /></div>
+                <div class="col-md-4 text-center"><input class="form-control" type="text" value="" /></div>
+                <div class="col-md-4 text-center"><input class="form-control" type="text" value="" /></div>
+                <div class="col-md-4 text-center"><input class="form-control" type="text" value="" /></div>
+                <div class="col-md-4 text-center">
+                    <button class='btn btn-icon' id="addSubDepartmentBt" subdepartmentid="0" onclick='addSubDepartment(this);' tabindex='1'>
+                        <i class='glyphicon glyphicon-circle-arrow-down'></i>
+                    </button>
+                </div>
+            </div>
+            <div class="row" style="padding-bottom:10px;">
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <td class="col-md-8">John</td>
+                            <td class="col-md-4 text-center">Doe</td>
+                            <td class="col-md-4 text-center">10</td>
+                            <td class="col-md-4 text-center">10</td>
+                            <td class="col-md-4 text-center">10</td>
+                            <td class="col-md-4 text-center">10</td>
+                            <td class="col-md-4 text-center">10</td>
+                            <td class="col-md-4 text-center">
+                                <button class='btn btn-icon' tabindex='1'>
+                                    <i class="glyphicon glyphicon-remove"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-8">Mary</td>
+                            <td class="col-md-4 text-center">Doe</td>
+                            <td class="col-md-4 text-center">10</td>
+                            <td class="col-md-4 text-center">10</td>
+                            <td class="col-md-4 text-center">10</td>
+                            <td class="col-md-4 text-center">10</td>
+                            <td class="col-md-4 text-center">10</td>
+                            <td class="col-md-4 text-center">
+                                <button class='btn btn-icon' tabindex='1'>
+                                    <i class="glyphicon glyphicon-remove"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="lastRow" style="padding-right:2px;">
+        <div class="border-box">
+            <div class="row">
+                <div class="col-md-3"><span>วันที่เริ่มต้น</span></div>
+                <div class="col-md-4"><input class="form-control" id="txtStartDate" type="text" value="" readonly /></div>
+                <div class="col-md-3"><span>วันที่สิ้นสุด</span></div>
+                <div class="col-md-4"><input class="form-control" id="txtLastDate" type="text" value="" /></div>
+                <div class="col-md-3"><span>หมายเหตุ</span></div>
+                <div class="col-md-15"><input class="form-control" id="txtRemark" type="text" value="" /></div>
+                <div class="col-md-4 text-center">
+                    <button class='btn btn-icon' onclick='' tabindex='1'>
+                        <i class='glyphicon glyphicon-circle-arrow-down'></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="buttonRow" style="padding-right:2px; margin-bottom:20px;">
+        <div class="col-md-8">
+            <input id="emport" type="button" class="btn btn-primary btn-block" value="คลิกที่นี่เพื่อนำเข้าข้อมูลจาก telecar" onclick="" />
+        </div>
+        <div class="col-md-20"> </div>
+        <div class="col-md-4">
+            <input id="cancel" type="button" class="btn btn-default btn-block" value="ยกเลิก" onclick="" />
+        </div>
+        <div class="col-md-4">
+            <input id="save" type="button" class="btn btn-success btn-block" value="บันทึก" onclick="" />
         </div>
     </div>
 </asp:Content>
