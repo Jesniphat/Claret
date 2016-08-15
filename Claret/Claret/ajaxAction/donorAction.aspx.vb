@@ -316,10 +316,99 @@ Public Class donorAction
                         DonorMainItem.DonationRecord.Add(drItem)
                     Next
 
-                    '### donation question
-                    Dim QuestionList As New List(Of DonorQuestionItem)
-                    For Each dRow As DataRow In Cbase.QueryTable("").Rows
+                    DonorMainItem.QuestionList = New List(Of DonorQuestionItem)
+                    If String.IsNullOrEmpty(_REQUEST("donationhospitalid")) Then
+                        '### donation question
+                        sqlMain = "select dq.id, dq.create_date, dq.create_staff, dq.donation_visit_id, dq.questionnaire_question_id, dq.questionnaire_question_code
+                                    , dq.questionnaire_question_desc, dq.answer, dq.parent_id, dq.questionnaire_question_desc_th
+                                    , wmsys.wm_concat(qa.code) as preset, qq.answer_type
+                                    from DONATION_QUESTIONNAIRE dq
+                                    left join QUESTIONNAIRE_QUESTION qq on qq.id = dq.questionnaire_question_id
+                                    left join QUESTIONNAIRE_ANSWER qa on qa.QUESTIONNAIRE_QUESTION_id = dq.questionnaire_question_id
+                                    where dq.donation_visit_id = '" & _REQUEST("visit_id") & "'
+                                    group by dq.id, dq.create_date, dq.create_staff, dq.donation_visit_id, dq.questionnaire_question_id, dq.questionnaire_question_code
+                                    , dq.questionnaire_question_desc, dq.answer, dq.parent_id, dq.questionnaire_question_desc_th, qq.answer_type
+                                    order by dq.id "
+                        For Each dRow As DataRow In Cbase.QueryTable(sqlMain).Rows
+                            Dim drItem As New DonorQuestionItem
+                            drItem.ID = dRow("id").ToString()
+                            drItem.VisitID = dRow("donation_visit_id").ToString()
+                            drItem.QuestionID = dRow("questionnaire_question_id").ToString()
+                            drItem.QuestionCode = dRow("questionnaire_question_code").ToString()
+                            drItem.QuestionDesc = dRow("questionnaire_question_desc").ToString()
+                            drItem.QuestionDescTH = dRow("questionnaire_question_desc_th").ToString()
+                            drItem.Answer = dRow("answer").ToString()
+                            drItem.ParentID = dRow("parent_id").ToString()
+                            drItem.Preset = dRow("preset").ToString()
+                            drItem.AnswerType = dRow("answer_type").ToString()
 
+                            DonorMainItem.QuestionList.Add(drItem)
+                        Next
+
+                    End If
+
+                    DonorMainItem.DonorDeferral = New List(Of DonorDeferralItem)
+                    '### donor deferral
+                    sqlMain = " select dd.id, ddd.id as detail_id, dd.donor_id, dd.deferral_id, dd.donation_visit_id , dd.create_date, dd.create_staff
+                                , to_char(dd.start_date, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as start_date
+                                , to_char(ddd.end_date, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as end_date
+                                , dd.note, ddd.donation_type_id, ddd.deferral_type, nvl(ddd.duration,0) as duration, dd.questionnaire_question_id
+                                , def.description
+                                from DONOR_DEFERRAL dd
+                                inner join DONOR_DEFERRAL_detail ddd on ddd.donor_deferral_id = dd.id
+                                left join DEFERRAL def on def.id = dd.deferral_id
+                                where dd.donor_id = '" & _REQUEST("id") & "'
+                                ORDER BY dd.id   "
+                    For Each dRow As DataRow In Cbase.QueryTable(sqlMain).Rows
+                        Dim drItem As New DonorDeferralItem
+                        drItem.ID = dRow("id").ToString()
+                        drItem.DetailID = dRow("detail_id").ToString()
+                        drItem.DonorID = dRow("donor_id").ToString()
+                        drItem.DeferralID = dRow("deferral_id").ToString()
+                        drItem.VisitID = dRow("donation_visit_id").ToString()
+                        drItem.StartDate = dRow("start_date").ToString()
+                        drItem.EndDate = dRow("end_date").ToString()
+                        drItem.Note = dRow("note").ToString()
+                        drItem.DonationTypeID = dRow("donation_type_id").ToString()
+                        drItem.DeferralType = dRow("deferral_type").ToString()
+                        drItem.Duration = dRow("duration").ToString()
+                        drItem.QuestionID = dRow("questionnaire_question_id").ToString()
+                        drItem.Desc = dRow("description").ToString()
+
+                        DonorMainItem.DonorDeferral.Add(drItem)
+                    Next
+
+                    DonorMainItem.DonationExam = New List(Of DonationExamination)
+                    '### donation examination
+                    sqlMain = " select de.id, de.create_date, de.create_staff, de.donation_visit_id, de.donation_hospital_id, de.donation_from
+                                , de.examination_group_id, de.examination_group_desc, de.examination_id, de.examination_desc, de.questionnaire_question_id
+                                , EXA.CODE as examination_code, exg.code as examination_group_code
+                                from DONATION_EXAMINATION de
+                                left join EXAMINATION exa on exa.id = DE.EXAMINATION_ID
+                                LEFT JOIN EXAMINATION_GROUP exg on exg.id = DE.examination_group_id
+                                where {0}
+                                ORDER BY id "
+                    If String.IsNullOrEmpty(_REQUEST("donationhospitalid")) Then
+                        sqlMain = String.Format(sqlMain, "de.donation_visit_id = '" & _REQUEST("visit_id") & "'")
+                    Else
+                        sqlMain = String.Format(sqlMain, "de.donation_hospital_id = '" & _REQUEST("visit_id") & "'")
+                    End If
+
+                    For Each dRow As DataRow In Cbase.QueryTable(sqlMain).Rows
+                        Dim drItem As New DonationExamination
+                        drItem.id = dRow("id").ToString()
+                        drItem.donation_visit_id = dRow("donation_visit_id").ToString()
+                        drItem.donation_hospital_id = dRow("donation_hospital_id").ToString()
+                        drItem.donation_from = dRow("donation_from").ToString()
+                        drItem.examination_group_id = dRow("examination_group_id").ToString()
+                        drItem.examination_group_desc = dRow("examination_group_desc").ToString()
+                        drItem.examination_id = dRow("examination_id").ToString()
+                        drItem.examination_desc = dRow("examination_desc").ToString()
+                        drItem.question_id = dRow("questionnaire_question_id").ToString()
+                        drItem.examination_code = dRow("examination_code").ToString()
+                        drItem.examination_group_code = dRow("examination_group_code").ToString()
+
+                        DonorMainItem.DonationExam.Add(drItem)
                     Next
 
                     JSONResponse.setItems(Of DonorMainItem)(DonorMainItem)
@@ -957,16 +1046,17 @@ Public Class donorAction
                     If Not String.IsNullOrEmpty(_REQUEST("surname")) Then param.Add("#SURNAME", " and UPPER(dor.surname) = UPPER('" & _REQUEST("surname") & "') ")
                     If Not String.IsNullOrEmpty(_REQUEST("birthday")) Then param.Add("#BIRTHDAY", "and to_char(dor.birthday, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("birthday") & "' ")
 
-                    Dim sql As String = "select nvl(count(DV.id),0) as visit_count, dor.id, dor.Name, dor.Surname 
+                    Dim sql As String = "select nvl(dv.queue_number,0) as visit_count, dor.id, dor.Name, dor.Surname 
+                                        , to_char(VISIT_DATE, 'HH24,MI') as visit_time
                                         from donor dor
                                         left join donation_visit dv on DV.donor_id = dor.id and to_char(dv.create_date,'yyyyMMdd') = to_char(sysdate,'yyyyMMdd')
-                                        where 1=1  /*#ID*/ /*#NAME*/ /*#SURNAME*/ /*#BIRTHDAY*/ 
-                                        GROUP BY dor.Name, dor.Surname, dor.id "
+                                        where rownum = 1 /*#ID*/ /*#NAME*/ /*#SURNAME*/ /*#BIRTHDAY*/ 
+                                        order by queue_number desc "
 
                     Dim dt As DataTable = Cbase.QueryTable(sql, param)
                     If dt.Rows.Count > 0 Then
                         If dt.Rows(0)("visit_count").ToString() <> "0" Then
-                            strReturn = "วันนี้คุณ " & dt.Rows(0)("name").ToString() & " " & dt.Rows(0)("surname").ToString() & " ทำการลงทะเบียนไปแล้ว"
+                            strReturn = "วันนี้คุณ " & dt.Rows(0)("name").ToString() & " " & dt.Rows(0)("surname").ToString() & " ทำการลงทะเบียนไปแล้ว คิวที่ " & dt.Rows(0)("visit_count").ToString() & " เวลา " & dt.Rows(0)("visit_time").ToString().Replace(",", ":")
                         End If
                         strReturnID = dt.Rows(0)("id").ToString()
 
@@ -1025,6 +1115,9 @@ Public Structure DonorMainItem
     Public DonationType As List(Of DonationTypeItem)
     Public DonorComment As List(Of DonorCommentItem)
     Public DonationRecord As List(Of DonationRecordItem)
+    Public QuestionList As List(Of DonorQuestionItem)
+    Public DonorDeferral As List(Of DonorDeferralItem)
+    Public DonationExam As List(Of DonationExamination)
 End Structure
 
 Public Structure SearchItem
@@ -1198,6 +1291,8 @@ Public Structure DonorQuestionItem
     Public QuestionDescTH As String
     Public Answer As String
     Public ParentID As String
+    Public Preset As String
+    Public AnswerType As String
 
     Public Shared Function WithCollection(ByVal item As DonorQuestionItem) As SQLCollection
         Dim param As New SQLCollection()
@@ -1231,6 +1326,7 @@ Public Structure DonorDeferralItem
     Public DeferralType As String
     Public Duration As String
     Public QuestionID As String
+    Public Desc As String
 
     Public Shared Function WithCollection(ByVal item As DonorDeferralItem) As SQLCollection
         Dim param As New SQLCollection()

@@ -150,7 +150,7 @@
             $("#leftMenu>div").hide();
 
             if (postAction) {
-
+                $("#data").H2GRemoveAttr("receiptHospitalID");
                 $("#data").H2GFill({ tmenu: $(xobj).H2GAttr("id"), lmenu: $(xobj).H2GAttr("lmenu") });
                 $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: $(xobj).H2GAttr("targetUrl"), method: "post" }).submit();
             } else {

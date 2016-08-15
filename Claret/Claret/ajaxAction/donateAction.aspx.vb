@@ -657,6 +657,8 @@ Public Class DonationExamination
     Public examination_id As String
     Public examination_desc As String
     Public question_id As String
+    Public examination_group_code As String
+    Public examination_code As String
 
     Public Shared Function WithCollection(ByVal item As DonationExamination) As SQLCollection
         Dim param As New SQLCollection()

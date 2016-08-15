@@ -20,6 +20,10 @@ Public Class planningAction
                 Call GetCountry()
             Case "getdepartmenttypeList"
                 Call GetCollectionCategory()
+            Case "getplanbyid"
+                Call GetPlanById()
+            Case "getsubcollectionedit"
+                Call GetSubCollectionEdit()
 
         End Select
 
@@ -188,6 +192,109 @@ Public Class planningAction
         End Try
     End Sub
 
+    Private Sub GetPlanById()
+        Try
+            Dim planId As String = _REQUEST("planid")
+            Dim getPlan As String = "SELECT c.*, cp.CODE as COLLECTION_POINT_CODE FROM collection_plan c inner join collection_point cp on c.COLLECTION_POINT_ID = cp.ID WHERE c.ID = '" & planId & "'"
+            Dim getPlanDetail As String = "SELECT D.ID, D.COLLECTION_PLAN_ID, D.COLLECTION_POINT_ID, D.TARGET_NUMBER, D.INVITE_NUMBER, D.DONATE_NUMBER, D.REFUSE_NUMBER, 
+                                           CP.CODE AS COLLECTION_POINT_CODE, CP.NAME, SUM(DV.ID) AS REGISDONATE 
+                                           FROM COLLECTION_PLAN_DETAIL D INNER JOIN COLLECTION_POINT CP ON D.COLLECTION_POINT_ID = CP.ID 
+                                           LEFT JOIN DONATION_VISIT DV ON D.COLLECTION_PLAN_ID = DV.COLLECTION_PLAN_ID AND D.COLLECTION_POINT_ID = DV.COLLECTION_POINT_ID 
+                                           WHERE D.COLLECTION_PLAN_ID = '" & planId & "' " &
+                                          "GROUP BY D.ID, D.COLLECTION_PLAN_ID, D.COLLECTION_POINT_ID, D.TARGET_NUMBER, D.INVITE_NUMBER, D.DONATE_NUMBER, D.REFUSE_NUMBER, 
+                                           CP.CODE, CP.NAME "
+            Dim GetEditData As New Getcollection_Edit_Data
+
+            Dim dtPlan As DataTable = Cbase.QueryTable(getPlan)
+            GetEditData.collection_plan = New List(Of Collection_Plan)
+            For Each dr As DataRow In dtPlan.Rows
+                Dim Item As New Collection_Plan
+                Item.id = dr("ID").ToString
+                Item.plan_date = dr("PLAN_DATE").ToString
+                Item.create_date = dr("CREATE_DATE").ToString
+                Item.create_staff = dr("CREATE_STAFF").ToString
+                Item.collection_point_id = dr("COLLECTION_POINT_ID").ToString
+                Item.name = dr("NAME").ToString
+                Item.location = dr("LOCATION").ToString
+                Item.address = dr("ADDRESS").ToString
+                Item.province = dr("PROVINCE").ToString
+                Item.zipcode = dr("ZIPCODE").ToString
+                Item.country_id = dr("COUNTRY_ID").ToString
+                Item.tel = dr("TEL").ToString
+                Item.fax = dr("FAX").ToString
+                Item.email = dr("EMAIL").ToString
+                Item.website = dr("WEBSITE").ToString
+                Item.association_id = dr("ASSOCIATION_ID").ToString
+                Item.collection_type = dr("COLLECTION_TYPE").ToString
+                Item.collection_category_id = dr("COLLECTION_CATEGORY_ID").ToString
+                Item.collection_mode = dr("COLLECTION_MODE").ToString
+                Item.site_id = dr("SITE_ID").ToString
+                Item.target_number = dr("TARGET_NUMBER").ToString
+                Item.invite_number = dr("INVITE_NUMBER").ToString
+                Item.donate_number = dr("DONATE_NUMBER").ToString
+                Item.refuse_number = dr("REFUSE_NUMBER").ToString
+                Item.status = dr("STATUS").ToString
+                Item.template = dr("TEMPLATE").ToString
+                Item.sub_district = dr("SUB_DISTRICT").ToString
+                Item.district = dr("DISTRICT").ToString
+                Item.mobile_1 = dr("MOBILE_1").ToString
+                Item.mobile_2 = dr("MOBILE_2").ToString
+                Item.tel_ext = dr("TEL_EXT").ToString
+                Item.start_time = dr("START_TIME").ToString
+                Item.end_time = dr("END_TIME").ToString
+                Item.collection_point_code = dr("COLLECTION_POINT_CODE").ToString
+
+                GetEditData.collection_plan.Add(Item)
+            Next
+
+            Dim dtPlanDetail As DataTable = Cbase.QueryTable(getPlanDetail)
+            GetEditData.collection_plan_detail = New List(Of Collection_Plan_Detail)
+            For Each dr As DataRow In dtPlanDetail.Rows
+                Dim Item As New Collection_Plan_Detail
+                Item.id = dr("ID").ToString
+                Item.collection_plan_id = dr("COLLECTION_PLAN_ID").ToString
+                Item.collection_point_id = dr("COLLECTION_POINT_ID").ToString
+                Item.target_number = dr("TARGET_NUMBER").ToString
+                Item.invite_number = dr("INVITE_NUMBER").ToString
+                Item.donate_number = dr("DONATE_NUMBER").ToString
+                Item.refuse_number = dr("REFUSE_NUMBER").ToString
+                Item.collection_point_code = dr("COLLECTION_POINT_CODE").ToString
+                Item.name = dr("NAME").ToString
+                Item.regisdonate = dr("REGISDONATE").ToString
+
+                GetEditData.collection_plan_detail.Add(Item)
+            Next
+
+            JSONResponse.setItems(JSON.Serialize(Of Getcollection_Edit_Data)(GetEditData))
+            Response.Write(JSONResponse.ToJSON())
+        Catch ex As Exception
+            Response.Write(New CallbackException(ex).ToJSON())
+        End Try
+    End Sub
+
+    Private Sub GetSubCollectionEdit()
+        Try
+            Dim sql As String = "select * from Collection_Point "
+            Dim dt As DataTable = Cbase.QueryTable(sql)
+            Dim subCollectionPointDataList = New List(Of Sub_Collection_Point)
+            For Each dr As DataRow In dt.Rows
+                Dim Item As New Sub_Collection_Point
+                Item.id = dr("ID").ToString
+                Item.label = dr("NAME").ToString
+                Item.code = dr("CODE").ToString
+                Item.name = dr("NAME").ToString
+
+                subCollectionPointDataList.Add(Item)
+            Next
+
+            JSONResponse.setItems(JSON.Serialize(Of List(Of Sub_Collection_Point))(subCollectionPointDataList))
+            Response.Write(JSONResponse.ToJSON())
+
+        Catch ex As Exception
+            Response.Write(New CallbackException(ex).ToJSON())
+        End Try
+    End Sub
+
 
 End Class
 
@@ -202,7 +309,6 @@ End Structure
 
 Public Structure PlanningLis
     Public id As String
-
 End Structure
 
 Public Structure Collection_Point
@@ -237,4 +343,66 @@ Public Structure Collection_Category
     Public code As String
     Public description As String
     Public hiig_code As String
+End Structure '
+
+Public Structure Collection_Plan_Detail
+    Public id As String
+    Public collection_plan_id As String
+    Public collection_point_id As String
+    Public target_number As String
+    Public invite_number As String
+    Public donate_number As String
+    Public refuse_number As String
+    Public collection_point_code As String
+    Public name As String
+    Public regisdonate As String
+End Structure
+
+Public Structure Collection_Plan
+    Public id As String
+    Public plan_date As String
+    Public create_date As String
+    Public create_staff As String
+    Public collection_point_id As String
+    Public name As String
+    Public location As String
+    Public address As String
+    Public province As String
+    Public zipcode As String
+    Public country_id As String
+    Public tel As String
+    Public fax As String
+    Public email As String
+    Public website As String
+    Public association_id As String
+    Public collection_type As String
+    Public collection_category_id As String
+    Public collection_mode As String
+    Public site_id As String
+    Public target_number As String
+    Public invite_number As String
+    Public donate_number As String
+    Public refuse_number As String
+    Public status As String
+    Public template As String
+    Public sub_district As String
+    Public district As String
+    Public mobile_1 As String
+    Public mobile_2 As String
+    Public tel_ext As String
+    Public start_time As String
+    Public end_time As String
+    Public collection_point_code As String
+End Structure
+
+Public Structure Getcollection_Edit_Data
+    Public collection_plan As List(Of Collection_Plan)
+    Public collection_plan_detail As List(Of Collection_Plan_Detail)
+End Structure
+
+Public Structure Sub_Collection_Point
+    Public id As String
+    Public label As String
+    Public name As String
+    Public code As String
 End Structure

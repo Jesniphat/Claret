@@ -10,8 +10,17 @@
     </style>
     <script src="../resources/javascript/page/planning.js" type="text/javascript"></script>
     <script>
+        var subDepartmentList = [];
+        var plan_edit_data = {};
+        var plan_detail_edit_data = [];
+        var plan_detail_list = [];
+        var sumExpectRegisterAmount = 0;
+        var sumRegisterAmount = 0;
+        var sumExpectDonationAmount = 0;
+        var sumDonationAmount = 0;
+        var sumExpectCdonationAmount = 0;
+        var sumCdonationAmount = 0;
         $(function () {
-
             $("#donateDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
                 // maxDate: new Date(),
                 minDate: "-100y",
@@ -46,6 +55,8 @@
             
             $("#txtDepartment").blur(function () { $("#ddlDepartment").val($("#txtDepartment").val().toUpperCase()).change(); });
             $("#txtRegion").blur(function () { $("#ddlRegion").val($("#txtRegion").val().toUpperCase()).change(); });
+
+            //$("#addSubDepartmentBt").click()
 
         });
 
@@ -261,18 +272,18 @@
                         <tbody>
                             <tr>
                                 <td>จำนวนผู้บริจารที่ลงทะเบียน</td>
-                                <td><input class="form-control" id="regisDonateExpect" value="" readonly /></td>
-                                <td><input class="form-control" id="regisDonateAmount" value="" readonly /></td>
+                                <td><input class="form-control" id="sumRegisDonateExpect" value="0" readonly /></td>
+                                <td><input class="form-control" id="sumRegisDonateAmount" value="0" readonly /></td>
                             </tr>
                             <tr>
                                 <td>ผู้บริจาคที่สามารถบริจาคโลหิตได้</td>
-                                <td><input class="form-control" id="canRegisDonateExpect" value="" readonly /></td>
-                                <td><input class="form-control" id="canRegisDonateAmount" value="" readonly /></td>
+                                <td><input class="form-control" id="sumCanRegisDonateExpect" value="0" readonly /></td>
+                                <td><input class="form-control" id="sumCanRegisDonateAmount" value="0" readonly /></td>
                             </tr>
                             <tr>
                                 <td>ผู้บริจาคที่ไม่สามารถบริจาคได้</td>
-                                <td><input class="form-control" id="cantRegisDonateExpect" value="" readonly /></td>
-                                <td><input class="form-control" id="cantRegisDonateAmount" value="" readonly /></td>
+                                <td><input class="form-control" id="sumCantRegisDonateExpect" value="0" readonly /></td>
+                                <td><input class="form-control" id="sumCantRegisDonateAmount" value="0" readonly /></td>
                             </tr>
                         </tbody>
                     </table>
@@ -316,23 +327,28 @@
                 <div class="col-md-4 text-center"></div>
             </div>
             <div class="row">
-                <div class="col-md-8"><input class="form-control" id="subDepartmentName" type="text" value="" /></div>
-                <div class="col-md-4 text-center"><input class="form-control" type="text" value="" /></div>
-                <div class="col-md-4 text-center"><input class="form-control" type="text" value="" /></div>
-                <div class="col-md-4 text-center"><input class="form-control" type="text" value="" /></div>
-                <div class="col-md-4 text-center"><input class="form-control" type="text" value="" /></div>
-                <div class="col-md-4 text-center"><input class="form-control" type="text" value="" /></div>
-                <div class="col-md-4 text-center"><input class="form-control" type="text" value="" /></div>
+                <div class="col-md-8">
+                    <%--<input class="form-control" id="subDepartmentName" type="text" value="" />--%>
+                    <select id="subDepartmentName" style="width:100%;">
+                        <option value="" >Loading...</option>
+                    </select>
+                </div>
+                <div class="col-md-4 text-center"><input class="form-control" id="expectRegisterAmount" type="text" value="" /></div>
+                <div class="col-md-4 text-center"><input class="form-control" id="registerAmount" type="text" value="" readonly /></div>
+                <div class="col-md-4 text-center"><input class="form-control" id="expectDonationAmount" type="text" value="" /></div>
+                <div class="col-md-4 text-center"><input class="form-control" id="donationAmount" type="text" value="" readonly /></div>
+                <div class="col-md-4 text-center"><input class="form-control" id="expectCdonationAmount" type="text" value="" /></div>
+                <div class="col-md-4 text-center"><input class="form-control" id="cDonationAmount" type="text" value="" readonly /></div>
                 <div class="col-md-4 text-center">
-                    <button class='btn btn-icon' id="addSubDepartmentBt" subdepartmentid="0" onclick='addSubDepartment(this);' tabindex='1'>
+                    <button class='btn btn-icon' id="addSubDepartmentBt" subdepartmentid="0" subdepartmentcode="" onclick='addSubDepartment(this);' tabindex='1'>
                         <i class='glyphicon glyphicon-circle-arrow-down'></i>
                     </button>
                 </div>
             </div>
             <div class="row" style="padding-bottom:10px;">
-                <table class="table table-striped">
+                <table class="table table-striped" id="departMentListTable">
                     <tbody>
-                        <tr>
+                       <%-- <tr>
                             <td class="col-md-8">John</td>
                             <td class="col-md-4 text-center">Doe</td>
                             <td class="col-md-4 text-center">10</td>
@@ -345,21 +361,7 @@
                                     <i class="glyphicon glyphicon-remove"></i>
                                 </button>
                             </td>
-                        </tr>
-                        <tr>
-                            <td class="col-md-8">Mary</td>
-                            <td class="col-md-4 text-center">Doe</td>
-                            <td class="col-md-4 text-center">10</td>
-                            <td class="col-md-4 text-center">10</td>
-                            <td class="col-md-4 text-center">10</td>
-                            <td class="col-md-4 text-center">10</td>
-                            <td class="col-md-4 text-center">10</td>
-                            <td class="col-md-4 text-center">
-                                <button class='btn btn-icon' tabindex='1'>
-                                    <i class="glyphicon glyphicon-remove"></i>
-                                </button>
-                            </td>
-                        </tr>
+                        </tr>--%>
                     </tbody>
                 </table>
             </div>

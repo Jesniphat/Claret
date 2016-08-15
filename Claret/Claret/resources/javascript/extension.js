@@ -496,9 +496,9 @@ $.extend($.fn, {
     },
     H2GRemoveAttr: function (nameList) {
         var nameList = nameList.split(",")
-        $.each((nameList), function (index, e) {
-            $(this).removeAttr(e);
-        });
+        for (i = 0; i < nameList.length; i++) {
+            $(this).removeAttr(nameList[i]);
+        }
         return this;
     },
 });

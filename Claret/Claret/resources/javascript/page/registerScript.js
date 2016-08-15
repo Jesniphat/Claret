@@ -43,7 +43,7 @@ function donorSelectDDL() {
         $("#ddlOccupation").setAutoListValue({
             url: '../../ajaxAction/masterAction.aspx',
             data: { action: 'occupation' },
-            defaultSelect: $("#ddlOccupation").H2GAttr("selectItem"),
+            defaultSelect: $("#ddlOccupation").H2GAttr("selectItem") || "1",
         }).on('autocompleteselect', function () {
             $("#ddlNationality").closest("div").focus();
         });
@@ -272,8 +272,8 @@ function validation() {
         $("#txtExtNumber").focus();
         notiWarning("กรุณากรอกข้อมูลบัตรผู้บริจาคอย่างน้อย 1 ใบ");
         return false;
-    } else if ($('#ddlTitleName').H2GValue() == "") {
-        $("#ddlTitleName").closest("div").focus();
+    } else if ($('#ddlTitleName').H2GValue() == null) {
+        $("#ddlTitleName").closest("div").find("input").focus();
         notiWarning("กรุณาเลือกคำนำหน้าชื่อผู้บริจาค");
         return false;
     } else if ($('#txtDonorName').H2GValue() == "") {
@@ -296,12 +296,12 @@ function validation() {
         $("#txtBirthday").focus();
         notiWarning("กรุณากรอกวันเกิดผู้บริจาค");
         return false;
-    } else if ($('#ddlOccupation').H2GValue() == "") {
-        $("#ddlOccupation").closest("div").focus();
+    } else if ($('#ddlOccupation').H2GValue() == null) {
+        $("#ddlOccupation").closest("div").find("input").focus();
         notiWarning("กรุณาเลือกอาชีพผู้บริจาค");
         return false;
-    } else if ($('#ddlNationality').H2GValue() == "") {
-        $("#ddlNationality").closest("div").focus();
+    } else if ($('#ddlNationality').H2GValue() == null) {
+        $("#ddlNationality").closest("div").find("input").focus();
         notiWarning("กรุณาเลือกสัญชาติผู้บริจาค");
         return false;
     } else if ($('#txtAddress').H2GValue() == "") {
@@ -323,6 +323,10 @@ function validation() {
     } else if ($('#txtZipcode').H2GValue() == "") {
         $("#txtZipcode").focus();
         notiWarning("กรุณากรอกรหัสไปรษณีย์ผู้บริจาค");
+        return false;
+    } else if ($('#ddlCountry').H2GValue() == null) {
+        $("#ddlCountry").closest("div").find("input").focus();
+        notiWarning("กรุณาเลือกประเทศผู้บริจาค");
         return false;
     } else if ($('#txtMobile1').H2GValue() == "") {
         $("#txtMobile1").focus();
@@ -485,7 +489,7 @@ function showDonorData() {
 
                 //### Deferral
                 if (data.getItems.Deferral.length > 0) {
-                    var dataView = $("#tbDeferral").H2GValue('');
+                    var dataView = $("#tbDeferral > tbody").H2GValue('');
                     $.each((data.getItems.Deferral), function (index, e) {
                         var dataRow = $("#tbDeferral > thead > tr.template-data").clone().show();
                         if (e.Status == "INACTIVE") { dataRow.hide(); }
@@ -498,7 +502,7 @@ function showDonorData() {
                     });
                 }
 
-                //### Deferral
+                //### Visit Info
                 $.each((data.getItems.DonationType), function (index, e) {
                     var span = $("span[donationCode=" + e.Code + "]");
                     if (span) { $(span).H2GValue('บริจาคล่าสุดเมื่อ ' + e.LastDate); }
@@ -562,12 +566,93 @@ function showDonorData() {
                     }
                     $('#divDonateRecord').prepend(spRecord).H2GAttr("lastrecord", e.DonateNumber);
                 });
+                
+                //### Donation Question
+                if (data.getItems.QuestionList.length > 0) {
+                    $('#tbQuestionnaire > tbody').H2GValue("");
+                    $.each((data.getItems.QuestionList), function (index, e) {
+                        var dataRow = $("#tbQuestionnaire > thead > tr.template-data").clone().show();
+                        $(dataRow).H2GFill({
+                            refID: e.ID,
+                            questID: e.QuestionID,
+                            questCode: e.QuestionCode,
+                            questAnswerType: e.AnswerType,
+                            questPreset: e.Preset,
+                            fromQuestion: e.ParentID,
+                            questDesc: e.QuestionDesc,
+                            questDescTH: e.QuestionDescTH,
+                        });
+                        $(dataRow).find(".td-question span").H2GValue(e.QuestionDesc);
+                        if (e.AnswerType == "PRESET") {
+                            var selectPreset = $(dataRow).find(".td-answer select").show();
+                            var preset = e.Preset.split(",");
+                            preset.sort();
+                            $("<option>", { value: '', text: 'กรุณาเลือก' }).appendTo(selectPreset);
+                            $.each((preset), function (indexs, es) {
+                                $("<option>", { value: es, text: es }).appendTo(selectPreset);
+                            });
+                            $(selectPreset).setDropdownList().H2GValue(e.Answer).change().on('change', function () {
+                                //ให้เอาคำตอบไปหาคำถามต่อไป
+                                selectNextQuestion($(this).closest("tr").H2GAttr("questID"), $(this).H2GValue());
+                            });
+                        } else {
+                            $(dataRow).find(".td-answer input").show().H2GValue(e.Answer);
+                            if (e.AnswerType == "DATE") {
+                                $(dataRow).find(".td-answer input").setCalendar({
+                                    maxDate: "+100y",
+                                    minDate: "-100y",
+                                    yearRange: "c-50:c+50",
+                                });
+                            }
+                        }
+                        $("#tbQuestionnaire > tbody").append(dataRow);
+                    });
+                }
 
+                //### Donor Deferral
+                $('#tbDefInterview > tbody').H2GValue("");
+                $.each((data.getItems.DonorDeferral), function (index, er) {
+                    var dataRow = $("#tbDefInterview > thead > tr.template-data").clone().show();
+                    $(dataRow).H2GFill({
+                        refID: er.ID,
+                        detailID: er.DetailID,
+                        defID: er.DeferralID,
+                        defType: er.DeferralType,
+                        defDuration: er.Duration,
+                        defStartDate: er.StartDate,
+                        defEndDate: er.EndDate,
+                        defRemarks: er.Note,
+                        questID: er.QuestionID,
+                    });
+                    
+                    $(dataRow).find('.td-description').append(er.Desc).H2GAttr("title", er.Desc);
+                    $(dataRow).find('.td-enddate').append('วันที่สิ้นสุด ' + formatDate(new Date(getDateFromFormat(er.EndDate, 'dd/mm/yyyy')), "dd NNN yyyy")).H2GAttr("title", 'วันที่สิ้นสุด ' + formatDate(new Date(getDateFromFormat(er.EndDate, 'dd/mm/yyyy')), "dd NNN yyyy"));
+                    $("#tbDefInterview > tbody").append(dataRow);
+                });
+
+                //### Donation Examination
+                $('#tbExam > tbody').H2GValue("");
+                $.each((data.getItems.DonationExam), function (index, e) {
+                    var dataRow = $("#tbExam > thead > tr.template-data").clone().show();
+                    $(dataRow).H2GFill({
+                        refID: e.id,
+                        examID: e.examination_id,
+                        examCode: e.examination_code,
+                        desc: e.examination_desc,
+                        groupID: e.examination_group_id,
+                        groupCode: e.examination_group_code,
+                        groupDesc: e.examination_group_desc,
+                        questID: e.question_id,
+                    });
+                    $(dataRow).find('.td-exam').append(e.examination_code + ' : ' + e.examination_desc).H2GAttr("title", e.examination_code + ' : ' + e.examination_desc);
+                    $("#tbExam > tbody").append(dataRow);
+                });
+                
                 if (!(data.getItems.Donor.DuplicateTransaction == "0")) {
                     alert("วันนี้คุณ " + data.getItems.Donor.Name + " " + data.getItems.Donor.Surname + "  ทำการลงทะเบียนไปแล้ว " + data.getItems.Donor.DuplicateTransaction + " ครั้ง");
                 }
                 if ($("#spRegisNumber").H2GAttr("visitID") != undefined) { $("#btnSave").H2GValue("บันทึก"); }
-
+                $("#txtCardNumber").focus();
             } else { }
             donorSelectDDL();
             $("#btnSave").prop("disabled", false);

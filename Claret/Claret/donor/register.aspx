@@ -99,7 +99,7 @@
                 yearRange: "c-50:c+50",
                 onSelect: function (selectedDate, objDate) { $("#txtDonorComment").focus(); },
             });
-            $("#txtDonorComment").enterKey(function () { $(this).addComment(); }).focus();
+            $("#txtDonorComment").enterKey(function () { $(this).addComment(); });
             $("#togCardNumber").click(function () {
                 if (parseInt($("#divCardNumber").H2GAttr("min-height")) < parseInt($("#divCardNumber").height())) {
                     $("#divCardNumber").css({ height: 30 });
@@ -112,11 +112,12 @@
             $("#ddlExtCard").setAutoListValue({
                 url: '../../ajaxAction/masterAction.aspx',
                 data: { action: 'externalcard' },
+                defaultSelect: '3',
                 selectItem: function () {
                     var cardNumber = $('#divCardNumber div[extID="' + $("#ddlExtCard").H2GValue() + '"]').H2GAttr('cardNumber');
                     $("#txtCardNumber").H2GValue(cardNumber || '');
                 },
-            }, "3");
+            });
             $("#ddlExtCard").on('autocompleteselect', function () {
                 var cardNumber = $('#divCardNumber div[extID="' + $(this).H2GValue() + '"]').H2GAttr('cardNumber');
                 $("#txtCardNumber").H2GValue(cardNumber || '').focus();
@@ -144,7 +145,6 @@
 
             //#### Default donor info from id
             if ($("#data").H2GAttr("receiptHospitalID")) {
-                console.log($("#data").H2GAttr("receiptHospitalID"), $("#data").H2GAttr("visitID"));
                 $.ajax({
                     url: '../../ajaxAction/qualityAction.aspx',
                     data: {
@@ -160,17 +160,19 @@
                     success: function (data) {
                         if (!data.onError) {
                             data.getItems = jQuery.parseJSON(data.getItems);
-                            console.log(data.getItems);
                             $("#divReceiptHospital").show();
                             $("#spReceiptHospital").H2GValue(data.getItems.HospitalName + " รายการที่ " + data.getItems.QueueCount + "/" + data.getItems.QueueTotal);
                         }
                     }
                 });    //End ajax
             }
+
             if ($("#data").H2GAttr("donorID") != undefined) {
+                //# Edit
                 if ($("#data").H2GAttr("visitID") != undefined) { $("#spRegisNumber").H2GAttr("visitID", $("#data").H2GAttr("visitID")); }
                 showDonorData();
             } else {
+                //# New
                 $("#txtDonorName").H2GValue($("#data").H2GAttr("donorName") || "");
                 $("#txtDonorSurName").H2GValue($("#data").H2GAttr("donorSurname") || "");
                 $("#txtBirthDay").H2GValue($("#data").H2GAttr("birthday") || "");
@@ -339,7 +341,7 @@
                 },
                 latinNameChange: function (args) {
                     if ($(this).is(':checked')) {
-                        $("#txtDonorNameEng").H2GEnable();
+                        $("#txtDonorNameEng").H2GEnable().focus();
                         $("#txtDonorSurNameEng").H2GEnable();
                     } else {
                         $("#txtDonorNameEng").H2GDisable();
@@ -377,6 +379,11 @@
                         }
                     }
                 },
+                selectHistoryDonate: function (args) {
+                    $("#data").H2GAttr("visitID", $(this).closest("tr").H2GAttr("refID"));
+                    $("#spRegisNumber").H2GAttr("visitID", $(this).closest("tr").H2GAttr("refID"));
+                    showDonorData();
+                },
             });
 
             showVisitHistory();
@@ -390,15 +397,16 @@
 
             // menu control
             if ($("#data").H2GAttr("lmenu") == "lmenuDonorRegis") {
-                $("#infoTabToday").tabs("option", "disabled", [1]);
-            } else if ($("#data").H2GAttr("lmenu") == "lmenuInterview") {
+                $("#infoTabToday").tabs("option", "disabled", [2]);
+            } else if ($("#data").H2GAttr("lmenu") == "lmenuInterview" || $("#data").H2GAttr("lmenu") == "lmenuHistoryReport") {
                 lookupTabQuestionaire();
             } else if ($("#data").H2GAttr("lmenu") == "lmenuDonate") {
-                $("#infoTabToday").tabs("option", "disabled", [1]);
+                $("#infoTabToday").tabs("option", "disabled", [2]);
             } else if ($("#data").H2GAttr("lmenu") == "lmenuHistoryReport") {
-                $("#infoTabToday").tabs("option", "disabled", [1]);
+                //$("#infoTabToday").tabs("option", "disabled", [1]);
             } else if ($("#data").H2GAttr("lmenu") == "lmenulabRegis") {
                 $(".mandatory-interview").hide();
+                lookupTabQuestionaire();
             }
         });
 
@@ -497,7 +505,9 @@
                         $("#tbQuestionnaire").data("data-questionnaire", data.getItems.QuestionItem)
                         $("#tbQuestionnaire").data("data-answer", data.getItems.AnswerItem)
                         // initial question
-                        genQuestion('3');
+                        if ($("#tbQuestionnaire > tbody > tr").length == 0) {
+                            genQuestion('3');
+                        }
                     }
                 }
             });
@@ -548,7 +558,6 @@
                             var notiInject = "";
                             if (!data.onError) {
                                 data.getItems = jQuery.parseJSON(data.getItems);
-                                console.log(data.getItems);
                                 $.each((data.getItems), function (index, e) {
                                     if ($("#tbExam > tbody > tr.template-data[examCode='" + e.Code + "']").length > 0) {
                                         // 1 ถ้า exam ที่เพิ่มเข้ามาซ้ำ และไม่มีกลุ่มจะไม่เพิ่มและแจ้งซ้ำ
@@ -559,13 +568,29 @@
                                             notiInject += e.Code + ", ";
                                             $("#tbExam > tbody > tr.template-data[examCode='" + e.Code + "']").remove();
                                             var dataRow = $("#tbExam > thead > tr.template-data").clone().show();
-                                            $(dataRow).H2GFill({ examID: e.ID, examCode: e.Code, desc: e.Description, groupID: e.GroupID, groupCode: e.GroupCode, groupDesc: e.GroupDescription, questID: questID });
+                                            $(dataRow).H2GFill({
+                                                examID: e.ID,
+                                                examCode: e.Code,
+                                                examDesc: e.Description,
+                                                groupID: e.GroupID,
+                                                groupCode: e.GroupCode,
+                                                groupDesc: e.GroupDescription,
+                                                questID: questID
+                                            });
                                             $(dataRow).find('.td-exam').append(e.Code + ' : ' + e.Description).H2GAttr("title", e.Code + ' : ' + e.Description);
                                             $(dataView).append(dataRow);
                                         }
                                     } else {
                                         var dataRow = $("#tbExam > thead > tr.template-data").clone().show();
-                                        $(dataRow).H2GFill({ examID: e.ID, examCode: e.Code, desc: e.Description, groupID: e.GroupID, groupCode: e.GroupCode, groupDesc: e.GroupDescription, questID: questID });
+                                        $(dataRow).H2GFill({
+                                            examID: e.ID,
+                                            examCode: e.Code,
+                                            examDesc: e.Description,
+                                            groupID: e.GroupID,
+                                            groupCode: e.GroupCode,
+                                            groupDesc: e.GroupDescription,
+                                            questID: questID
+                                        });
                                         $(dataRow).find('.td-exam').append(e.Code + ' : ' + e.Description).H2GAttr("title", e.Code + ' : ' + e.Description);
                                         $(dataView).append(dataRow);
                                     }
@@ -741,6 +766,7 @@
                             }
                         });
                     });
+
                 }
             }         
         }
@@ -757,7 +783,6 @@
         function addExamByQuestion(examID, questID) {
             examID = examID || "";
             if (examID != "") {
-                console.log(examID);
                 examID = examID.split(",");
                 $.each((examID), function (index, e) {
                     if (e != "") {
@@ -815,7 +840,7 @@
                 <input id="txtCardNumber" type="text" class="form-control" tabindex="1" />
             </div>
             <div class="col-md-2">
-                <button id="spInsertExtCard" class="btn btn-icon" onclick="return false;" tabindex="1">
+                <button id="spInsertExtCard" class="btn btn-icon" onclick="return false;" tabindex="-1">
                     <i class="glyphicon glyphicon-circle-arrow-right"></i>
                 </button>
             </div>
@@ -1119,7 +1144,7 @@
                                         <td class="text-center">
                                             <div>
                                                 <a class="icon">
-                                                    <span class="glyphicon glyphicon-arrow-right" aria-hidden="true" onclick="return false;"></span>
+                                                    <span class="glyphicon glyphicon-arrow-right" aria-hidden="true" onclick="return $(this).selectHistoryDonate();"></span>
                                                 </a>
                                             </div>
                                         </td>
@@ -1138,8 +1163,8 @@
                         <div id="infoTabToday">
                             <ul>
                                 <li><a href="#subHistoryPane" style="">ข้อมูลทั่วไป</a></li>
-                                <li><a href="#subInterview" style="">คัดกรอง</a></li>
                                 <li><a href="#synthesis" style="" id="synthesisLink">Synthesis</a></li>
+                                <li><a href="#subInterview" style="">คัดกรอง</a></li>
                             </ul>
                             <div id="subHistoryPane">
                                 <div class="border-box">
@@ -1273,7 +1298,7 @@
                                                             <input id="txtLastDonateDate" type="text" class="form-control text-center" tabindex="3" />
                                                         </div>
                                                         <div class="col-md-2 text-center">
-                                                            <button id="spAddDonateRecord" class="btn btn-icon" onclick="return false;" tabindex="3">
+                                                            <button id="spAddDonateRecord" class="btn btn-icon" onclick="return false;" tabindex="-1">
                                                                 <i class="glyphicon glyphicon-circle-arrow-down" style="vertical-align: text-top;"></i>
                                                             </button>
                                                         </div>
@@ -1411,13 +1436,13 @@
                                                             <span>ความดัน</span>
                                                         </div>
                                                         <div class="col-md-4">
-                                                            <input id="txtPresureMax" type="text" class="form-control required text-right" />
+                                                            <input id="txtPresureMax" type="text" class="form-control required text-right" placeholder="สูงสุด" />
                                                         </div>
                                                         <div class="col-md-2 text-center">
                                                             <span>/</span>
                                                         </div>
                                                         <div class="col-md-4">
-                                                            <input id="txtPresureMin" type="text" class="form-control required text-right" />
+                                                            <input id="txtPresureMin" type="text" class="form-control required text-right" placeholder="ต่ำสุด" />
                                                         </div>
                                                         <div class="col-md-15 text-right">
                                                             <span>การตรวจหัวใจและปอด</span>
@@ -2126,7 +2151,7 @@
                     <input id="txtDonorComment" type="text" class="form-control"  tabindex="4" />
                 </div>
                 <div class="col-md-1 text-center">
-                    <button id="spAddComment" class="btn btn-icon" onclick="return false;" tabindex="4">
+                    <button id="spAddComment" class="btn btn-icon" onclick="return false;" tabindex="-1">
                         <i class="glyphicon glyphicon-circle-arrow-down"></i>
                     </button>
                 </div>
