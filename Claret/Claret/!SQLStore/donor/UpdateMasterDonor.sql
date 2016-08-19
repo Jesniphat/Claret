@@ -13,6 +13,7 @@ update donor set
 , Country_ID = :Country_ID
 , Occupation_ID = :Occupation_ID
 , Nationality_ID = :Nationality_ID
+, Association_ID = :Association_ID
 , Race_ID = :Race_ID
 , Tel_Mobile1 = :Tel_Mobile1
 , Tel_Mobile2 = :Tel_Mobile2
@@ -23,6 +24,6 @@ update donor set
 , Visit_Number = :Visit_Number
 , Donate_Number_Ext = :Donate_Number_Ext
 , Update_Date = sysdate
-, Update_Staff = :Create_Staff
+, Update_Staff = :update_staff
 , Birthday = :Birthday
 where id = :id

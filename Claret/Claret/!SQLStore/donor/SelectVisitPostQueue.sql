@@ -5,9 +5,9 @@ FROM (
         FROM (
             SELECT dn.* 
                 FROM (
-		select DV.id as visit_id, DN.id as donor_id, DV.QUEUE_NUMBER, DN.name || ' '  || DN.SURNAME as name
+						select DV.id as visit_id, DN.id as donor_id, DV.QUEUE_NUMBER, DN.name || ' '  || DN.SURNAME as name
                         , DV.SAMPLE_NUMBER, DV.COMMENT_TEXT, to_char(nvl(DV.VISIT_DATE,dv.create_date),'HH24,MI') as regis_time
-                        , st.code as regis_staff, to_char(dv.INTERVIEW_DATE,'HH24,MI') as INTERVIEW_time, dv.INTERVIEW_STAFF
+                        , st.code as regis_staff, to_char(dv.INTERVIEW_DATE,'HH24,MI') as INTERVIEW_time, si.code as INTERVIEW_STAFF
                         , '' as collection_time, '' as collection_staff, '' as lab_time, '' as lab_staff
                         from DONATION_VISIT dv
                         inner join donor dn on DN.id = DV.DONOR_ID
@@ -15,6 +15,7 @@ FROM (
                         left join external_card ec on ec.id = dexc.external_card_id
                         left join rh_group rg on rg.id = dn.rh_group_id
                         left join staff st on st.id = dv.create_staff
+                        left join staff si on si.id = dv.INTERVIEW_STAFF
                         where 1=1 /*#REPORT_DATE*/ /*#STATUS*/
                         /*#QUEUE_NUMBER*/ /*#DONOR_NUMBER*/ /*#NATION_NUMBER*/ /*#NAME*/ /*#SURNAME*/ 
                         /*#BIRTHDAY*/ /*#BLOOD_GROUP*/ 

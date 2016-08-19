@@ -365,3 +365,8 @@ div > button > i[class^="icon-"]:hover, div > button > i[class*=" icon-"]:hover 
 .selecte-box-custom > option {
     background-color:#FFFFFF;
 }
+table.table-dis-input > tbody input[type=text] {
+    background-color: transparent;
+    border: 0;
+    width:100%;
+}

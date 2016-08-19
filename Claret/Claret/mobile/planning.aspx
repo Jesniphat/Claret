@@ -7,6 +7,17 @@
         .table > tbody > tr > td {
             padding: 7px 5px;
         }
+        .border-top-left {
+            border-top: solid 1px #ccc;
+            border-left: solid 1px #ccc;
+        }
+        .out-padding-top-botton {
+            padding-top: 0px;
+            padding-bottom: 0px;
+        }
+        .border-lefts {
+            border-left: solid 1px #ccc;
+        }
     </style>
     <script src="../resources/javascript/page/planning.js" type="text/javascript"></script>
     <script>
@@ -20,8 +31,24 @@
         var sumDonationAmount = 0;
         var sumExpectCdonationAmount = 0;
         var sumCdonationAmount = 0;
+        var hasPlanDetailList = [];
+        var HaveDonation = false;
         $(function () {
-            $("#donateDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
+            //$("#ui-datepicker-div").block();
+            $("#donateDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().prop('readonly', true).setCalendar({
+                // maxDate: new Date(),
+                //minDate: "-1d",
+                yearRange: "c-100:c+0",
+                onSelect: function (selectedDate, objDate) {
+                    // $("#txtHospital").focus();
+                    //getDornorHospitalList(selectedDate);
+                    //if ($("#data").attr("donateaction") == "edit") {
+                    //    _clareFunction()
+                    //}
+                },
+            });
+
+            $("#txtStartRemarakDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().prop('readonly', true).setCalendar({
                 // maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+0",
@@ -31,17 +58,7 @@
                 },
             });
 
-            $("#txtStartDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
-                // maxDate: new Date(),
-                minDate: "-100y",
-                yearRange: "c-100:c+0",
-                onSelect: function (selectedDate, objDate) {
-                    // $("#txtHospital").focus();
-                    //getDornorHospitalList(selectedDate);
-                },
-            });
-
-            $("#txtLastDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
+            $("#txtLastRemarakDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().prop('readonly', true).setCalendar({
                 // maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+0",
@@ -57,6 +74,16 @@
             $("#txtRegion").blur(function () { $("#ddlRegion").val($("#txtRegion").val().toUpperCase()).change(); });
 
             //$("#addSubDepartmentBt").click()
+            $.mask.definitions['2'] = '[012]';
+            $.mask.definitions['3'] = '[0123456789]';
+            $.mask.definitions['5'] = '[012345]';
+            $.mask.definitions['9'] = '[0123456789]';
+            $("#donationTime").mask("23:59");
+            $("#donationTimeUse").mask("23:59");
+
+            $("#save").click(savePlanning);
+
+            //$("#donateDate").focus();
 
         });
 
@@ -66,7 +93,7 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="cphMaster" runat="server">
     <div class="claret-page-header row">
         <div class="col-md-36" style="font-size:larger; font-weight:bold;">
-            <span>สร้างแผนการดำเนินงาน > เพิ่มแผนงานการรับบริจาค</span>
+            <span>แผนการดำเนินงาน > ข้อมูลแผนการดำเนินงาน</span>
         </div>
     </div>
     <div class="row" id="firstRowDate" style="padding-right:2px;">
@@ -76,7 +103,7 @@
                     <span>วันที่รับบริจาค </span>
                 </div>
                 <div class="col-md-15">
-                    <input class="form-control required" id="donateDate" type="text" value="" />
+                    <input class="form-control required" id="donateDate" type="text" value="" tabindex="1" />
                 </div>
             </div>
             <div class="col-md-16">
@@ -85,7 +112,7 @@
                     สถานะ
                 </div>
                 <div class="col-md-6">
-                    <select id="planningStatus" class="selecte-box-custom required">
+                    <select id="planningStatus" class="selecte-box-custom required" tabindex="2">
                         <option selected="selected" value="ACTIVE">ACTIVE</option>
                         <option value="INACTIVE">INACTIVE</option>
                     </select>
@@ -106,10 +133,10 @@
                 <div class="row">
                     <div class="col-md-7"><span>ภาค</span></div>
                     <div class="col-md-5" style="text-align:right;padding-right: 0;">
-                        <input id="txtRegion" type="text" class="form-control required" placeholder="ภาค" />
+                        <input id="txtRegion" type="text" class="form-control required" placeholder="ภาค" tabindex="3" />
                     </div>
                     <div class="col-md-17" style="padding-left: 5px;">
-                        <select id="ddlRegion" class="required text-left" style="width:100%;" tabindex="-1">
+                        <select id="ddlRegion" class="required text-left" style="width:100%;" tabindex="4">
                             <option value="0">Loading...</option>
                         </select>
                     </div>
@@ -117,10 +144,10 @@
                 <div class="row">
                     <div class="col-md-7"><span>รหัสหน่วย</span></div>
                     <div class="col-md-5" style="text-align:right;padding-right: 0;">
-                        <input id="txtDepartment" type="text" class="form-control required" placeholder="หน่วยงาน" />
+                        <input id="txtDepartment" type="text" class="form-control required" placeholder="หน่วยงาน" tabindex="5" />
                     </div>
                     <div class="col-md-17" style="padding-left: 5px;">
-                        <select id="ddlDepartment" class="required text-left" style="width:100%;" tabindex="-1">
+                        <select id="ddlDepartment" class="required text-left" style="width:100%;" tabindex="6">
                             <option value="0">Loading...</option>
                         </select>
                     </div>
@@ -128,33 +155,33 @@
                 <div class="row">
                     <div class="col-md-7"><span>สถานที่ตั้ง</span></div>
                     <div class="col-md-12">
-                        <input class="form-control" id="departmentLocation" type="text" value="" readonly/>
+                        <input class="form-control" id="departmentLocation" type="text" value="" readonly disabled/>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-7"><span>ที่อยู่</span></div>
                     <div class="col-md-29">
-                        <textarea class="form-control" id="departmentAddr" readonly></textarea>
+                        <textarea class="form-control" id="departmentAddr" readonly disabled></textarea>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-7"><span>แขวง/ตำบล</span></div>
                     <div class="col-md-11">
-                        <input class="form-control" id="departmentSubDistrict" type="text" value="" readonly/>
+                        <input class="form-control" id="departmentSubDistrict" type="text" value="" readonly disabled />
                     </div>
                     <div class="col-md-7" style="padding-left: 32px;"><span>เขต/อำเภอ</span></div>
                     <div class="col-md-11">
-                        <input class="form-control" id="departmentDistrict" type="text" value="" readonly/>
+                        <input class="form-control" id="departmentDistrict" type="text" value="" readonly disabled />
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-7"><span>จังหวัด</span></div>
                     <div class="col-md-11">
-                        <input class="form-control" id="departmentProvince" type="text" value="" readonly/>
+                        <input class="form-control" id="departmentProvince" type="text" value="" readonly disabled />
                     </div>
                     <div class="col-md-7" style="padding-left: 32px;"><span>รหัสไปรษณีย์</span></div>
                     <div class="col-md-11">
-                        <input class="form-control" id="departmentZipcode" type="text" value="" readonly/>
+                        <input class="form-control" id="departmentZipcode" type="text" value="" readonly disabled/>
                     </div>
                 </div>
                 <div class="row">
@@ -174,27 +201,27 @@
                 <div class="row">
                     <div class="col-md-7"><span>เบอร์มือถือ 1</span></div>
                     <div class="col-md-11">
-                        <input class="form-control" id="departmentMobile1" type="text" value="" readonly/>
+                        <input class="form-control" id="departmentMobile1" type="text" value="" readonly disabled/>
                     </div>
                     <div class="col-md-7" style="padding-left: 32px;"><span>Email</span></div>
                     <div class="col-md-11">
-                        <input class="form-control" id="departmentEmail" type="text" value="" readonly/>
+                        <input class="form-control" id="departmentEmail" type="text" value="" readonly disabled/>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-7"><span>เบอร์มือถือ 2</span></div>
                     <div class="col-md-11">
-                        <input class="form-control" id="departmentMobile2" type="text" value="" readonly/>
+                        <input class="form-control" id="departmentMobile2" type="text" value="" readonly disabled/>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-7"><span>เบอร์ที่ทำงาน</span></div>
                     <div class="col-md-11">
-                        <input class="form-control" id="departmentTel" type="text" value="" readonly/>
+                        <input class="form-control" id="departmentTel" type="text" value="" readonly disabled/>
                     </div>
                     <div class="col-md-7" style="padding-left: 32px;"><span>เบอร์ต่อ</span></div>
                     <div class="col-md-11">
-                        <input class="form-control" id="departmentTelMore" type="text" value="" readonly/>
+                        <input class="form-control" id="departmentTelMore" type="text" value="" readonly disabled/>
                     </div>
                 </div>
             </div>
@@ -207,7 +234,7 @@
                 <div class="row">
                     <div class="col-md-9"><span>ประเภทงาน</span></div>
                     <div class="col-md-27">
-                        <input class="form-control" id="workType" type="text" value="" readonly/>
+                        <input class="form-control" id="workType" type="text" value="" readonly disabled/>
                         <%--<select id="workType" class="selecte-box-custom" style="background-color: #eeeeee;" disabled>
                             <option value="" >ALL</option>
                             <option value="MOBILE SITE">MOBILE SITE</option>
@@ -229,9 +256,9 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-9"><span>ประรถ</span></div>
+                    <div class="col-md-9"><span>ประเภทรถ</span></div>
                     <div class="col-md-27">
-                        <input class="form-control" id="carType" type="text" value="" readonly/>
+                        <input class="form-control" id="carType" type="text" value="" readonly disabled />
                         <%--<select id="cartType" class="selecte-box-custom" style="background-color: #eeeeee;" disabled>
                             <option value="" >ALL</option>
                             <option value="MOBILE SITE">MOBILE SITE</option>
@@ -248,11 +275,11 @@
                 <div class="row">
                     <div class="col-md-11"><span>เวลารับบริจาค</span></div>
                     <div class="col-md-7">
-                        <input class="form-control required" id="donationTime" type="text" value="" />
+                        <input class="form-control required" id="donationTime" type="text" tabindex="7" />
                     </div>
                     <div class="col-md-11" style="padding-left: 32px;"><span>เวลาสิ้นสุดรับบริจาค</span></div>
                     <div class="col-md-7">
-                        <input class="form-control required" id="donationTimeUse" type="text" value="" />
+                        <input class="form-control required" id="donationTimeUse" type="text" tabindex="8" />
                     </div>
                 </div>
             </div>
@@ -271,19 +298,19 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>จำนวนผู้บริจารที่ลงทะเบียน</td>
-                                <td><input class="form-control" id="sumRegisDonateExpect" value="0" readonly /></td>
-                                <td><input class="form-control" id="sumRegisDonateAmount" value="0" readonly /></td>
+                                <td>จำนวนผู้บริจาคที่ลงทะเบียน</td>
+                                <td><input class="form-control" id="sumRegisDonateExpect" value="0" readonly disabled /></td>
+                                <td><input class="form-control" id="sumRegisDonateAmount" value="0" readonly disabled /></td>
                             </tr>
                             <tr>
                                 <td>ผู้บริจาคที่สามารถบริจาคโลหิตได้</td>
-                                <td><input class="form-control" id="sumCanRegisDonateExpect" value="0" readonly /></td>
-                                <td><input class="form-control" id="sumCanRegisDonateAmount" value="0" readonly /></td>
+                                <td><input class="form-control" id="sumCanRegisDonateExpect" value="0" readonly disabled /></td>
+                                <td><input class="form-control" id="sumCanRegisDonateAmount" value="0" readonly disabled /></td>
                             </tr>
                             <tr>
                                 <td>ผู้บริจาคที่ไม่สามารถบริจาคได้</td>
-                                <td><input class="form-control" id="sumCantRegisDonateExpect" value="0" readonly /></td>
-                                <td><input class="form-control" id="sumCantRegisDonateAmount" value="0" readonly /></td>
+                                <td><input class="form-control" id="sumCantRegisDonateExpect" value="0" readonly disabled /></td>
+                                <td><input class="form-control" id="sumCantRegisDonateAmount" value="0" readonly disabled /></td>
                             </tr>
                         </tbody>
                     </table>
@@ -299,54 +326,54 @@
                     <span>หน่วยงานย่อย</span>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-8 text-left">
+            <div class="row" style="padding-top:2px; padding-bottom:0px; margin-right: 0px;">
+                <div class="col-md-8 text-left border-top-left">
                     ชื่อหน่วยงานย่อย
                 </div>
-                <div class="col-md-8 text-center">
+                <div class="col-md-8 text-center border-top-left">
                     จำนวนผู้บริจาคที่ลงทะเบียน
                 </div>
-                <div class="col-md-8 text-center">
-                    ผู้บริจาคที่สามรถบริจาคโลหิตได้
+                <div class="col-md-8 text-center border-top-left">
+                    ผู้บริจาคที่สามารถบริจาคโลหิตได้
                 </div>
-                <div class="col-md-8 text-center">
+                <div class="col-md-8 text-center border-top-left">
                     ผู้บริจาคที่ไม่สามารถบริจาคโลหิตได้
                 </div>
-                <div class="col-md-4 text-center">
-                    
+                <div class="col-md-4 text-center border-top-left" style="border-right:solid 1px #ccc">
+                    &nbsp;
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-8"></div>
-                <div class="col-md-4 text-center">จำนวนที่คาดหวัง</div>
-                <div class="col-md-4 text-center">ผู้บริจาค</div>
-                <div class="col-md-4 text-center">จำนวนที่คาดหวัง</div>
-                <div class="col-md-4 text-center">ผู้บริจาค</div>
-                <div class="col-md-4 text-center">จำนวนที่คาดหวัง</div>
-                <div class="col-md-4 text-center">ผู้บริจาค</div>
-                <div class="col-md-4 text-center"></div>
+            <div class="row out-padding-top-botton" style="margin-right: 0px;">
+                <div class="col-md-8 border-top-left">&nbsp;</div>
+                <div class="col-md-4 text-center border-top-left">จำนวนที่คาดหวัง</div>
+                <div class="col-md-4 text-center border-top-left">ผู้บริจาค</div>
+                <div class="col-md-4 text-center border-top-left">จำนวนที่คาดหวัง</div>
+                <div class="col-md-4 text-center border-top-left">ผู้บริจาค</div>
+                <div class="col-md-4 text-center border-top-left">จำนวนที่คาดหวัง</div>
+                <div class="col-md-4 text-center border-top-left">ผู้บริจาค</div>
+                <div class="col-md-4 text-center border-top-left" style="border-right:solid 1px #ccc">&nbsp;</div>
             </div>
-            <div class="row">
-                <div class="col-md-8">
+            <div class="row out-padding-top-botton" style="margin-right: 0px;">
+                <div class="col-md-8 border-top-left">
                     <%--<input class="form-control" id="subDepartmentName" type="text" value="" />--%>
-                    <select id="subDepartmentName" style="width:100%;">
+                    <select id="subDepartmentName" style="width:100%;" tabindex="9">
                         <option value="" >Loading...</option>
                     </select>
                 </div>
-                <div class="col-md-4 text-center"><input class="form-control" id="expectRegisterAmount" type="text" value="" /></div>
-                <div class="col-md-4 text-center"><input class="form-control" id="registerAmount" type="text" value="" readonly /></div>
-                <div class="col-md-4 text-center"><input class="form-control" id="expectDonationAmount" type="text" value="" /></div>
-                <div class="col-md-4 text-center"><input class="form-control" id="donationAmount" type="text" value="" readonly /></div>
-                <div class="col-md-4 text-center"><input class="form-control" id="expectCdonationAmount" type="text" value="" /></div>
-                <div class="col-md-4 text-center"><input class="form-control" id="cDonationAmount" type="text" value="" readonly /></div>
-                <div class="col-md-4 text-center">
-                    <button class='btn btn-icon' id="addSubDepartmentBt" subdepartmentid="0" subdepartmentcode="" onclick='addSubDepartment(this);' tabindex='1'>
+                <div class="col-md-4 text-center border-top-left" style="border-bottom:solid 1px #ccc"><input class="form-control" id="expectRegisterAmount" type="number" value="" tabindex="10" /></div>
+                <div class="col-md-4 text-center border-top-left" style="border-bottom:solid 1px #ccc"><input class="form-control" id="registerAmount" type="number" value="" readonly disabled /></div>
+                <div class="col-md-4 text-center border-top-left" style="border-bottom:solid 1px #ccc"><input class="form-control" id="expectDonationAmount" type="number" value="" tabindex="11" /></div>
+                <div class="col-md-4 text-center border-top-left" style="border-bottom:solid 1px #ccc"><input class="form-control" id="donationAmount" type="number" value="" readonly disabled /></div>
+                <div class="col-md-4 text-center border-top-left" style="border-bottom:solid 1px #ccc"><input class="form-control" id="expectCdonationAmount" type="number" value="" tabindex="12" /></div>
+                <div class="col-md-4 text-center border-top-left" style="border-bottom:solid 1px #ccc"><input class="form-control" id="cDonationAmount" type="number" value="" readonly disabled /></div>
+                <div class="col-md-4 text-center border-top-left" style="border-right:1px solid #ccc; border-bottom:solid 1px #ccc">
+                    <button class='btn btn-icon' id="addSubDepartmentBt" subdepartmentid="0" subdepartmentcode="" onclick='addSubDepartment(this);' tabindex='13'>
                         <i class='glyphicon glyphicon-circle-arrow-down'></i>
                     </button>
                 </div>
             </div>
-            <div class="row" style="padding-bottom:10px;">
-                <table class="table table-striped" id="departMentListTable">
+            <div class="row" style="padding-bottom:10px; padding-top: 0px;">
+                <table class="table table-striped" id="departMentListTable" style="border-bottom:1px solid #ccc">
                     <tbody>
                        <%-- <tr>
                             <td class="col-md-8">John</td>
@@ -372,15 +399,15 @@
         <div class="border-box">
             <div class="row">
                 <div class="col-md-3"><span>วันที่เริ่มต้น</span></div>
-                <div class="col-md-4"><input class="form-control" id="txtStartDate" type="text" value="" readonly /></div>
+                <div class="col-md-4"><input class="form-control" id="txtStartRemarakDate" type="text" value="" readonly disabled /></div>
                 <div class="col-md-3"><span>วันที่สิ้นสุด</span></div>
-                <div class="col-md-4"><input class="form-control" id="txtLastDate" type="text" value="" /></div>
+                <div class="col-md-4"><input class="form-control" id="txtLastRemarakDate" type="text" value="" tabindex="14" /></div>
                 <div class="col-md-3"><span>หมายเหตุ</span></div>
-                <div class="col-md-15"><input class="form-control" id="txtRemark" type="text" value="" /></div>
+                <div class="col-md-15"><input class="form-control" id="txtRemark" type="text" value="" tabindex="15" /></div>
                 <div class="col-md-4 text-center">
-                    <button class='btn btn-icon' onclick='' tabindex='1'>
+                    <%--<button class='btn btn-icon' onclick='' tabindex='16'>
                         <i class='glyphicon glyphicon-circle-arrow-down'></i>
-                    </button>
+                    </button>--%>
                 </div>
             </div>
         </div>
@@ -391,10 +418,10 @@
         </div>
         <div class="col-md-20"> </div>
         <div class="col-md-4">
-            <input id="cancel" type="button" class="btn btn-default btn-block" value="ยกเลิก" onclick="" />
+            <input id="cancel" type="button" class="btn btn-default btn-block" value="ยกเลิก" onclick="_clareFunction()" tabindex="17" />
         </div>
         <div class="col-md-4">
-            <input id="save" type="button" class="btn btn-success btn-block" value="บันทึก" onclick="" />
+            <input id="save" type="button" class="btn btn-success btn-block" value="บันทึก" onclick="" tabindex="18" />
         </div>
     </div>
 </asp:Content>

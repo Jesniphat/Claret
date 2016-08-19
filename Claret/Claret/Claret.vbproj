@@ -132,6 +132,7 @@
   <ItemGroup>
     <Content Include="!SQLStore\donor\InsertDonationExam.sql" />
     <Content Include="!SQLStore\donor\InsertDonationHospital.sql" />
+    <Content Include="!SQLStore\donor\UpdateDonationVisit.sql" />
     <Content Include="!SQLStore\donor\InsertDonorDeferralDetail.sql" />
     <Content Include="!SQLStore\donor\InsertDonorDeferral.sql" />
     <Content Include="!SQLStore\donor\InsertDonationQuestion.sql" />
@@ -200,6 +201,8 @@
     <Content Include="resources\css\bootstrap-select.css" />
     <Content Include="resources\css\donateStyle.css" />
     <Content Include="resources\css\table-excel.css" />
+    <Content Include="resources\css\timepicker.css" />
+    <Content Include="resources\fonts\fontello.svg" />
     <Content Include="resources\javascript\bootstrap-select.js" />
     <Content Include="resources\javascript\page\donateScript.js" />
     <Content Include="resources\javascript\page\donateScriptEdit.js" />
@@ -207,6 +210,7 @@
     <Content Include="resources\javascript\page\planning.js" />
     <Content Include="resources\javascript\page\planningInfo.js" />
     <Content Include="resources\javascript\page\registerScript.js" />
+    <Content Include="resources\jquery\timepicker.js" />
     <Content Include="resources\jquery\jquery-latest.js" />
     <Content Include="resources\jquery\jquery.blockUI.js" />
     <Content Include="resources\jquery\jquery.metadata.js" />
@@ -444,6 +448,9 @@
     <Content Include="resources\fonts\icomoon.eot" />
     <Content Include="resources\fonts\icomoon.ttf" />
     <Content Include="resources\fonts\icomoon.woff" />
+    <Content Include="resources\fonts\fontello.eot" />
+    <Content Include="resources\fonts\fontello.ttf" />
+    <Content Include="resources\fonts\fontello.woff" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

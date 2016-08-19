@@ -8,6 +8,7 @@ function linkToCollection() {
     console.log("Link");
     var param = {
         donateAction: "new",
+        donatesubaction: "a",
         donorID: "0",
         visitID: "0",
         donateType: $("#donateType").val(),

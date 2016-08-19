@@ -4,6 +4,8 @@ Public Class User
     Public Name As String
     Public SiteID As String
     Public CollectionPointID As String
+    Public PlanID As String
+    Public PlanDate As String
 
     Public Shared SessionTime As Long = 3600 ' Second
 

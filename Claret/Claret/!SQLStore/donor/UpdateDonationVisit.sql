@@ -1,0 +1,21 @@
+update donation_visit set
+donation_type_id = :donation_type_id
+, bag_id = :bag_id
+, donation_to_id = :donation_to_id
+, weight = :weight
+, pressure_max = :pressure_max
+, pressure_min = :pressure_min
+, hb = :hb
+, plt = :plt
+,hb_test = :hb_test
+,heart_rate = :heart_rate
+,heart_lung = :heart_lung
+, status = :status
+, interview_status = :interview_status
+, interview_staff = nvl(interview_staff, :interview_staff)
+, interview_date = nvl(interview_date, sysdate)
+, sample_number = :sample_number
+, for_collection_point_id = :for_collection_point_id
+, Update_Date = sysdate
+, Update_Staff = :update_staff
+where id = :id

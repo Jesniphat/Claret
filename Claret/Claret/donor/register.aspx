@@ -25,11 +25,13 @@
             font-weight:normal;
         }
     </style>
-    <script src="../resources/javascript/page/registerScript.js?ver=20160122" type="text/javascript"></script>
+    <script src="../resources/javascript/page/registerScript.js?ver=20160129" type="text/javascript"></script>
     <script>
         $(function () {
             lookupControl();
-            $("#txtCardNumber").enterKey(function () { $(this).addExtCard(); }).focus();
+            $("#txtCardNumber").enterKey(function () { $(this).addExtCard(); }).on("blur", function () {
+                $("#txtCardNumber").addExtCard();
+            }).focus();
             $("#ddlDefferal").setDropdownList().on('change', function () {
                 if ($(this).H2GValue() == 'ACTIVE') { $("#tbDeferral > thead > tr[status=INACTIVE]").hide(); }
                 else { $("#tbDeferral > thead > tr[status=INACTIVE]").show(); }
@@ -54,7 +56,7 @@
                     $(ui.newPanel).find("input:not(input[type=button],input[type=submit],button):visible:first").focus();
                 },
             });
-            $("#txtBirthDay").H2GDatebox().setCalendar({
+            $("#txtBirthDay").H2GDatebox().prop('readonly', true).setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+70",
@@ -77,7 +79,7 @@
                     }
                 },
             });
-            $("#txtLastDonateDate").H2GDatebox().setCalendar({
+            $("#txtLastDonateDate").H2GDatebox().prop('readonly', true).setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+70",
@@ -93,7 +95,7 @@
                 },
             });
             $("#txtCommentDateForm").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy"));
-            $("#txtCommentDateTo").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
+            $("#txtCommentDateTo").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().prop('readonly', true).setCalendar({
                 maxDate: "+100y",
                 minDate: new Date(),
                 yearRange: "c-50:c+50",
@@ -115,12 +117,12 @@
                 defaultSelect: '3',
                 selectItem: function () {
                     var cardNumber = $('#divCardNumber div[extID="' + $("#ddlExtCard").H2GValue() + '"]').H2GAttr('cardNumber');
-                    $("#txtCardNumber").H2GValue(cardNumber || '');
+                    $("#txtCardNumber").H2GValue(cardNumber || '').H2GFill({ maxlength: $("#ddlExtCard option:selected").H2GAttr("maxLength"), minlength:  $("#ddlExtCard option:selected").H2GAttr("minLength")});
                 },
             });
             $("#ddlExtCard").on('autocompleteselect', function () {
-                var cardNumber = $('#divCardNumber div[extID="' + $(this).H2GValue() + '"]').H2GAttr('cardNumber');
-                $("#txtCardNumber").H2GValue(cardNumber || '').focus();
+                //var cardNumber = $('#divCardNumber div[extID="' + $(this).H2GValue() + '"]').H2GAttr('cardNumber');
+                //$("#txtCardNumber").H2GValue(cardNumber || '').focus();
             });
             $("input:radio[name=gender]").change(function (e) {
                 $("#ddlTitleName").setAutoListValue({ url: '../../ajaxAction/masterAction.aspx', data: { action: 'titlename', gender: $("#rbtM").is(':checked') == true ? "M" : "F" } });
@@ -128,7 +130,12 @@
             $("#txtDefDateFrom").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy"));
             
             $("#btnSave").click(function () {
-                saveDonorInfo();
+                checkBeforSave();                
+            });
+            $("#btnSaveOnlyDonor").click(function () {
+                if (validation()) {
+                    saveDonorInfo(false);
+                }
             });
             $("#btnCancel").click(function () {
                 cancelRegis(this);
@@ -186,23 +193,30 @@
                 $("#infoTab > ul > li > a[href='#todayPane']").H2GValue(formatDate(H2G.today(), "dd NNN yyyy"))
                 $("#spVisitCount").H2GValue("รวมจำนวนการเข้าพบ 0 ครั้ง / บริจาค 0 ครั้ง");
                 donorSelectDDL();
+                lookupTabQuestionaire();
+                showVisitHistory();
             }
 
             $.extend($.fn, {
                 addExtCard: function (args) {
                     if ($(this).H2GValue() != "") {
-                        var extCard = $('#divCardNumber div[extID="' + $("#ddlExtCard").H2GValue() + '"]');
-                        if (extCard.length>0) {
-                            $(extCard).find(".ext-number").H2GValue($("#ddlExtCard :selected").text() + " : " + $(this).H2GValue()).H2GAttr("cardNumber", $(this).H2GValue());
+                        if (checkMinLength($(this))) {
+                            var extCard = $('#divCardNumber div[extID="' + $("#ddlExtCard").H2GValue() + '"]');
+                            if (extCard.length > 0) {
+                                $(extCard).H2GFill({ cardNumber: $(this).H2GValue() }).find(".ext-number").H2GValue($("#ddlExtCard :selected").text() + " : " + $(this).H2GValue()).H2GAttr("cardNumber", $(this).H2GValue());
+                            } else {
+                                var spExtCard = $("#divCardNumberTemp").children().clone();
+                                $(spExtCard).H2GFill({ extID: $("#ddlExtCard").H2GValue(), cardNumber: $(this).H2GValue() }).find(".ext-number").H2GValue($("#ddlExtCard :selected").text() + " : " + $(this).H2GValue());
+                                $('#divCardNumber').append(spExtCard);
+                            }
+                            $(this).H2GValue('');
                         } else {
-                            var spExtCard = $("#divCardNumberTemp").children().clone();
-                            $(spExtCard).H2GFill({ extID: $("#ddlExtCard").H2GValue(), cardNumber: $(this).H2GValue() }).find(".ext-number").H2GValue($("#ddlExtCard :selected").text() + " : " + $(this).H2GValue());
-                            $('#divCardNumber').append(spExtCard);
+                            notiWarning("กรุณากรอกเลขบัตรอย่างน้อย " + $(this).H2GAttr("minlength") + " ตัวอักษร");
+                            $(this).focus();
                         }
-                        $(this).H2GValue('');
                     } else {
-                        notiWarning("กรุณากรอกเลขบัตร");
-                        $(this).focus();
+                        //notiWarning("กรุณากรอกเลขบัตร");
+                        //$(this).focus();
                     }
                 },
                 deleteExtCard: function (args) {
@@ -212,6 +226,7 @@
                         } else {
                             $(this).closest("div.row").hide().H2GAttr("refID", "D#" + $(this).closest("div.row").H2GAttr("refID"));
                         }
+                        $("#txtCardNumber").focus();
                     }
                 },
                 addComment: function (args) {
@@ -240,73 +255,89 @@
                 },
                 addDonateRecord: function (args) {
                     if ($("#txtOuterDonate").H2GValue() != "" && $("#txtLastDonateDate").H2GValue() != "") {
-                        $.ajax({
-                            url: "../../ajaxAction/donorAction.aspx",
-                            data: H2G.ajaxData({ 
-                                action: 'getdonatereward',
-                                id: $("#data").H2GAttr("donorID"),
-                                donatedate: $("#txtLastDonateDate").H2GValue(),
-                                donatenumber: $("#txtOuterDonate").H2GValue(),
-                                lastrecord: $("#divDonateRecord").H2GAttr("lastrecord") ? $("#divDonateRecord").H2GAttr("lastrecord") : 0
-                            }).config,
-                            type: "POST",
-                            dataType: "json",
-                            error: function (xhr, s, err) {
-                                console.log(s, err);
-                            },
-                            success: function (data) {
-                                if (!data.onError) {
-                                    data.getItems = jQuery.parseJSON(data.getItems);                                    
-                                    $.each((data.getItems), function (index, e) {
-                                        var rowRecord = $("#divDonateRecordTemp").children().clone();
-                                        $(rowRecord).H2GAttr({ donatedate: $("#txtLastDonateDate").H2GValue(), donatenumber: e.DonationNumber, donatefrom: e.DonationFrom });
-                                        $(rowRecord).find("span.rec-text").H2GValue("ครั้งที่ " + e.DonationNumber + " บริจาควันที่ " + $("#txtLastDonateDate").H2GAttr("donatedatetext") + " ณ โรงพยาบาลนอกเครือข่าย");
+                        if ($("#txtOuterDonate").H2GAttr("wStatus") != "working") {
+                            $("#txtOuterDonate").H2GAttr("wStatus", "working");
+                            $.ajax({
+                                url: "../../ajaxAction/donorAction.aspx",
+                                data: H2G.ajaxData({ 
+                                    action: 'getdonatereward',
+                                    id: $("#data").H2GAttr("donorID"),
+                                    donatedate: $("#txtLastDonateDate").H2GValue(),
+                                    donatenumber: $("#txtOuterDonate").H2GValue(),
+                                    lastrecord: $("#divDonateRecord").H2GAttr("lastrecord") ? $("#divDonateRecord").H2GAttr("lastrecord") : 0
+                                }).config,
+                                type: "POST",
+                                dataType: "json",
+                                error: function (xhr, s, err) {
+                                    console.log(s, err);
+                                    $("#txtOuterDonate").H2GAttr("wStatus", "error");
+                                },
+                                success: function (data) {
+                                    if (!data.onError) {
+                                        data.getItems = jQuery.parseJSON(data.getItems);                                    
+                                        $.each((data.getItems), function (index, e) {
+                                            var rowRecord = $("#divDonateRecordTemp").children().clone();
+                                            $(rowRecord).H2GAttr({ donatedate: $("#txtLastDonateDate").H2GValue(), donatenumber: e.DonationNumber, donatefrom: e.DonationFrom });
+                                            $(rowRecord).find("span.rec-text").H2GValue("ครั้งที่ " + e.DonationNumber + " บริจาควันที่ " + $("#txtLastDonateDate").H2GAttr("donatedatetext") + " ณ โรงพยาบาลนอกเครือข่าย");
                                         
-                                        // for each reward 
-                                        $.each((e.DonationRewardList), function (indexr, er) {
-                                            var rowReward = $("#donateRewardTemp").clone();
-                                            $(rowReward).find(".lbl-check-reward").append(er.Description).H2GAttr('rewardID', er.ID);
-                                            $(rowReward).find(".lbl-check-reward input").on("change", function () { $(this).checkedReward() });
-                                            $(rowReward).find(".txt-reward-date").H2GFill({ rewardID: er.ID }).setCalendar({
-                                                maxDate: new Date(),
-                                                minDate: "-20y",
-                                                yearRange: "c-20:c+0",
-                                                onSelect: function (selectedDate, objDate) {
-                                                    if (selectedDate != '') {
-                                                        $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
-                                                    }
-                                                },
-                                                onClose: function () {
-                                                    if ($(this).H2GValue() == '') {
-                                                        $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", false);
-                                                    } else {
-                                                        $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
-                                                    }
-                                                },
-                                            }).H2GDatebox();
-                                            $(rowRecord).append($(rowReward).children());
+                                            // for each reward 
+                                            $.each((e.DonationRewardList), function (indexr, er) {
+                                                if ($('#divDonateRecord').H2GAttr("rewardList").indexOf("," + er.ID + ",") == -1) {
+                                                    var rowReward = $("#donateRewardTemp").clone();
+                                                    $(rowReward).find(".lbl-check-reward").append(er.Description).H2GAttr('rewardID', er.ID);
+                                                    $(rowReward).find(".lbl-check-reward input").on("change", function () { $(this).checkedReward() });
+                                                    $(rowReward).find(".txt-reward-date").H2GFill({ rewardID: er.ID }).setCalendar({
+                                                        maxDate: new Date(),
+                                                        minDate: "-20y",
+                                                        yearRange: "c-20:c+0",
+                                                        onSelect: function (selectedDate, objDate) {
+                                                            if (selectedDate != '') {
+                                                                $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
+                                                            }
+                                                        },
+                                                        onClose: function () {
+                                                            if ($(this).H2GValue() == '') {
+                                                                $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", false);
+                                                            } else {
+                                                                $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
+                                                            }
+                                                        },
+                                                    }).H2GDatebox().prop('readonly', true);
+                                                    $(rowRecord).append($(rowReward).children());
+                                                    $('#divDonateRecord').H2GAttr("rewardList", $('#divDonateRecord').H2GAttr("rewardList") + "," + er.ID + ",");
+                                                }
+                                            });
+
+                                            $('#divDonateRecord').prepend(rowRecord).H2GAttr("lastrecord", e.DonationNumber);
                                         });
 
-                                        $('#divDonateRecord').prepend(rowRecord).H2GAttr("lastrecord", e.DonationNumber);
-                                    });
-                                    $("#spRegisNumber").H2GAttr({ donateNumberExt: $("#txtOuterDonate").H2GValue().toNumber() + $("#spRegisNumber").H2GAttr("donateNumberExt").toNumber() });
+                                        $("#spRegisNumber").H2GAttr({ donateNumberExt: $("#txtOuterDonate").H2GValue().toNumber() + $("#spRegisNumber").H2GAttr("donateNumberExt").toNumber() });
 
-                                    $("#spVisitCount").H2GValue("รวมจำนวนการเข้าพบ " + $("#spRegisNumber").H2GAttr("visitNumber") + " ครั้ง / บริจาค " + ($("#spRegisNumber").H2GAttr("donateNumber").toNumber() + $("#spRegisNumber").H2GAttr("donateNumberExt").toNumber()) + " ครั้ง");
+                                        $("#spVisitCount").H2GValue("รวมจำนวนการเข้าพบ " + $("#spRegisNumber").H2GAttr("visitNumber") + " ครั้ง / บริจาค " + ($("#spRegisNumber").H2GAttr("donateNumber").toNumber() + $("#spRegisNumber").H2GAttr("donateNumberExt").toNumber()) + "(" + $("#spRegisNumber").H2GAttr("donateNumber") + "+" + $("#spRegisNumber").H2GAttr("donateNumberExt") + ") ครั้ง");
+                                    
+                                        $("#spVisitInfo").H2GValue("");
+                                        $("#spVisitInfo").append("วันที่ลงทะเบียน " + $("#spVisitInfo").H2GAttr("visitDateText"));
+                                        if ($("#spVisitInfo").H2GAttr("lastVisitDateText") != "") {
+                                            $("#spVisitInfo").append(" เข้าพบครั้งสุดท้ายเมื่อ " + $("#spVisitInfo").H2GAttr("lastVisitDateText") + " ( " + $("#spVisitInfo").H2GAttr("diffDate") + " วัน )");
+                                        } else {
+                                            $("#spVisitInfo").append(" เข้าพบครั้งแรก");
+                                        }
 
-                                    $("#spVisitInfo").H2GValue("");
-                                    $("#spVisitInfo").append("วันที่ลงทะเบียน " + $("#spVisitInfo").H2GAttr("visitDateText"));
-                                    if ($("#spVisitInfo").H2GAttr("lastVisitDateText") != "") {
-                                        $("#spVisitInfo").append(" เข้าพบครั้งสุดท้ายเมื่อ " + $("#spVisitInfo").H2GAttr("lastVisitDateText") + " ( " + $("#spVisitInfo").H2GAttr("diffDate") + " วัน )");
-                                    } else {
-                                        $("#spVisitInfo").append(" เข้าพบครั้งแรก");
+                                        $("#spVisitInfo").H2GFill({ currentdonatenumber: ($("#spVisitInfo").H2GAttr("currentDonateNumber").toNumber() + $("#txtOuterDonate").H2GValue().toNumber()) }).append(" กำลังดำเนินการบริจาคครั้งที่ " + $("#spVisitInfo").H2GAttr("currentDonateNumber"));
+                                                                        
+                                        // รันปุ่มลบใหม่
+                                        $('#divDonateRecord > div:visible a.icon').hide();
+                                        $.each(($('#divDonateRecord > div:visible')), function (index, e) {
+                                            if ($(e).H2GAttr("donatefrom") == "EXTERNAL") { $(e).find("a.icon").show(); }
+                                            return false;
+                                        });
+
+                                        $("#txtOuterDonate").H2GValue(""); $("#txtLastDonateDate").H2GValue("");
                                     }
-
-                                    $("#spVisitInfo").append(" กำลังดำเนินการบริจาคครั้งที่ " + ($("#spVisitInfo").H2GAttr("currentDonateNumber").toNumber() + $("#txtOuterDonate").H2GValue().toNumber()));
-
-                                    $("#txtOuterDonate").H2GValue(""); $("#txtLastDonateDate").H2GValue("");
-                                } 
-                            }
-                        });    //End ajax
+                                    $("#txtOuterDonate").H2GAttr("wStatus", "done");
+                                }
+                            });    //End ajax
+                        }
                     } else {
                         var warning = "";
                         if ($("#txtOuterDonate").H2GValue() == "") { warning = "กรุณากรอกจำนวนครั้งที่บริจาค"; $("#txtOuterDonate").focus(); }
@@ -315,11 +346,34 @@
                     }
                 },
                 deleteDonateRecord: function (args) {
+                    //var rewardList = $('#divDonateRecord').H2GAttr("rewardList") || "";
+                    //.H2GAttr("rewardID")
+                    $.each(($(this).closest("div.row").find("input.txt-reward-date")), function (index, e) {
+                        $('#divDonateRecord').H2GAttr("rewardList", $('#divDonateRecord').H2GAttr("rewardList").replace("," + $(e).H2GAttr("rewardID") + ",", ""));
+                    });
+
                     if ($(this).closest("div.row").H2GAttr("refID") == "NEW") {
                         $(this).closest("div.row").remove();
                     } else {
                         $(this).closest("div.row").hide().H2GAttr("refID", "D#" + $(this).closest("div.row").H2GAttr("refID"));
                     }
+                    // ต้องคำนวน DonateNumberExt ใหม่โดยจะลดลง 1 ทุกครั้ง
+                    var DonateNumber = $("#spRegisNumber").H2GAttr("donateNumber") || "0";
+                    var DonateNumberExt = $("#spRegisNumber").H2GAttr("donateNumberExt") || "0";
+                    if (DonateNumberExt != "0") { DonateNumberExt = (DonateNumberExt.toNumber() - 1) + ""; }
+                    $("#spVisitCount").H2GValue("รวมจำนวนการเข้าพบ " + $("#spRegisNumber").H2GAttr("visitNumber") + " ครั้ง / บริจาค " + (DonateNumberExt.toNumber() + DonateNumber.toNumber()) + "(" + $("#spRegisNumber").H2GAttr("donateNumber") + "+" + DonateNumberExt + ") ครั้ง");
+                    $("#spRegisNumber").H2GAttr("donateNumberExt", DonateNumberExt);
+                    
+                    $("#spVisitInfo").H2GValue("วันที่ลงทะเบียน " + $("#spVisitInfo").H2GAttr("visitDateText") + " เข้าพบครั้งสุดท้ายเมื่อ " + $("#spVisitInfo").H2GAttr("lastVisitDateText") + " ( " + $("#spVisitInfo").H2GAttr("diffDate") + " วัน ) กำลังดำเนินการบริจาคครั้งที่ " + (DonateNumberExt.toNumber() + DonateNumber.toNumber() + 1))
+                        .H2GFill({ currentDonateNumber: (DonateNumberExt.toNumber() + DonateNumber.toNumber() + 1) });
+                    // last record จะลดลง 1 เสมอ
+                    var lastRecord = $('#divDonateRecord').H2GAttr("lastrecord") || "0";
+                    $('#divDonateRecord').H2GFill({ lastrecord: lastRecord.toNumber() - 1 });
+                    // รันปุ่มลบใหม่
+                    $.each(($('#divDonateRecord > div:visible')), function (index, e) {
+                        if ($(e).H2GAttr("donatefrom") == "EXTERNAL") { $(e).find("a.icon").show(); }
+                        return false;
+                    });
                 },
                 checkedReward: function (args) {
                     if ($(this).is(":checked")) {
@@ -383,10 +437,26 @@
                     $("#data").H2GAttr("visitID", $(this).closest("tr").H2GAttr("refID"));
                     $("#spRegisNumber").H2GAttr("visitID", $(this).closest("tr").H2GAttr("refID"));
                     showDonorData();
+                    $("#infoTab").tabs("option", "active", 1);
+                },
+                checkSampleNo: function() {
+                    var popup = $(this).closest("div #divBarcodeTemplete");
+                    $(popup).find("#txt").H2GValue();
+                    $(popup).find("#txt").H2GValue();
+                },
+                changeQuestLanguage: function () {
+                    self = this;
+                    var questContent = $("#tbQuestionnaire > tbody > tr");
+                    $.each((questContent), function (index, e) {
+                        if ($(self).H2GValue() == "English") {
+                            $(e).find(".td-question > span").H2GValue($(e).H2GAttr("questdesc"));
+                        } else {
+                            $(e).find(".td-question > span").H2GValue($(e).H2GAttr("questdescth"));
+                        }
+                    });
                 },
             });
 
-            showVisitHistory();
             //### extend
 
             $("#synthesisLink").click(loadSynthesisLink);
@@ -398,35 +468,52 @@
             // menu control
             if ($("#data").H2GAttr("lmenu") == "lmenuDonorRegis") {
                 $("#infoTabToday").tabs("option", "disabled", [2]);
-            } else if ($("#data").H2GAttr("lmenu") == "lmenuInterview" || $("#data").H2GAttr("lmenu") == "lmenuHistoryReport") {
-                lookupTabQuestionaire();
+                $(".claret-page-header span").H2GValue("ลงทะเบียนผู้บริจาค");
+            } else if ($("#data").H2GAttr("lmenu") == "lmenuInterview") {
+                $("#infoTabToday").tabs("option", "active", [2]);
+                $(".claret-page-header span").H2GValue("คัดกรองผู้บริจาค");
             } else if ($("#data").H2GAttr("lmenu") == "lmenuDonate") {
                 $("#infoTabToday").tabs("option", "disabled", [2]);
+                $(".claret-page-header span").H2GValue("เจาะเก็บ");
             } else if ($("#data").H2GAttr("lmenu") == "lmenuHistoryReport") {
                 //$("#infoTabToday").tabs("option", "disabled", [1]);
+                $(".claret-page-header span").H2GValue("รายงานย้อนหลัง");
             } else if ($("#data").H2GAttr("lmenu") == "lmenulabRegis") {
+                $(".claret-page-header span").H2GValue("ลงทะเบียนขอตรวจ Lab");
                 $(".mandatory-interview").hide();
-                lookupTabQuestionaire();
             }
+
+            $("#btnSticker").click(stickerPrint)
+
+
+            //$.ajax({
+            //    url: 'http://localhost:9091/print?path=C:\mailmerge\tmp\20164219010809_707.doc', data: { action: 'checksamplenumber' }, type: "POST", dataType: "json",
+            //    error: function (xhr, s, err) { console.log(s, err); },
+            //    success: function (data) {
+            //        if (!data.onError) {
+            //            if (true) {
+            //                $("#spRegisNumber").H2GAttr("sampleNumber", $(xobj).H2GValue());
+            //                saveDonorInfo();
+            //            } else {
+            //                notiWarning("");
+            //            }
+            //        } else { notiError(data.exMessage); }
+            //    }
+            //});    //End ajax
+
         });
-
+        function checkMinLength(xobj) {
+            if ($(xobj).H2GAttr("minlength") == "") {
+                return true;
+            } else if (parseInt($(xobj).H2GAttr("minlength")) > $(xobj).H2GValue().length) {
+                return false;
+            } 
+            return true;
+        }
         function lookupTabQuestionaire() {
-            $("#ddlDeferralType").setDropdownList();
-            $("#ddlITVResult").setDropdownList();
-            $("#ddlHbTest").setDropdownList();
-            $("#txtWeight").H2GNumberbox();
-            $("#txtHeartRate").H2GNumberbox();
-            $("#txtPresureMin").H2GNumberbox();
-            $("#txtPresureMax").H2GNumberbox();
-            $("#txtDuration").H2GNumberbox();
-
-            $("#txtDefDateTo").H2GDatebox().setCalendar({
-                maxDate: "+100y",
-                minDate: new Date(),
-                yearRange: "c50:c+50",
-                onSelect: function (selectedDate, objDate) { $("#txtDefRemarks").focus(); },
-            });
-
+            $("#ddlQuestLanguage").on("change", function () {
+                $(this).changeQuestLanguage();
+            })
             $("#txtExamCode").enterKey(function () { getExamination($(this).H2GValue()); });
             $("#ddlExam").setAutoListValue({
                 url: '../ajaxAction/masterAction.aspx', data: { action: 'examination' },
@@ -436,17 +523,20 @@
                 },
             });
 
-            $("#ddlITVDonationType").H2GAttr("selectItem", $("#data").H2GAttr("donationTypeID"));
-            $("#ddlITVBag").H2GAttr("selectItem", $("#data").H2GAttr("bagID"));
-            $("#ddlITVDonationTo").H2GAttr("selectItem", $("#data").H2GAttr("donationToID"));
+            if ($("#spStatus").H2GValue() == "WAIT INTERVIEW") {
+                $("#ddlITVDonationType").H2GAttr("selectItem", $("#data").H2GAttr("donationTypeID") || "");
+                $("#ddlITVBag").H2GAttr("selectItem", $("#data").H2GAttr("bagID") || "");
+                $("#ddlITVDonationTo").H2GAttr("selectItem", $("#data").H2GAttr("donationToID") || "");
+            }
 
             if ($("#ddlITVDonationType option").length > 1) { $("#ddlITVDonationType").H2GValue($("#ddlITVDonationType").H2GAttr("selectItem")).change(); } else {
                 $("#ddlITVDonationType").setDropdownListValue({
                     url: '../../ajaxAction/masterAction.aspx',
                     data: { action: 'donationtype' },
                     defaultSelect: $("#ddlITVDonationType").H2GAttr("selectItem"),
+                    tempData: true,
                 }).on('change', function () {
-                    $("#ddlITVBag").closest("div").focus();
+                    //$("#ddlITVBag").closest("div").focus();
                     setDeferralData($("#ddlITVDonationType option:selected").H2GAttr("valueID"));
                 });
             }
@@ -456,7 +546,7 @@
                     data: { action: 'bag' },
                     defaultSelect: $("#ddlITVBag").H2GAttr("selectItem"),
                 }).on('change', function () {
-                    $("#ddlITVDonationTo").closest("div").focus();
+                    //$("#ddlITVDonationTo").closest("div").focus();
                 });
             }
             if ($("#ddlITVDonationTo option").length > 1) { $("#ddlITVDonationTo").H2GValue($("#ddlITVDonationTo").H2GAttr("selectItem")).change(); } else {
@@ -465,7 +555,7 @@
                     data: { action: 'donationto' },
                     defaultSelect: $("#ddlITVDonationTo").H2GAttr("selectItem"),
                 }).on('change', function () {
-                    $("#txtDefCode").focus();
+                    //$("#txtDefCode").focus();
                 });
             }
             
@@ -673,7 +763,10 @@
                                 questDesc: er.Description,
                                 questDescTH: er.DescriptionTH,
                             });
-                            $(dataRow).find(".td-question span").H2GValue(er.Description);
+
+                            if ($("#ddlQuestLanguage").H2GValue() == "English") { $(dataRow).find(".td-question span").H2GValue(er.Description); }
+                            else { $(dataRow).find(".td-question span").H2GValue(er.DescriptionTH); }
+
                             if (er.AnswerType == "PRESET") {
                                 var selectPreset = $(dataRow).find(".td-answer select").show();
                                 var preset = er.Preset.split(",");
@@ -696,6 +789,7 @@
                                     });
                                 }
                             }
+                            //$(dataRow).insertAfter($("#tbQuestionnaire > tbody > tr[questid=" + fromQuestion + "]"))
                             $("#tbQuestionnaire > tbody").append(dataRow);
                             return false;
                         }
@@ -801,7 +895,7 @@
                 }
             });
         }
-
+        
     </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="cphMaster" runat="server">
@@ -821,7 +915,7 @@
         <div class="border-box blue" style="border-radius: 4px 4px 0px 0px; font-weight: bold;">
             <div class="col-md-27">
                 <span id="spQueue">-</span>/ เลขประจำตัวผู้บริจาค :
-                <span id="spRegisNumber" visitID dPlanID dPointID siteID="1" visitFrom="HOSPITAL" queueNum dTypeID bagID dToID donateNumberExt="0" donateNumber="0" visitNumber="0"></span>
+                <span id="spRegisNumber" visitID dPlanID dPointID siteID="1" visitFrom="HOSPITAL" queueNum dTypeID bagID dToID donateNumberExt="0" donateNumber="0" visitNumber="0" SampleNumber></span>
             </div>
             <div class="col-md-9 text-right">
                 <span>สถานะ</span>
@@ -837,7 +931,7 @@
                 </select>
             </div>
             <div class="col-md-7">
-                <input id="txtCardNumber" type="text" class="form-control" tabindex="1" />
+                <input id="txtCardNumber" type="text" class="form-control" tabindex="1" minlength="13" maxlength="13" />
             </div>
             <div class="col-md-2">
                 <button id="spInsertExtCard" class="btn btn-icon" onclick="return false;" tabindex="-1">
@@ -1172,6 +1266,20 @@
                                         <div class="row">
                                             <div class="col-md-36">
                                                 <div class="border-box">
+                                                    <div class="col-md-10">
+                                                        รับบริจาคสำหรับหน่วยงาน
+                                                    </div>
+                                                    <div class="col-md-26">
+                                                        <select id="ddlCollectionPoint" style="width: 398px;" placeholder="กรุณาเลือก" tabindex="3">
+                                                            <option value="0">Loading...</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-36">
+                                                <div class="border-box">
                                                     <div class="col-md-36">
                                                         <span>ที่อยู่ปัจจุบัน</span>
                                                     </div>
@@ -1208,7 +1316,7 @@
                                                         <div class="col-md-3"></div>
                                                         <div class="col-md-5"><span>ประเทศ</span></div>
                                                         <div class="col-md-12">
-                                                            <select id="ddlCountry" class="required" style="width: 100%;" placeholder="กรุณาเลือก" tabindex="1">
+                                                            <select id="ddlCountry" class="required" style="width: 185px;" placeholder="กรุณาเลือก" tabindex="1">
                                                                 <option value="0">Loading...</option>
                                                             </select>
                                                         </div>
@@ -1271,7 +1379,7 @@
                                                         รหัสเชื่อมโยงโรงพยาบาลในเครือ
                                                     </div>
                                                     <div class="col-md-24">
-                                                        <select id="ddlAssociation" style="width: 100%;" placeholder="กรุณาเลือก" tabindex="3">
+                                                        <select id="ddlAssociation" class="required" style="width: 368px;" placeholder="กรุณาเลือก" tabindex="1">
                                                             <option value="0">Loading...</option>
                                                         </select>
                                                     </div>
@@ -1322,7 +1430,7 @@
                                                     </div>
                                                     <div class="row" style="margin-left: 15px;">
                                                         <div class="col-md-36">
-                                                            <div id="divDonateRecord" style="overflow-x: hidden; overflow-y: scroll; height: 205px;" donateNumberExt="0" donateNumber="0">
+                                                            <div id="divDonateRecord" style="overflow-x: hidden; overflow-y: scroll; height: 249px;" donateNumberExt="0" donateNumber="0" rewardList="">
                                                             </div>
                                                             <div id="divDonateRecordTemp" style="display:none;">
                                                                 <div refID="NEW" class="row outpadding">
@@ -1330,7 +1438,7 @@
                                                                         <span class="rec-text"></span>
                                                                     </div>
                                                                     <div class="col-md-3 text-center">
-                                                                        <a class="icon" style="display:none;"><span class="glyphicon glyphicon-remove" aria-hidden="true" onclick="$(this).deleteRecord();"></span></a>
+                                                                        <a class="icon" style="display:none;"><span class="glyphicon glyphicon-remove" aria-hidden="true" onclick="$(this).deleteDonateRecord();"></span></a>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -1359,11 +1467,17 @@
                                         <div class="row">
                                             <div class="col-md-36">
                                                 <div class="row" style="border-top: solid 1px #CCCCCC; border-left: solid 1px #CCCCCC; border-right: solid 1px #CCCCCC; margin: 0; background-color:#DBEEF3;">
-                                                    <div class="col-md-18 text-left" style="padding-left:5px;">
+                                                    <div class="col-md-14 text-left" style="padding-left:5px;">
                                                         Questionnaire NBC
                                                     </div>
-                                                    <div class="col-md-18 text-right" style="padding-right:25px;">
+                                                    <div class="col-md-14 text-right">
                                                         วันที่ดำเนินการ 12 พ.ค. 2559 10:15
+                                                    </div>
+                                                    <div class="col-md-6 col-md-offset-1" style="padding-right: 5px; padding-left: 9px;">
+                                                        <select id="ddlQuestLanguage">
+                                                            <option value="English">English</option>
+                                                            <option value="Thai">Thai</option>
+                                                        </select>
                                                     </div>
                                                 </div>
                                                 <div class="border-box" style="padding:0; height:375px;overflow-y:scroll;overflow-x:hidden;">
@@ -1419,10 +1533,10 @@
                                                         </div>
                                                         <div class="col-md-2"></div>
                                                         <div class="col-md-4 text-center">
-                                                            <span id="spLastWeight">62 KG</span>
+                                                            <span id="spLastWeight"></span>
                                                         </div>
                                                         <div class="col-md-9 text-center">
-                                                            <span id="spLastDateWeight">เมื่อ 09 พ.ค. 2559</span>
+                                                            <span id="spLastDateWeight"></span>
                                                         </div>
                                                         <div class="col-md-6 text-right">
                                                             <span>อัตราชีพจร</span>
@@ -1468,6 +1582,7 @@
                                                         </div>
                                                         <div class="col-md-4 text-right">
                                                             <select id="ddlHbTest" class="required text-center" style="width:100%;">
+                                                                <option value="">&nbsp</option>
                                                                 <option value="N">N</option>
                                                                 <option value="P">P</option>
                                                                 <option value="Y">Y</option>
@@ -1500,6 +1615,7 @@
                                                     <div class="row">
                                                         <div class="col-md-16 col-md-offset-11">
                                                             <select id="ddlITVResult" class="required" style="width:100%;">
+                                                                <option value="">กรุณาเลือก</option>
                                                                 <option value="DONATION">DONATION</option>
                                                                 <option value="SAMPLE">SAMPLE</option>
                                                                 <option value="REFUSED">REFUSED</option>
@@ -2113,7 +2229,6 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-
                                         </tbody>
                                     </table>
                                 </div>
@@ -2179,16 +2294,67 @@
             <input id="btnSticker" type="button" class="btn btn-primary btn-block" value="พิมพ์สติ๊กเกอร์" tabindex="-1" />
         </div>
         <div class="col-md-3">
-            <input id="btnHistory" type="button" class="btn btn-success btn-block" value="บันทึกประวัติ" tabindex="-1" />
+            <input id="btnSaveOnlyDonor" type="button" class="btn btn-success btn-block" value="บันทึกประวัติ" tabindex="-1" />
         </div>
         <div class="col-md-21"></div>
         <div class="col-md-3">
-            <input id="btnCancel" type="button" class="btn btn-block" value="ยกเลิก" tabindex="-1" />
+            <input id="btnCancel" type="button" class="btn btn-block" value="ย้อนกลับ" tabindex="-1" />
         </div>
         <div class="col-md-3">
-            <input id="btnSave" type="button" class="btn btn-success btn-block" value="ลงทะเบียน" tabindex="1" />
+            <input id="btnSave" type="button" class="btn btn-success btn-block" value="บันทึก" tabindex="1" />
         </div>
     </div>
     <div style="display: none;">
     <input id="data" runat="server" /></div>
+    <div id="divBarcodeContainer" style="display:none;">
+        <div id="divBarcodeTemplete" style="display: inline-block;">
+            <div class="newouterborder" style="background-color: #F4F4F4;">
+                <div class="popheader row" style="padding: 5px 0px;">
+                    <div class="popupheader col-md-33">ทำการสแกนบาร์โค้ด</div>
+                    <div class="col-md-3 text-center" style="float:right;">
+                        <a class="icon"><span class="glyphicon glyphicon-remove" aria-hidden="true" title="close" onclick="$('#btnSave').prop('disabled', false); return closePopup();"></span></a>
+                    </div>
+                </div>
+                <div class="popupbody" style="width:300px;">
+                    <div class="row">
+                        <div class="col-md-10"><span>รหัสผู้บริจาค</span></div>
+                        <div class="col-md-26"><input id="txtScanDonorNumber" type="text" class="form-control required" /></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-10"><span>Sample No</span></div>
+                        <div class="col-md-26"><input id="txtScanSampleNumber" type="text" class="form-control required" /></div>
+                    </div>
+                </div>
+                <div class="popfooter" style="text-align: right;">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="divAgeContainer" style="display:none;">
+            <div id="divAgeTemplete" style="display: inline-block;">
+                <div class="newouterborder" style="background-color: #F4F4F4;">
+                    <div class="popheader row text-left" style="padding: 5px 0px;">
+                        <div id="popupheader" class="popupheader col-md-33">กรุณาตรวจสอบ</div>
+                        <div class="col-md-3 text-center" style="float:right;">
+                            <a class="icon"><span class="glyphicon glyphicon-remove" aria-hidden="true" title="close" onclick="$('#btnSave').prop('disabled', false); return closePopup(); "></span></a>
+                        </div>
+                    </div>
+                    <div class="popupbody text-left" style="width:300px;">
+                        <div class="row">
+                            <div class="col-md-36"><span id="spAgeWarning"></span></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-md-offset-24 text-right">
+                                <input type="button" value="ตกลง" class="btn btn-block btn-success" onclick="return preSaveDonor();" />
+                            </div>
+                            <div class="col-md-6 text-right">
+                                <input type="button" value="ยกเลิก" class="btn btn-block" onclick="$('#btnSave').prop('disabled', false); return closePopup();" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="popfooter" style="text-align: right;">
+                    </div>
+                </div>
+            </div>
+        </div>
 </asp:Content>

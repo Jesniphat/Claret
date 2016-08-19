@@ -4,7 +4,7 @@
     <script src="../resources/javascript/page/donateScriptEdit.js" type="text/javascript"></script>
     <script>
         $(function () {
-            $("#donerNumber").focus()
+            
             checkParam()
             .then(getDonateTypeList)
             .then(getDonateBagTypeList)
@@ -12,6 +12,8 @@
             .then(getExamination)
             .then(getProblemReason)
             .then(getDonationList)
+            .then(getStaffAutocomplete)
+            .then(setKeyComplete)
             .done(getInitialData)
             .fail(function (err) {
             console.log(err);
@@ -26,7 +28,7 @@
 
             $("#addLabExamination").click(addLabExamination);
             
-            $("#startDonateDate").timepicker();
+            // $("#startDonateDate").timepicker();
             $("#labExamination").autocomplete({
                 source: examinationAutoData
             });
@@ -53,7 +55,19 @@
             $("#sampleNumber").keydown(checkValidDonateNum);
             $("#sampleNumber").blur(checkSampleNumber);
             $("#btnSave").click(saveData);
+            //$("#btnSave").click(saveDatatest);
             $("#btnCancel").click(clareData);
+
+            $.mask.definitions['2'] = '[012]';
+            $.mask.definitions['3'] = '[0123456789]';
+            $.mask.definitions['5'] = '[012345]';
+            $.mask.definitions['9'] = '[0123456789]';
+            $("#startDonateDate").mask("23:59");
+            $("#donateTimes").mask("23:59");
+
+            //$("#testx").click(function () {
+            //    hl7Generator('41', '93', '9995900007', '123456789')
+            //})
         });
         
     </script>
@@ -69,11 +83,11 @@
             <div class="border-box">
                 <div class="col-md-4 text-left">เลขประจำตัวผู้บริจาค</div>
                 <div class="col-md-7">
-                    <input class="col-md-36 form-control required" id="donerNumber" type="text" value=""/>
+                    <input class="col-md-36 form-control required" id="donerNumber" type="text" value="" tabindex="1"/>
                 </div>
-                <div class="col-md-3 text-left" style="padding-left:18px;">Sample No</div>
+                <div class="col-md-3 text-left" id="testx" style="padding-left:18px;">Sample No</div>
                 <div class="col-md-7">
-                    <input class="col-md-36 form-control required" id="sampleNumber" type="text" value="" />
+                    <input class="col-md-36 form-control required" id="sampleNumber" type="text" value="" tabindex="2" />
                 </div>
             </div>
         </div>
@@ -84,7 +98,7 @@
                 <div class="row">
                     <div class="col-md-8 text-left">ประเภทการบริจาค</div>
                     <div class="col-md-14" style="padding-left:9px; max-width:232px; width:100%;">
-                        <select id="donateType" class="required selecte-box-custom">
+                        <select id="donateType" class="required selecte-box-custom" tabindex="3">
                             
                         </select>
                     </div>
@@ -93,7 +107,7 @@
                 <div class="row">
                     <div class="col-md-8 text-left">ประเภทถุง</div>
                     <div class="col-md-14" style="padding-left:9px; max-width:232px; width:100%;">
-                        <select id="donateBagType" class="required selecte-box-custom">
+                        <select id="donateBagType" class="required selecte-box-custom" tabindex="4">
                             
                         </select>
                     </div>
@@ -101,7 +115,7 @@
                 <div class="row">
                     <div class="col-md-8 text-left">ประเภทการใช้งาน</div>
                     <div class="col-md-14" style="padding-left:9px; max-width:232px; width:100%;">
-                        <select id="donateApply" class="required selecte-box-custom">
+                        <select id="donateApply" class="required selecte-box-custom" tabindex="5">
                             
                         </select>
                     </div>
@@ -114,17 +128,17 @@
                     <div class="col-md-8 text-left">Prescribed Volumn</div>
                     <div class="col-md-9 text-left"><input class="col-md-9 form-control" id="prescribedVol" type="text" value="" readonly/></div>
                     <div class="col-md-8 text-left">Volumn</div>
-                    <div class="col-md-9 text-left"><input class="col-md-9 form-control required" id="vol" type="text" value=""/></div>
+                    <div class="col-md-9 text-left"><input class="col-md-9 form-control required" id="vol" type="text" value="" tabindex="6" /></div>
                 </div>
                 <div class="row">
                     <div class="col-md-8 text-left">เวลาที่เริ่มบริจาค</div>
-                    <div class="col-md-9 text-left"><input class="col-md-9 form-control required" id="startDonateDate" type="text" value=""/></div>
+                    <div class="col-md-9 text-left"><input class="col-md-9 form-control required" id="startDonateDate" type="text" value="" tabindex="7" /></div>
                     <div class="col-md-8 text-left">ระยะเวลาที่บริจาค</div>
-                    <div class="col-md-9 text-left"><input class="col-md-9 form-control required" id="donateTimes" type="text" value=""/></div>
+                    <div class="col-md-9 text-left"><input class="col-md-9 form-control required" id="donateTimes" type="text" value="" tabindex="8"/></div>
                 </div>
                 <div class="row">
                     <div class="col-md-8 text-left">ผู้เจาะเก็บ</div>
-                    <div class="col-md-15 text-left"><input class="col-md-15 form-control required" id="donateStaff" type="text" value=""/></div>
+                    <div class="col-md-15 text-left"><input class="col-md-15 form-control required" id="donateStaff" staffid="0" type="text" value="" tabindex="9"/></div>
                 </div>
             </div>
         </div>
@@ -139,9 +153,9 @@
                     <table class="table table-bordered" style="margin-bottom:5px;">
                         <tbody>
                             <tr>
-                                <td class="col-md-34"><input class="form-control" id="labExamination" style="border:none;" value="" /></td>
+                                <td class="col-md-34"><input class="form-control" id="labExamination" style="border:none;" value="" tabindex="10" /></td>
                                 <td class="col-md-1" style="border:1px solid #ffffff;">
-                                    <button id="addLabExamination" class="btn btn-icon" onclick="return false;" tabindex="1">
+                                    <button id="addLabExamination" class="btn btn-icon" onclick="return false;" tabindex="11">
                                         <i class="glyphicon glyphicon-circle-arrow-down"></i>
                                     </button>
                                 </td>
@@ -175,21 +189,21 @@
                                         <option value="0">ทดสอบ...</option>
                                         <option value="1">ทดสอบ2...</option>
                                     </select>--%>
-                                    <input class="form-control" id="collectedProblem" value="" />
+                                    <input class="form-control" id="collectedProblem" value="" tabindex="12" />
                                 </td>
                                 <td class="col-md-11" style="border:1px solid #ffffff; padding: 0px;">
                                     <%--<select id="collectedProblemReason1">
                                         <option value="0">ทดสอบ...</option>
                                         <option value="1">ทดสอบ2...</option>
                                     </select>--%>
-                                    <input class="form-control" id="collectedProblemReason1" value="" />
+                                    <input class="form-control" id="collectedProblemReason1" value="" tabindex="13" />
                                 </td>
                                 <td class="col-md-11" style="border:1px solid #ffffff; padding: 0px;">
                                     <%--<select id="collectedProblemReason2">
                                         <option value="0">ทดสอบ...</option>
                                         <option value="1">ทดสอบ2...</option>
                                     </select>--%>
-                                    <input class="form-control" id="collectedProblemReason2" value="" />
+                                    <input class="form-control" id="collectedProblemReason2" value="" tabindex="14" />
                                 </td>
                                 <td class="col-md-1" style="border:1px solid #ffffff;">
                                     <%--<button id="addCollectedProblem" class="btn btn-icon" onclick="return false;" tabindex="1">
@@ -214,14 +228,14 @@
     <div class="row" style="margin-top:10px;">
         <div class="col-md-36">
             <div class="col-md-30">&nbsp;</div>
-            <div class="col-md-3"><input id="btnCancel" type="button" class="btn btn-block" value="ยกเลิก" tabindex="-1" /></div>
-            <div class="col-md-3"><input id="btnSave" type="button" class="btn btn-success btn-block" value="บันทึก" tabindex="1" /></div>
+            <div class="col-md-3"><input id="btnCancel" type="button" class="btn btn-block" value="ยกเลิก" tabindex="15" /></div>
+            <div class="col-md-3"><input id="btnSave" type="button" class="btn btn-success btn-block" value="บันทึก" tabindex="16" /></div>
         </div>
     </div>
     <div class="row" style="margin-top:20px;">
         <div class="col-md-36" style="padding-left:0px;">
             <div class="tableHeadDivFullDark" id="headTimeDiv">
-                <b>รายการ วันที่ <span id="donateDate"></span> เจาะเก็บที่ ห้องเจาะเก็บชั้น 2 - รวมเจาะเก็บ <span id="sampleCount">Sample</span></b>
+                <b>รายการ วันที่ <span id="donateDate"></span> เจาะเก็บที่ ห้องเจาะเก็บชั้น 2<%-- - รวมเจาะเก็บ <span id="sampleCount">Sample</span>--%></b>
             </div>
         </div>
         <div class="col-md-36">

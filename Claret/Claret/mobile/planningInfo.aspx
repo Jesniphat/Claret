@@ -1,5 +1,10 @@
 ﻿<%@ Page Title="" Language="vb" AutoEventWireup="false" MasterPageFile="~/MasterPage.Master" CodeBehind="planningInfo.aspx.vb" Inherits="Claret.planning_info" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
+    <style>
+        .glyphicon-triangle-bottom {
+            font-size: 15px;
+        }
+    </style>
     <script src="../resources/javascript/page/planningInfo.js" type="text/javascript"></script>
     <script>
         $(function () {
@@ -10,7 +15,7 @@
                 //$("#txtRegion").focus());
             });
 
-            $("#txtPlanDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
+            $("#txtPlanDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().prop('readonly', true).setCalendar({
                 // maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+0",
@@ -48,12 +53,14 @@
             $("#tbDonor thead button").click(function () { sortButton($(this), donorSearch); return false; });
             $("#tbPostQueue thead button").click(function () { sortButton($(this), postQueueSearch); return false; });
 
+            getSiteCode();
+            $("#txtSectorCode").focus();
         });
     </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="cphMaster" runat="server">
     <div class="claret-page-header row">
-        <div class="col-md-36" style="font-size:larger; font-weight:bold;">
+        <div class="col-md-36" style="font-size:larger; font-weight:bold; border-bottom:1px solid #ccc; margin-bottom:20px;">
             <span>แผนการดำเนินงาน</span>
         </div>
     </div>
@@ -101,20 +108,20 @@
         </div>
         <div id="divCriteria" class="row" style="padding-top: 3px; padding-bottom: 3px; padding-left:15px;">
             <div class="col-md-5">
-                <input id="txtSectorCode" class="form-control" type="text" />
+                <input id="txtSectorCode" class="form-control" type="text" tabindex="1" />
             </div>
             <div class="col-md-5">
-                <input id="txtDepartmentCode" class="form-control" type="text" />
+                <input id="txtDepartmentCode" class="form-control" type="text" tabindex="2" />
             </div>
             <div class="col-md-11">
-                <input id="txtDepartmentName" class="form-control" type="text" />
+                <input id="txtDepartmentName" class="form-control" type="text" tabindex="3" />
             </div>
             <div class="col-md-5">
-                <input id="txtPlanDate" class="form-control" type="text" />
+                <input id="txtPlanDate" class="form-control" type="text" tabindex="4" />
             </div>
             <div class="col-md-5">
                 <%--<input id="txtPlanStatus" class="form-control" type="text" />--%>
-                <select id="txtPlanStatus" class="selecte-box-custom">
+                <select id="txtPlanStatus" class="selecte-box-custom" tabindex="5">
                     <option value="" >ALL</option>
                     <option value="ACTIVE">ACTIVE</option>
                     <option value="INACTIVE">INACTIVE</option>
@@ -122,7 +129,7 @@
             </div>
             <div class="col-md-3">
                 <%--<input id="txtPlanType" class="form-control text-center" type="text" />--%>
-                <select id="txtPlanType" class="selecte-box-custom">
+                <select id="txtPlanType" class="selecte-box-custom" tabindex="6">
                     <option value="" >ALL</option>
                     <option value="MOBILE SITE">MOBILE SITE</option>
                     <option value="FIXED SITE">FIXED SITE</option>
@@ -131,8 +138,8 @@
             </div>
             <div class="col-md-2">
                 <div class="col-md-36">
-                    <a title="ลบข้อมูลที่กรอก"><span id="spClear" class="glyphicon glyphicon-remove"></span></a>
-                    <a title="ค้นหา"><span id="spSearch" class="glyphicon glyphicon-search"></span></a>
+                    <a title="ลบข้อมูลที่กรอก" tabindex="7"><span id="spClear" class="glyphicon glyphicon-remove"></span></a>
+                    <a title="ค้นหา" tabindex="8"><span id="spSearch" class="glyphicon glyphicon-search"></span></a>
                 </div>
             </div>
         </div>
@@ -153,7 +160,7 @@
                     <thead>
                         <tr>
                             <th class="col-md-5">
-                                <button sortOrder="SITE_ID">
+                                <button sortOrder="SITE_CODE">
                                     <span>รหัสภาค<i class="glyphicon glyphicon-triangle-bottom"></i></span>
                                 </button>
                             </th>

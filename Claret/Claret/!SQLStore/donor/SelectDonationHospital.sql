@@ -7,11 +7,13 @@ select dor.id as donor_id, dor.Donor_Number, dor.Gender, dor.Name, dor.Surname, 
 , to_char(nvl(dor.Last_Visit_Date,sysdate), 'DD MON YYYY HH24,MI', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as Last_Visit_Date_text
 , to_date(to_char(nvl(DV.visit_date,nvl(dv.Create_Date,sysdate)),'dd/mm/yyyy'),'dd/mm/yyyy') 
 	- to_date(to_char(nvl(dor.Last_Visit_Date,sysdate),'dd/mm/yyyy'),'dd/mm/yyyy') as diff_date 
-, dv.id as visit_id, '' as collection_plan_id, dv.collection_point_id, dv.site_id, nvl(dv.status,'REGISTER') as status, 'HOSPITAL' as visit_from
+, dv.id as visit_id, '' as collection_plan_id, dv.collection_point_id, dv.site_id, nvl(dv.status,'WAIT INTERVIEW') as status, 'HOSPITAL' as visit_from
 , dv.order_number as queue_number, '' as donation_type_id, '' as bag_id, dv.donation_to_id
 , to_char(nvl(DV.visit_date,nvl(dv.Create_Date,sysdate)), 'DD MON YYYY HH24,MI', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as visit_date_time_text
 , to_char(nvl(DV.visit_date,nvl(dv.Create_Date,sysdate)), 'DD MON YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as visit_date_text
 , to_char(nvl(DV.visit_date,nvl(dv.Create_Date,sysdate)), 'DD-MM-YYYY HH24,MI', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as visit_date
+, '' as weight, '' as pressure_max, '' as pressure_min, '' as hb, '' as plt, '' as hb_test, '' as heart_rate, '' as heart_lung
+, '' as interview_status, dv.sample_number, '' as for_collection_point_id
 from donor dor 
 left join donation_hospital dv on DV.donor_id = dor.id  and dv.id = :donation_hospital_id 
 left join rh_group rg on rg.id = dor.RH_Group_ID

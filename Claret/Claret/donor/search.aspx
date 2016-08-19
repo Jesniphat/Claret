@@ -3,14 +3,16 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <script>
         $(function () {
-            $("#spQueueHeader").H2GValue("คิวประจำวันที่ " + formatDate(H2G.today(), " dd MMM พ.ศ. yyyy")).H2GAttr("reportDate", formatDate(H2G.today(), "dd/MM/yyyy"));
+            //$("#spQueueHeader").H2GValue("คิวประจำวันที่ " + formatDate(H2G.today(), " dd MMM พ.ศ. yyyy")).H2GAttr("reportDate", formatDate(H2G.today(), "dd/MM/yyyy"));
+            $("#spQueueHeader").H2GValue("คิวประจำวันที่ " + formatDate(new Date(getDateFromFormat($("#data").H2GAttr("plan_date"), "dd/mm/yyyy")), " dd MMM พ.ศ. yyyy"));
+            if (!($("#data").H2GAttr("receiptHospitalID") == undefined || $("#data").H2GAttr("receiptHospitalID") == "")) { $("#spQueueHeader").hide(); }
             $("#searchTab").tabs({
                 active: 0,
                 activate: function (event, ui) {
                     $(ui.newPanel).find("input:not(input[type=button],input[type=submit],button):visible:first").focus();
                 },
             });
-            $("#txtBirthday").H2GDatebox().setCalendar({
+            $("#txtBirthday").H2GDatebox().prop('readonly', true).setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+0",
@@ -22,6 +24,14 @@
                 },
                 onEnterKey: function () {
                     enterDatePickerSearch($("#txtBirthday"), "enter");
+                },
+            });
+            $("#txtPostBirthday").H2GDatebox().prop('readonly', true).setCalendar({
+                maxDate: new Date(),
+                minDate: "-100y",
+                yearRange: "c-100:c+0",
+                onSelect: function (selectedDate, objDate) {
+                    $("#txtBloodGroup").focus();
                 },
             });
             $("#txtName").H2GNamebox(37);
@@ -55,9 +65,7 @@
                     notiWarning("กรุณากรอกวันเกิดผู้บริจาค");
                     return false;
                 }
-
                 validation($('#txtName').H2GValue(), $('#txtSurname').H2GValue(), $('#txtBirthday').H2GValue(), "");
-
             });
             $("#spPostSearch").click(function () {
                 postQueueSearch(true);
@@ -68,7 +76,7 @@
             });
             $.extend($.fn, {
                 donorSelect: function () {
-                    validation("", "", "", $(this).closest("tr").H2GAttr("refID"));
+                    validation("", "", $(this).closest("tr").H2GAttr("birthday"), $(this).closest("tr").H2GAttr("refID"));
                 },
                 queueSelect: function () {
                     $("#data").H2GFill({ donorID: $(this).closest("tr").H2GAttr("donorID"), visitID: $(this).closest("tr").H2GAttr("refID")});
@@ -102,10 +110,15 @@
                             $("#divReceiptHospital").show();
                             $("#spReceiptHospital").H2GValue(data.getItems.HospitalName + " รายการที่ " + data.getItems.QueueCount + "/" + data.getItems.QueueTotal);
                             $("#spQueueHeader").H2GValue("คิวประจำวันที่ " + formatDate(new Date(getDateFromFormat(data.getItems.CreateDate, "dd/MM/yyyy")), " dd MMM พ.ศ. yyyy")).H2GAttr("reportDate", data.getItems.CreateDate);
-                        } 
+
+                            postQueueSearch(true);
+                        }
                     }
                 });    //End ajax
+            } else {
+                postQueueSearch(true);
             }
+            
         });
         function validation(name, surname, birthday, donorid) {
             $.ajax({
@@ -116,6 +129,7 @@
                     , name: name
                     , surname: surname
                     , birthday: birthday
+                    , receipthospitalid: $("#data").H2GAttr("receiptHospitalID")
                 },
                 type: "POST",
                 dataType: "json",
@@ -126,7 +140,7 @@
                     if (!data.onError) {
                         data.getItems = jQuery.parseJSON(data.getItems);
                         console.log(data.getItems);
-                        if (data.getItems.Duplicate == "") {
+                        if (data.getItems.Duplicate == "" && data.getItems.AgeCheck == "") {
                             if (data.getItems.DonorID == "") {
                                 $("#data").removeAttr("donorID").removeAttr("visitID").H2GFill({ donorName: name, donorSurname: surname, birthday: birthday });
                                 $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "register.aspx", method: "post", staffaction: "register" }).submit();
@@ -134,8 +148,24 @@
                                 $("#data").removeAttr("donorName").removeAttr("donorSurname").removeAttr("birthday").H2GAttr("donorID", data.getItems.DonorID);
                                 $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "register.aspx", method: "post", staffaction: "register" }).submit();
                             }
-                        } else {
-                            alert(data.getItems.Duplicate);
+                        } else if (data.getItems.Duplicate != "") {
+                            notiWarning(data.getItems.Duplicate);
+                        } else if (data.getItems.AgeCheck != "") {
+                            //notiWarning(data.getItems.AgeCheck);
+                            $("#popupheader").H2GValue("กรุณาตรวจสอบ");
+                            $("#spAgeWarning").H2GValue(data.getItems.AgeCheck);
+                            $("#divAgeContainer").H2GFill({ donorID: data.getItems.DonorID });
+                            $("#divAgeContainer input.btn-success").click(function () {
+                                if ($('#divAgeContainer').H2GAttr("donorID") == "") {
+                                    $("#data").H2GRemoveAttr("donorID,visitID").H2GFill({ donorName: name, donorSurname: surname, birthday: birthday });
+                                    $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "register.aspx", method: "post", staffaction: "register" }).submit();
+                                } else {
+                                    $("#data").H2GRemoveAttr("donorName,donorSurname,birthday").H2GAttr("donorID", $('#divAgeContainer').H2GAttr("donorID"));
+                                    $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "register.aspx", method: "post", staffaction: "register" }).submit();
+                                }
+                            });
+                            $("#divAgeContainer").find("input.btn-block").click(function () { closePopup(); });
+                            openPopup($("#divAgeContainer"));
                         }
                     } else {
                         notiWarning(data.exMessage);
@@ -146,89 +176,100 @@
             return true;
         }
         function donorSearch(newSearch) {
-            var dataView = $("#tbDonor > tbody");
-            $(dataView).H2GValue($("#tbDonor > thead > tr.more-loading").clone().show());
-            if ($(dataView).closest("table").H2GAttr("wStatus") != "working") {
-                if (newSearch) { $("#tbDonor").attr("currentPage", 1) }
-                $(dataView).closest("table").H2GAttr("wStatus", "working");
-                $.ajax({
-                    url: '../../ajaxAction/donorAction.aspx',
-                    data: {
-                        action: 'searchdonor'
-                        , donornumber: $("#txtDonorNumber").H2GValue()
-                        , nationnumber: $("#txtNationNumber").H2GValue()
-                        , extnumber: $("#txtExtNumber").H2GValue()
-                        , name: $("#txtName").H2GValue()
-                        , surname: $("#txtSurname").H2GValue()
-                        , birthday: $("#txtBirthday").H2GValue()
-                        , bloodgroup: $("#txtBloodGroup").H2GValue()
-                        , p: $("#tbDonor").attr("currentPage") || 1
-                        , so: $("#tbDonor").attr("sortOrder") || "donor_number"
-                        , sd: $("#tbDonor").attr("sortDirection") || "desc"
-                    },
-                    type: "POST",
-                    dataType: "json",
-                    error: function (xhr, s, err) {
-                        console.log(s, err);
-                        $(dataView).H2GValue($("#tbDonor > thead > tr.no-transaction").clone().show());
-                        $(dataView).closest("table").H2GAttr("wStatus", "error");
-                    },
-                    success: function (data) {
-                        $(dataView).H2GValue('');
-                        if (!data.onError) {
-                            data.getItems = jQuery.parseJSON(data.getItems);
-                            if (data.getItems.SearchList.length > 0) {
-                                if (data.getItems.GoNext == "Y") {
-                                    if (data.getItems.Duplicate == "") {
-                                        $.each((data.getItems.SearchList), function (index, e) {
-                                            var dataRow = $("#tbDonor > thead > tr.template-data").clone();
-                                            $(dataRow).attr('refID', e.ID).donorSelect();
-                                        });
+            if (!($("#txtDonorNumber").H2GValue() == "" &&
+                $("#txtNationNumber").H2GValue() == "" &&
+                $("#txtExtNumber").H2GValue() == "" &&
+                $("#txtName").H2GValue() == "" &&
+                $("#txtSurname").H2GValue() == "" &&
+                $("#txtBirthday").H2GValue() == "" &&
+                $("#txtBloodGroup").H2GValue() == "")) {
+                var dataView = $("#tbDonor > tbody");
+                $(dataView).H2GValue($("#tbDonor > thead > tr.more-loading").clone().show());
+                if ($(dataView).closest("table").H2GAttr("wStatus") != "working") {
+                    if (newSearch) { $("#tbDonor").attr("currentPage", 1) }
+                    $(dataView).closest("table").H2GAttr("wStatus", "working");
+                    $.ajax({
+                        url: '../../ajaxAction/donorAction.aspx',
+                        data: {
+                            action: 'searchdonor'
+                            , donornumber: $("#txtDonorNumber").H2GValue()
+                            , nationnumber: $("#txtNationNumber").H2GValue()
+                            , extnumber: $("#txtExtNumber").H2GValue()
+                            , name: $("#txtName").H2GValue()
+                            , surname: $("#txtSurname").H2GValue()
+                            , birthday: $("#txtBirthday").H2GValue()
+                            , bloodgroup: $("#txtBloodGroup").H2GValue()
+                            , p: $("#tbDonor").attr("currentPage") || 1
+                            , so: $("#tbDonor").attr("sortOrder") || "donor_number"
+                            , sd: $("#tbDonor").attr("sortDirection") || "desc"
+                        },
+                        type: "POST",
+                        dataType: "json",
+                        error: function (xhr, s, err) {
+                            console.log(s, err);
+                            $(dataView).H2GValue($("#tbDonor > thead > tr.no-transaction").clone().show());
+                            $(dataView).closest("table").H2GAttr("wStatus", "error");
+                        },
+                        success: function (data) {
+                            $(dataView).H2GValue('');
+                            if (!data.onError) {
+                                data.getItems = jQuery.parseJSON(data.getItems);
+                                if (data.getItems.SearchList.length > 0) {
+                                    if (data.getItems.GoNext == "Y") {
+                                        if (data.getItems.Duplicate == "") {
+                                            $.each((data.getItems.SearchList), function (index, e) {
+                                                var dataRow = $("#tbDonor > thead > tr.template-data").clone();
+                                                $(dataRow).H2GFill({ refID: e.ID, birthday: e.BirthdayFormat }).donorSelect();
+                                            });
+                                        } else {
+                                            $.each((data.getItems.SearchList), function (index, e) {
+                                                var dataRow = $("#tbDonor > thead > tr.template-data").clone().show();
+                                                $(dataRow).H2GFill({ refID: e.ID, birthday: e.BirthdayFormat });
+                                                $(dataRow).find('.td-donor-number').H2GValue(e.DonorNumber).H2GAttr("title", e.DonorNumber);
+                                                $(dataRow).find('.td-nation-number').H2GValue(e.NationNumber).H2GAttr("title", e.NationNumber);
+                                                $(dataRow).find('.td-ext-number').H2GValue(e.ExternalNumber).H2GAttr("title", e.ExternalNumber);
+                                                $(dataRow).find('.td-name').H2GValue(e.Name).H2GAttr("title", e.Name);
+                                                $(dataRow).find('.td-surname').H2GValue(e.Surname).H2GAttr("title", e.Surname);
+                                                $(dataRow).find('.td-birthday').H2GValue(e.Birthday).H2GAttr("title", e.Birthday);
+                                                $(dataRow).find('.td-blood-group').H2GValue(e.BloodGroup).H2GAttr("title", e.BloodGroup);
+                                                $(dataView).append(dataRow);
+                                            });
+                                            $(dataView).closest("table").attr("totalPage", data.getItems.TotalPage)
+                                            //alert(data.getItems.Duplicate);
+                                        }
                                     } else {
                                         $.each((data.getItems.SearchList), function (index, e) {
                                             var dataRow = $("#tbDonor > thead > tr.template-data").clone().show();
-                                            $(dataRow).H2GAttr('refID', e.ID);
-                                            $(dataRow).find('.td-donor-number').append(e.DonorNumber).H2GAttr("title", e.DonorNumber);
-                                            $(dataRow).find('.td-nation-number').append(e.NationNumber).H2GAttr("title", e.NationNumber);
-                                            $(dataRow).find('.td-ext-number').append(e.ExternalNumber).H2GAttr("title", e.ExternalNumber);
-                                            $(dataRow).find('.td-name').append(e.Name).H2GAttr("title", e.Name);
-                                            $(dataRow).find('.td-surname').append(e.Surname).H2GAttr("title", e.Surname);
-                                            $(dataRow).find('.td-birthday').append(e.Birthday).H2GAttr("title", e.Birthday);
+                                            $(dataRow).H2GFill({ refID: e.ID, birthday: e.BirthdayFormat });
+                                            $(dataRow).find('.td-donor-number').H2GValue(e.DonorNumber).H2GAttr("title", e.DonorNumber);
+                                            $(dataRow).find('.td-nation-number').H2GValue(e.NationNumber).H2GAttr("title", e.NationNumber);
+                                            $(dataRow).find('.td-ext-number').H2GValue(e.ExternalNumber).H2GAttr("title", e.ExternalNumber);
+                                            $(dataRow).find('.td-name').H2GValue(e.Name).H2GAttr("title", e.Name);
+                                            $(dataRow).find('.td-surname').H2GValue(e.Surname).H2GAttr("title", e.Surname);
+                                            $(dataRow).find('.td-birthday').H2GValue(e.Birthday).H2GAttr("title", e.Birthday);
                                             $(dataRow).find('.td-blood-group').append(e.BloodGroup).H2GAttr("title", e.BloodGroup);
                                             $(dataView).append(dataRow);
                                         });
                                         $(dataView).closest("table").attr("totalPage", data.getItems.TotalPage)
-                                        alert(data.getItems.Duplicate);
                                     }
-                                } else {
-                                    $.each((data.getItems.SearchList), function (index, e) {
-                                        var dataRow = $("#tbDonor > thead > tr.template-data").clone().show();
-                                        $(dataRow).H2GAttr('refID', e.ID);
-                                        $(dataRow).find('.td-donor-number').append(e.DonorNumber).H2GAttr("title", e.DonorNumber);
-                                        $(dataRow).find('.td-nation-number').append(e.NationNumber).H2GAttr("title", e.NationNumber);
-                                        $(dataRow).find('.td-ext-number').append(e.ExternalNumber).H2GAttr("title", e.ExternalNumber);
-                                        $(dataRow).find('.td-name').append(e.Name).H2GAttr("title", e.Name);
-                                        $(dataRow).find('.td-surname').append(e.Surname).H2GAttr("title", e.Surname);
-                                        $(dataRow).find('.td-birthday').append(e.Birthday).H2GAttr("title", e.Birthday);
-                                        $(dataRow).find('.td-blood-group').append(e.BloodGroup).H2GAttr("title", e.BloodGroup);
-                                        $(dataView).append(dataRow);
-                                    });
-                                    $(dataView).closest("table").attr("totalPage", data.getItems.TotalPage)
-                                }
 
+                                } else {
+                                    $(dataView).H2GValue($("#tbDonor > thead > tr.no-transaction").clone().show());
+                                    $(dataView).closest("table").attr("totalPage", 0)
+                                }
                             } else {
                                 $(dataView).H2GValue($("#tbDonor > thead > tr.no-transaction").clone().show());
                                 $(dataView).closest("table").attr("totalPage", 0)
                             }
-                        } else {
-                            $(dataView).H2GValue($("#tbDonor > thead > tr.no-transaction").clone().show());
-                            $(dataView).closest("table").attr("totalPage", 0)
+                            $(dataView).closest("table").H2GAttr("wStatus", "done");
+                            genGridPage($(dataView).closest("table"), donorSearch);
+                            $("#txtDonorNumber").focus();
                         }
-                        $(dataView).closest("table").H2GAttr("wStatus", "done");
-                        genGridPage($(dataView).closest("table"), donorSearch);
-                        $("#txtDonorNumber").focus();
-                    }
-                });    //End ajax
+                    });    //End ajax
+                }
+
+            } else {
+                notiWarning("กรุณากรอกข้อมูลที่ต้องการค้นหา อย่างน้อย 1 ช่องข้อมูล");
             }
         }
         function postQueueSearch(newSearch) {
@@ -249,8 +290,8 @@
                         , birthday: $("#txtPostBirthday").H2GValue()
                         , bloodgroup: $("#txtPostBloodGroup").H2GValue()
                         , samplenumber: $("#txtPostSample").H2GValue()
-                        , reportdate: $("#spQueueHeader").H2GAttr("reportDate") //formatDate(H2G.today(), "dd/MM/yyyy") //$("#txtReportDate").H2GValue()
-                        , status: ""
+                        , reportdate: $("#data").H2GAttr("plan_date") //formatDate(H2G.today(), "dd/MM/yyyy") //$("#txtReportDate").H2GValue()
+                        , status: $("#data").H2GAttr("receiptHospitalID") ? "WAIT RESULT" : "WAIT INTERVIEW"
                         , receipthospitalid: $("#data").H2GAttr("receiptHospitalID")
                         , p: $("#tbPostQueue").attr("currentPage") || 1
                         , so: $("#tbPostQueue").attr("sortOrder") || "queue_number"
@@ -277,19 +318,18 @@
                                     $.each((data.getItems.PostQueueList), function (index, e) {
                                         var dataRow = $("#tbPostQueue > thead > tr.template-data").clone().show();
                                         $(dataRow).H2GFill({ refID: e.VisitID, donorID: e.DonorID });
-                                        $(dataRow).find('.td-queue').append(e.QueueNumber).H2GAttr("title", e.QueueNumber);
-                                        $(dataRow).find('.td-name').append(e.Name).H2GAttr("title", e.Name);
-                                        $(dataRow).find('.td-sample').append(e.SampleNumber).H2GAttr("title", e.SampleNumber);
-                                        $(dataRow).find('.td-remarks').append(e.Comment).H2GAttr("title", e.Comment);
-
-                                        $(dataRow).find('.td-regis-staff').append(e.RegisStaff).H2GAttr("title", e.RegisStaff);
-                                        $(dataRow).find('.td-regis-time').append(e.RegisTime).H2GAttr("title", e.RegisTime);
-                                        $(dataRow).find('.td-interview-staff').append(e.InterviewStaff).H2GAttr("title", e.InterviewStaff);
-                                        $(dataRow).find('.td-interview-time').append(e.InterviewTime).H2GAttr("title", e.InterviewTime);
-                                        $(dataRow).find('.td-collection-staff').append(e.CollectionStaff).H2GAttr("title", e.CollectionStaff);
-                                        $(dataRow).find('.td-collection-time').append(e.CollectionTime).H2GAttr("title", e.CollectionTime);
-                                        $(dataRow).find('.td-lab-staff').append(e.LabStaff).H2GAttr("title", e.LabStaff);
-                                        $(dataRow).find('.td-lab-time').append(e.LabTime).H2GAttr("title", e.LabTime);
+                                        $(dataRow).find('.td-queue').H2GValue(e.QueueNumber).H2GAttr("title", e.QueueNumber);
+                                        $(dataRow).find('.td-name').H2GValue(e.Name).H2GAttr("title", e.Name);
+                                        $(dataRow).find('.td-sample').H2GValue(e.SampleNumber).H2GAttr("title", e.SampleNumber);
+                                        $(dataRow).find('.td-remarks').H2GValue(e.Comment).H2GAttr("title", e.Comment);
+                                        $(dataRow).find('.td-regis-staff').H2GValue(e.RegisStaff).H2GAttr("title", e.RegisStaff);
+                                        $(dataRow).find('.td-regis-time').H2GValue(e.RegisTime).H2GAttr("title", e.RegisTime);
+                                        $(dataRow).find('.td-interview-staff').H2GValue(e.InterviewStaff).H2GAttr("title", e.InterviewStaff);
+                                        $(dataRow).find('.td-interview-time').H2GValue(e.InterviewTime).H2GAttr("title", e.InterviewTime);
+                                        $(dataRow).find('.td-collection-staff').H2GValue(e.CollectionStaff).H2GAttr("title", e.CollectionStaff);
+                                        $(dataRow).find('.td-collection-time').H2GValue(e.CollectionTime).H2GAttr("title", e.CollectionTime);
+                                        $(dataRow).find('.td-lab-staff').H2GValue(e.LabStaff).H2GAttr("title", e.LabStaff);
+                                        $(dataRow).find('.td-lab-time').H2GValue(e.LabTime).H2GAttr("title", e.LabTime);
                                         $(dataView).append(dataRow);
                                     });
                                     $(dataView).closest("table").attr("totalPage", data.getItems.TotalPage)
@@ -443,7 +483,7 @@
                         </div>
                         <div class="row" style="padding-left: 15px;">
                             <div class="col-md-36">
-                                <table id="tbDonor" class="table table-hover table-striped" totalPage="1" currentPage="1" sortDirection="desc" sortOrder="donor_number">
+                                <table id="tbDonor" class="table table-hover table-striped table-dis-input" totalPage="1" currentPage="1" sortDirection="desc" sortOrder="donor_number">
                                     <thead>
                                         <tr>
                                             <th style="width: 16.66666667%;"><button sortOrder="donor_number">เลขประจำตัวผู้บริจาค<i class="glyphicon glyphicon-triangle-bottom"></i></button>
@@ -468,11 +508,14 @@
                                             </td>
                                             <td class="td-nation-number">
                                             </td>
-                                            <td class="td-ext-number">
+                                            <td>
+                                                <input type="text"  class="td-ext-number" readonly />
                                             </td>
-                                            <td class="td-name">
+                                            <td>
+                                                <input type="text" class="td-name" readonly />
                                             </td>
-                                            <td class="td-surname">
+                                            <td>
+                                                <input type="text" class="td-surname" readonly />
                                             </td>
                                             <td class="td-birthday">
                                             </td>
@@ -601,7 +644,7 @@
                         </div>
                         <div class="row" style="padding-left: 15px;">
                             <div class="col-md-36">
-                                <table id="tbPostQueue" class="table table-bordered" totalPage="1" currentPage="1" sortDirection="desc" sortOrder="queue_number">
+                                <table id="tbPostQueue" class="table table-bordered table-dis-input" totalPage="1" currentPage="1" sortDirection="desc" sortOrder="queue_number">
                                     <thead>
                                         <tr>
                                             <th class="col-md-2"><button sortOrder="QUEUE_NUMBER">คิวที่<i class="glyphicon glyphicon-triangle-bottom"></i></button>
@@ -616,7 +659,7 @@
                                             </th>
                                             <th class="col-md-4" colspan="2"><button>คัดกรอง</button>
                                             </th>
-                                            <th class="col-md-4" colspan="2"><button>จัดเก็บ</button>
+                                            <th class="col-md-4" colspan="2"><button>บริจาค</button>
                                             </th>
                                             <th class="col-md-4" colspan="2"><button>Lab</button>
                                             </th>
@@ -627,11 +670,14 @@
                                         <tr class="template-data" style="display:none;" refID="NEW">
                                             <td class="td-queue text-center">
                                             </td>
-                                            <td class="td-name">
+                                            <td>
+                                                <input type="text" class="td-name" readonly />
                                             </td>
-                                            <td class="td-sample">
+                                            <td>
+                                                <input type="text" class="td-sample" readonly />
                                             </td>
-                                            <td class="td-remarks">
+                                            <td>
+                                                <input type="text" class="td-remarks" readonly />
                                             </td>
                                             <td class="td-regis-staff col-md-2" style="background-color: #DBEEF3;">
                                             </td>
@@ -675,5 +721,31 @@
             </div>
         </div>
     </div>
-
+    <div id="divAgeContainer" style="display:none;">
+            <div id="divAgeTemplete" style="display: inline-block;">
+                <div class="newouterborder" style="background-color: #F4F4F4;">
+                    <div class="popheader row text-left" style="padding: 5px 0px;">
+                        <div id="popupheader" class="popupheader col-md-33">กรุณาตรวจสอบ</div>
+                        <div class="col-md-3 text-center" style="float:right;">
+                            <a class="icon"><span class="glyphicon glyphicon-remove" aria-hidden="true" title="close" onclick="return closePopup();"></span></a>
+                        </div>
+                    </div>
+                    <div class="popupbody text-left" style="width:300px;">
+                        <div class="row">
+                            <div class="col-md-36"><span id="spAgeWarning"></span></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-md-offset-24 text-right">
+                                <input type="button" value="ตกลง" class="btn btn-block btn-success" onclick="return autoCreatePlan();" />
+                            </div>
+                            <div class="col-md-6 text-right">
+                                <input type="button" value="ยกเลิก" class="btn btn-block" onclick="return closePopup();" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="popfooter" style="text-align: right;">
+                    </div>
+                </div>
+            </div>
+        </div>
 </asp:Content>

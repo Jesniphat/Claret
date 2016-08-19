@@ -15,7 +15,10 @@
     <script type="text/javascript">
         var departmentData;
         $(function () {
-            $("#txtDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
+            $("#txtHospital").focus().enterKey(function () { $("#ddlHospital").val($("#txtHospital").val().toUpperCase()).change(); });
+            $("#txtDepartment").enterKey(function () { $("#ddlDepartment").val($("#txtDepartment").val().toUpperCase()).change(); });
+            $("#txtLab").enterKey(function () { $("#ddlLab").val($("#txtLab").val().toUpperCase()).change(); });
+            $("#txtDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().prop('readonly', true).setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+0",
@@ -24,12 +27,11 @@
                 },
             });
 
-            $("#ddlHospital").setDropdownListValue({ url: '../ajaxAction/masterAction.aspx', data: { action: 'hospital' } }).on("change", function () {
+            $("#ddlHospital").on("change", function () {
                 $("#txtHospital").H2GValue($("#ddlHospital").H2GValue());
-
                 if ($("#txtHospital").H2GValue() == "") {
                     $("#ddlDepartment").val("").change().H2GDisable();
-                    $("#txtDepartment").H2GDisable().H2GValue('').focus();
+                    $("#txtDepartment").H2GDisable().H2GValue('');//.focus();
                 } else {
                     var dataObj = [];
                     var dataAll = $("#ddlDepartment").data("data-ddl");
@@ -43,25 +45,18 @@
                         });
                     }
                     $("#ddlDepartment").setDropdownListValue({ dataObject: dataObj, enable: true });
-                    $("#txtDepartment").H2GEnable().H2GValue('').focus();
+                    $("#txtDepartment").H2GEnable().H2GValue('');//.focus();
                 }
-            });
+            }).setDropdownListValue({ url: '../ajaxAction/masterAction.aspx', data: { action: 'hospital' } });
 
-            $("#ddlReason").setDropdownListValue({ url: '../ajaxAction/masterAction.aspx', data: { action: 'reason' } }).on("change", function () {
-                $("#txtLab").focus();
-            });
-            $("#ddlDonationTo").setDropdownListValue({ url: '../ajaxAction/masterAction.aspx', data: { action: 'donationto' } }).on("change", function () {
-                $("#txtExamCode").focus();
-            });
-
-            $("#ddlLab").setDropdownListValue({ url: '../ajaxAction/masterAction.aspx', data: { action: 'lab' } }).on("change", function () {
+            $("#ddlReason")//.on("change", function () { $("#txtLab").focus(); console.log('$("#txtLab").focus()'); })
+                .setDropdownListValue({ url: '../ajaxAction/masterAction.aspx', data: { action: 'reason' } });
+            $("#ddlDonationTo")//.on("change", function () { $("#txtExamCode").focus(); })
+                .setDropdownListValue({ url: '../ajaxAction/masterAction.aspx', data: { action: 'donationto' } });
+            $("#ddlLab").on("change", function () {
                 $("#txtLab").H2GValue($("#ddlLab").H2GValue());
-                $("#ddlDonationTo").closest("div").focus();
-            });
-            $("#txtHospital").enterKey(function () { $("#ddlHospital").val($("#txtHospital").val().toUpperCase()).change(); });
-            $("#txtDepartment").enterKey(function () { $("#ddlDepartment").val($("#txtDepartment").val().toUpperCase()).change(); });
-            $("#txtLab").enterKey(function () { $("#ddlLab").val($("#txtLab").val().toUpperCase()).change(); });
-
+                //$("#ddlDonationTo").closest("div").focus();
+            }).setDropdownListValue({ url: '../ajaxAction/masterAction.aspx', data: { action: 'lab' } });
             $("#ddlExam").setAutoListValue({
                 url: '../ajaxAction/masterAction.aspx', data: { action: 'examination' },
                 selectItem: function () {
@@ -77,14 +72,14 @@
             $("#txtExamCode").enterKey(function () { getExamination(); });
             
             $("#txtDepartment").H2GDisable();
-            $("#ddlDepartment").setDropdownListValue({
+            $("#ddlDepartment").on("change", function () {
+                $("#txtDepartment").H2GValue($("#ddlDepartment").H2GValue());
+                //$("#ddlStaff").closest("div").find("input").focus();
+            }).setDropdownListValue({
                 url: '../ajaxAction/masterAction.aspx',
                 data: { action: 'department' },
                 tempData: true,
                 enable: false,
-            }).on("change", function () {
-                $("#txtDepartment").H2GValue($("#ddlDepartment").H2GValue());
-                $("#ddlStaff").closest("div").find("input").focus();
             });
             $.extend($.fn, {
                 deleteExam: function (args) {
@@ -166,8 +161,7 @@
                 },
             });
 
-
-            $("#dateList").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
+            $("#dateList").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().prop('readonly', true).setCalendar({
                 // maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+0",
@@ -179,6 +173,7 @@
             
             var hospitalListDate = $("#dateList").val();
             getDornorHospitalList(hospitalListDate);
+
         });
 
         function getExamination() {
@@ -272,9 +267,7 @@
             }
             return true;
         }
-
         function getDornorHospitalList(hospitalListDate) {
-            // console.log("hospitalListDate = ", hospitalListDate);
             $.ajax({
                 url: "../ajaxAction/qualityAction.aspx",
                 data: H2G.ajaxData({
@@ -311,15 +304,13 @@
                                             "</td>" +
                                         "</tr>";
                             $('#hospitalList > tbody').append(rows);
-                        }
-                        
+                        }                        
                     } else {
                         
                     }
                 }
             });
         }
-
         function gotoSearch(id) {
             //console.log(id);
             $("#data").H2GFill({ receiptHospitalID: id});
@@ -461,7 +452,7 @@
             รายการวันที่ <input type="text" id="dateList" value="" class="form-control required text-center" style="width:143px; display:inline;" />
         </div>
     </div>
-    <div class="row" style="margin-top:5px;">
+    <div class="row" style="margin-top:5px; margin-bottom: 50px;">
         <div class="col-md-36">
             <table class="table table-bordered" id="hospitalList">
                 <thead class="table table-bordered" style="color:gray">

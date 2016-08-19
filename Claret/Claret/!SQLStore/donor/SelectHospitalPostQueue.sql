@@ -15,7 +15,7 @@ FROM (
 						left join external_card ec on ec.id = dexc.external_card_id
 						left join rh_group rg on rg.id = dn.rh_group_id
 						left join staff st on st.id = dv.create_staff
-                        where dv.receipt_hospital_id = :receipt_hospital_id /*#REPORT_DATE*/ /*#STATUS*/
+                        where dv.receipt_hospital_id = :receipt_hospital_id /*#STATUS*/
                         /*#QUEUE_NUMBER*/ /*#DONOR_NUMBER*/ /*#NATION_NUMBER*/ /*#NAME*/ /*#SURNAME*/ 
                         /*#BIRTHDAY*/ /*#BLOOD_GROUP*/ 
 					) dn

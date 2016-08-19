@@ -24,6 +24,16 @@ Public Class planningAction
                 Call GetPlanById()
             Case "getsubcollectionedit"
                 Call GetSubCollectionEdit()
+            Case "getHasPlanDetail"
+                Call GetHasPlanDetail()
+            Case "saveplan"
+                Call SavePlanning()
+            Case "getmaxdate"
+                Call GetMaxDate()
+            Case "checkduplicateactive"
+                Call CheckDuplicateActive()
+            Case "getsitecodebyid"
+                Call getsitecodebyid()
 
         End Select
 
@@ -46,8 +56,8 @@ Public Class planningAction
             Dim intItemPerPage As Integer = 20
             Dim intTotalPage As Integer = 1
 
-            If Not String.IsNullOrEmpty(_REQUEST("sectorcode")) Then param.Add("#SITE_ID", " and (UPPER(cp.SITE_ID) like UPPER('" & _REQUEST("sectorcode") & "')) ")
-            If Not String.IsNullOrEmpty(_REQUEST("departmentcode")) Then param.Add("#COLLECTION_POINT_ID", " and (UPPER(cp.COLLECTION_POINT_ID) like UPPER('" & _REQUEST("departmentcode") & "')) ")
+            If Not String.IsNullOrEmpty(_REQUEST("sectorcode")) Then param.Add("#SITE_ID", " and (UPPER(s.CODE) like UPPER('" & _REQUEST("sectorcode") & "')) ")
+            If Not String.IsNullOrEmpty(_REQUEST("departmentcode")) Then param.Add("#COLLECTION_POINT_ID", " and (UPPER(cpo.CODE) like UPPER('" & _REQUEST("departmentcode") & "')) ")
             If Not String.IsNullOrEmpty(_REQUEST("plandate")) Then param.Add("#PLAN_DATE", "and to_char(cp.PLAN_DATE, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("plandate") & "' ")
             If Not String.IsNullOrEmpty(_REQUEST("departmentname")) Then param.Add("#NAME", " and UPPER(cpo.NAME) like UPPER('" & _REQUEST("departmentname") & "') ")
             'If Not String.IsNullOrEmpty(_REQUEST("samplenumber")) Then param.Add("#BLOOD_GROUP", " and UPPER(rg.description) like UPPER('" & _REQUEST("bloodgroup") & "') ")
@@ -56,7 +66,7 @@ Public Class planningAction
             'If Not String.IsNullOrEmpty(_REQUEST("reportdate")) Then param.Add("#REPORT_DATE", "and to_char(nvl(dv.VISIT_DATE,dv.CREATE_DATE), 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("reportdate") & "' ")
 
             If Not String.IsNullOrEmpty(_REQUEST("planstatus")) Then param.Add("#STATUS", " and cp.STATUS = '" & _REQUEST("planstatus") & "' ")
-            If Not String.IsNullOrEmpty(_REQUEST("plantype")) Then param.Add("#COLLECTION_TYPE", " and cp.COLLECTION_TYPE = '" & _REQUEST("plantype") & "' ")
+            If Not String.IsNullOrEmpty(_REQUEST("plantype")) Then param.Add("#COLLECTION_TYPE", " and cpo.COLLECTION_TYPE = '" & _REQUEST("plantype") & "' ")
 
             Dim sqlRecord As String = "SELECT DN.rn as row_num, dn.* 
                                 FROM (
@@ -64,7 +74,9 @@ Public Class planningAction
                                         FROM (
                                             SELECT dn.* 
                                                 FROM (
-									                    select cp.ID, cp.SITE_ID, cp.COLLECTION_POINT_ID, cpo.NAME, cp.PLAN_DATE, cp.STATUS, cp.COLLECTION_TYPE from COLLECTION_PLAN cp 
+									                    select cp.ID, s.CODE AS SITE_CODE, cp.SITE_ID, cp.COLLECTION_POINT_ID, cpo.CODE AS COLLECTION_POINT_CODE, cpo.NAME, to_char(nvl(cp.PLAN_DATE,nvl(cp.PLAN_DATE,sysdate)), 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') AS PLAN_DATE, cp.STATUS, cpo.COLLECTION_TYPE 
+                                                        from COLLECTION_PLAN cp 
+                                                        INNER JOIN SITE s ON cp.SITE_ID = s.ID
                                                         LEFT JOIN COLLECTION_POINT cpo on cp.COLLECTION_POINT_ID = cpo.ID
                                                         where 1=1 /*#SITE_ID*/ /*#STATUS*/ /*#COLLECTION_TYPE*/ 
                                                         /*#COLLECTION_POINT_ID*/ /*#PLAN_DATE*/ /*#NAME*/  
@@ -74,7 +86,9 @@ Public Class planningAction
                                     ) dn
                                 WHERE rn BETWEEN :start_row AND :end_row "
 
-            Dim sqlTotal As String = "SELECT nvl(count(COLLECTION_POINT_ID),0) from ( select cp.SITE_ID, cp.COLLECTION_POINT_ID, cpo.NAME, cp.PLAN_DATE, cp.STATUS, cp.COLLECTION_TYPE from COLLECTION_PLAN cp 
+            Dim sqlTotal As String = "SELECT nvl(count(COLLECTION_POINT_ID),0) from ( select cp.SITE_ID, cp.COLLECTION_POINT_ID, cpo.CODE AS COLLECTION_POINT_CODE, cpo.NAME, cp.PLAN_DATE, cp.STATUS, cpo.COLLECTION_TYPE 
+                                                        from COLLECTION_PLAN cp 
+                                                        INNER JOIN SITE s ON cp.SITE_ID = s.ID 
                                                         LEFT JOIN COLLECTION_POINT cpo on cp.COLLECTION_POINT_ID = cpo.ID
                                                         where 1=1 /*#SITE_ID*/ /*#STATUS*/ /*#COLLECTION_TYPE*/ 
                                                         /*#COLLECTION_POINT_ID*/ /*#PLAN_DATE*/ /*#NAME*/ ) dn"
@@ -90,8 +104,8 @@ Public Class planningAction
             For Each dRow As DataRow In Cbase.QueryTable(sqlRecord, param).Rows
                 DonorSearchItem = New DonorSearchItem
                 DonorSearchItem.ID = dRow("id").ToString()
-                DonorSearchItem.DonorNumber = dRow("SITE_ID").ToString()
-                DonorSearchItem.NationNumber = dRow("COLLECTION_POINT_ID").ToString()
+                DonorSearchItem.DonorNumber = dRow("SITE_CODE").ToString()
+                DonorSearchItem.NationNumber = dRow("COLLECTION_POINT_CODE").ToString()
                 DonorSearchItem.ExternalNumber = dRow("NAME").ToString()
                 DonorSearchItem.Name = dRow("PLAN_DATE").ToString()
                 DonorSearchItem.Surname = dRow("STATUS").ToString()
@@ -195,9 +209,22 @@ Public Class planningAction
     Private Sub GetPlanById()
         Try
             Dim planId As String = _REQUEST("planid")
-            Dim getPlan As String = "SELECT c.*, cp.CODE as COLLECTION_POINT_CODE FROM collection_plan c inner join collection_point cp on c.COLLECTION_POINT_ID = cp.ID WHERE c.ID = '" & planId & "'"
+            Dim getPlan As String = "SELECT c.*, cp.*, cp.CODE as COLLECTION_POINT_CODE, s.code As SITE_CODE,
+                                     to_char(nvl(c.PLAN_DATE,nvl(c.PLAN_DATE,sysdate)), 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as PLANDATE, 
+                                     to_char(nvl(cpc.START_DATE,nvl(cpc.START_DATE,sysdate)), 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as RMSTART, 
+                                     to_char(nvl(cpc.END_DATE,nvl(cpc.END_DATE,sysdate)), 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') AS RMEND, 
+                                     cpc.COMMENT_TEXT 
+                                     FROM collection_plan c 
+                                     inner join collection_point cp on c.COLLECTION_POINT_ID = cp.ID 
+                                     inner join site s on c.site_id = s.id 
+                                     left join Collection_Plan_Comment cpc ON c.ID = cpc.COLLECTION_PLAN_ID 
+                                     WHERE c.ID = '" & planId & "'"
+            'CODE as COLLECTION_POINT_CODE, s.code As SITE_CODE, cp.NAME, cp.LACATION, cp.ADDRESS, cp.PROVINCE,
+            '                         cp.ZIPCODE, cp.COUNTRY_ID, cp.TEL, cp.FAX, cp.EMAIL, cp.WEBSITE,
+
             Dim getPlanDetail As String = "SELECT D.ID, D.COLLECTION_PLAN_ID, D.COLLECTION_POINT_ID, D.TARGET_NUMBER, D.INVITE_NUMBER, D.DONATE_NUMBER, D.REFUSE_NUMBER, 
-                                           CP.CODE AS COLLECTION_POINT_CODE, CP.NAME, SUM(DV.ID) AS REGISDONATE 
+                                           CP.CODE AS COLLECTION_POINT_CODE, CP.NAME, NVL(COUNT(DV.ID),0) AS REGISAMT , NVL(SUM(decode(interview_status,'DONATION',1,0)),0) AS DONATEAMT, 
+                                           NVL(SUM(decode(interview_status,'REFUSED',1,0)),0) AS REFUSEAMT 
                                            FROM COLLECTION_PLAN_DETAIL D INNER JOIN COLLECTION_POINT CP ON D.COLLECTION_POINT_ID = CP.ID 
                                            LEFT JOIN DONATION_VISIT DV ON D.COLLECTION_PLAN_ID = DV.COLLECTION_PLAN_ID AND D.COLLECTION_POINT_ID = DV.COLLECTION_POINT_ID 
                                            WHERE D.COLLECTION_PLAN_ID = '" & planId & "' " &
@@ -210,7 +237,7 @@ Public Class planningAction
             For Each dr As DataRow In dtPlan.Rows
                 Dim Item As New Collection_Plan
                 Item.id = dr("ID").ToString
-                Item.plan_date = dr("PLAN_DATE").ToString
+                Item.plan_date = dr("PLANDATE").ToString
                 Item.create_date = dr("CREATE_DATE").ToString
                 Item.create_staff = dr("CREATE_STAFF").ToString
                 Item.collection_point_id = dr("COLLECTION_POINT_ID").ToString
@@ -243,6 +270,10 @@ Public Class planningAction
                 Item.start_time = dr("START_TIME").ToString
                 Item.end_time = dr("END_TIME").ToString
                 Item.collection_point_code = dr("COLLECTION_POINT_CODE").ToString
+                Item.site_code = dr("SITE_CODE").ToString
+                Item.rmstart = dr("RMSTART").ToString
+                Item.rmend = dr("RMEND").ToString
+                Item.remark = dr("COMMENT_TEXT").ToString
 
                 GetEditData.collection_plan.Add(Item)
             Next
@@ -260,7 +291,9 @@ Public Class planningAction
                 Item.refuse_number = dr("REFUSE_NUMBER").ToString
                 Item.collection_point_code = dr("COLLECTION_POINT_CODE").ToString
                 Item.name = dr("NAME").ToString
-                Item.regisdonate = dr("REGISDONATE").ToString
+                Item.regisdonate = dr("REGISAMT").ToString
+                Item.donate_amount = dr("DONATEAMT").ToString
+                Item.refuse_amount = dr("REFUSEAMT").ToString
 
                 GetEditData.collection_plan_detail.Add(Item)
             Next
@@ -295,6 +328,219 @@ Public Class planningAction
         End Try
     End Sub
 
+    Private Sub GetHasPlanDetail()
+        Try
+            Dim sql As String = "SELECT CPD.*, CP.PLAN_DATE from COLLECTION_PLAN CP INNER JOIN COLLECTION_PLAN_DETAIL CPD ON CP.ID = CPD.COLLECTION_PLAN_ID
+                                 WHERE CP.STATUS = 'ACTIVE' AND to_char(CP.PLAN_DATE, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("plandate") & "' "
+            Dim dt As DataTable = Cbase.QueryTable(sql)
+            Dim HasPlanDataList = New List(Of HasChack)
+            For Each dr As DataRow In dt.Rows
+                Dim Item As New HasChack
+                Item.id = dr("ID").ToString
+                Item.collection_plan_id = dr("COLLECTION_PLAN_ID").ToString
+                Item.collection_point_id = dr("COLLECTION_POINT_ID").ToString
+                Item.plan_date = dr("PLAN_DATE").ToString
+
+                HasPlanDataList.Add(Item)
+            Next
+            JSONResponse.setItems(JSON.Serialize(Of List(Of HasChack))(HasPlanDataList))
+            Response.Write(JSONResponse.ToJSON())
+        Catch ex As Exception
+            Response.Write(New CallbackException(ex).ToJSON())
+        End Try
+    End Sub
+
+    Private Sub SavePlanning()
+        Try
+            Dim insertplan As String = ""
+            Dim planid As String = "0"
+            If _REQUEST("how") = "new" Then
+                planid = Cbase.QueryField(H2G.nextVal("collection_plan"))
+
+                param.Add(":id", DbType.Int64, planid)
+                'param.Add(":plan_date", DbType.Date, H2G.BE2AC(H2G.Convert(Of DateTime)(_REQUEST("plandate"))).ToString("dd-MM-yyyy"))
+                'param.Add(":create_date", DbType.Date, )
+                param.Add(":create_staff", DbType.Int64, _REQUEST("staffid"))
+                param.Add(":site_id", DbType.Int64, _REQUEST("site_id"))
+                param.Add(":collection_point_id", DbType.Int64, _REQUEST("collection_id"))
+                'param.Add(":name", DbType.String, _REQUEST("collection_name"))
+                'param.Add(":location", DbType.String, _REQUEST("collection_lacation"))
+                'param.Add(":address", DbType.String, _REQUEST("collection_addr"))
+                'param.Add(":province", DbType.String, _REQUEST("collection_province"))
+                'param.Add(":zipcode", DbType.String, _REQUEST("collection_zipcode"))
+                'param.Add(":country_id", DbType.Int64, _REQUEST("collection_country"))
+                'param.Add(":tel", DbType.String, _REQUEST("collection_tel"))
+                'param.Add(":fax", DbType.String, "")
+                'param.Add(":email", DbType.String, _REQUEST("collection_email"))
+                'param.Add(":website", DbType.String, "")
+                'param.Add(":template", DbType.String, "")
+                param.Add(":start_time", DbType.String, _REQUEST("collection_donatetime"))
+                param.Add(":end_time", DbType.String, _REQUEST("collection_donationtimeuse"))
+                'param.Add(":association_id", DbType.String, "")
+                'param.Add(":collection_type", DbType.String, _REQUEST("collection_worktype"))
+                'param.Add(":collection_category_id", DbType.Int64, _REQUEST("collection_type"))
+                'param.Add(":collection_mode", DbType.String, _REQUEST("collection_cartype"))
+                param.Add(":target_number", DbType.Int64, _REQUEST("collection_sumregisdonateexpect"))
+                param.Add(":invite_number", DbType.Int64, "")
+                param.Add(":donate_number", DbType.Int64, _REQUEST("collection_sumcanregisdonateexpect"))
+                param.Add(":refuse_number", DbType.Int64, _REQUEST("collection_sumcantregisdonateexpect"))
+                param.Add(":status", DbType.String, _REQUEST("status"))
+                param.Add(":staff_id", DbType.Int64, _REQUEST("staffid"))
+
+                'insertplan = "INSERT INTO collection_plan (ID, PLAN_DATE, CREATE_DATE, CREATE_STAFF, SITE_ID, COLLECTION_POINT_ID, NAME, LOCATION,
+                '              ADDRESS, PROVINCE, ZIPCODE, COUNTRY_ID, TEL, FAX, EMAIL, WEBSITE, TEMPLATE, START_TIME, END_TIME, ASSOCIATION_ID,
+                '              COLLECTION_TYPE, COLLECTION_CATEGORY_ID, COLLECTION_MODE, TARGET_NUMBER, INVITE_NUMBER, DONATE_NUMBER, REFUSE_NUMBER,
+                '              STATUS) VALUES (:id, :plan_date, SYSDATE, :create_staff, :site_id, :collection_point_id, :name, :location, 
+                '              :address, :province, :zipcode, :country_id, :tel, :fax, :email, :website, :template, :start_time, :end_time, :association_id, 
+                '              :collection_type, :collection_category_id, :collection_mode, :target_number, :invite_number, :donate_number, :refuse_number, :status)"
+
+                insertplan = "INSERT INTO collection_plan (ID, PLAN_DATE, CREATE_DATE, CREATE_STAFF, SITE_ID, COLLECTION_POINT_ID,
+                              START_TIME, END_TIME, TARGET_NUMBER, INVITE_NUMBER, DONATE_NUMBER, REFUSE_NUMBER,
+                              STATUS, UPDATE_DATE, UPDATE_STAFF) VALUES (:id, to_date('" & H2G.BE2AC(H2G.Convert(Of DateTime)(_REQUEST("plandate"))).ToString("dd-MM-yyyy") & "','DD-MM-YYYY'), SYSDATE, :create_staff, :site_id, :collection_point_id, 
+                              :start_time, :end_time, :target_number, :invite_number, :donate_number, 
+                              :refuse_number, :status, SYSDATE, :staff_id)"
+
+                Cbase.Execute(insertplan, param)
+
+                Dim remarkid As String = Cbase.QueryField(H2G.nextVal("Collection_Plan_Comment"))
+                Dim remarkSql As String = "INSERT INTO Collection_Plan_Comment (ID, CREATE_DATE, CREATE_STAFF, COLLECTION_PLAN_ID, START_DATE, END_DATE, COMMENT_TEXT) " &
+                              "VALUES ('" & remarkid & "', SYSDATE, " &
+                              "'" & _REQUEST("staffid") & "', '" & planid & "', to_date('" & H2G.BE2AC(H2G.Convert(Of DateTime)(_REQUEST("startremark"))).ToString("dd-MM-yyyy") & "','DD-MM-YYYY'), " &
+                              "to_date('" & H2G.BE2AC(H2G.Convert(Of DateTime)(_REQUEST("endremark"))).ToString("dd-MM-yyyy") & "','DD-MM-YYYY'), '" & _REQUEST("remark") & "')"
+                Cbase.Execute(remarkSql)
+
+                Dim DRecordList As List(Of Collection_Plan_Detail) = JSON.Deserialize(Of List(Of Collection_Plan_Detail))(_REQUEST("subplan_list"))
+                For Each item In DRecordList
+                    Dim cpdid As String = Cbase.QueryField(H2G.nextVal("collection_plan_detail"))
+                    Dim paramDRecord As New SQLCollection
+
+                    paramDRecord.Add(":id", DbType.Int64, cpdid)
+                    paramDRecord.Add(":collection_plan_id", DbType.Int64, planid)
+                    paramDRecord.Add(":collection_point_id", DbType.Int64, item.collection_point_id)
+                    paramDRecord.Add(":target_number", DbType.Int64, item.target_number)
+                    paramDRecord.Add(":invite_number", DbType.Int64, 0)
+                    paramDRecord.Add(":donate_number", DbType.Int64, item.donate_number)
+                    paramDRecord.Add(":refuse_number", DbType.Int64, item.refuse_number)
+
+                    Cbase.Execute("INSERT INTO collection_plan_detail (""ID"", ""COLLECTION_PLAN_ID"", ""COLLECTION_POINT_ID"", ""TARGET_NUMBER"", ""INVITE_NUMBER"", ""DONATE_NUMBER"", ""REFUSE_NUMBER"") 
+                                   VALUES (:id, :collection_plan_id, :collection_point_id, :target_number, :invite_number, :donate_number, :refuse_number)", paramDRecord)
+                Next
+
+            ElseIf _REQUEST("how") = "edit" Then
+                param.Add(":id", DbType.Int64, _REQUEST("planid"))
+                param.Add(":plan_date", DbType.Date, H2G.BE2AC(H2G.Convert(Of DateTime)(_REQUEST("plandate"))).ToString("dd-MM-yyyy"))
+                'param.Add(":create_date", DbType.Date, )
+                param.Add(":create_staff", DbType.Int64, _REQUEST("staffid"))
+                param.Add(":site_id", DbType.Int64, _REQUEST("site_id"))
+                param.Add(":collection_point_id", DbType.Int64, _REQUEST("collection_id"))
+                'param.Add(":name", DbType.String, _REQUEST("collection_name"))
+                'param.Add(":location", DbType.String, _REQUEST("collection_lacation"))
+                'param.Add(":address", DbType.String, _REQUEST("collection_addr"))
+                'param.Add(":province", DbType.String, _REQUEST("collection_province"))
+                'param.Add(":zipcode", DbType.String, _REQUEST("collection_zipcode"))
+                'param.Add(":country_id", DbType.Int64, _REQUEST("collection_country"))
+                'param.Add(":tel", DbType.String, _REQUEST("collection_tel"))
+                'param.Add(":fax", DbType.String, "")
+                'param.Add(":email", DbType.String, _REQUEST("collection_email"))
+                'param.Add(":website", DbType.String, "")
+                'param.Add(":template", DbType.String, "")
+                param.Add(":start_time", DbType.String, _REQUEST("collection_donatetime"))
+                param.Add(":end_time", DbType.String, _REQUEST("collection_donationtimeuse"))
+                'param.Add(":association_id", DbType.String, "")
+                'param.Add(":collection_type", DbType.String, _REQUEST("collection_worktype"))
+                'param.Add(":collection_category_id", DbType.Int64, _REQUEST("collection_type"))
+                'param.Add(":collection_mode", DbType.String, _REQUEST("collection_cartype"))
+                param.Add(":target_number", DbType.Int64, _REQUEST("collection_sumregisdonateexpect"))
+                param.Add(":invite_number", DbType.Int64, "")
+                param.Add(":donate_number", DbType.Int64, _REQUEST("collection_sumcanregisdonateexpect"))
+                param.Add(":refuse_number", DbType.Int64, _REQUEST("collection_sumcantregisdonateexpect"))
+                param.Add(":status", DbType.String, _REQUEST("status"))
+                param.Add(":staff_id", DbType.Int64, _REQUEST("staffid"))
+
+                insertplan = "UPDATE collection_plan SET " &
+                             "PLAN_DATE = :plan_date, CREATE_DATE = SYSDATE, CREATE_STAFF = :create_staff, SITE_ID = :site_id, " &
+                             "COLLECTION_POINT_ID = :collection_point_id,  START_TIME = :start_time, END_TIME = :end_time, " &
+                             "TARGET_NUMBER = :target_number, INVITE_NUMBER = :invite_number, DONATE_NUMBER = :donate_number, " &
+                             "REFUSE_NUMBER = :refuse_number, UPDATE_DATE = SYSDATE, UPDATE_STAFF = :staff_id, " &
+                             "STATUS = :status WHERE ID = :id"
+                Cbase.Execute(insertplan, param)
+
+                Dim remarkSqlUpdate As String = "UPDATE Collection_Plan_Comment SET CREATE_STAFF = '" & _REQUEST("staffid") & "', " &
+                                          "START_DATE = to_date('" & H2G.BE2AC(H2G.Convert(Of DateTime)(_REQUEST("startremark"))).ToString("dd-MM-yyyy") & "','DD-MM-YYYY'), " &
+                                          "END_DATE = to_date('" & H2G.BE2AC(H2G.Convert(Of DateTime)(_REQUEST("endremark"))).ToString("dd-MM-yyyy") & "','DD-MM-YYYY'), " &
+                                          "COMMENT_TEXT = '" & _REQUEST("remark") & "' WHERE COLLECTION_PLAN_ID = '" & _REQUEST("planid") & "'"
+
+                Cbase.Execute(remarkSqlUpdate)
+
+                Cbase.Execute("DELETE FROM collection_plan_detail WHERE COLLECTION_PLAN_ID = '" & _REQUEST("planid") & "'")
+
+                Dim DRecordList As List(Of Collection_Plan_Detail) = JSON.Deserialize(Of List(Of Collection_Plan_Detail))(_REQUEST("subplan_list"))
+                For Each item In DRecordList
+                    Dim cpdid As String = Cbase.QueryField(H2G.nextVal("collection_plan_detail"))
+                    Dim paramDRecord As New SQLCollection
+
+                    paramDRecord.Add(":id", DbType.Int64, cpdid)
+                    paramDRecord.Add(":collection_plan_id", DbType.Int64, _REQUEST("planid"))
+                    paramDRecord.Add(":collection_point_id", DbType.Int64, item.collection_point_id)
+                    paramDRecord.Add(":target_number", DbType.Int64, item.target_number)
+                    paramDRecord.Add(":invite_number", DbType.Int64, 0)
+                    paramDRecord.Add(":donate_number", DbType.Int64, item.donate_number)
+                    paramDRecord.Add(":refuse_number", DbType.Int64, item.refuse_number)
+
+                    Cbase.Execute("INSERT INTO collection_plan_detail (""ID"", ""COLLECTION_PLAN_ID"", ""COLLECTION_POINT_ID"", ""TARGET_NUMBER"", ""INVITE_NUMBER"", ""DONATE_NUMBER"", ""REFUSE_NUMBER"") 
+                                   VALUES (:id, :collection_plan_id, :collection_point_id, :target_number, :invite_number, :donate_number, :refuse_number)", paramDRecord)
+                Next
+            End If
+
+            Cbase.Apply()
+            JSONResponse.setItems("{""plan_id"" : """ & planid & """ }")
+            Response.Write(JSONResponse.ToJSON())
+        Catch ex As Exception
+            Cbase.Rollback()
+            Response.Write(New CallbackException(ex).ToJSON())
+        End Try
+    End Sub
+
+    Private Sub GetMaxDate()
+        Try
+            Dim sql As String = "select to_char(MAX(plan_date), 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as dx from COLLECTION_PLAN where status = 'ACTIVE' and collection_point_id = '" & _REQUEST("departmentid") & "'"
+            'Dim sql As String = "select MAX(plan_date) from COLLECTION_PLAN where status = 'ACTIVE' and collection_point_id = '" & _REQUEST("departmentid") & "'"
+            Dim maxDate As String = Cbase.QueryField(sql)
+
+            JSONResponse.setItems("{""maxDate"" : """ & maxDate & """ }")
+            Response.Write(JSONResponse.ToJSON())
+        Catch ex As Exception
+            Response.Write(New CallbackException(ex).ToJSON())
+        End Try
+    End Sub
+
+    Private Sub CheckDuplicateActive()
+        Try
+            Dim isCheck As String = "x"
+            Dim Data As String = Cbase.QueryField("SELECT ID FROM COLLECTION_PLAN WHERE STATUS = 'ACTIVE' AND COLLECTION_POINT_ID = '" & _REQUEST("collection_id_check") & "' " &
+                                                  "AND to_char(PLAN_DATE, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("plandate") & "' ")
+            If Data <> "" Then
+                isCheck = "x"
+            Else
+                isCheck = "y"
+            End If
+
+            JSONResponse.setItems("{""ischeck"" : """ & isCheck & """ }")
+            Response.Write(JSONResponse.ToJSON())
+        Catch ex As Exception
+            Response.Write(New CallbackException(ex).ToJSON())
+        End Try
+    End Sub
+
+    Private Sub getsitecodebyid()
+        Try
+            Dim site_id As String = Cbase.QueryField("SELECT CODE FROM SITE WHERE ID = '" & _REQUEST("site_id_get") & "'")
+            JSONResponse.setItems("{""site_id"" : """ & site_id & """ }")
+            Response.Write(JSONResponse.ToJSON())
+        Catch ex As Exception
+            Response.Write(New CallbackException(ex).ToJSON())
+        End Try
+    End Sub
 
 End Class
 
@@ -356,6 +602,8 @@ Public Structure Collection_Plan_Detail
     Public collection_point_code As String
     Public name As String
     Public regisdonate As String
+    Public donate_amount As String
+    Public refuse_amount As String
 End Structure
 
 Public Structure Collection_Plan
@@ -393,6 +641,10 @@ Public Structure Collection_Plan
     Public start_time As String
     Public end_time As String
     Public collection_point_code As String
+    Public site_code As String
+    Public rmstart As String
+    Public rmend As String
+    Public remark As String
 End Structure
 
 Public Structure Getcollection_Edit_Data
@@ -405,4 +657,15 @@ Public Structure Sub_Collection_Point
     Public label As String
     Public name As String
     Public code As String
+End Structure
+
+Public Structure HasChack
+    Public id As String
+    Public collection_plan_id As String
+    Public collection_point_id As String
+    Public target_number As String
+    Public invite_number As String
+    Public donate_number As String
+    Public refuse_number As String
+    Public plan_date As String
 End Structure

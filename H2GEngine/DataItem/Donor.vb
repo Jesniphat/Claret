@@ -35,8 +35,8 @@ Namespace DataItem
         Public LastVisitDate As String
         Public HIIGCode As String
         Public VisitID As String
+        Public notOnlyDonor As String
 
-        '### Donor Visit
         Public Shared Function WithCollection(ByVal item As DataItem.DonorItem) As SQLCollection
             Dim param As New SQLCollection()
             With item
@@ -47,7 +47,7 @@ Namespace DataItem
                 param.Add(":Surname", DbType.String, .Surname)
                 param.Add(":Name_E", DbType.String, .NameE)
                 param.Add(":Surname_E", DbType.String, .SurnameE)
-                param.Add(":Birthday", DbType.DateTime, H2G.BE2AC(H2G.Convert(Of DateTime)(.Birthday.Replace("/", "-"))).ToString("dd-MM-yyyy"))
+                param.Add(":Birthday", DbType.DateTime, H2G.BE2AC(H2G.Convert(Of DateTime)(.Birthday)).ToString("dd-MM-yyyy"))
                 param.Add(":Title_ID", DbType.Int64, .TitleID)
                 param.Add(":Address", DbType.String, .Address)
                 param.Add(":Sub_District", DbType.String, .SubDistrict)
@@ -64,15 +64,12 @@ Namespace DataItem
                 param.Add(":Tel_Office", DbType.String, .OfficeTel)
                 param.Add(":Tel_Office_Ext", DbType.String, .OfficeTelExt)
                 param.Add(":Email", DbType.String, .Email)
-                If String.IsNullOrEmpty(.AssociationID) Then
-                    param.Add(":Association_ID", DbType.Int64, Nothing)
-                Else
-                    param.Add(":Association_ID", DbType.Int64, .AssociationID)
-                End If
+                param.Add(":Association_ID", DbType.Int64, IIf(String.IsNullOrEmpty(.AssociationID), Nothing, .AssociationID))
                 param.Add(":Visit_Number", DbType.Int64, .VisitNumber)
                 param.Add(":Donate_Number_Ext", DbType.Int64, .DonateNumberExt)
                 param.Add(":HIIG_Code", DbType.String, .HIIGCode)
                 param.Add(":Create_Staff", DbType.Int64, H2G.Login.ID)
+                param.Add(":update_staff", DbType.Int64, H2G.Login.ID)
 
             End With
 
@@ -135,6 +132,7 @@ Namespace DataItem
         Public SampleNumber As String
         Public CollectionPlanID As String
         Public CollectionPointID As String
+        Public ForCollectionPointID As String
         Public SiteID As String
         Public Comment As String
         Public VisitNumber As String
@@ -142,6 +140,7 @@ Namespace DataItem
         Public PLT As String
         Public HBTest As String
         Public HeartLung As String
+        Public HeartRate As String
         Public HospitalID As String
         Public DepartmentID As String
         Public ExtSampleNumber As String
@@ -158,6 +157,7 @@ Namespace DataItem
         Public PurgeDate As String
         Public PurgeStaff As String
         Public Status As String
+        Public InterviewStatus As String
         Public VisitDate As String
 
         Public Shared Function WithCollection(ByVal item As DataItem.DonationVisitItem) As SQLCollection
@@ -170,44 +170,22 @@ Namespace DataItem
                 param.Add(":weight", DbType.Decimal, .Weight)
                 param.Add(":pressure_max", DbType.Int64, .PressureMax)
                 param.Add(":pressure_min", DbType.Int64, .PressureMin)
-                If String.IsNullOrEmpty(.DonationTypeID) Then
-                    param.Add(":donation_type_id", DbType.Int64, Nothing)
-                Else
-                    param.Add(":donation_type_id", DbType.Int64, .DonationTypeID)
-                End If
-                If String.IsNullOrEmpty(.BagID) Then
-                    param.Add(":bag_id", DbType.Int64, Nothing)
-                Else
-                    param.Add(":bag_id", DbType.Int64, .BagID)
-                End If
-                If String.IsNullOrEmpty(.DonationToID) Then
-                    param.Add(":donation_to_id", DbType.Int64, Nothing)
-                Else
-                    param.Add(":donation_to_id", DbType.Int64, .DonationToID)
-                End If
+                param.Add(":donation_type_id", DbType.Int64, IIf(String.IsNullOrEmpty(.DonationTypeID), Nothing, .DonationTypeID))
+                param.Add(":bag_id", DbType.Int64, IIf(String.IsNullOrEmpty(.BagID), Nothing, .BagID))
+                param.Add(":donation_to_id", DbType.Int64, IIf(String.IsNullOrEmpty(.DonationToID), Nothing, .DonationToID))
                 param.Add(":refuse_deferral_id", DbType.Int64, .RefuseDeferralID)
                 param.Add(":sample_number", DbType.String, .SampleNumber)
-                If String.IsNullOrEmpty(.CollectionPlanID) Then
-                    param.Add(":collection_plan_id", DbType.Int64, Nothing)
-                Else
-                    param.Add(":collection_plan_id", DbType.Int64, .CollectionPlanID)
-                End If
-                If String.IsNullOrEmpty(.CollectionPointID) Then
-                    param.Add(":collection_point_id", DbType.Int64, Nothing)
-                Else
-                    param.Add(":collection_point_id", DbType.Int64, .CollectionPointID)
-                End If
-                If String.IsNullOrEmpty(.SiteID) Then
-                    param.Add(":site_id", DbType.Int64, Nothing)
-                Else
-                    param.Add(":site_id", DbType.Int64, .SiteID)
-                End If
+                param.Add(":collection_plan_id", DbType.Int64, IIf(String.IsNullOrEmpty(.CollectionPlanID), Nothing, .CollectionPlanID))
+                param.Add(":collection_point_id", DbType.Int64, IIf(String.IsNullOrEmpty(.CollectionPointID), Nothing, .CollectionPointID))
+                param.Add(":for_collection_point_id", DbType.Int64, IIf(String.IsNullOrEmpty(.ForCollectionPointID), Nothing, .ForCollectionPointID))
+                param.Add(":site_id", DbType.Int64, IIf(String.IsNullOrEmpty(.SiteID), Nothing, .SiteID))
                 param.Add(":comment", DbType.String, .Comment)
                 param.Add(":visit_number", DbType.Int64, .VisitNumber)
                 param.Add(":hb", DbType.Int64, .HB)
                 param.Add(":plt", DbType.Int64, .PLT)
-                param.Add(":hbtest", DbType.String, .HBTest)
+                param.Add(":hb_test", DbType.String, .HBTest)
                 param.Add(":heart_lung", DbType.String, .HeartLung)
+                param.Add(":heart_rate", DbType.Int64, IIf(String.IsNullOrEmpty(.HeartRate), Nothing, .HeartRate))
                 param.Add(":hospital_id", DbType.Int64, .HospitalID)
                 param.Add(":department_id", DbType.Int64, .DepartmentID)
                 param.Add(":ext_sample_number", DbType.String, .ExtSampleNumber)
@@ -225,7 +203,10 @@ Namespace DataItem
                 param.Add(":purge_staff", DbType.Int64, .PurgeStaff)
                 param.Add(":status", DbType.String, .Status)
                 param.Add(":create_staff", DbType.Int64, H2G.Login.ID)
-                param.Add(":visit_date", DbType.DateTime, H2G.BE2AC(H2G.Convert(Of DateTime)(.VisitDate.Replace("/", "-"))).ToString("dd-MM-yyyy HH:mm"))
+                param.Add(":interview_staff", DbType.Int64, H2G.Login.ID)
+                param.Add(":update_staff", DbType.Int64, H2G.Login.ID)
+                param.Add(":interview_status", DbType.String, .InterviewStatus)
+                param.Add(":visit_date", DbType.DateTime, H2G.BE2AC(H2G.Convert(Of DateTime)(.VisitDate)).ToString("dd-MM-yyyy HH:mm"))
 
             End With
 
@@ -255,10 +236,11 @@ Namespace DataItem
             With item
                 param.Add(":id", DbType.Int64, .ID)
                 param.Add(":create_staff", DbType.Int64, H2G.Login.ID)
+                param.Add(":update_staff", DbType.Int64, H2G.Login.ID)
                 param.Add(":receipt_hospital_id", DbType.Int64, .ReceiptHospitalID)
                 param.Add(":order_number", DbType.Int64, .OrderNumber)
                 param.Add(":donor_id", DbType.Int64, .DonorID)
-                param.Add(":visit_date", DbType.DateTime, H2G.BE2AC(H2G.Convert(Of DateTime)(.VisitDate.Replace("/", "-"))).ToString("dd-MM-yyyy HH:mm"))
+                param.Add(":visit_date", DbType.DateTime, H2G.BE2AC(H2G.Convert(Of DateTime)(.VisitDate)).ToString("dd-MM-yyyy HH:mm"))
                 param.Add(":donation_to_id", DbType.Int64, .DonationToID)
                 param.Add(":site_id", DbType.Int64, .SiteID)
                 param.Add(":collection_point_id", DbType.Int64, .CollectionPointID)
@@ -354,8 +336,8 @@ Namespace DataItem
                 param.Add(":id", DbType.Int64, .ID)
                 param.Add(":donor_id", DbType.Int64, .DonorID)
                 param.Add(":create_staff", DbType.Int64, H2G.Login.ID)
-                param.Add(":start_date", DbType.Date, H2G.BE2AC(H2G.Convert(Of DateTime)(.StartDate.Replace("/", "-"))).ToString("dd-MM-yyyy HH:mm:ss"))
-                param.Add(":end_date", DbType.Date, H2G.BE2AC(H2G.Convert(Of DateTime)(.EndDate.Replace("/", "-"))).ToString("dd-MM-yyyy HH:mm:ss"))
+                param.Add(":start_date", DbType.Date, H2G.BE2AC(H2G.Convert(Of DateTime)(.StartDate)).ToString("dd-MM-yyyy HH:mm:ss"))
+                param.Add(":end_date", DbType.Date, H2G.BE2AC(H2G.Convert(Of DateTime)(.EndDate)).ToString("dd-MM-yyyy HH:mm:ss"))
                 param.Add(":description", DbType.String, .Description)
             End With
             Return param
@@ -374,46 +356,6 @@ Namespace DataItem
         End Function
 
     End Class
-
-    'Public Class DonateRecordWithRewardItem
-    '    Public ID As String
-    '    Public DonorID As String
-    '    Public CreateDate As String
-    '    Public CreateStaff As String
-    '    Public DonationFrom As String
-    '    Public DonationVisitID As String
-    '    Public DonationDate As String
-    '    Public DonationNumber As String
-    '    Public DonationReward As String
-
-
-    '    Public Shared Function WithCollection(ByVal item As DataItem.DonateRecordWithRewardItem) As SQLCollection
-    '        Dim param As New SQLCollection()
-    '        With item
-    '            param.Add(":id", DbType.Int64, .ID)
-    '            param.Add(":donor_id", DbType.Int64, .DonorID)
-    '            param.Add(":create_staff", DbType.Int64, H2G.Login.ID)
-    '            param.Add(":donation_from", DbType.String, .DonationFrom)
-    '            param.Add(":donation_visit_id", DbType.Int64, .DonationVisitID)
-    '            param.Add(":donation_date", DbType.Date, H2G.BE2AC(H2G.Convert(Of DateTime)(.DonationDate.Replace("/", "-"))).ToString("dd-MM-yyyy HH:mm:ss"))
-    '            param.Add(":donation_number", DbType.Int64, .DonationNumber)
-    '        End With
-    '        Return param
-    '    End Function
-
-    '    Public Shared Function WithItems(ByVal item As DataItem.DonateRecordWithRewardItem, ByVal dRow As DataRow) As DataItem.DonateRecordWithRewardItem
-    '        With item
-    '            .ID = dRow("id").ToString()
-    '            .DonorID = dRow("donor_id").ToString()
-    '            .CreateStaff = dRow("create_staff").ToString()
-    '            .DonationFrom = dRow("donation_from").ToString()
-    '            .DonationDate = dRow("donation_date").ToString()
-    '            .DonationNumber = dRow("donation_number").ToString()
-    '        End With
-    '        Return item
-    '    End Function
-
-    'End Class
 
     Public Class DTransaction
         Public DonorID As String
@@ -455,6 +397,7 @@ Namespace DataItem
         Public VisitID As String
         Public CollectionPlanID As String
         Public CollectionPointID As String
+        Public ForCollectionPointID As String
         Public SiteID As String
         Public Status As String
         Public VisitFrom As String
@@ -465,6 +408,19 @@ Namespace DataItem
         Public VisitDateTimeText As String
         Public VisitDateText As String
         Public VisitDate As String
+        Public Weight As String
+        Public PressureMax As String
+        Public PressureMin As String
+        Public HB As String
+        Public PLT As String
+        Public HBTest As String
+        Public HeartLung As String
+        Public HeartRate As String
+        Public InterviewStatus As String
+        Public SampleNumber As String
+
+        Public LastWeight As String
+        Public LastVisit As String
 
         Public DuplicateTransaction As String
 
@@ -510,16 +466,27 @@ Namespace DataItem
                 .VisitID = dRow("visit_id").ToString()
                 .CollectionPlanID = dRow("collection_plan_id").ToString()
                 .CollectionPointID = dRow("collection_point_id").ToString()
+                .ForCollectionPointID = dRow("for_collection_point_id").ToString()
                 .SiteID = dRow("site_id").ToString()
                 .Status = dRow("status").ToString()
                 .VisitFrom = dRow("visit_from").ToString()
                 .QueueNumber = dRow("queue_number").ToString()
+                .SampleNumber = dRow("sample_number").ToString()
                 .DonationTypeID = dRow("donation_type_id").ToString()
                 .BagID = dRow("bag_id").ToString()
                 .DonationToID = dRow("donation_to_id").ToString()
                 .VisitDateTimeText = dRow("visit_date_time_text").ToString().Replace(",", ":")
                 .VisitDateText = dRow("visit_date_text").ToString().Replace(",", ":")
                 .VisitDate = dRow("visit_date").ToString().Replace(",", ":")
+                .Weight = dRow("weight").ToString().Replace("0", "")
+                .PressureMax = dRow("pressure_max").ToString()
+                .PressureMin = dRow("pressure_min").ToString()
+                .HB = dRow("hb").ToString()
+                .PLT = dRow("plt").ToString()
+                .HBTest = dRow("hb_test").ToString()
+                .HeartLung = dRow("heart_lung").ToString()
+                .HeartRate = dRow("heart_rate").ToString()
+                .InterviewStatus = dRow("interview_status").ToString()
 
             End With
             Return item

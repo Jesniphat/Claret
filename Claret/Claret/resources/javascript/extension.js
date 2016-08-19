@@ -94,13 +94,18 @@ var H2G = {
 }
 
 $.extend($.fn, {
-    setDropdownList: function () {
+    setDropdownList: function (setting) {
+        var config = {
+            defaultSelect: "",
+        };
         var dclass = "";
         if ($(this).attr("class") != undefined) {
             dclass = $(this).attr("class");
         }
         $.selecter("defaults", { customClass: dclass });
-        $(this).selecter();
+        $(this).selecter().change();
+        if (config.defaultSelect != "") { $(this).val(config.defaultSelect).change(); }
+
         return this;
     },
     setDropdownListValue: function (setting) {
@@ -117,21 +122,26 @@ $.extend($.fn, {
         };
         $.extend(config, setting);
 
+        var timeStamp = new Performance(config.data.action);
         var compile = function (data) {
             if (config.tempData) { $(self).data("data-ddl", data); }
 
             $(self).html('');
             var placeholder = $(self).H2GAttr("placeholder") || "กรุณาเลือก";
             $("<option>", { value: "" }).html(placeholder).appendTo(self);
-            $.each((data), function (index, e) {
-                $("<option>", {}).H2GFill(e).appendTo(self);
-            });
+
+            for (i = 0; i < data.length; i++) {
+                $("<option>", {}).H2GFill(data[i]).appendTo(self);
+            }
+            timeStamp.Check("added " + data.length + " items of " + config.data.action);
+
             $(self).setDropdownList().selecter("update");
             if (config.defaultSelect != "") { $(self).val(config.defaultSelect).change(); }
-
             if (config.enable) { $(self).H2GEnable(); } else { $(self).H2GDisable(); }
+            timeStamp.Stop("stop success of " + config.data.action);
         }
 
+        timeStamp.Start("start of " + config.data.action);
         if (config.dataObject.length == 0) {
             $.ajax({
                 url: config.url,
@@ -140,21 +150,21 @@ $.extend($.fn, {
                 dataType: config.dataType,
                 error: function (xhr, s, err) {
                     console.log(s, err);
+                    timeStamp.Stop("stop error of " + config.data.action);
                 },
                 success: function (data) {
-
+                    timeStamp.Check("received response of " + config.data.action);
                     if (!data.onError) {
                         data.getItems = jQuery.parseJSON(data.getItems);
                         if (config.tempData) { $(self).data("data-ddl", data.getItems); }
                         compile(data.getItems);
-                    } else { $(self).setDropdownList().selecter("update"); }
-                    
+                    } else { $(self).setDropdownList().selecter("update"); timeStamp.Stop("stop onError of " + config.data.action); }                    
                 }
             });    //End ajax
         } else {
             compile(config.dataObject);
         }
-
+        
         return this;
     },
     setAutoListValue: function (setting) {
@@ -173,21 +183,27 @@ $.extend($.fn, {
         };
         $.extend(config, setting);
 
+        var timeStamp = new Performance(config.data.action);
         var compile = function (data) {
             if (config.tempData) { $(self).data("data-ddl", data); }
 
             $(self).html('');
-            $.each((data), function (index, e) {
-                $("<option>", {}).H2GFill(e).appendTo(self);
-            });
+            //$.each((data), function (index, e) {
+            //    $("<option>", {}).H2GFill(e).appendTo(self);
+            //});
+            for (i = 0; i < data.length; i++) {
+                $("<option>", {}).H2GFill(data[i]).appendTo(self);
+            }
+            timeStamp.Check("added " + data.length + " items of " + config.data.action);
             $(self).H2GValue(config.defaultSelect).combobox({
                 select: config.selectItem,
             });
             $(self).parent().find("span").find("input").val($(self).find(":selected").text());
-
             if (config.enable) { $(self).H2GEnable(); } else { $(self).H2GDisable(); }
+            timeStamp.Stop("stop success of " + config.data.action);
         }
 
+        timeStamp.Start("start of " + config.data.action);
         if (config.url != "") {
             $.ajax({
                 url: config.url,
@@ -196,8 +212,10 @@ $.extend($.fn, {
                 dataType: config.dataType,
                 error: function (xhr, s, err) {
                     console.log(s, err);
+                    timeStamp.Stop("stop error of " + config.data.action);
                 },
                 success: function (data) {
+                    timeStamp.Check("received response of " + config.data.action);
                     if (!data.onError) {
                         data.getItems = jQuery.parseJSON(data.getItems);
                         if (config.tempData) { $(self).data("data-ddl", data.getItems); }
@@ -207,13 +225,14 @@ $.extend($.fn, {
                             select: config.selectItem,
                             placeholder: config.placeholder,
                         });
+                        timeStamp.Stop("stop onError of " + config.data.action);
                     }
                 }
             });    //End ajax
         } else {
             compile(config.dataObject);
         }
-
+        
         return this;
     },
     setCalendar: function (setting) {
@@ -501,6 +520,24 @@ $.extend($.fn, {
         }
         return this;
     },
+    H2GFocus: function () {
+        switch ($(this).prop('tagName')) {
+            case 'INPUT':
+                $(this).focus();
+                break;
+            case 'SELECT':
+                if ($(this).H2GAttr("combobox") == undefined) {
+                    $(this).selecter("disable");
+                } else {
+                    $(this).combobox("disable");
+                }
+                break;
+            default:
+                $(this).prop('disabled', true);
+                break;
+        }
+        return this;
+    },
 });
 
 $.extend(Number.prototype, {
@@ -608,3 +645,54 @@ function sortButton(xobj, doFunction) {
     }
 }
 //### Paging 
+
+$.extend(window, {
+    CallbackException: function (m1, m2) {
+        this.onError = m1.onError || true;
+        this.exTitle = m1.exTitle || ((m2 != undefined) ? m1 : undefined) || "ERROR";
+        this.exMessage = m1.exMessage || m2 || m1 || "";
+        this.getItems = m1.getItems || {};
+        if (m1.getItems != undefined) this.getItems = jQuery.parseJSON(this.getItems);
+        this.toString = function () { return this.exTitle + ' >>> ' + this.exMessage; }
+    },
+    Performance: function (funcName) {
+        var EnablePerformance = performance != undefined;
+        var BeginTime = 0.0, ElapsedTime = 0.0, FinishTime = 0.0;
+        var func_name = funcName || "Performance"
+        this.Start = function () {
+            if (EnablePerformance) {
+                var time = new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds();
+                BeginTime = performance.now();
+                ElapsedTime = BeginTime;
+                log(func_name + "() Performance >>> Starting on " + time);
+            }
+        }
+        this.Check = function (msg) {
+            if (EnablePerformance) {
+                var now = performance.now();
+                log((msg == undefined ? func_name + "() elapsed time is" : msg) + "\n\r", (now - ElapsedTime), "ms");
+                ElapsedTime = now;
+            }
+        }
+        this.Stop = function (msg) {
+            if (EnablePerformance) {
+                var time = new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds();
+                var now = performance.now();
+                FinishTime = now;
+                log((msg == undefined ? func_name + "() elapsedtime is" : msg) + "\n\r", (now - ElapsedTime), "ms (" + ((FinishTime - BeginTime) / 1000).toFixed(2) + " s)");
+                log(func_name + "() Performance >>> Stoped on " + time);
+                ElapsedTime = performance.now();
+            }
+        }
+        this.toString = function () { return func_name + "() elapsedtime is " + ((FinishTime - BeginTime) / 1000).toFixed(2) + " s"; }
+    },
+    log: function (msg1, msg2, msg3, msg4, msg5) {
+        if (console != undefined) {
+            if (msg2 == undefined) { console.log(msg1); }
+            else if (msg3 == undefined) { console.log(msg1, msg2); }
+            else if (msg4 == undefined) { console.log(msg1, msg2, msg3); }
+            else if (msg5 == undefined) { console.log(msg1, msg2, msg3, msg4); }
+            else if (msg5 != undefined) { console.log(msg1, msg2, msg3, msg4, msg5); }
+        }
+    },
+});

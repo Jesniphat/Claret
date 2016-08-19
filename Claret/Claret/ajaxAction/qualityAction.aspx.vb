@@ -21,7 +21,7 @@ Public Class qualityAction
         End Try
     End Sub
 
-    Private Function Action()
+    Private Function Action() As String
         Select Case _REQUEST("action")
             Case "getexamination" : getExamination()
             Case "savereceipthospital" : saveReceiptHospital()
@@ -135,10 +135,11 @@ Public Class qualityAction
     Private Sub getDornorHospitalList()
         Dim HospitalList As New List(Of getDornorHospitalListData)
 
-        Dim sql As String = "select r.id, h.name, count(d.id) donor_amount, to_char(r.create_date,'hh:mi') regis_time, r.register_staff staff, r.create_date
-                            from receipt_hospital r, hospital h, donation_hospital d
-                            where r.hospital_id = h.id and r.id = d.receipt_hospital_id 
-                            and to_char(r.create_date, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("whereDate") & "'
+        Dim sql As String = "select r.id, h.name, count(d.id) donor_amount, to_char(r.create_date,'hh24:mi') regis_time, r.register_staff staff, r.create_date
+                            from receipt_hospital r
+                            inner join hospital h on r.hospital_id = h.id
+                            left join donation_hospital d on r.id = d.receipt_hospital_id 
+                            where to_char(r.create_date, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("whereDate") & "'
                             group by r.id, h.name, r.create_date, r.register_staff"
         Dim dt As DataTable = Cbase.QueryTable(sql)
         For Each dr As DataRow In dt.Rows

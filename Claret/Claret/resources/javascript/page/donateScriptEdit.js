@@ -18,7 +18,12 @@ var problemDataList = [];
 var problemDataAuto = [];
 var problemReason = { collectedProblem: "", collectedProblemReason1: "", collectedProblemReason2: "" };
 
+var staffListData = [];
+
 var dataSave = {};
+
+var site_id = 0;
+var exChangeList = [];
 ////////////////////////////////////////////////////// function ///////////////////////////////////////////////////////////////
 
 function checkParam() {
@@ -35,6 +40,11 @@ function checkParam() {
     }
     console.log(getParam);
     deferred.resolve("Ok");
+    if ($("#data").attr("donateAction") == "new") {
+        $("#donerNumber").focus();
+    } else if ($("#data").attr("donateAction") == "edit") {
+        $("#donateType").focus();
+    }
     return deferred.promise();
 }
 
@@ -60,13 +70,27 @@ function getInitialData() {
                     if (data.getItems.visit.length > 0) {
                         $("#sampleNumber").val(data.getItems.visit[0].sampleNumber);
                         $("#sampleNumber").prop("readonly", true);
+                        if ($("#data").attr("donatesubaction") == "b") {
+                            console.log(data.getItems.visit[0].donation_type_id, "ddddddd");
+                            $("#donateType").val(data.getItems.visit[0].donation_type_id);
+                            $("#donateBagType").val(data.getItems.visit[0].bag_id);
+                            $("#donateApply").val(data.getItems.visit[0].donation_to_id);
+                        }
                     }
                     if (data.getItems.InitalData.length > 0) {
                         // console.log("sss = ", data.getItems.InitalData);
                         $("#vol").val(data.getItems.InitalData[0].volume_actual);
                         $("#startDonateDate").val(data.getItems.InitalData[0].donation_time);
                         $("#donateTimes").val(data.getItems.InitalData[0].dulation);
-                        $("#donateStaff").val(data.getItems.InitalData[0].collection_staff);
+
+                        $("#donateStaff").attr("staffid", data.getItems.InitalData[0].collection_staff);
+                        //console.log("staff label = ", staffListData);
+                        for (var i = 0; i < staffListData.length; i++) {
+                            if (staffListData[i].id == data.getItems.InitalData[0].collection_staff) {
+                                $("#donateStaff").val(staffListData[i].label);
+                                break;
+                            }
+                        }
 
                         var proBl = data.getItems.InitalData[0];
                         problemReason.collectedProblem = proBl.refuse_reason1_id;
@@ -325,7 +349,7 @@ function randerAddLabExamination() {
         var rows = "<tr class='labExaminationListTableRows'>" +
                         "<td class='col-md-34'>" + labExaminationList[i].text + "</td>" +
                         "<td class='col-md-1' style='border:1px solid #ffffff; background-color:#ffffff;'>" +
-                            "<button class='btn btn-icon' onclick='removeLabExamination(" + i + ");' tabindex='1'>" +
+                            "<button class='btn btn-icon' onclick='removeLabExamination(" + i + ");'>" +
                                 "<i class='glyphicon glyphicon-remove'></i>" +
                             "</button>" +
                         "</td>" +
@@ -385,7 +409,7 @@ function randerAddCollectedProblem() {
         var rows = "<tr class='collectedProblemListTableRows'>" +
                         "<td class='col-md-33'>" + collectedProblemList[i].text + "</td>" +
                         "<td class='col-md-1' style='border:1px solid #ffffff; background-color:#ffffff;'>" +
-                            "<button class='btn btn-icon' onclick='removeLabExamination(" + i + ");' tabindex='1'>" +
+                            "<button class='btn btn-icon' onclick='removeLabExamination(" + i + ");'>" +
                                 "<i class='glyphicon glyphicon-remove'></i>" +
                             "</button>" +
                         "</td>" +
@@ -414,7 +438,9 @@ function checkDonateNum() {
                         //$("#donerNumber").focus();
                         getParam.donorID = "0";
                         getParam.visitID = "0";
-                        notiWarning("ไม่พบเลขผู้บริจาคนี้");
+                        if ($("#donerNumber").val() != "") {
+                            notiWarning("ไม่พบเลขผู้บริจาคนี้");
+                        }
                         $("#donerNumber").val("");
                         $("#sampleNumber").val("");
                     } else {
@@ -423,11 +449,11 @@ function checkDonateNum() {
                         $("#sampleNumber").focus();
                         //notiSuccess("พบเลขผู้บริจาคนี้");
                     }
-                    $('body').unblock();
+                    //$('body').unblock();
                     //console.log(problemDataAuto);
                 } else {
                     console.log("Error = ", data.exMessage)
-                    $('body').unblock();
+                    //$('body').unblock();
                 }
             }
         });
@@ -453,7 +479,7 @@ function checkSampleNumber() {
             type: "POST",
             dataType: "json",
             beforeSend: function () {
-                $('body').block();
+                //$('body').block();
             },
             error: function (xhr, s, err) {
                 console.log(s, err);
@@ -471,11 +497,11 @@ function checkSampleNumber() {
                         $("#data").attr("visitid", data.getItems[0].visitId);
                         //notiSuccess("พบเลข Sample Number นี้");
                     }
-                    $('body').unblock();
+                    //$('body').unblock();
                     //console.log(problemDataAuto);
                 } else {
                     console.log("Error = ", data.exMessage)
-                    $('body').unblock();
+                    //$('body').unblock();
                 }
             }
         });
@@ -484,69 +510,82 @@ function checkSampleNumber() {
 
 function saveData() {
     if ($("#donerNumber").val() == "") {
-        alert("กรุณากรอกเลขที่ผู้บริจาค");
+        //alert("กรุณากรอกเลขที่ผู้บริจาค");
+        notiWarning("กรุณากรอกเลขที่ผู้บริจาค");
         $("#donerNumber").focus();
         return;
     }
     if ($("#sampleNumber").val() == "") {
-        alert("กรุณากรอก Sample Number");
+        //alert("กรุณากรอก Sample Number");
+        notiWarning("กรุณากรอก Sample Number");
         $("#sampleNumber").focus();
         return;
     }
     if ($("#donateType").val() == "0") {
-        alert("กรุณาเลือกประเภทการบริจาค");
+        //alert("กรุณาเลือกประเภทการบริจาค");
+        notiWarning("กรุณาเลือกประเภทการบริจาค");
         $("#donateType").focus();
         return;
     }
     if ($("#donateBagType").val() == "0") {
-        alert("กรุณาเลือกประเภทถุง");
+        //alert("กรุณาเลือกประเภทถุง");
+        notiWarning("กรุณาเลือกประเภทถุง");
         $("#donateBagType").focus();
         return;
     }
     if ($("#donateApply").val() == "0") {
-        alert("กรุณาเลือกประเภทการใช้งาน");
+        //alert("กรุณาเลือกประเภทการใช้งาน");
+        notiWarning("กรุณาเลือกประเภทการใช้งาน");
         $("#donateApply").focus();
         return;
     }
     if ($("#vol").val() == "") {
-        alert("กรุณากรอก Valumn");
+        //alert("กรุณากรอก Valumn");
+        notiWarning("กรุณากรอก Valumn");
         $("#vol").focus();
         return;
     }
     if ($("#startDonateDate").val() == "" || $("#startDonateDate").val() == "0000-00-00") {
-        alert("กรุณาเลือกวันที่บริจาค");
+        //alert("กรุณาเลือกวันที่บริจาค");
+        notiWarning("กรุณาเลือกวันที่บริจาค");
         $("#startDonateDate").focus();
         return;
     }
     if ($("#donateTimes").val() == "" || $("#donateTimes").val() == "0000-00-00") {
-        alert("กรุณากรอกระยะเวลาบริการ");
+        //alert("กรุณากรอกระยะเวลาบริการ");
+        notiWarning("กรุณากรอกระยะเวลาบริการ");
         $("#donateTimes").focus();
         return;
     }
     if ($("#donateStaff").val() == "") {
-        alert("กรุณากรอกผู้จัดเก็บ");
+        //alert("กรุณากรอกผู้จัดเก็บ");
+        notiWarning("กรุณากรอกผู้จัดเก็บ");
         $("#donateStaff").focus();
         return;
     }
     if (labExaminationSaveList == 0 || labExaminationSaveList == "") {
-        alert("กรุณาเลือก LAB EXAMINATION");
+        //alert("กรุณาเลือก LAB EXAMINATION");
+        notiWarning("กรุณาเลือก LAB EXAMINATION");
         $("#labExamination").focus();
         return;
     }
     if (problemReason.collectedProblem == 0 || problemReason.collectedProblem == "") {
-        alert("กรุณากรอกปัญหาในการจัดเก็บ");
-        $("#collectedProblem").focus();
-        return;
+        problemReason.collectedProblem = 0;
+        //alert("กรุณากรอกปัญหาในการจัดเก็บ");
+        //$("#collectedProblem").focus();
+        //return;
     }
     if (problemReason.collectedProblemReason1 == 0 || problemReason.collectedProblemReason1 == "") {
-        alert("กรุณากรอกเหตุผลปัญหาในการจัดเก็บ 1");
-        $("#collectedProblemReason1").focus();
-        return;
+        problemReason.collectedProblemReason1 = 0;
+        //alert("กรุณากรอกเหตุผลปัญหาในการจัดเก็บ 1");
+        //$("#collectedProblemReason1").focus();
+        //return;
     }
     if (problemReason.collectedProblemReason2 == 0 || problemReason.collectedProblemReason2 == "") {
-        alert("กรุณากรอกเหตุผลปัญหาในการจัดเก็บ 2");
-        $("#collectedProblemReason2").focus();
-        return;
+        problemReason.collectedProblemReason2 = 0;
+        //alert("กรุณากรอกเหตุผลปัญหาในการจัดเก็บ 2");
+        //$("#collectedProblemReason2").focus();
+        //return;
     }
     var saveData = {
         action: 'saveDonate',
@@ -556,9 +595,10 @@ function saveData() {
         donateApplyId: $("#donateApply").val(),
         prescribedVol: $("#prescribedVol").val(),
         volumnActual: $("#vol").val(),
-        donationTime: $("#startDonateDate").val(),
-        duration: $("#donateTimes").val(),
-        collection_staff: $("#donateStaff").val(),
+        donationTime: $("#data").attr("donatedate") + " " + $("#startDonateDate").val() + ":00",
+        duration: $("#data").attr("donatedate") + " " + $("#donateTimes").val() + ":00",
+        // collection_staff: $("#donateStaff").val(),
+        collection_staff: $("#donateStaff").attr("staffid"),
         refuse_reason1_id: problemReason.collectedProblem,
         refuse_reason2_id: problemReason.collectedProblemReason1,
         refuse_reason3_id: problemReason.collectedProblemReason2,
@@ -572,7 +612,7 @@ function saveData() {
         type: "POST",
         dataType: "json",
         beforeSend: function () {
-            $('body').block();
+           // $('body').block();
         },
         error: function (xhr, s, err) {
             console.log(s, err);
@@ -580,14 +620,14 @@ function saveData() {
         success: function (data) {
             if (!data.onError) {
                 data.getItems = jQuery.parseJSON(data.getItems);
-                $('body').unblock();
+               // $('body').unblock();
                 notiSuccess("บันทึกข้อมูลสำเร็จ");
-                
+                hl7Generator($("#data").attr("donorid"), $("#data").attr("visitid"), $("#donerNumber").val(), $("#sampleNumber").val());
                 resetData();
                 randerAddLabExamination();
             } else {
                 console.log("Error = ", data.exMessage);
-                $('body').unblock();
+              //  $('body').unblock();
                 notiWarning("บันทึกข้อมูลไม่สำเร็จ");
             }
         }
@@ -604,6 +644,7 @@ function resetData() {
     $("#startDonateDate").val("");
     $("#donateTimes").val("");
     $("#donateStaff").val("");
+    $("#donateStaff").attr("staffid", "0");
 
     $("#donerNumber").val("");
     $("#sampleNumber").val("");
@@ -634,7 +675,7 @@ function getDonationList() {
     var deferred = $.Deferred();
     $.ajax({
         url: '../../ajaxAction/donateAction.aspx',
-        data: H2G.ajaxData({ action: 'getDonationList' }).config,
+        data: H2G.ajaxData({ action: 'getDonationList', visit_date: $("#data").H2GAttr("plan_date") }).config,
         type: "POST",
         dataType: "json",
         error: function (xhr, s, err) {
@@ -658,10 +699,10 @@ function getDonationList() {
                                     "<td class='col-md-5'><input value = '" + data.getItems[i].bag_des + "' /></td>" +
                                     "<td class='col-md-5'><input value = '" + data.getItems[i].apply_des + "' /></td>" +
                                     "<td class='col-md-3'><input value = '" + data.getItems[i].volume_actual + "' /></td>" +
-                                    "<td class='col-md-3'><input value = '" + data.getItems[i].collection_date + "' /></td>" +
                                     "<td class='col-md-3'><input value = '" + data.getItems[i].donation_time + "' /></td>" +
+                                    "<td class='col-md-3'><input value = '" + data.getItems[i].duration + "' /></td>" +
                                     "<td class='col-md-3'>" +
-                                        "<button class='btn btn-icon' onclick='goEditIt(" + data.getItems[i].visit_id + ", " + data.getItems[i].donor_id + ");' tabindex='1'>" +
+                                        "<button class='btn btn-icon' onclick='goEditIt(" + data.getItems[i].visit_id + ", " + data.getItems[i].donor_id + ");'>" +
                                             "<i class='glyphicon glyphicon-circle-arrow-up'></i>" +
                                         "</button>" +
                                     "</td>" +
@@ -692,11 +733,11 @@ function setForEditList() {
 }
 
 function goEditIt(visitId, donorId) {
-
     resetData()
     .then(function () {
         var deferred = $.Deferred();
         $("#data").attr("donateAction", "edit");
+        $("#data").attr("donatesubaction", "b");
         $("#data").attr("donorid", donorId);
         $("#data").attr("visitid", visitId);
         deferred.resolve("OK");
@@ -714,4 +755,188 @@ function clareData() {
     resetData();
 
     randerAddLabExamination();
+}
+
+function getStaffAutocomplete() {
+    var deferred = $.Deferred();
+    $.ajax({
+        url: '../../ajaxAction/donateAction.aspx',
+        data: H2G.ajaxData({ action: 'getStaffAutocomplete' }).config,
+        type: "POST",
+        dataType: "json",
+        error: function (xhr, s, err) {
+            console.log(s, err);
+            deferred.reject("Error = " + err);
+        },
+        success: function (data) {
+            if (!data.onError) {
+                data.getItems = jQuery.parseJSON(data.getItems);
+                // console.log(data.getItems);
+                staffListData = data.getItems;
+                deferred.resolve("Ok");
+            } else {
+                console.log("Error = ", data.exMessage);
+                deferred.reject("Error = " + data.exMessage);
+            }
+        }
+    });
+    return deferred.promise();
+}
+
+function setKeyComplete() {
+    var deferred = $.Deferred();
+    $.widget("custom.kaycomplete", $.ui.autocomplete, {
+        _renderMenu: function (ul, items) {
+            var that = this,
+                currentCategory = "";
+            $.each(items, function (index, item) {
+                if (item.category != currentCategory) {
+                    ul.append("<li class='ui-autocomplete-category'></li>");
+                    currentCategory = item.category;
+                }
+                that._renderItemData(ul, item);
+            });
+        }
+    });
+
+    $("#donateStaff").kaycomplete({
+        source: staffListData,
+        select: function (event, ui) {
+            console.log("ui = ", ui);
+            $("#donateStaff").val(ui.item.label);
+            $("#donateStaff").attr("staffid", ui.item.id);
+        }
+    });
+
+    $("#donateStaff").blur(function(){
+        var isCheck = checkDuplicatIt(staffListData, $("#donateStaff").val(), $("#donateStaff").attr("staffid"));
+        if(!isCheck){
+            notiWarning("ไม่มีชื่อพนักงานนี้");
+            $("#donateStaff").val("");
+            $("#donateStaff").attr("staffid", "0");
+        }
+    });
+
+    var checkDuplicatIt = function(data,label,key){
+        //console.log("data = ", data, label, key );
+        var check = false;
+        for (var i = 0; i < data.length; i++){
+            if (label == data[i].label && key == data[i].id) {
+                //console.log("1");
+                check = true;
+                break;
+            } else if (label == data[i].label && key != data[i].id) {
+                //console.log("2");
+                // $('#re').val(data[i].id);
+                $("#donateStaff").attr("staffid", data[i].id);
+                check = true;
+                break;
+            }
+        }
+        return check;
+    }
+}
+
+function saveDatatest() {
+    console.log("start = ", $("#data").attr("donatedate") + " " + $("#startDonateDate").val());
+    console.log("start = ", $("#data").attr("donatedate") + " " + $("#donateTimes").val());
+}
+
+function hl7Generator(donorid, visitid, donorno, sample_no) {
+
+    console.log("paramiter = ", donorid, visitid, donorid);
+
+    var getSiteId = function () {
+        var deferred = $.Deferred();
+        $.ajax({
+            url: '../../ajaxAction/donateAction.aspx',
+            data: H2G.ajaxData({ action: 'getsiteidhl7', donor_id: donorid, visit_id: visitid }).config,
+            type: "POST",
+            dataType: "json",
+            error: function (xhr, s, err) {
+                console.log(s, err);
+                deferred.reject("error = " + err);
+            },
+            success: function (data) {
+                if (!data.onError) {
+                    data.getItems = jQuery.parseJSON(data.getItems);
+                    console.log(data.getItems);
+                    site_id = data.getItems.site_id;
+                    deferred.resolve("ok");
+                } else {
+                    console.log("Error = ", data.exMessage);
+                    deferred.reject("error = " + data.exMessage);
+                }
+            }
+        });
+        return deferred.promise();
+    }
+
+    var getExchangeList = function () {
+        var deferred = $.Deferred();
+        $.ajax({
+            url: '../../ajaxAction/donateAction.aspx',
+            data: H2G.ajaxData({ action: 'getexchangelist', site_id: site_id }).config,
+            type: "POST",
+            dataType: "json",
+            error: function (xhr, s, err) {
+                console.log(s, err);
+                deferred.reject("error = " + err);
+            },
+            success: function (data) {
+                if (!data.onError) {
+                    data.getItems = jQuery.parseJSON(data.getItems);
+                    console.log(data.getItems);
+                    exChangeList = data.getItems;
+                    deferred.resolve("ok");
+                } else {
+                    console.log("Error = ", data.exMessage);
+                    deferred.reject("error = " + data.exMessage);
+                }
+            }
+        });
+        return deferred.promise();
+    }
+
+    var hl7Generat = function () {
+        var deferred = $.Deferred();
+        for (var i = 0; i < exChangeList.length; i++) {
+            $.ajax({
+                url: '../../ajaxAction/donateAction.aspx',
+                data: H2G.ajaxData({
+                    action: 'hl7generator',
+                    exchange_id: exChangeList[i].exchange_id,
+                    donor_no: donorno,
+                    sample_no: sample_no,
+                    donor_id: donorid,
+                    visit_id: visitid
+                }).config,
+                type: "POST",
+                dataType: "json",
+                error: function (xhr, s, err) {
+                    console.log(s, err);
+                    deferred.reject("error = " + err);
+                },
+                success: function (data) {
+                    if (!data.onError) {
+                        data.getItems = jQuery.parseJSON(data.getItems);
+                        console.log(data.getItems);
+                        notiSuccess("บันทึกแฟ้ม HL7 เรียบร้อยแล้ว");
+                    } else {
+                        console.log("Error = ", data.exMessage);
+                        deferred.reject("error = " + data.exMessage);
+                    }
+                }
+            });
+        }
+        deferred.resolve("ok");
+        return deferred.promise();
+    }
+
+    getSiteId()
+    .then(getExchangeList)
+    .then(hl7Generat)
+    .fail(function (err) {
+        console.log(err);
+    });
 }

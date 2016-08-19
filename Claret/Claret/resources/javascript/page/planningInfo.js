@@ -68,3 +68,31 @@ function donorSearch(newSearch) {
         });    //End ajax
     }
 }
+
+function getSiteCode() {
+    var deferred = $.Deferred();
+    $.ajax({
+        url: '../../ajaxAction/planningAction.aspx',
+        data: H2G.ajaxData({ action: 'getsitecodebyid', site_id_get: $("#data").attr("siteid") }).config,
+        type: "POST",
+        dataType: "json",
+        error: function (xhr, s, err) {
+            console.log(s, err);
+            deferred.reject("error");
+        },
+        success: function (data) {
+            if (!data.onError) {
+                data.getItems = jQuery.parseJSON(data.getItems);
+                console.log("ss = ", data.getItems);
+                //hasPlanDetailList = data.getItems;
+                $("#txtSectorCode").val(data.getItems.site_id);
+                deferred.resolve("ok");
+            } else {
+                console.log("Error = ", data.exMessage);
+                deferred.reject("error");
+            }
+        }
+    });
+
+    return deferred.promise();
+}

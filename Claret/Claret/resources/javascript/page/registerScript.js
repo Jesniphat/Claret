@@ -7,7 +7,7 @@
     $("#ddlVisit").setDropdownList();
     $("#togDeferal").toggleSlide();
     $("#togVisitInfo").toggleSlide();
-    $("#txtStmRegisDate").setCalendar().H2GDatebox();
+    $("#txtStmRegisDate").setCalendar().H2GDatebox().prop('readonly', true);
     $("#txtOuterDonate").H2GNumberbox();
     $("#txtMobile1").H2GPhonebox();
     $("#txtMobile2").H2GPhonebox();
@@ -19,6 +19,23 @@
     $("#exams-tab").click(setExamsDatas);
     $("#immunohaemtology-tab").click(setImmunohaemtologyFile);
 
+    //### Tab คัดกรอง
+    $("#ddlQuestLanguage").setDropdownList();
+    $("#ddlDeferralType").setDropdownList();
+    $("#ddlITVResult").setDropdownList();
+    $("#ddlHbTest").setDropdownList();
+    $("#txtWeight").H2GNumberbox();
+    $("#txtHeartRate").H2GNumberbox();
+    $("#txtPresureMin").H2GNumberbox();
+    $("#txtPresureMax").H2GNumberbox();
+    $("#txtDuration").H2GNumberbox();
+
+    $("#txtDefDateTo").H2GDatebox().prop('readonly', true).setCalendar({
+        maxDate: "+100y",
+        minDate: new Date(),
+        yearRange: "c50:c+50",
+        onSelect: function (selectedDate, objDate) { $("#txtDefRemarks").focus(); },
+    });
 }
 function donorSelectDDL() {
     if ($("#ddlTitleName option").length > 1) { $("#ddlTitleName").H2GValue($("#ddlTitleName").H2GAttr("selectItem")).change(); } else {
@@ -66,210 +83,326 @@ function donorSelectDDL() {
             $("#txtAddress").focus();
         });
     }
-    if ($("#ddlAssociation option").length > 1) { $("#ddlAssociation").H2GValue($("#ddlAssociation").H2GAttr("selectItem")).change(); } else {
+    if ($("#ddlAssociation option").length > 1) { $("#ddlAssociation").H2GValue($("#ddlAssociation").H2GAttr("selectItem")).change().H2GDisable(); } else {
         $("#ddlAssociation").setAutoListValue({
             url: '../../ajaxAction/masterAction.aspx',
             data: { action: 'association' },
             defaultSelect: $("#ddlAssociation").H2GAttr("selectItem"),
+            enable: ($("#ddlAssociation").H2GAttr("selectItem") == "" || $("#ddlAssociation").H2GAttr("selectItem") == undefined) ? true : false,
         }).on('autocompleteselect', function () {
             $("#txtOuterDonate").focus();
         });
     }
-
+    if ($("#ddlCollectionPoint option").length > 1) { $("#ddlCollectionPoint").H2GValue($("#ddlCollectionPoint").H2GAttr("selectItem")).change(); } else {
+        $("#ddlCollectionPoint").setAutoListValue({
+            url: '../../ajaxAction/masterAction.aspx',
+            data: { action: 'forcollection', siteID: $("#spRegisNumber").H2GAttr("siteID") || $("#data").H2GAttr("siteID") },
+            defaultSelect: $("#ddlCollectionPoint").H2GAttr("selectItem") || $("#data").H2GAttr("collectionpointid"),
+        }).on('autocompleteselect', function () {
+            //$("#txtOuterDonate").focus();
+        });
+    }
 }
-function saveDonorInfo() {
+function checkBeforSave() {
     $("#btnSave").prop("disabled", true);
     if (validation()) {
-        var MasterDonor = {
-            ID: $("#spRegisNumber").H2GAttr("donorID"),
-            DonorNumber: $("#spRegisNumber").H2GValue(),
-            Gender: $("#rbtM").is(':checked') == true ? "M" : "F",
-            Name: $("#txtDonorName").H2GValue(),
-            Surname: $("#txtDonorSurName").H2GValue(),
-            NameE: $("#txtDonorNameEng").H2GValue(),
-            SurnameE: $("#txtDonorSurNameEng").H2GValue(),
-            Birthday: $("#txtBirthDay").H2GValue(),
-            TitleID: $("#ddlTitleName").H2GValue(),
-            Address: $("#txtAddress").H2GValue(),
-            SubDistrict: $("#txtSubDistrict").H2GValue(),
-            District: $("#txtDistrict").H2GValue(),
-            Province: $("#txtProvince").H2GValue(),
-            Zipcode: $("#txtZipcode").H2GValue(),
-            CountryID: $("#ddlCountry").H2GValue(),
-            OccupationID: $("#ddlOccupation").H2GValue(),
-            NationalityID: $("#ddlNationality").H2GValue(),
-            RaceID: $("#ddlRace").H2GValue(),
-            Mobile1: $("#txtMobile1").H2GValue(),
-            Mobile2: $("#txtMobile2").H2GValue(),
-            HomeTel: $("#txtHomeTel").H2GValue(),
-            OfficeTel: $("#txtTel").H2GValue(),
-            OfficeTelExt: $("#txtTelExt").H2GValue(),
-            Email: $("#txtEmail").H2GValue(),
-            AssociationID: $("#ddlAssociation").H2GValue(),
-            DonateNumberExt: $("#spRegisNumber").H2GAttr("donateNumberExt"),
-            VisitNumber: $("#spRegisNumber").H2GAttr("visitNumber"),
-        };
-        var DonorVisit = {
-            ID: $("#spRegisNumber").H2GAttr("visitID"),
-            DonorID: $("#spRegisNumber").H2GAttr("donorID"),
-            QueueNumber: $("#spRegisNumber").H2GAttr("queueNum"),
-            VisitFrom: $("#spRegisNumber").H2GAttr("visitFrom"),
-            DonationTypeID: $("#spRegisNumber").H2GAttr("dTypeID"),
-            BagID: $("#spRegisNumber").H2GAttr("bagID"),
-            DonationToID: $("#spRegisNumber").H2GAttr("dToID"),
-            CollectionPlanID: $("#spRegisNumber").H2GAttr("cPlanID"),
-            CollectionPointID: $("#spRegisNumber").H2GAttr("dPointID") || $("#data").H2GAttr("collectionpointid"),
-            SiteID: $("#spRegisNumber").H2GAttr("siteID") || $("#data").H2GAttr("siteid"),
-            VisitNumber: $("#spRegisNumber").H2GAttr("visitNumber"),
-            Status: $("#spStatus").H2GValue(),
-            VisitDate: $("#spVisitInfo").H2GAttr("visitDate"),
-        };
-        var DonorHospital = {
-            ID: "",
-            ReceiptHospitalID: "",
-            VisitDate: $("#spVisitInfo").H2GAttr("visitDate"),
-        };
-        if ($("#data").H2GAttr("receiptHospitalID")) {
-            DonorHospital.ID = $("#spRegisNumber").H2GAttr("visitID");
-            DonorHospital.ReceiptHospitalID = $("#data").H2GAttr("receiptHospitalID");
+        //ตรวจสอบอายุอยู่ในช่วงที่จะบริจาคได้
+        var ageWarning = checkAgeDonor();
+        if (ageWarning == "") {
+            preSaveDonor();
+        } else {
+            $("#popupheader").H2GValue("กรุณาตรวจสอบ");
+            $("#spAgeWarning").H2GValue(ageWarning);
+            openPopup($("#divAgeContainer"));
         }
-        var DonorExtCard = [];
-        var create = 0;
-        $('#divCardNumber .row').each(function (i, e) {
-            DonorExtCard[create] = {
-                ID: $(e).H2GAttr('refID'),
-                DonorID: $(e).H2GAttr('donorID'),
-                ExternalCardID: $(e).H2GAttr('extID'),
-                CardNumber: $(e).H2GAttr('cardNumber'),
-            };
-            create++;
-        });
-        var DonorComment = [];
-        create = 0;
-        $('#divComment .row').each(function (i, e) {
-            DonorComment[create] = {
-                ID: $(e).H2GAttr('refID'),
-                StartDate: $(e).H2GAttr('startDate'),
-                EndDate: $(e).H2GAttr('endDate'),
-                Description: $(e).find(".dc-comment").H2GValue(),
-            };
-            create++;
-        });
-
-        var DonorRecord = [];
-        if ($("#subInterview").is(":visible") && $("#todayPane").is(":visible")) {
-            create = 0;
-            $('#divDonateRecord .row').each(function (i, e) {
-                DonorRecord[create] = {
-                    ID: $(e).H2GAttr('refID'),
-                    DonateDate: $(e).H2GAttr('donatedate'),
-                    DonateNumber: $(e).H2GAttr('donatenumber'),
-                    DonateFrom: $(e).H2GAttr('donatefrom'),
-                    DonateReward: getReward(e),
-                };
-                create++;
-            });
-            DonorRecord.sort(H2G.keysrt('DonateNumber'));
-        }
-
-        var DonorQuestionItem = [];
-        var DonorDeferralItem = [];
-        var DonationExamination = [];
-        // ถ้าไม่ใช่ลงทะเบียนให้เก็บ Questionnaire, Deferral และ Examination
-        if ($("#data").H2GAttr("lmenu") != "lmenuDonorRegis") {
-            create = 0;
-            $('#tbQuestionnaire > tbody > tr').each(function (i, e) {
-                DonorQuestionItem[create] = {
-                    ID: $(e).H2GAttr('refID'),
-                    QuestionID: $(e).H2GAttr('questID'),
-                    QuestionCode: $(e).H2GAttr('questCode'),
-                    QuestionDesc: $(e).H2GAttr('questDesc'),
-                    QuestionDescTH: $(e).H2GAttr('questDescTH'),
-                    Answer: $(e).H2GAttr('questAnswerType') == "PRESET" ? $(e).find(".td-answer select").H2GValue() : $(e).find(".td-answer input").H2GValue(),
-                    ParentID: $(e).H2GAttr('fromQuestion'),
-                };
-                create++;
-            });
-            create = 0;
-            $('#tbDefInterview > tbody > tr').each(function (i, e) {
-                DonorDeferralItem[create] = {
-                    ID: $(e).H2GAttr('refID'),
-                    DetailID: $(e).H2GAttr('detailID'),
-                    DeferralID: $(e).H2GAttr('defID'),
-                    StartDate: $(e).H2GAttr("defStartDate"),
-                    EndDate: $(e).H2GAttr('defEndDate'),
-                    Note: $(e).H2GAttr('defRemarks'),
-                    DonationTypeID: $("#ddlITVDonationType").H2GValue(),
-                    DeferralType: $(e).H2GAttr('defType'),
-                    Duration: $(e).H2GAttr('defDuration'),
-                    QuestionID: $(e).H2GAttr('questID'),
-                };
-                create++;
-            });
-            create = 0;
-            $('#tbExam > tbody > tr').each(function (i, e) {
-                DonationExamination[create] = {
-                    id: $(e).H2GAttr('refID'),
-                    examination_group_id: $(e).H2GAttr('groupID'),
-                    examination_group_desc: $(e).H2GAttr('groupDesc'),
-                    examination_id: $(e).H2GAttr("examID"),
-                    examination_desc: $(e).H2GAttr('examDesc'),
-                    question_id: $(e).H2GAttr('questID'),
-                };
-                create++;
-            });
-        }
-
-        $.ajax({
-            url: '../../ajaxAction/donorAction.aspx',
-            data: H2G.ajaxData({
-                action: 'savedonor',
-                md: JSON.stringify(MasterDonor),
-                dv: JSON.stringify(DonorVisit),
-                dec: JSON.stringify(DonorExtCard),
-                dc: JSON.stringify(DonorComment),
-                dr: JSON.stringify(DonorRecord),
-                dh: JSON.stringify(DonorHospital),
-                dq: JSON.stringify(DonorQuestionItem),
-                dd: JSON.stringify(DonorDeferralItem),
-                de: JSON.stringify(DonationExamination),
-                receipthospitalid: $("#data").H2GAttr("receiptHospitalID"),
-            }).config,
-            type: "POST",
-            dataType: "json",
-            error: function (xhr, s, err) {
-                console.log(s, err);
-                notiError("บันทึกไม่สำเร็จ");
-                $("#btnSave").prop("disabled", false);
-            },
-            success: function (data) {
-                data.getItems = jQuery.parseJSON(data.getItems);
-                if (!data.onError) {
-                    $("#data").H2GAttr("donorID", data.getItems.ID);
-                    $("#spRegisNumber").H2GAttr("visitID", data.getItems.VisitID)
-                    notiSuccess("บันทึกสำเร็จ");
-                    showDonorData();
-                } else { notiError("บันทึกไม่สำเร็จ"); }
-                $("#btnSave").prop("disabled", false);
-            }
-        });    //End ajax
     } else {
         $("#btnSave").prop("disabled", false);
     }
+}
+function preSaveDonor() {
+    // ถ้าสถานะเป็น WAIT INTERVIEW และมาจากเมนู คัดกรอง หากยังไม่มี Sample No ให้เปิด popup ให้กรอกเลขผู้บริจาคและ Sample No
+    if ($("#spStatus").H2GValue() == "WAIT INTERVIEW" && $("#data").H2GAttr("lmenu") == "lmenuInterview" && $("#spRegisNumber").H2GAttr("sampleNumber") == "") {
+        openPopup($("#divBarcodeContainer"));
+        $("#divContent").find("#txtScanDonorNumber").enterKey(function () {
+            if ($("#divContent").find("#txtScanDonorNumber").H2GValue() != $("#spRegisNumber").H2GValue()) {
+                notiWarning("รหัสผู้บริจาคไม่ถูกต้อง กรุณาตรวจสอบ");
+                $("#divContent").find("#txtScanDonorNumber").H2GValue("").focus();
+            } else {
+                $("#divContent").find("#txtScanSampleNumber").focus();
+            }
+        }).on("blur", function () {
+            if ($("#divContent").find("#txtScanDonorNumber").H2GValue() != $("#spRegisNumber").H2GValue()) {
+                notiWarning("รหัสผู้บริจาคไม่ถูกต้อง กรุณาตรวจสอบ");
+                $("#divContent").find("#txtScanDonorNumber").H2GValue("").focus();
+            }
+        });
+        $("#divContent").find("#txtScanSampleNumber").enterKey(function () { checkKeySample($(this)); });
+        $("#spRegisNumber").H2GAttr("backToSearch", "Y");
+    } else {
+        $("#spRegisNumber").H2GRemoveAttr("backToSearch");
+        saveDonorInfo();
+        closePopup();
+    }
+}
+function checkAgeDonor() {
+    var DonationType = $("#ddlITVDonationType").H2GValue() || "-1";
+    var maxAge = 70; var minAge = 17; var age = H2G.calAge($("#txtBirthDay").H2GValue()); var strAgeCheck = "";
+    var dataAll = $("#ddlITVDonationType").data("data-ddl");
+    if (dataAll != undefined) {
+        for (i = 0; i < dataAll.length; i++) {
+            if (DonationType == dataAll[i].valueID) {
+                maxAge = dataAll[i].maxAge;
+                minAge = dataAll[i].minAge;
+                break;
+            }
+        }
+    }
+    if (age < minAge || age > maxAge) {
+        strAgeCheck = "ผู้บริจาคมีอายุ " + age + " ปี ไม่อยู่ในเกณฑ์อายุ " + minAge + "-" + maxAge + " ปี กรุณาตรวจสอบ"
+    }
+    return strAgeCheck;
+}
+function checkKeySample(xobj) {
+    if ($(xobj).H2GValue() != "") {
+        $.ajax({
+            url: '../ajaxAction/donorAction.aspx', data: { action: 'checksamplenumber', samplenumber: $(xobj).H2GValue() }, type: "POST", dataType: "json",
+            error: function (xhr, s, err) { console.log(s, err); },
+            success: function (data) {
+                if (!data.onError) {
+                    data.getItems = jQuery.parseJSON(data.getItems);
+                    if (data.getItems.samplenumber == "") {
+                        $("#spRegisNumber").H2GAttr("sampleNumber", $(xobj).H2GValue());
+                        saveDonorInfo();
+                    } else {
+                        notiWarning("รายการ Sample Number นี้ถูกใช้ไปแล้ว");
+                    }
+                } else { notiError(data.exMessage); }
+            }
+        });    //End ajax
+    } else {
+        notiWarning("กรุณากรอก Sample Number");
+    }
+}
+function saveDonorInfo(notOnlyDonor) {
+    $("#btnSave").prop("disabled", true);
+    $("#btnSaveOnlyDonor").prop("disabled", true);
+    var MasterDonor = {
+        ID: $("#spRegisNumber").H2GAttr("donorID"),
+        DonorNumber: $("#spRegisNumber").H2GValue(),
+        Gender: $("#rbtM").is(':checked') == true ? "M" : "F",
+        Name: $("#txtDonorName").H2GValue(),
+        Surname: $("#txtDonorSurName").H2GValue(),
+        NameE: $("#txtDonorNameEng").H2GValue(),
+        SurnameE: $("#txtDonorSurNameEng").H2GValue(),
+        Birthday: $("#txtBirthDay").H2GValue(),
+        TitleID: $("#ddlTitleName").H2GValue(),
+        Address: $("#txtAddress").H2GValue(),
+        SubDistrict: $("#txtSubDistrict").H2GValue(),
+        District: $("#txtDistrict").H2GValue(),
+        Province: $("#txtProvince").H2GValue(),
+        Zipcode: $("#txtZipcode").H2GValue(),
+        CountryID: $("#ddlCountry").H2GValue(),
+        OccupationID: $("#ddlOccupation").H2GValue(),
+        NationalityID: $("#ddlNationality").H2GValue(),
+        RaceID: $("#ddlRace").H2GValue(),
+        Mobile1: $("#txtMobile1").H2GValue(),
+        Mobile2: $("#txtMobile2").H2GValue(),
+        HomeTel: $("#txtHomeTel").H2GValue(),
+        OfficeTel: $("#txtTel").H2GValue(),
+        OfficeTelExt: $("#txtTelExt").H2GValue(),
+        Email: $("#txtEmail").H2GValue(),
+        AssociationID: $("#ddlAssociation").H2GValue(),
+        DonateNumberExt: $("#spRegisNumber").H2GAttr("donateNumberExt"),
+        VisitNumber: $("#spRegisNumber").H2GAttr("visitNumber"),
+        notOnlyDonor: notOnlyDonor == undefined ? true : notOnlyDonor,
+    };
+    var DonorVisit = {
+        ID: $("#spRegisNumber").H2GAttr("visitID"),
+        DonorID: $("#spRegisNumber").H2GAttr("donorID"),
+        QueueNumber: $("#spRegisNumber").H2GAttr("queueNum"),
+        VisitFrom: $("#spRegisNumber").H2GAttr("visitFrom"),
+        DonationTypeID: $("#spRegisNumber").H2GAttr("dTypeID"),
+        BagID: $("#spRegisNumber").H2GAttr("bagID"),
+        DonationToID: $("#spRegisNumber").H2GAttr("dToID"),
+        CollectionPlanID: $("#spRegisNumber").H2GAttr("cPlanID"),
+        CollectionPointID: $("#spRegisNumber").H2GAttr("dPointID") || $("#data").H2GAttr("collectionpointid"),
+        ForCollectionPointID: $("#ddlCollectionPoint").H2GValue() || $("#data").H2GAttr("collectionpointid"),
+        SiteID: $("#spRegisNumber").H2GAttr("siteID") || $("#data").H2GAttr("siteid"),
+        VisitNumber: $("#spRegisNumber").H2GAttr("visitNumber"),
+        VisitDate: $("#spVisitInfo").H2GAttr("visitDate"),
+        Weight: $("#txtWeight").H2GValue(),
+        PressureMax: $("#txtPresureMax").H2GValue(),
+        PressureMin: $("#txtPresureMin").H2GValue(),
+        DonationTypeID: $("#ddlITVDonationType").H2GValue() || "",
+        BagID: $("#ddlITVBag").H2GValue() || "",
+        DonationToID: $("#ddlITVDonationTo").H2GValue() || "",
+        HB: $("#txtHb").H2GValue(),
+        PLT: $("#txtPlt").H2GValue(),
+        HBTest: $("#ddlHbTest").H2GValue() || "",
+        HeartLung: $("#txtHeartLung").H2GValue(),
+        HeartRate: $("#txtHeartRate").H2GValue(),
+        InterviewStatus: $("#ddlITVResult").H2GValue() || "",
+        Status: checkGetStatusForDonation(),
+        SampleNumber: $("#spRegisNumber").H2GAttr("sampleNumber"),
+    };
+    var DonorHospital = {
+        ID: "",
+        ReceiptHospitalID: "",
+        VisitDate: $("#spVisitInfo").H2GAttr("visitDate"),
+    };
+    if ($("#data").H2GAttr("receiptHospitalID")) {
+        DonorHospital.ID = $("#spRegisNumber").H2GAttr("visitID");
+        DonorHospital.ReceiptHospitalID = $("#data").H2GAttr("receiptHospitalID");
+    }
+    var DonorExtCard = [];
+    var create = 0;
+    $('#divCardNumber .row').each(function (i, e) {
+        DonorExtCard[create] = {
+            ID: $(e).H2GAttr('refID'),
+            DonorID: $(e).H2GAttr('donorID'),
+            ExternalCardID: $(e).H2GAttr('extID'),
+            CardNumber: $(e).H2GAttr('cardNumber'),
+        };
+        create++;
+    });
+    var DonorComment = [];
+    create = 0;
+    $('#divComment .row').each(function (i, e) {
+        DonorComment[create] = {
+            ID: $(e).H2GAttr('refID'),
+            StartDate: $(e).H2GAttr('startDate'),
+            EndDate: $(e).H2GAttr('endDate'),
+            Description: $(e).find(".dc-comment").H2GValue(),
+        };
+        create++;
+    });
+
+    var DonorRecord = [];
+    create = 0;
+    $('#divDonateRecord .row').each(function (i, e) {
+        DonorRecord[create] = {
+            ID: $(e).H2GAttr('refID'),
+            DonateDate: $(e).H2GAttr('donatedate'),
+            DonateNumber: $(e).H2GAttr('donatenumber'),
+            DonateFrom: $(e).H2GAttr('donatefrom'),
+            DonateReward: getReward(e),
+        };
+        create++;
+    });
+    DonorRecord.sort(H2G.keysrt('ID'));
+
+    var DonorQuestionItem = [];
+    var DonorDeferralItem = [];
+    var DonationExamination = [];
+    // ถ้าไม่ใช่ลงทะเบียนให้เก็บ Questionnaire, Deferral และ Examination
+    if ($("#data").H2GAttr("lmenu") != "lmenuDonorRegis") {
+        create = 0;
+        $('#tbQuestionnaire > tbody > tr').each(function (i, e) {
+            DonorQuestionItem[create] = {
+                ID: $(e).H2GAttr('refID'),
+                QuestionID: $(e).H2GAttr('questID'),
+                QuestionCode: $(e).H2GAttr('questCode'),
+                QuestionDesc: $(e).H2GAttr('questDesc'),
+                QuestionDescTH: $(e).H2GAttr('questDescTH'),
+                Answer: $(e).H2GAttr('questAnswerType') == "PRESET" ? $(e).find(".td-answer select").H2GValue() : $(e).find(".td-answer input").H2GValue(),
+                ParentID: $(e).H2GAttr('fromQuestion'),
+            };
+            create++;
+        });
+        create = 0;
+        $('#tbDefInterview > tbody > tr').each(function (i, e) {
+            DonorDeferralItem[create] = {
+                ID: $(e).H2GAttr('refID'),
+                DetailID: $(e).H2GAttr('detailID'),
+                DeferralID: $(e).H2GAttr('defID'),
+                StartDate: $(e).H2GAttr("defStartDate"),
+                EndDate: $(e).H2GAttr('defEndDate'),
+                Note: $(e).H2GAttr('defRemarks'),
+                DonationTypeID: $("#ddlITVDonationType").H2GValue(),
+                DeferralType: $(e).H2GAttr('defType'),
+                Duration: $(e).H2GAttr('defDuration'),
+                QuestionID: $(e).H2GAttr('questID'),
+            };
+            create++;
+        });
+        create = 0;
+        $('#tbExam > tbody > tr').each(function (i, e) {
+            DonationExamination[create] = {
+                id: $(e).H2GAttr('refID'),
+                examination_group_id: $(e).H2GAttr('groupID'),
+                examination_group_desc: $(e).H2GAttr('groupDesc'),
+                examination_id: $(e).H2GAttr("examID"),
+                examination_desc: $(e).H2GAttr('examDesc'),
+                question_id: $(e).H2GAttr('questID'),
+            };
+            create++;
+        });
+    }
+    $.ajax({
+        url: '../../ajaxAction/donorAction.aspx',
+        data: H2G.ajaxData({
+            action: 'savedonor',
+            md: JSON.stringify(MasterDonor),
+            dv: JSON.stringify(DonorVisit),
+            dec: JSON.stringify(DonorExtCard),
+            dc: JSON.stringify(DonorComment),
+            dr: JSON.stringify(DonorRecord),
+            dh: JSON.stringify(DonorHospital),
+            dq: JSON.stringify(DonorQuestionItem),
+            dd: JSON.stringify(DonorDeferralItem),
+            de: JSON.stringify(DonationExamination),
+            receipthospitalid: $("#data").H2GAttr("receiptHospitalID"),
+        }).config,
+        type: "POST",
+        dataType: "json",
+        error: function (xhr, s, err) {
+            console.log(s, err);
+            notiError("บันทึกไม่สำเร็จ");
+            $("#btnSave").prop("disabled", false);
+            $("#btnSaveOnlyDonor").prop("disabled", false);
+        },
+        success: function (data) {
+            data.getItems = jQuery.parseJSON(data.getItems);
+            if (!data.onError) {
+                $("#data").H2GAttr("donorID", data.getItems.ID);
+                $("#spRegisNumber").H2GAttr("visitID", data.getItems.VisitID)
+                notiSuccess("บันทึกสำเร็จ");
+                if ($("#spRegisNumber").H2GAttr("backToSearch") == "Y") {
+                    cancelRegis(this);
+                } else {
+                    showDonorData();
+                }
+            } else { notiError("บันทึกไม่สำเร็จ"); }
+            $("#btnSave").prop("disabled", false);
+            $("#btnSaveOnlyDonor").prop("disabled", false);
+        }
+    });    //End ajax
+}
+function checkGetStatusForDonation() {
+    var thisMenu = $("#data").H2GAttr("lmenu");
+    var thisStatus = $("#spStatus").H2GValue();
+    if (thisMenu == "lmenuDonorRegis" && thisStatus == "REGISTER") {
+        thisStatus = "WAIT INTERVIEW"
+    } else if (thisMenu == "lmenuInterview" && thisStatus == "WAIT INTERVIEW") {
+        thisStatus = "WAIT COLLECTION"
+    } else if (thisMenu == "lmenulabRegis" && thisStatus == "WAIT INTERVIEW") {
+        thisStatus = "WAIT RESULT"
+    }
+    return thisStatus;
 }
 function getReward(xobj) {
     var reward = '';
     // reward_id|reward_date##
     $(xobj).find(".txt-reward-date[donateRewardID='NEW']").each(function (i, e) {
         if ($(e).H2GValue() != "") {
-            reward = $(e).H2GAttr("rewardID") + "|" + $(e).H2GValue() + "##";
+            reward = reward + $(e).H2GAttr("rewardID") + "|" + $(e).H2GValue() + "##";
         }
     });
     return reward;
 }
 function validation() {
     if ($('#divCardNumber > div').length == 0) {
-        $("#txtExtNumber").focus();
+        $("#txtCardNumber").focus();
         notiWarning("กรุณากรอกข้อมูลบัตรผู้บริจาคอย่างน้อย 1 ใบ");
         return false;
     } else if ($('#ddlTitleName').H2GValue() == null) {
@@ -284,14 +417,14 @@ function validation() {
         $("#txtDonorSurName").focus();
         notiWarning("กรุณากรอกนามสกุลผู้บริจาค");
         return false;
-    //} else if ($('#txtDonorNameEng').H2GValue() == "") {
-    //    $("#txtDonorNameEng").focus();
-    //    notiWarning("กรุณากรอกชื่อภาษาอังกฤษผู้บริจาค");
-    //    return false;
-    //} else if ($('#txtDonorSurNameEng').H2GValue() == "") {
-    //    $("#txtDonorSurNameEng").focus();
-    //    notiWarning("กรุณากรอกนามสกุลภาษาอังกฤษผู้บริจาค");
-    //    return false;
+        //} else if ($('#txtDonorNameEng').H2GValue() == "") {
+        //    $("#txtDonorNameEng").focus();
+        //    notiWarning("กรุณากรอกชื่อภาษาอังกฤษผู้บริจาค");
+        //    return false;
+        //} else if ($('#txtDonorSurNameEng').H2GValue() == "") {
+        //    $("#txtDonorSurNameEng").focus();
+        //    notiWarning("กรุณากรอกนามสกุลภาษาอังกฤษผู้บริจาค");
+        //    return false;
     } else if ($('#txtBirthday').H2GValue() == "") {
         $("#txtBirthday").focus();
         notiWarning("กรุณากรอกวันเกิดผู้บริจาค");
@@ -305,39 +438,53 @@ function validation() {
         notiWarning("กรุณาเลือกสัญชาติผู้บริจาค");
         return false;
     } else if ($('#txtAddress').H2GValue() == "") {
+        $("#infoTabToday").tabs("option", "active", [0]);
         $("#txtAddress").focus();
         notiWarning("กรุณากรอกที่อยู่ผู้บริจาค");
         return false;
     } else if ($('#txtSubDistrict').H2GValue() == "") {
+        $("#infoTabToday").tabs("option", "active", [0]);
         $("#txtSubDistrict").focus();
         notiWarning("กรุณากรอกแขวง/ตำบลผู้บริจาค");
         return false;
     } else if ($('#txtDistrict').H2GValue() == "") {
+        $("#infoTabToday").tabs("option", "active", [0]);
         $("#txtDistrict").focus();
         notiWarning("กรุณากรอกเขต/อำเภอผู้บริจาค");
         return false;
     } else if ($('#txtProvince').H2GValue() == "") {
+        $("#infoTabToday").tabs("option", "active", [0]);
         $("#txtProvince").focus();
         notiWarning("กรุณากรอกจังหวัดผู้บริจาค");
         return false;
     } else if ($('#txtZipcode').H2GValue() == "") {
+        $("#infoTabToday").tabs("option", "active", [0]);
         $("#txtZipcode").focus();
         notiWarning("กรุณากรอกรหัสไปรษณีย์ผู้บริจาค");
         return false;
     } else if ($('#ddlCountry').H2GValue() == null) {
+        $("#infoTabToday").tabs("option", "active", [0]);
         $("#ddlCountry").closest("div").find("input").focus();
         notiWarning("กรุณาเลือกประเทศผู้บริจาค");
         return false;
     } else if ($('#txtMobile1').H2GValue() == "") {
+        $("#infoTabToday").tabs("option", "active", [0]);
         $("#txtMobile1").focus();
         notiWarning("กรุณากรอกเบอร์โทรศัพท์มือถือผู้บริจาค");
         return false;
     } else if (checkEmail()) {
-        notiWarning("กรุณากรอกอีเมลให้ถูกต้อง");
+        $("#infoTabToday").tabs("option", "active", [0]);
         $("#txtEmail").focus();
+        notiWarning("กรุณากรอกอีเมลให้ถูกต้อง");
+        return false;
+    } else if ($('#ddlAssociation').H2GValue() == null) {
+        $("#infoTabToday").tabs("option", "active", [0]);
+        $("#ddlAssociation").closest("div").find("input").focus();
+        notiWarning("กรุณากรอกรหัสเชื่อมโยงโรงพยาบาลในเครือ");
         return false;
     } else if (interviewValidation()) {
         // ไม่ผ่านการตรวจสอบ tab คัดกรอง
+        $("#infoTabToday").tabs("option", "active", 2);
         return false;
     }
 
@@ -354,28 +501,44 @@ function interviewValidation() {
     // ตรวจสอบการกรอกข้อมูล
     if ($("#data").H2GAttr("lmenu") == "lmenuInterview") {
         if (notAllAnswer()) {
+            $("#infoTabToday").tabs("option", "active", [2]);
             $("#tbQuestionnaire > tbody > tr select:first").closest("div").focus();
-            alert("กรุณาตอบคำถามให้ครบทุกข้อ");
+            notiWarning("กรุณาตอบคำถามให้ครบทุกข้อ");
             return true;
         } else if ($("#txtWeight").H2GValue() == "") {
+            $("#infoTabToday").tabs("option", "active", [2]);
             $("#txtWeight").focus()
-            alert("กรุณากรอกน้ำหนัก");
+            notiWarning("กรุณากรอกน้ำหนัก");
             return true;
         } else if ($("#txtHeartRate").H2GValue() == "") {
+            $("#infoTabToday").tabs("option", "active", [2]);
             $("#txtHeartRate").focus()
-            alert("กรุณากรอกอัตราชีพจร");
+            notiWarning("กรุณากรอกอัตราชีพจร");
             return true;
         } else if ($("#txtPresureMax").H2GValue() == "") {
+            $("#infoTabToday").tabs("option", "active", [2]);
             $("#txtPresureMax").focus()
-            alert("กรุณากรอกความดันสูงสุด");
+            notiWarning("กรุณากรอกความดันสูงสุด");
             return true;
         } else if ($("#txtPresureMin").H2GValue() == "") {
+            $("#infoTabToday").tabs("option", "active", [2]);
             $("#txtPresureMin").focus()
-            alert("กรุณากรอกความดันต่ำสุด");
+            notiWarning("กรุณากรอกความดันต่ำสุด");
+            return true;
+        } else if ($('#ddlHbTest').H2GValue() == "") {
+            $("#infoTabToday").tabs("option", "active", [2]);
+            $("#ddlHbTest").closest("div").focus();
+            notiWarning("กรุณาเลือก Hb Test");
             return true;
         } else if ($("#txtHb").H2GValue() == "") {
+            $("#infoTabToday").tabs("option", "active", [2]);
             $("#txtHb").focus()
-            alert("กรุณากรอก Hb");
+            notiWarning("กรุณากรอก Hb");
+            return true;
+        } else if ($('#ddlITVResult').H2GValue() == "") {
+            $("#infoTabToday").tabs("option", "active", [2]);
+            $("#ddlITVResult").closest("div").focus();
+            notiWarning("กรุณาเลือกผลการตรวจคัดกรอง");
             return true;
         }
     }
@@ -385,7 +548,7 @@ function notAllAnswer() {
     var quest = $("#tbQuestionnaire > tbody > tr");
     var notanswer = false;
     $.each((quest), function (index, e) {
-        if ($(e).find("input").H2GValue() == "" && $(e).find("select").H2GValue() == "") {
+        if ($(e).find("input").H2GValue() == "" && ($(e).find("select").H2GValue() == "" || $(e).find("select").H2GValue() == null)) {
             notanswer = true;
             return false; // brake loop
         }
@@ -400,10 +563,15 @@ function showDonorData() {
             id: $("#data").H2GAttr("donorID"),
             visit_id: $("#spRegisNumber").H2GAttr("visitID"), 
             donationhospitalid: $("#data").H2GAttr("receiptHospitalID") ? $("#spRegisNumber").H2GAttr("visitID") : "",
+            receipthospitalid: $("#data").H2GAttr("receiptHospitalID"),
         }).config,
         type: "POST",
         dataType: "json",
+        beforeSend: function () {
+            //$('#tbVisitHistory > tbody').block();
+        },
         error: function (xhr, s, err) {
+            //$('#tbVisitHistory > tbody').unblock();
             $("#btnSave").prop("disabled", false);
             console.log(s, err);
         },
@@ -424,10 +592,12 @@ function showDonorData() {
                     dToID: data.getItems.Donor.DonationToID,
                     donateNumber: data.getItems.Donor.DonateNumber,
                     donateNumberExt: data.getItems.Donor.DonateNumberExt,
-                    visitNumber: data.getItems.Donor.VisitNumber
+                    visitNumber: data.getItems.Donor.VisitNumber,
+                    sampleNumber: data.getItems.Donor.SampleNumber,
+                    donateCount: data.getItems.Donor.DonateCount,
                 });
 
-                $("#spVisitCount").H2GValue("รวมจำนวนการเข้าพบ " + data.getItems.Donor.VisitNumber + " ครั้ง / บริจาค " + data.getItems.Donor.DonateCount + " ครั้ง");
+                $("#spVisitCount").H2GValue("รวมจำนวนการเข้าพบ " + data.getItems.Donor.VisitNumber + " ครั้ง / บริจาค " + data.getItems.Donor.DonateCount + "(" + data.getItems.Donor.DonateNumber + "+" + data.getItems.Donor.DonateNumberExt + ") ครั้ง");
                 $("#spVisitInfo").H2GValue("วันที่ลงทะเบียน " + data.getItems.Donor.VisitDateTimeText + " เข้าพบครั้งสุดท้ายเมื่อ " + data.getItems.Donor.LastVisitDateText + " ( " + data.getItems.Donor.DiffDate + " วัน ) กำลังดำเนินการบริจาคครั้งที่ " + data.getItems.Donor.CurrentDonateNumber)
                     .H2GFill({
                         visitDateText: data.getItems.Donor.VisitDateText,
@@ -436,12 +606,15 @@ function showDonorData() {
                         currentDonateNumber: data.getItems.Donor.CurrentDonateNumber,
                         visitDate: data.getItems.Donor.VisitDate
                     });
+
                 $("#infoTab > ul > li > a[href='#todayPane']").H2GValue(data.getItems.Donor.VisitDateText)
 
                 $("#spRegisNumber").H2GValue(data.getItems.Donor.DonorNumber);
                 $("#spQueue").H2GValue(data.getItems.Donor.QueueNumber == "" ? "-" : "คิวที่ " + data.getItems.Donor.QueueNumber).H2GAttr("queueNumber", data.getItems.Donor.QueueNumber);
                 if ($("#data").H2GAttr("receiptHospitalID")) { $("#spQueue").H2GValue($("#spQueue").H2GValue().replace("คิวที่", "ลำดับที่"));}
                 $("#spStatus").H2GValue(data.getItems.Donor.Status);
+                //if (data.getItems.Donor.Status == "REGISTER") { $("#btnSave").val("ลงทะเบียน"); } else { $("#btnSave").val("บันทึก"); }
+
                 $("input:radio[name=gender]").prop("checked", false);
                 if (data.getItems.Donor.Gender == "M") { $("#rbtM").prop("checked", true); } else { $("#rbtF").prop("checked", true); }
                 $("#divBloodType").H2GValue(data.getItems.Donor.RHGroup);
@@ -476,8 +649,25 @@ function showDonorData() {
                 $("#txtTel").H2GValue(data.getItems.Donor.OfficeTel);
                 $("#txtTelExt").H2GValue(data.getItems.Donor.OfficeTelExt);
                 $("#txtEmail").H2GValue(data.getItems.Donor.Email);
+                $("#ddlCollectionPoint").H2GAttr("selectItem", data.getItems.Donor.ForCollectionPointID);
                 $("#ddlAssociation").H2GAttr("selectItem", data.getItems.Donor.AssociationID);
 
+                //### Tab คัดกรอง
+                if (data.getItems.Donor.LastWeight != "") { $("#spLastWeight").H2GValue(data.getItems.Donor.LastWeight + " kg"); }
+                if (data.getItems.Donor.LastVisit != "") { $("#spLastDateWeight").H2GValue("เมื่อ " + data.getItems.Donor.LastVisit); }
+                $("#txtWeight").H2GValue(data.getItems.Donor.Weight);
+                $("#txtPresureMax").H2GValue(data.getItems.Donor.PressureMax);
+                $("#txtPresureMin").H2GValue(data.getItems.Donor.PressureMin);
+                $("#txtHb").H2GValue(data.getItems.Donor.HB);
+                $("#txtPlt").H2GValue(data.getItems.Donor.PLT);
+                $("#txtHeartLung").H2GValue(data.getItems.Donor.HeartLung);
+                $("#txtHeartRate").H2GValue(data.getItems.Donor.HeartRate);
+                $("#ddlITVDonationType").H2GAttr("selectItem", data.getItems.Donor.DonationTypeID);
+                $("#ddlITVBag").H2GAttr("selectItem", data.getItems.Donor.BagID);
+                $("#ddlITVDonationTo").H2GAttr("selectItem", data.getItems.Donor.DonationToID);
+                $("#ddlHbTest").val(data.getItems.Donor.HBTest).change();
+                $("#ddlITVResult").val(data.getItems.Donor.InterviewStatus).change();
+                
                 //### External Card
                 $('#divCardNumber').H2GValue("");
                 $.each((data.getItems.ExtCard), function (index, e) {
@@ -521,11 +711,12 @@ function showDonorData() {
 
                 //### Donation Record
                 $('#divDonateRecord').H2GValue("");
+                var candelete = true;
+                data.getItems.DonationRecord.sort(H2G.keysrt('DonateNumber', true));
                 $.each((data.getItems.DonationRecord), function (index, e) {
                     var spRecord = $("#divDonateRecordTemp").children().clone();
                     $(spRecord).H2GFill({ refID: e.ID, donatedate: e.DonateDate, donatenumber: e.DonateNumber, donatefrom: e.DonateFrom });
                     $(spRecord).find("span.rec-text").H2GValue("ครั้งที่ " + e.DonateNumber + " บริจาควันที่ " + e.DonateDateText + (e.DonateFrom == "EXTERNAL" ? " ณ โรงพยาบาลนอกเครือข่าย" : " ณ โรงพยาบาลในเครือข่าย"));
-
                     //มี Reward ต้องแสดง
                     if (e.DonateReward != "") {
                         var rewardRec = e.DonateReward.split('##');
@@ -533,81 +724,87 @@ function showDonorData() {
                             if (e != "") {
                                 var rewardInfo = e.split("|");
                                 // reward_id|reward_desc|donation_reward_id|reward_date
-                                var rowReward = $("#donateRewardTemp").clone();
-                                $(rowReward).find(".lbl-check-reward").append(rewardInfo[1]).H2GFill({ rewardID: rewardInfo[0] }).find("input").prop("checked", (rewardInfo[2] == "" ? "N" : "Y").toBoolean());
-                                $(rowReward).find(".txt-reward-date").H2GFill({ rewardID: rewardInfo[0], donateRewardID: rewardInfo[2] }).H2GValue(rewardInfo[3]);
+                                var rewardList = $('#divDonateRecord').H2GAttr("rewardList") || '';
+                                if (rewardList.indexOf("," + rewardInfo[0] + ",") == -1) {
+                                    var rowReward = $("#donateRewardTemp").clone();
+                                    $(rowReward).find(".lbl-check-reward").append(rewardInfo[1]).H2GFill({ rewardID: rewardInfo[0] }).find("input").prop("checked", (rewardInfo[2] == "" ? "N" : "Y").toBoolean());
+                                    $(rowReward).find(".txt-reward-date").H2GFill({ rewardID: rewardInfo[0], donateRewardID: rewardInfo[2] }).H2GValue(rewardInfo[3]);
 
-                                if (rewardInfo[2] != "") {
-                                    $(rowReward).find(".lbl-check-reward input").prop("disabled", true);
-                                    $(rowReward).find(".txt-reward-date").prop("disabled", true);
-                                } else {
-                                    $(rowReward).find(".lbl-check-reward input").on("change", function () { $(this).checkedReward() });
-                                    $(rowReward).find(".txt-reward-date").setCalendar({
-                                        maxDate: new Date(),
-                                        minDate: "-20y",
-                                        yearRange: "c-20:c+0",
-                                        onSelect: function (selectedDate, objDate) {
-                                            if (selectedDate != '') {
-                                                $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
-                                            }
-                                        },
-                                        onClose: function () {
-                                            if ($(this).H2GValue() == '') {
-                                                $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", false);
-                                            } else {
-                                                $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
-                                            }
-                                        },
-                                    }).H2GDatebox().H2GValue(rewardInfo[3]);
+                                    if (rewardInfo[2] != "") {
+                                        $(rowReward).find(".lbl-check-reward input").prop("disabled", true);
+                                        $(rowReward).find(".txt-reward-date").prop("disabled", true);
+                                    } else {
+                                        $(rowReward).find(".lbl-check-reward input").on("change", function () { $(this).checkedReward() });
+                                        $(rowReward).find(".txt-reward-date").setCalendar({
+                                            maxDate: new Date(),
+                                            minDate: "-20y",
+                                            yearRange: "c-20:c+0",
+                                            onSelect: function (selectedDate, objDate) {
+                                                if (selectedDate != '') {
+                                                    $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
+                                                }
+                                            },
+                                            onClose: function () {
+                                                if ($(this).H2GValue() == '') {
+                                                    $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", false);
+                                                } else {
+                                                    $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
+                                                }
+                                            },
+                                        }).H2GDatebox().prop('readonly', true).H2GValue(rewardInfo[3]);
+                                    }
+                                    $(spRecord).append($(rowReward).children());
+                                    $('#divDonateRecord').H2GAttr("rewardList", rewardList + "," + rewardInfo[0] + ",")
                                 }
-                                $(spRecord).append($(rowReward).children());
                             }
                         });
                     }
-                    $('#divDonateRecord').prepend(spRecord).H2GAttr("lastrecord", e.DonateNumber);
+                    if (e.DonateFrom == "INTERNAL" && candelete) { candelete = false; }
+                    if (candelete) { $(spRecord).find("a.icon").show(); candelete = false; }
+                    $('#divDonateRecord').append(spRecord).H2GAttr("lastrecord", data.getItems.Donor.DonateCount);
+
                 });
                 
                 //### Donation Question
-                if (data.getItems.QuestionList.length > 0) {
-                    $('#tbQuestionnaire > tbody').H2GValue("");
-                    $.each((data.getItems.QuestionList), function (index, e) {
-                        var dataRow = $("#tbQuestionnaire > thead > tr.template-data").clone().show();
-                        $(dataRow).H2GFill({
-                            refID: e.ID,
-                            questID: e.QuestionID,
-                            questCode: e.QuestionCode,
-                            questAnswerType: e.AnswerType,
-                            questPreset: e.Preset,
-                            fromQuestion: e.ParentID,
-                            questDesc: e.QuestionDesc,
-                            questDescTH: e.QuestionDescTH,
-                        });
-                        $(dataRow).find(".td-question span").H2GValue(e.QuestionDesc);
-                        if (e.AnswerType == "PRESET") {
-                            var selectPreset = $(dataRow).find(".td-answer select").show();
-                            var preset = e.Preset.split(",");
-                            preset.sort();
-                            $("<option>", { value: '', text: 'กรุณาเลือก' }).appendTo(selectPreset);
-                            $.each((preset), function (indexs, es) {
-                                $("<option>", { value: es, text: es }).appendTo(selectPreset);
-                            });
-                            $(selectPreset).setDropdownList().H2GValue(e.Answer).change().on('change', function () {
-                                //ให้เอาคำตอบไปหาคำถามต่อไป
-                                selectNextQuestion($(this).closest("tr").H2GAttr("questID"), $(this).H2GValue());
-                            });
-                        } else {
-                            $(dataRow).find(".td-answer input").show().H2GValue(e.Answer);
-                            if (e.AnswerType == "DATE") {
-                                $(dataRow).find(".td-answer input").setCalendar({
-                                    maxDate: "+100y",
-                                    minDate: "-100y",
-                                    yearRange: "c-50:c+50",
-                                });
-                            }
-                        }
-                        $("#tbQuestionnaire > tbody").append(dataRow);
+                $('#tbQuestionnaire > tbody').H2GValue("");
+                $.each((data.getItems.QuestionList), function (index, e) {
+                    var dataRow = $("#tbQuestionnaire > thead > tr.template-data").clone().show();
+                    $(dataRow).H2GFill({
+                        refID: e.ID,
+                        questID: e.QuestionID,
+                        questCode: e.QuestionCode,
+                        questAnswerType: e.AnswerType,
+                        questPreset: e.Preset,
+                        fromQuestion: e.ParentID,
+                        questDesc: e.QuestionDesc,
+                        questDescTH: e.QuestionDescTH,
                     });
-                }
+                    if ($('#ddlQuestLanguage').H2GValue() == "English") { $(dataRow).find(".td-question span").H2GValue(e.QuestionDesc); }
+                    else { $(dataRow).find(".td-question span").H2GValue(e.QuestionDescTH); }
+                    if (e.AnswerType == "PRESET") {
+                        var selectPreset = $(dataRow).find(".td-answer select").show();
+                        var preset = e.Preset.split(",");
+                        preset.sort();
+                        $("<option>", { value: '', text: 'กรุณาเลือก' }).appendTo(selectPreset);
+                        $.each((preset), function (indexs, es) {
+                            $("<option>", { value: es, text: es }).appendTo(selectPreset);
+                        });
+                        $(selectPreset).setDropdownList().H2GValue(e.Answer).change().on('change', function () {
+                            //ให้เอาคำตอบไปหาคำถามต่อไป
+                            selectNextQuestion($(this).closest("tr").H2GAttr("questID"), $(this).H2GValue());
+                        });
+                    } else {
+                        $(dataRow).find(".td-answer input").show().H2GValue(e.Answer);
+                        if (e.AnswerType == "DATE") {
+                            $(dataRow).find(".td-answer input").setCalendar({
+                                maxDate: "+100y",
+                                minDate: "-100y",
+                                yearRange: "c-50:c+50",
+                            });
+                        }
+                    }
+                    $("#tbQuestionnaire > tbody").append(dataRow);
+                });
 
                 //### Donor Deferral
                 $('#tbDefInterview > tbody').H2GValue("");
@@ -648,20 +845,22 @@ function showDonorData() {
                     $("#tbExam > tbody").append(dataRow);
                 });
                 
-                if (!(data.getItems.Donor.DuplicateTransaction == "0")) {
-                    alert("วันนี้คุณ " + data.getItems.Donor.Name + " " + data.getItems.Donor.Surname + "  ทำการลงทะเบียนไปแล้ว " + data.getItems.Donor.DuplicateTransaction + " ครั้ง");
-                }
                 if ($("#spRegisNumber").H2GAttr("visitID") != undefined) { $("#btnSave").H2GValue("บันทึก"); }
                 $("#txtCardNumber").focus();
             } else { }
             donorSelectDDL();
+            lookupTabQuestionaire();
+            showVisitHistory();
+            //$('#tbVisitHistory > tbody').unblock();
             $("#btnSave").prop("disabled", false);
         }
     });    //End ajax
 }
 function cancelRegis(xobj) {
-    $("#data").H2GAttr("donorID", "");
-    $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: 'search.aspx', method: "post" }).submit();
+    $("#data").H2GRemoveAttr("donorID,visitID");
+    var target = "search.aspx";
+    if ($("#data").H2GAttr("lmenu") == "lmenuInterview" || $("#data").H2GAttr("lmenu") == "lmenuHistoryReport") { target = "historyReport.aspx" }
+    $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: target, method: "post" }).submit();
 }
 function setHistoricalFileDatas() {
     //console.log("setHistoricalFileDatas");
@@ -702,7 +901,7 @@ function setHistoricalFileDatas() {
                                     "<td><input type='text' class='text-left' readonly value='" + datas[i].LastSample + "' /></td>" +
                                     "<td><input type='text' class='text-left' readonly value='" + datas[i].FirstAuthorisingLab + "' /></td>" +
                                     "<td><input type='text' class='text-left' readonly value='" + datas[i].LastAuthorisingLab + "' /></td>" +
-                               "</tr>";
+                                "</tr>";
                     $('#historicalFileTable > tbody').append(rows);
                 }
                 $("#historicalFileTable").tablesorter({ dateFormat: "uk" });
@@ -753,8 +952,7 @@ function setImmunohaemtologyFile() {
         });
         return deferred.promise();
     }
-    
-    
+        
     function getSet2() {
         //console.log("do set2");
         var deferred = $.Deferred();
@@ -882,7 +1080,7 @@ function setExamsDatas() {
                                     "<td class='text-left td-text-excel'>" + datas[i].TestBy3 + "</td>" +
                                     "<td class='text-left td-text-excel'>" + datas[i].ExecutingLab + "</td>" +
                                     "<td class='text-center td-text-excel'>" + datas[i].PcatdLib + "</td>" +
-                               "</tr>";
+                                "</tr>";
                     $('#exams-tab-table > tbody').append(rows);
                 }
                 $("#exams-tab-table").tablesorter({ dateFormat: "uk" });
@@ -968,18 +1166,17 @@ function showVisitHistory() {
 
 function loadSynthesisLink() {
     // console.log("Yessss");
-
     $.ajax({
         url: '../../ajaxAction/donorAction.aspx',
         data: H2G.ajaxData({ action: 'loadSynthesisSet1',donn_numero: $("#spRegisNumber").H2GValue() }).config,
         type: "POST",
         dataType: "json",
         beforeSend: function () {
-            $('body').block();
+           // $('body').block();
         },
         error: function (xhr, s, err) {
             console.log(s, err);
-            $('body').unblock();
+           // $('body').unblock();
         },
         success: function (data) {
             if (!data.onError) {
@@ -1025,7 +1222,7 @@ function loadSynthesisLink() {
                                         "<td class='text-left td-text-excel Ag-E-" + datas[i].dornor_rank + "'></td>" +
                                         "<td class='text-left td-text-excel Ag-e-" + datas[i].dornor_rank + "'></td>" +
                                         "<td class='text-left td-text-excel Ag-K-" + datas[i].dornor_rank + "'></td>" +
-                                   "</tr>";
+                                    "</tr>";
                         // console.log("Row = ", rows);
                         $('#synthesisStandard > tbody').append(rows);
 
@@ -1055,7 +1252,7 @@ function loadSynthesisLink() {
                                         "<td class='text-left td-text-excel'></td>" +
                                         "<td class='text-left td-text-excel'></td>" +
                                         "<td class='text-left td-text-excel'></td>" +
-                                   "</tr>";
+                                    "</tr>";
                         // console.log("Row = ", rows);
                         $('#synthesisVirology > tbody').append(rows2);
 
@@ -1084,7 +1281,7 @@ function loadSynthesisLink() {
                                         "<td class='text-left td-text-excel'></td>" +
                                         "<td class='text-left td-text-excel'></td>" +
                                         "<td class='text-left td-text-excel'></td>" +
-                                   "</tr>";
+                                    "</tr>";
 
                         $('#synthesisImmunohematology > tbody').append(rows3);
                     }
@@ -1103,7 +1300,7 @@ function loadSynthesisLink() {
                 }
                 
             }
-            $('body').unblock();
+            //$('body').unblock();
         }
     });
 }
@@ -1129,7 +1326,7 @@ function siteAnddateSet(data) {
             type: "POST",
             dataType: "json",
             beforeSend: function () {
-                $('body').block();
+                //$('body').block();
             },
             error: function (xhr, s, err) {
                 console.log(s, err);
@@ -1139,7 +1336,7 @@ function siteAnddateSet(data) {
                 if (!data.onError) {
                     $(".firstDonateAt").text(data.getItems.site)
                 }
-                $('body').unblock();
+                //$('body').unblock();
             }
         });
     }
@@ -1152,7 +1349,7 @@ function siteAnddateSet(data) {
             type: "POST",
             dataType: "json",
             beforeSend: function () {
-                $('body').block();
+                //$('body').block();
             },
             error: function (xhr, s, err) {
                 console.log(s, err);
@@ -1162,7 +1359,7 @@ function siteAnddateSet(data) {
                 if (!data.onError) {
                     $(".lastDonateAt").text(data.getItems.site)
                 }
-                $('body').unblock();
+                //$('body').unblock();
             }
         });
     }
@@ -1183,4 +1380,25 @@ function selecterTable(even){
         $("#synthesisVirology").css({ "display": "none" });
         $("#synthesisImmunohematology").css({ "display": "block" });
     }
+}
+
+function stickerPrint() {
+    $.ajax({
+        url: '../../ajaxAction/donorAction.aspx',
+        data: H2G.ajaxData({ action: 'stickerprint' }).config,
+        type: "POST",
+        dataType: "json",
+        //beforeSend: function () {
+        //    $('body').block();
+        //},
+        error: function (xhr, s, err) {
+            console.log(s, err);
+        },
+        success: function (data) {
+            data.getItems = jQuery.parseJSON(data.getItems);
+            if (!data.onError) {
+                console.log("success = ", data.getItems);
+            }
+        }
+    });
 }
