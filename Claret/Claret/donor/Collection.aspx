@@ -253,10 +253,10 @@
                         <tbody>
                             <tr>
                                 <td class="col-md-17" style="border:1px solid #ffffff; padding: 0px;">
-                                    <input class="form-control" id="collectedProblemReason3" value="" tabindex="13" />
+                                    <input class="form-control" id="collectedProblemReason3" value="" tabindex="15" />
                                 </td>
                                 <td class="col-md-17" style="border:1px solid #ffffff; padding: 0px;">
-                                    <input class="form-control" id="collectedProblemReason4" value="" tabindex="14" />
+                                    <input class="form-control" id="collectedProblemReason4" value="" tabindex="16" />
                                 </td>
                             </tr>
                         </tbody>
@@ -276,8 +276,8 @@
     <div class="row" style="margin-top:10px;">
         <div class="col-md-36">
             <div class="col-md-30">&nbsp;</div>
-            <div class="col-md-3"><input id="btnCancel" type="button" class="btn btn-block" value="ยกเลิก" tabindex="15" /></div>
-            <div class="col-md-3"><input id="btnSave" type="button" class="btn btn-success btn-block" value="บันทึก" tabindex="16" /></div>
+            <div class="col-md-3"><input id="btnCancel" type="button" class="btn btn-block" value="ยกเลิก" tabindex="17" /></div>
+            <div class="col-md-3"><input id="btnSave" type="button" class="btn btn-success btn-block" value="บันทึก" tabindex="18" /></div>
         </div>
     </div>
     <div class="row" style="margin-top:20px;">
