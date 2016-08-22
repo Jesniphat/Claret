@@ -16,7 +16,7 @@ var examinationCheckNoGroup = [];
 var collectedProblemList = [];
 var problemDataList = [];
 var problemDataAuto = [];
-var problemReason = { collectedProblem: "", collectedProblemReason1: "", collectedProblemReason2: "" };
+var problemReason = { collectedProblem: "", collectedProblemReason1: "", collectedProblemReason2: "", collectedProblemReason3: "", collectedProblemReason4: "" };
 
 var staffListData = [];
 
@@ -71,10 +71,27 @@ function getInitialData() {
                         $("#sampleNumber").val(data.getItems.visit[0].sampleNumber);
                         $("#sampleNumber").prop("readonly", true);
                         if ($("#data").attr("donatesubaction") == "b") {
-                            console.log(data.getItems.visit[0].donation_type_id, "ddddddd");
-                            $("#donateType").val(data.getItems.visit[0].donation_type_id);
-                            $("#donateBagType").val(data.getItems.visit[0].bag_id);
-                            $("#donateApply").val(data.getItems.visit[0].donation_to_id);
+                            console.log(data.getItems.visit[0].donation_type_id, "donatesubaction = b");
+                            // $("#donateType").val(data.getItems.visit[0].donation_type_id);
+                            $("#donateType").combobox("setvalue", data.getItems.visit[0].donation_type_id);
+                            // $("#donateBagType").val(data.getItems.visit[0].bag_id);
+                            $("#donateBagType").combobox("setvalue", data.getItems.visit[0].bag_id);
+                            // $("#donateApply").val(data.getItems.visit[0].donation_to_id);
+                            $("#donateApply").combobox("setvalue", data.getItems.visit[0].donation_to_id);
+                        }
+
+                        if ($("#data").attr("donatesubaction") == "a" && $("#data").attr("donatetype") == "0") {
+                            console.log(data.getItems.visit[0].donation_type_id, "donatesubaction = a 0");
+                            // $("#donateType").val(data.getItems.visit[0].donation_type_id);
+                            $("#donateType").combobox("setvalue", data.getItems.visit[0].donation_type_id);
+                        }
+                        if ($("#data").attr("donatesubaction") == "a" && $("#data").attr("donatebagtype") == "0") {
+                            // $("#donateBagType").val(data.getItems.visit[0].bag_id);
+                            $("#donateBagType").combobox("setvalue", data.getItems.visit[0].bag_id);
+                        }
+                        if ($("#data").attr("donatesubaction") == "a" && $("#data").attr("donateapply") == "0") {
+                            // $("#donateApply").val(data.getItems.visit[0].donation_to_id);
+                            $("#donateApply").combobox("setvalue", data.getItems.visit[0].donation_to_id);
                         }
                     }
                     if (data.getItems.InitalData.length > 0) {
@@ -96,6 +113,8 @@ function getInitialData() {
                         problemReason.collectedProblem = proBl.refuse_reason1_id;
                         problemReason.collectedProblemReason1 = proBl.refuse_reason2_id;
                         problemReason.collectedProblemReason2 = proBl.refuse_reason3_id;
+                        problemReason.collectedProblemReason3 = proBl.refuse_reason4_id;
+                        problemReason.collectedProblemReason4 = proBl.refuse_reason5_id;
                         for (var i = 0; i < problemDataList.length; i++) {
                             if (proBl.refuse_reason1_id == problemDataList[i].id) {
                                 $("#collectedProblem").val(problemDataList[i].code + " - " + problemDataList[i].description);
@@ -107,6 +126,14 @@ function getInitialData() {
                             }
                             if (proBl.refuse_reason3_id == problemDataList[i].id) {
                                 $("#collectedProblemReason2").val(problemDataList[i].code + " - " + problemDataList[i].description);
+
+                            }
+                            if (proBl.refuse_reason4_id == problemDataList[i].id) {
+                                $("#collectedProblemReason3").val(problemDataList[i].code + " - " + problemDataList[i].description);
+
+                            }
+                            if (proBl.refuse_reason5_id == problemDataList[i].id) {
+                                $("#collectedProblemReason4").val(problemDataList[i].code + " - " + problemDataList[i].description);
 
                             }
                         }
@@ -139,85 +166,112 @@ function getInitialData() {
 
 function getDonateTypeList() {
     var deferred = $.Deferred();
-    $.ajax({
-        url: '../../ajaxAction/donateAction.aspx',
-        data: H2G.ajaxData({ action: 'getDonateTypeList' }).config,
-        type: "POST",
-        dataType: "json",
-        error: function (xhr, s, err) {
-            console.log(s, err);
-        },
-        success: function (data) {
-            if (!data.onError) {
-                data.getItems = jQuery.parseJSON(data.getItems);
-                $("#donateType").append($("<option value='0'>&nbsp</option>"));
-                for (var i = 0; i < data.getItems.length; i++) {
-                    $("#donateType").append($("<option value='" + data.getItems[i].Id + "'>" + data.getItems[i].Description + "</option>"));
-                }
-                $("#donateType").val(getParam.donateType);
-                deferred.resolve("Ok");
-            } else {
-                console.log("Error = ", data.exMessage);
-                deferred.reject("error");
-            }
-        }
+    //$.ajax({
+    //    url: '../../ajaxAction/donateAction.aspx',
+    //    data: H2G.ajaxData({ action: 'getDonateTypeList' }).config,
+    //    type: "POST",
+    //    dataType: "json",
+    //    error: function (xhr, s, err) {
+    //        console.log(s, err);
+    //    },
+    //    success: function (data) {
+    //        if (!data.onError) {
+    //            data.getItems = jQuery.parseJSON(data.getItems);
+    //            $("#donateType").append($("<option value='0'>&nbsp</option>"));
+    //            for (var i = 0; i < data.getItems.length; i++) {
+    //                $("#donateType").append($("<option value='" + data.getItems[i].Id + "'>" + data.getItems[i].Description + "</option>"));
+    //            }
+    //            $("#donateType").val(getParam.donateType);
+    //            deferred.resolve("Ok");
+    //        } else {
+    //            console.log("Error = ", data.exMessage);
+    //            deferred.reject("error");
+    //        }
+    //    }
+    //});
+    $("#donateType").setAutoListValue({
+        url: '../../ajaxAction/masterAction.aspx',
+        data: { action: 'donationtype2' },
+        defaultSelect: getParam.donateType, //$("#donateType").H2GAttr("selectItem") || $("#data").H2GAttr("collectionpointid"),
+    }).on('autocompleteselect', function () {
+        //$("#txtOuterDonate").focus();
     });
+
+    deferred.resolve("Ok");
     return deferred.promise();
 }
 
 function getDonateBagTypeList() {
     var deferred = $.Deferred();
-    $.ajax({
-        url: '../../ajaxAction/donateAction.aspx',
-        data: H2G.ajaxData({ action: 'getDonateBagTypeList' }).config,
-        type: "POST",
-        dataType: "json",
-        error: function (xhr, s, err) {
-            console.log(s, err);
-        },
-        success: function (data) {
-            if (!data.onError) {
-                data.getItems = jQuery.parseJSON(data.getItems);
-                $("#donateBagType").append($("<option value='0'>&nbsp</option>"));
-                for (var i = 0; i < data.getItems.length; i++) {
-                    $("#donateBagType").append($("<option value='" + data.getItems[i].Id + "'>" + data.getItems[i].Description + "</option>"));
-                }
-                $("#donateBagType").val(getParam.donateBagType);
-                deferred.resolve("Ok");
-            } else {
-                console.log("Error = ", data.exMessage);
-                deferred.reject("error");
-            }
-        }
+    //$.ajax({
+    //    url: '../../ajaxAction/donateAction.aspx',
+    //    data: H2G.ajaxData({ action: 'getDonateBagTypeList' }).config,
+    //    type: "POST",
+    //    dataType: "json",
+    //    error: function (xhr, s, err) {
+    //        console.log(s, err);
+    //    },
+    //    success: function (data) {
+    //        if (!data.onError) {
+    //            data.getItems = jQuery.parseJSON(data.getItems);
+    //            $("#donateBagType").append($("<option value='0'>&nbsp</option>"));
+    //            for (var i = 0; i < data.getItems.length; i++) {
+    //                $("#donateBagType").append($("<option value='" + data.getItems[i].Id + "'>" + data.getItems[i].Description + "</option>"));
+    //            }
+    //            $("#donateBagType").val(getParam.donateBagType);
+    //            deferred.resolve("Ok");
+    //        } else {
+    //            console.log("Error = ", data.exMessage);
+    //            deferred.reject("error");
+    //        }
+    //    }
+    //});
+    $("#donateBagType").setAutoListValue({
+        url: '../../ajaxAction/masterAction.aspx',
+        data: { action: 'getdonatebagtypelist' },
+        defaultSelect: getParam.donateBagType, //$("#donateType").H2GAttr("selectItem") || $("#data").H2GAttr("collectionpointid"),
+    }).on('autocompleteselect', function () {
+        //$("#txtOuterDonate").focus();
     });
+
+    deferred.resolve("Ok");
     return deferred.promise();
 }
 
 function getDonateApplyList() {
     var deferred = $.Deferred();
-    $.ajax({
-        url: '../../ajaxAction/donateAction.aspx',
-        data: H2G.ajaxData({ action: 'getDonateApplyList' }).config,
-        type: "POST",
-        dataType: "json",
-        error: function (xhr, s, err) {
-            console.log(s, err);
-        },
-        success: function (data) {
-            if (!data.onError) {
-                data.getItems = jQuery.parseJSON(data.getItems);
-                $("#donateApply").append($("<option value='0'>&nbsp</option>"));
-                for (var i = 0; i < data.getItems.length; i++) {
-                    $("#donateApply").append($("<option value='" + data.getItems[i].Id + "'>" + data.getItems[i].Description + "</option>"));
-                }
-                $("#donateApply").val(getParam.donateApply);
-                deferred.resolve("Ok");
-            } else {
-                console.log("Error = ", data.exMessage);
-                deferred.reject("Error");
-            }
-        }
+    //$.ajax({
+    //    url: '../../ajaxAction/donateAction.aspx',
+    //    data: H2G.ajaxData({ action: 'getDonateApplyList' }).config,
+    //    type: "POST",
+    //    dataType: "json",
+    //    error: function (xhr, s, err) {
+    //        console.log(s, err);
+    //    },
+    //    success: function (data) {
+    //        if (!data.onError) {
+    //            data.getItems = jQuery.parseJSON(data.getItems);
+    //            $("#donateApply").append($("<option value='0'>&nbsp</option>"));
+    //            for (var i = 0; i < data.getItems.length; i++) {
+    //                $("#donateApply").append($("<option value='" + data.getItems[i].Id + "'>" + data.getItems[i].Description + "</option>"));
+    //            }
+    //            $("#donateApply").val(getParam.donateApply);
+    //            deferred.resolve("Ok");
+    //        } else {
+    //            console.log("Error = ", data.exMessage);
+    //            deferred.reject("Error");
+    //        }
+    //    }
+    //});
+    $("#donateApply").setAutoListValue({
+        url: '../../ajaxAction/masterAction.aspx',
+        data: { action: 'getdonateapplylist' },
+        defaultSelect: getParam.donateApply, //$("#donateType").H2GAttr("selectItem") || $("#data").H2GAttr("collectionpointid"),
+    }).on('autocompleteselect', function () {
+        //$("#txtOuterDonate").focus();
     });
+
+    deferred.resolve("Ok");
     return deferred.promise();
 }
 
@@ -397,6 +451,10 @@ function setIdProblem(id) {
                 problemReason.collectedProblemReason1 = problemDataList[i].id;
             } else if (id == "collectedProblemReason2") {
                 problemReason.collectedProblemReason2 = problemDataList[i].id;
+            } else if (id == "collectedProblemReason3") {
+                problemReason.collectedProblemReason3 = problemDataList[i].id;
+            } else if (id == "collectedProblemReason4") {
+                problemReason.collectedProblemReason4 = problemDataList[i].id;
             }
         }
     }
@@ -541,7 +599,7 @@ function saveData() {
     }
     if ($("#vol").val() == "") {
         //alert("กรุณากรอก Valumn");
-        notiWarning("กรุณากรอก Valumn");
+        notiWarning("กรุณากรอก Volumn");
         $("#vol").focus();
         return;
     }
@@ -563,12 +621,12 @@ function saveData() {
         $("#donateStaff").focus();
         return;
     }
-    if (labExaminationSaveList == 0 || labExaminationSaveList == "") {
-        //alert("กรุณาเลือก LAB EXAMINATION");
-        notiWarning("กรุณาเลือก LAB EXAMINATION");
-        $("#labExamination").focus();
-        return;
-    }
+    //if (labExaminationSaveList == 0 || labExaminationSaveList == "") {
+    //    //alert("กรุณาเลือก LAB EXAMINATION");
+    //    notiWarning("กรุณาเลือก LAB EXAMINATION");
+    //    $("#labExamination").focus();
+    //    return;
+    //}
     if (problemReason.collectedProblem == 0 || problemReason.collectedProblem == "") {
         problemReason.collectedProblem = 0;
         //alert("กรุณากรอกปัญหาในการจัดเก็บ");
@@ -587,6 +645,12 @@ function saveData() {
         //$("#collectedProblemReason2").focus();
         //return;
     }
+    if (problemReason.collectedProblemReason3 == 0 || problemReason.collectedProblemReason3 == "") {
+        problemReason.collectedProblemReason3 = 0;
+    }
+    if (problemReason.collectedProblemReason4 == 0 || problemReason.collectedProblemReason4 == "") {
+        problemReason.collectedProblemReason4 = 0;
+    }
     var saveData = {
         action: 'saveDonate',
         donateAction: getParam.donateAction,
@@ -596,12 +660,14 @@ function saveData() {
         prescribedVol: $("#prescribedVol").val(),
         volumnActual: $("#vol").val(),
         donationTime: $("#data").attr("donatedate") + " " + $("#startDonateDate").val() + ":00",
-        duration: $("#data").attr("donatedate") + " " + $("#donateTimes").val() + ":00",
+        duration: $("#data").attr("donatedate") + " " + $("#donateTimes").val(),
         // collection_staff: $("#donateStaff").val(),
         collection_staff: $("#donateStaff").attr("staffid"),
         refuse_reason1_id: problemReason.collectedProblem,
         refuse_reason2_id: problemReason.collectedProblemReason1,
         refuse_reason3_id: problemReason.collectedProblemReason2,
+        refuse_reason4_id: problemReason.collectedProblemReason3,
+        refuse_reason5_id: problemReason.collectedProblemReason4,
         labExaminationSaveList: JSON.stringify(labExaminationSaveList)
     }
     console.log("data = ", saveData);
@@ -625,6 +691,7 @@ function saveData() {
                 hl7Generator($("#data").attr("donorid"), $("#data").attr("visitid"), $("#donerNumber").val(), $("#sampleNumber").val());
                 resetData();
                 randerAddLabExamination();
+                getDonationList();
             } else {
                 console.log("Error = ", data.exMessage);
               //  $('body').unblock();
@@ -654,6 +721,8 @@ function resetData() {
     $("#collectedProblem").val("");
     $("#collectedProblemReason1").val("");
     $("#collectedProblemReason2").val("");
+    $("#collectedProblemReason3").val("");
+    $("#collectedProblemReason4").val("");
 
     labExaminationList = [];
     labExaminationIdList = [];
@@ -667,6 +736,8 @@ function resetData() {
     $("#data").attr("donateapply", "0");
     // $("#data").attr("donatedate", "");
     $("#data").attr("donatestatus", "WAIT COLLECTION");
+
+    getDonationList();
     deferred.resolve("OK");
     return deferred.promise();
 }
@@ -687,8 +758,10 @@ function getDonationList() {
                 console.log(data.getItems);
                 if (data.getItems.length > 0) {
                     $("tr").remove(".no-transactionDonate");
+                    $("tr").remove(".donate-table-rows");
                 } else {
                     $("tr").remove(".no-transactionDonate");
+                    $("tr").remove(".donate-table-rows");
                     $('#donate-table > tbody').append("<tr class='no-transactionDonate'><td align='center' colspan='9'>ไม่พบข้อมูล</td></tr>");
                 }
                 for (var i = 0; i < data.getItems.length; i++) {
@@ -785,19 +858,7 @@ function getStaffAutocomplete() {
 
 function setKeyComplete() {
     var deferred = $.Deferred();
-    $.widget("custom.kaycomplete", $.ui.autocomplete, {
-        _renderMenu: function (ul, items) {
-            var that = this,
-                currentCategory = "";
-            $.each(items, function (index, item) {
-                if (item.category != currentCategory) {
-                    ul.append("<li class='ui-autocomplete-category'></li>");
-                    currentCategory = item.category;
-                }
-                that._renderItemData(ul, item);
-            });
-        }
-    });
+    
 
     $("#donateStaff").kaycomplete({
         source: staffListData,
@@ -805,7 +866,10 @@ function setKeyComplete() {
             console.log("ui = ", ui);
             $("#donateStaff").val(ui.item.label);
             $("#donateStaff").attr("staffid", ui.item.id);
-        }
+        },
+        minLength: 0
+    }).focus(function () {
+        $(this).kaycomplete("search");
     });
 
     $("#donateStaff").blur(function(){
@@ -834,6 +898,16 @@ function setKeyComplete() {
             }
         }
         return check;
+    }
+}
+
+function setDefaultStaff() {
+    $("#donateStaff").attr("staffid", $("#data").attr("staffid"));
+    for (var i = 0; i < staffListData.length; i++) {
+        if (staffListData[i].id == $("#data").attr("staffid")) {
+            $("#donateStaff").val(staffListData[i].label);
+            break;
+        }
     }
 }
 

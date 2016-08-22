@@ -136,4 +136,21 @@
             this.element.show();
         },
     });
+
 })(jQuery);
+
+(function ($) {
+    $.widget("custom.kaycomplete", $.ui.autocomplete, {
+        _renderMenu: function (ul, items) {
+            var that = this,
+                currentCategory = "";
+            $.each(items, function (index, item) {
+                if (item.category != currentCategory) {
+                    ul.append("<li class='ui-autocomplete-category'></li>");
+                    currentCategory = item.category;
+                }
+                that._renderItemData(ul, item);
+            });
+        }
+    });
+})(jQuery)

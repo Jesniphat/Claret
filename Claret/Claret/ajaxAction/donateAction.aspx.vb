@@ -155,7 +155,7 @@ Public Class donateAction
             If Not String.IsNullOrEmpty(_REQUEST("surname")) Then param.Add("#SURNAME", " and (UPPER(dn.surname) like UPPER('" & _REQUEST("surname") & "') or UPPER(dn.surname_e) like UPPER('" & _REQUEST("surname") & "')) ")
             If Not String.IsNullOrEmpty(_REQUEST("birthday")) Then param.Add("#BIRTHDAY", "and to_char(dn.birthday, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("birthday") & "' ")
             If Not String.IsNullOrEmpty(_REQUEST("bloodgroup")) Then param.Add("#BLOOD_GROUP", " and UPPER(rg.description) like UPPER('" & _REQUEST("bloodgroup") & "') ")
-            If Not String.IsNullOrEmpty(_REQUEST("samplenumber")) Then param.Add("#BLOOD_GROUP", " and UPPER(rg.description) like UPPER('" & _REQUEST("bloodgroup") & "') ")
+            If Not String.IsNullOrEmpty(_REQUEST("samplenumber")) Then param.Add("#SAMPLE_NUMBER", " and UPPER(dv.SAMPLE_NUMBER) like UPPER('" & _REQUEST("samplenumber") & "') ")
             'If Not String.IsNullOrEmpty(_REQUEST("reportdate")) Then param.Add("#REPORT_DATE", " and nvl(dv.VISIT_DATE,dv.CREATE_DATE) between to_date('" & _REQUEST("reportdate").Replace("/", "") & "','ddMMyyyy') and to_date('" & _REQUEST("reportdate").Replace("/", "") & "','ddMMyyyy')+1 ")
 
             If Not String.IsNullOrEmpty(_REQUEST("reportdate")) Then param.Add("#REPORT_DATE", "and to_char(nvl(dv.VISIT_DATE,dv.CREATE_DATE), 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("reportdate") & "' ")
@@ -172,7 +172,8 @@ Public Class donateAction
                                                 FROM (
 									                    select DV.id as visit_id, DN.id as donor_id, DV.QUEUE_NUMBER, DN.name || ' '  || DN.SURNAME as name
                                                         , DV.SAMPLE_NUMBER, DV.COMMENT_TEXT, to_char(nvl(DV.VISIT_DATE,dv.create_date),'HH24,MI') as regis_time
-                                                        , st.code as regis_staff, to_char(dv.Interview_DATE,'HH24,MI') as Interview_time, dv.Interview_STAFF
+                                                        , st.code as regis_staff, to_char(dv.Interview_DATE,'HH24,MI') as Interview_time, dv.Interview_STAFF AS Interview_STAFF_REAL
+                                                        , st2.code AS Interview_STAFF 
                                                         , '' as collection_time, '' as collection_staff, '' as lab_time, '' as lab_staff
                                                         from DONATION_VISIT dv
                                                         inner join donor dn on DN.id = DV.DONOR_ID
@@ -180,9 +181,10 @@ Public Class donateAction
                                                         left join external_card ec on ec.id = dexc.external_card_id
                                                         left join rh_group rg on rg.id = dn.rh_group_id
                                                         left join staff st on st.id = dv.create_staff
+                                                        left join staff st2 on st2.id = dv.Interview_STAFF
                                                         where 1=1 /*#REPORT_DATE*/ /*#STATUS*/
                                                         /*#QUEUE_NUMBER*/ /*#DONOR_NUMBER*/ /*#NATION_NUMBER*/ /*#NAME*/ /*#SURNAME*/ 
-                                                        /*#BIRTHDAY*/ /*#BLOOD_GROUP*/ 
+                                                        /*#BIRTHDAY*/ /*#BLOOD_GROUP*/ /*#SAMPLE_NUMBER*/ 
 									                ) dn
                                             ORDER BY dn./*#SORT_ORDER*/ /*#SORT_DIRECTION*/
                                             ) dn
@@ -288,7 +290,7 @@ Public Class donateAction
 
     Private Sub GetProblemReason()
         Try
-            Dim sql As String = "select * from Reason where hiig_table = 'MOTIFDEST'"
+            Dim sql As String = "select * from Reason where hiig_table = 'PPBPREL'"
 
             Dim dt As DataTable = Cbase.QueryTable(sql)
             Dim ProblemReasonList = New List(Of ProblemReason)
@@ -378,9 +380,9 @@ Public Class donateAction
                                       where dv.ID = '" & VistId & "' 
                                       AND d.ID = '" & DonorId & "'"
             Dim GetInData As String = "SELECT VOLUME_ACTUAL, to_char(nvl(DONATION_TIME, nvl(DONATION_TIME, sysdate)), 'HH24:MI', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') AS DONATION_TIME, 
-                                       to_char(nvl(DURATION, nvl(DURATION, sysdate)), 'HH24:MI', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') AS DURATION, 
-                                       COLLECTION_STAFF, COLLECTION_DATE, 
-                                       REFUSE_REASON1_ID, REFUSE_REASON2_ID, REFUSE_REASON3_ID FROM DONATION_RECORD 
+                                       to_char(nvl(DURATION, nvl(DURATION, sysdate)), 'HH24:MI:SS', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') AS DURATION, 
+                                       COLLECTION_STAFF, COLLECTION_DATE, REFUSE_REASON1_ID, REFUSE_REASON2_ID, REFUSE_REASON3_ID, REFUSE_REASON4_ID, REFUSE_REASON5_ID
+                                       FROM DONATION_RECORD 
                                        WHERE DONOR_ID = '" & DonorId & "' AND DONATION_VISIT_ID = '" & VistId & "' "
             Dim GetExamination As String = "select * from DONATION_EXAMINATION WHERE DONATION_VISIT_ID = '" & VistId & "'"
 
@@ -422,6 +424,8 @@ Public Class donateAction
                 Item.refuse_reason1_id = dr("REFUSE_REASON1_ID").ToString
                 Item.refuse_reason2_id = dr("REFUSE_REASON2_ID").ToString
                 Item.refuse_reason3_id = dr("REFUSE_REASON3_ID").ToString
+                Item.refuse_reason4_id = dr("REFUSE_REASON4_ID").ToString
+                Item.refuse_reason5_id = dr("REFUSE_REASON5_ID").ToString
 
                 AllInitalDataList.InitalData.Add(Item)
             Next
@@ -467,6 +471,8 @@ Public Class donateAction
             Dim refuseReason1Id As String = _REQUEST("refuse_reason1_id")
             Dim refuseReason2Id As String = _REQUEST("refuse_reason2_id")
             Dim refuseReason3Id As String = _REQUEST("refuse_reason3_id")
+            Dim refuseReason4Id As String = _REQUEST("refuse_reason4_id")
+            Dim refuseReason5Id As String = _REQUEST("refuse_reason5_id")
 
             Dim CheckStatus = Cbase.QueryField("SELECT STATUS FROM DONATION_VISIT WHERE ID = '" & visitId & "' " & "AND DONOR_ID = '" & donerId & "'")
 
@@ -478,10 +484,16 @@ Public Class donateAction
                 LabExaminationString += "'" & Les.id & "',"
             Next
 
-            Dim strLabExaminationString As String = LabExaminationString.Substring(0, (LabExaminationString.Length - 1))
+            Dim morewhere As String = ""
+            Dim strLabExaminationString As String = ""
+            If LabExaminationString.Length > 0 Then
+                strLabExaminationString = LabExaminationString.Substring(0, (LabExaminationString.Length - 1))
+                morewhere = "And el.EXAMINATION_ID Not in (" & strLabExaminationString & ")"
+            End If
+
             Dim ExaminationDonationListSql = "SELECT el.ID AS EL_ID, el.DONATION_TYPE_ID, el.EXAMINATION_ID AS id, e.CODE, e.DESCRIPTION, el.EXAMINATION_GROUP_ID as group_id
                 FROM EXAMINATION_DONATION_LIST el inner join EXAMINATION e on el.EXAMINATION_ID = e.ID 
-                WHERE DONATION_TYPE_ID = '" & donateTypeId & "' AND el.NEW_DONOR_FLAG = 'A' AND el.EXAMINATION_ID not in (" & strLabExaminationString & ")"
+                WHERE DONATION_TYPE_ID = '" & donateTypeId & "' AND el.NEW_DONOR_FLAG = 'A' " & morewhere
 
             Dim NewExaminationList As DataTable = Cbase.QueryTable(ExaminationDonationListSql)
             For Each dr As DataRow In NewExaminationList.Rows
@@ -503,16 +515,19 @@ Public Class donateAction
                                                    "STATUS = 'WAIT RESULT' WHERE ID = '" & visitId & "' " &
                                                    "AND DONOR_ID = '" & donerId & "'"
             Cbase.Execute(UpdateDonationVisitSql)
+
             If CheckStatus = "WAIT RESULT" Then
                 Dim UpdateDonationRecordSql As String = "UPDATE DONATION_RECORD SET " &
                                                     "VOLUME_ACTUAL = '" & volumnActual & "', " &
                                                     "DONATION_TIME = to_date('" & H2G.BE2AC(H2G.Convert(Of DateTime)(donationTime)).ToString("dd-MM-yyyy HH:mm") & "','DD-MM-YYYY HH24:MI:SS'), " &
-                                                    "DURATION = to_date('" & H2G.BE2AC(H2G.Convert(Of DateTime)(duration)).ToString("dd-MM-yyyy HH:mm") & "','DD-MM-YYYY HH24:MI:SS'), " &
+                                                    "DURATION = to_date('" & H2G.BE2AC(H2G.Convert(Of DateTime)(duration)).ToString("dd-MM-yyyy HH:mm:ss") & "','DD-MM-YYYY HH24:MI:SS'), " &
                                                     "COLLECTION_STAFF = '" & collectionStaff & "', " &
                                                     "COLLECTION_DATE = SYSDATE, " &
                                                     "REFUSE_REASON1_ID = '" & refuseReason1Id & "', " &
                                                     "REFUSE_REASON2_ID = '" & refuseReason2Id & "', " &
                                                     "REFUSE_REASON3_ID = '" & refuseReason3Id & "', " &
+                                                    "REFUSE_REASON4_ID = '" & refuseReason4Id & "', " &
+                                                    "REFUSE_REASON5_ID = '" & refuseReason5Id & "', " &
                                                     "UPDATE_STAFF = '" & collectionStaff & "', " &
                                                     "UPDATE_DATE = SYSDATE " &
                                                     "WHERE DONATION_VISIT_ID = '" & visitId & "' " &
@@ -522,11 +537,13 @@ Public Class donateAction
             Else
                 Dim recordId As String = Cbase.QueryField(H2G.nextVal("DONATION_RECORD"))
                 Dim InsertDonationRecordSql As String = "INSERT INTO DONATION_RECORD (ID, VOLUME_ACTUAL, DONATION_TIME, DURATION, COLLECTION_STAFF, 
-                COLLECTION_DATE, REFUSE_REASON1_ID, REFUSE_REASON2_ID, REFUSE_REASON3_ID, UPDATE_STAFF, UPDATE_DATE, DONATION_VISIT_ID, DONOR_ID, CREATE_DATE, CREATE_STAFF) 
+                COLLECTION_DATE, REFUSE_REASON1_ID, REFUSE_REASON2_ID, REFUSE_REASON3_ID, REFUSE_REASON4_ID, REFUSE_REASON5_ID,
+                UPDATE_STAFF, UPDATE_DATE, DONATION_VISIT_ID, DONOR_ID, CREATE_DATE, CREATE_STAFF) 
                 values ('" & recordId & "', '" & volumnActual & "', 
                 to_date('" & H2G.BE2AC(H2G.Convert(Of DateTime)(donationTime)).ToString("dd-MM-yyyy HH:mm") & "','DD-MM-YYYY HH24:MI:SS'), 
-                to_date('" & H2G.BE2AC(H2G.Convert(Of DateTime)(duration)).ToString("dd-MM-yyyy HH:mm") & "','DD-MM-YYYY HH24:MI:SS'), 
-                '" & collectionStaff & "', SYSDATE, '" & refuseReason1Id & "', '" & refuseReason2Id & "', '" & refuseReason3Id & "', '" & collectionStaff & "', SYSDATE, '" & visitId & "', '" & donerId & "', SYSDATE, '" & collectionStaff & "')"
+                to_date('" & H2G.BE2AC(H2G.Convert(Of DateTime)(duration)).ToString("dd-MM-yyyy HH:mm:ss") & "','DD-MM-YYYY HH24:MI:SS'), 
+                '" & collectionStaff & "', SYSDATE, '" & refuseReason1Id & "', '" & refuseReason2Id & "', '" & refuseReason3Id & "', '" & refuseReason4Id & "', '" & refuseReason5Id & "',
+                '" & collectionStaff & "', SYSDATE, '" & visitId & "', '" & donerId & "', SYSDATE, '" & collectionStaff & "')"
 
                 Cbase.Execute(InsertDonationRecordSql)
             End If
@@ -559,7 +576,7 @@ Public Class donateAction
         Try
             Dim sql As String = "SELECT D.ID AS DONOR_ID,DV.ID AS VISIT_ID,D.DONOR_NUMBER,DV.SAMPLE_NUMBER,DV.DONATION_TYPE_ID,DV.BAG_ID,DV.DONATION_TO_ID, 
                                 DR.VOLUME_ACTUAL, to_char(nvl(DR.DONATION_TIME, nvl(DR.DONATION_TIME, sysdate)), 'HH24:MI', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') AS DONATION_TIME,
-                                to_char(nvl(DR.DURATION, nvl(DR.DURATION, sysdate)), 'HH24:MI', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') AS DURATION,
+                                to_char(nvl(DR.DURATION, nvl(DR.DURATION, sysdate)), 'HH24:MI:SS', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') AS DURATION,
                                 DR.COLLECTION_DATE,DR.COLLECTION_STAFF,
                                 DR.REFUSE_REASON1_ID,DR.REFUSE_REASON2_ID,DR.REFUSE_REASON3_ID,
                                 DT.DESCRIPTION AS TYPE_DES,G.DESCRIPTION AS BAG_DES, DTT.DESCRIPTION AS APPLY_DES 
@@ -567,7 +584,8 @@ Public Class donateAction
                                 LEFT JOIN DONATION_RECORD DR ON D.ID = DR.DONOR_ID AND DV.ID = DR.DONATION_VISIT_ID
                                 INNER JOIN DONATION_TYPE DT ON DV.DONATION_TYPE_ID = DT.ID
                                 INNER JOIN BAG G ON DV.BAG_ID = G.ID INNER JOIN Donation_To DTT ON DV.DONATION_TO_ID = DTT.ID
-                                WHERE DV.STATUS IN ('WAIT RESULT') AND to_char(nvl(DV.VISIT_DATE,DV.CREATE_DATE), 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("visit_date") & "' "
+                                WHERE DV.STATUS IN ('WAIT RESULT')  AND DV.UPDATE_DATE  IS NOT NULL AND to_char(nvl(DV.VISIT_DATE,DV.CREATE_DATE), 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("visit_date") & "' 
+                                ORDER BY DV.UPDATE_DATE DESC "
             Dim dt As DataTable = Cbase.QueryTable(sql)
             Dim DonationLists = New List(Of DonationList)
             For Each dr As DataRow In dt.Rows
@@ -813,6 +831,8 @@ Public Structure InitalData
     Public refuse_reason1_id As String
     Public refuse_reason2_id As String
     Public refuse_reason3_id As String
+    Public refuse_reason4_id As String
+    Public refuse_reason5_id As String
 End Structure
 
 Public Class DonationExamination

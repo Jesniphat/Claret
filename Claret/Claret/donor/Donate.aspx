@@ -29,6 +29,9 @@
             $("#spPostClear").click(function () {
                 $("#divPostCriteria input").H2GValue('');
                 $("#txtQueue").focus();
+
+                donateSearch(true);
+                postQueueSearch(true);
             });
             $("#divPostCriteria input").enterKey(function () {
                 postQueueSearch(true);
@@ -38,12 +41,14 @@
             $("#spClear").click(function () {
                 $("#divCriteria input").H2GValue('');
                 $("#txtPostQueue").focus();
-                // donateSearch
+
+                donateSearch(true);
+                postQueueSearch(true);
             });
-            //$("#divCriteria input").enterKey(function () {
-            //    donateSearch(true);
-            //    return false;
-            //});
+            $("#divCriteria input").enterKey(function () {
+                donateSearch(true);
+                return false;
+            });
 
             $("#txtName").H2GNamebox(37);
             $("#txtSurname").H2GNamebox(37);

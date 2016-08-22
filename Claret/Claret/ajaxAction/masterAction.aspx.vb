@@ -39,9 +39,12 @@ Public Class masterAction
             Case "staff" : getStaff()
             Case "deferral" : getDeferral()
             Case "donationtype" : getDonationType()
+            Case "donationtype2" : getDonationType2()
             Case "bag" : getBag()
             Case "questionnaire" : getQuestionnaire()
             Case "forcollection" : getForCollection()
+            Case "getdonatebagtypelist" : GetDonateBagTypeList()
+            Case "getdonateapplylist" : GetDonateApplyList()
             Case "logincontent" : JSONResponse.setItems(Of LoginContent)(Me.getLoginContent())
             Case Else
                 Dim exMsg As String = IIf(String.IsNullOrEmpty(_REQUEST("action")), "", _REQUEST("action"))
@@ -374,6 +377,69 @@ Public Class masterAction
                 DataItem.text = dr("description").ToString()
                 DataItem.minAge = dr("min_age").ToString()
                 DataItem.maxAge = dr("max_age").ToString()
+                DataList.Add(DataItem)
+            Next
+        Else
+            Throw New Exception("No data found.", New Exception("Donation To has no record"))
+        End If
+        JSONResponse.setItems(Of List(Of DonationtypeListItem))(DataList)
+    End Sub
+    Private Sub getDonationType2()
+        Dim DataList As New List(Of DonationtypeListItem)
+        Dim DataItem As DonationtypeListItem
+        Dim sql As String = "select distinct dt.id, dt.description, dc.min_age, dc.max_age
+                            from DONATION_TYPE dt
+                            inner join DONATION_CONDITION dc on DC.DONATION_TYPE_id = dt.id
+                            where dt.ID > 0
+                            order by dt.description "
+        Dim dt As DataTable = Cbase.QueryTable(sql)
+
+        If dt.Rows.Count > 0 Then
+            For Each dr As DataRow In dt.Rows()
+                DataItem = New DonationtypeListItem
+                DataItem.valueID = dr("id").ToString()
+                DataItem.value = dr("id").ToString()
+                DataItem.text = dr("description").ToString()
+                DataItem.minAge = dr("min_age").ToString()
+                DataItem.maxAge = dr("max_age").ToString()
+                DataList.Add(DataItem)
+            Next
+        Else
+            Throw New Exception("No data found.", New Exception("Donation To has no record"))
+        End If
+        JSONResponse.setItems(Of List(Of DonationtypeListItem))(DataList)
+    End Sub
+    Private Sub GetDonateBagTypeList()
+        Dim DataList As New List(Of DonationtypeListItem)
+        Dim DataItem As DonationtypeListItem
+        Dim sql As String = "select * from Bag where ID > 0"
+
+        Dim dt As DataTable = Cbase.QueryTable(sql)
+        If dt.Rows.Count > 0 Then
+            For Each dr As DataRow In dt.Rows()
+                DataItem = New DonationtypeListItem
+                DataItem.valueID = dr("ID").ToString()
+                DataItem.value = dr("ID").ToString()
+                DataItem.text = dr("DESCRIPTION").ToString()
+                DataList.Add(DataItem)
+            Next
+        Else
+            Throw New Exception("No data found.", New Exception("Donation To has no record"))
+        End If
+        JSONResponse.setItems(Of List(Of DonationtypeListItem))(DataList)
+    End Sub
+    Private Sub GetDonateApplyList()
+        Dim DataList As New List(Of DonationtypeListItem)
+        Dim DataItem As DonationtypeListItem
+        Dim sql As String = "select * from Donation_To where used_module like '%D,%'"
+
+        Dim dt As DataTable = Cbase.QueryTable(sql)
+        If dt.Rows.Count > 0 Then
+            For Each dr As DataRow In dt.Rows()
+                DataItem = New DonationtypeListItem
+                DataItem.valueID = dr("ID").ToString()
+                DataItem.value = dr("ID").ToString()
+                DataItem.text = dr("DESCRIPTION").ToString()
                 DataList.Add(DataItem)
             Next
         Else

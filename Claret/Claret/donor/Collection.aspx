@@ -14,6 +14,7 @@
             .then(getDonationList)
             .then(getStaffAutocomplete)
             .then(setKeyComplete)
+            .then(setDefaultStaff)
             .done(getInitialData)
             .fail(function (err) {
             console.log(err);
@@ -30,16 +31,40 @@
             
             // $("#startDonateDate").timepicker();
             $("#labExamination").autocomplete({
-                source: examinationAutoData
+                source: examinationAutoData,
+                minLength: 0
+            }).focus(function () {
+                $(this).autocomplete("search");
             });
             $("#collectedProblem").autocomplete({
-                source: problemDataAuto
+                source: problemDataAuto,
+                minLength: 0
+            }).focus(function () {
+                $(this).autocomplete("search");
             });
             $("#collectedProblemReason1").autocomplete({
-                source: problemDataAuto
+                source: problemDataAuto,
+                minLength: 0
+            }).focus(function () {
+                $(this).autocomplete("search");
             });
             $("#collectedProblemReason2").autocomplete({
-                source: problemDataAuto
+                source: problemDataAuto,
+                minLength: 0
+            }).focus(function () {
+                $(this).autocomplete("search");
+            });
+            $("#collectedProblemReason3").autocomplete({
+                source: problemDataAuto,
+                minLength: 0
+            }).focus(function () {
+                $(this).autocomplete("search");
+            });
+            $("#collectedProblemReason4").autocomplete({
+                source: problemDataAuto,
+                minLength: 0
+            }).focus(function () {
+                $(this).autocomplete("search");
             });
             $("#collectedProblem").blur(function () {
                 setIdProblem("collectedProblem");
@@ -49,6 +74,12 @@
             });
             $("#collectedProblemReason2").blur(function () {
                 setIdProblem("collectedProblemReason2");
+            });
+            $("#collectedProblemReason3").blur(function () {
+                setIdProblem("collectedProblemReason3");
+            });
+            $("#collectedProblemReason4").blur(function () {
+                setIdProblem("collectedProblemReason4");
             });
 
             $("#donerNumber").blur(checkDonateNum);
@@ -63,7 +94,7 @@
             $.mask.definitions['5'] = '[012345]';
             $.mask.definitions['9'] = '[0123456789]';
             $("#startDonateDate").mask("23:59");
-            $("#donateTimes").mask("23:59");
+            $("#donateTimes").mask("23:59:59");
 
             //$("#testx").click(function () {
             //    hl7Generator('41', '93', '9995900007', '123456789')
@@ -176,39 +207,56 @@
         <div class="col-md-19">
             <div class="border-box">
                 <div class="row">
-                    <div class="col-md-11" style="padding-left: 6px;">ปัญหาในหารเจาะเก็บ</div>
-                    <div class="col-md-11" style="padding-left: 8px;">สาเหตุ 1</div>
-                    <div class="col-md-11" style="padding-left: 10px;">สาเหตุ 2</div>
+                    <div class="col-md-34" style="padding-left: 6px;">ปัญหาในหารเจาะเก็บ</div>
+                    <%--<div class="col-md-11" style="padding-left: 8px;">สาเหตุ 1</div>
+                    <div class="col-md-11" style="padding-left: 10px;">สาเหตุ 2</div>--%>
                 </div>
                 <div class="row">
                     <table class="table table-bordered" style="margin-bottom:5px;">
                         <tbody>
                             <tr>
-                                <td class="col-md-11" style="border:1px solid #ffffff; padding: 0px;">
+                                <td class="col-md-34" style="border:1px solid #ffffff; padding: 0px;">
                                     <%--<select id="collectedProblem">
                                         <option value="0">ทดสอบ...</option>
                                         <option value="1">ทดสอบ2...</option>
                                     </select>--%>
                                     <input class="form-control" id="collectedProblem" value="" tabindex="12" />
                                 </td>
-                                <td class="col-md-11" style="border:1px solid #ffffff; padding: 0px;">
-                                    <%--<select id="collectedProblemReason1">
-                                        <option value="0">ทดสอบ...</option>
-                                        <option value="1">ทดสอบ2...</option>
-                                    </select>--%>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="col-md-17" style="padding-left: 8px;">สาเหตุ 1</div>
+                    <div class="col-md-17" style="padding-left: 20px;">สาเหตุ 2</div>
+                </div>
+                <div class="row">
+                    <table class="table table-bordered" style="margin-bottom:5px;">
+                        <tbody>
+                            <tr>
+                                <td class="col-md-17" style="border:1px solid #ffffff; padding: 0px;">
                                     <input class="form-control" id="collectedProblemReason1" value="" tabindex="13" />
                                 </td>
-                                <td class="col-md-11" style="border:1px solid #ffffff; padding: 0px;">
-                                    <%--<select id="collectedProblemReason2">
-                                        <option value="0">ทดสอบ...</option>
-                                        <option value="1">ทดสอบ2...</option>
-                                    </select>--%>
+                                <td class="col-md-17" style="border:1px solid #ffffff; padding: 0px;">
                                     <input class="form-control" id="collectedProblemReason2" value="" tabindex="14" />
                                 </td>
-                                <td class="col-md-1" style="border:1px solid #ffffff;">
-                                    <%--<button id="addCollectedProblem" class="btn btn-icon" onclick="return false;" tabindex="1">
-                                        <i class="glyphicon glyphicon-circle-arrow-down"></i>
-                                    </button>--%>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="col-md-17" style="padding-left: 8px;">สาเหตุ 3</div>
+                    <div class="col-md-17" style="padding-left: 20px;">สาเหตุ 4</div>
+                </div>
+                <div class="row">
+                    <table class="table table-bordered" style="margin-bottom:5px;">
+                        <tbody>
+                            <tr>
+                                <td class="col-md-17" style="border:1px solid #ffffff; padding: 0px;">
+                                    <input class="form-control" id="collectedProblemReason3" value="" tabindex="13" />
+                                </td>
+                                <td class="col-md-17" style="border:1px solid #ffffff; padding: 0px;">
+                                    <input class="form-control" id="collectedProblemReason4" value="" tabindex="14" />
                                 </td>
                             </tr>
                         </tbody>
