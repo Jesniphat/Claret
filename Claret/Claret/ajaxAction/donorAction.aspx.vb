@@ -1117,9 +1117,10 @@ Public Class donorAction
         If Not String.IsNullOrEmpty(_REQUEST("receipthospitalid")) Then
             sql = "select nvl(dv.order_number,0) as visit_count, dor.id, dor.Name, dor.Surname 
                     , to_char(VISIT_DATE, 'HH24,MI') as visit_time
-                    from donor dor
-                    left join donation_hospital dv on dv.receipt_hospital_id = '" & _REQUEST("receipthospitalid") & "'
-                    where rownum = 1 /*#ID*/ /*#NAME*/ /*#SURNAME*/ /*#BIRTHDAY*/ 
+                    from donation_hospital dv
+                    left Join donor dor on dv.donor_id = dor.id 
+                    where rownum = 1 and dv.receipt_hospital_id = '" & _REQUEST("receipthospitalid") & "' 
+                    /*#ID*/ /*#NAME*/ /*#SURNAME*/ /*#BIRTHDAY*/ 
                     order by dv.order_number desc "
         End If
 
@@ -1133,8 +1134,8 @@ Public Class donorAction
                 End If
             End If
             strReturnID = dt.Rows(0)("id").ToString()
-
         End If
+        If strReturnID = "" Then strReturnID = _REQUEST("id")
 
         '### check อายุ
         Dim minAge As Integer = 0 : Dim maxAge As Integer = 0
@@ -1154,22 +1155,29 @@ Public Class donorAction
         Dim strReturn As String = ""
         Dim base As New oraDBQuery(oraDBQuery.Schema.CLARET)
         Dim dt As DataTable = base.QueryTable("Select id,prefix_from_table,format_text,code_dummy,to_table,to_column from running_number where code='" & code & "'")
+        Dim nowDate As DateTime = Now.AddYears(543)
         If dt.Rows.Count > 0 Then
-            Dim sqlRunning As String = "select nvl(max(" & dt.Rows(0)("to_column") & "),'') from " & dt.Rows(0)("to_table") & " "
-
-            Dim strOldRunning As String = base.QueryField(sqlRunning)
             Dim strFieldDigit As String = IIf(dt.Rows(0)("format_text").ToString().Contains("CODE_3DIGIT"), "CODE_3DIGIT", "CODE_2DIGIT")
             Dim strDigit As String = base.QueryField("select " & strFieldDigit & " from " & dt.Rows(0)("prefix_from_table").ToString & " where id=" & idTableDigit & "")
-            '### if can't find digit from target table, Use code dummy instant.
             If strDigit = "" Then strDigit = dt.Rows(0)("code_dummy").ToString()
+            '
+            Dim tempFormat As String = dt.Rows(0)("format_text").ToString()
+            tempFormat = tempFormat.Replace("YYYY", nowDate.ToString("yyyy"))
+            tempFormat = tempFormat.Replace("YY", nowDate.ToString("yy"))
+            tempFormat = tempFormat.Replace("MM", nowDate.ToString("MM"))
+            tempFormat = tempFormat.Replace("DD", nowDate.ToString("dd"))
+            tempFormat = tempFormat.Replace(strFieldDigit, strDigit)
+            tempFormat = tempFormat.Replace(",", "").Replace("X", "")
+            Dim sqlRunning As String = "select nvl(max(" & dt.Rows(0)("to_column") & "),'') from " & dt.Rows(0)("to_table") & " where " & dt.Rows(0)("to_column") & " like '" & tempFormat & "%' "
+
+            Dim strOldRunning As String = base.QueryField(sqlRunning)
+            '### if can't find digit from target table, Use code dummy instant.
             Dim intRunningDigit As Int16 = dt.Rows(0)("format_text").ToString.Length - dt.Rows(0)("format_text").ToString.Replace("X", "").Length
             Dim intNumber As Int64 = 1
             If Not String.IsNullOrEmpty(strOldRunning) Then intNumber = CInt(Right(strOldRunning, intRunningDigit)) + 1
 
             strReturn = dt.Rows(0)("format_text").ToString()
             strReturn = Left(strReturn, strReturn.Length - intRunningDigit) & New String("0"c, H2G.CountCharacter(strReturn, "X"c) - intNumber.ToString.Length) & intNumber
-
-            Dim nowDate As DateTime = Now.AddYears(543)
             strReturn = strReturn.Replace("YYYY", nowDate.ToString("yyyy"))
             strReturn = strReturn.Replace("YY", nowDate.ToString("yy"))
             strReturn = strReturn.Replace("MM", nowDate.ToString("MM"))

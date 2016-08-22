@@ -441,10 +441,10 @@
                         </div>
                         <div id="divCriteria" class="row" style="padding-top: 3px; padding-bottom: 3px; padding-left:15px;">
                             <div class="col-md-6">
-                                <input id="txtDonorNumber" class="form-control color-yellow" type="text" />
+                                <input id="txtDonorNumber" class="form-control color-yellow" maxlength="10" type="text" />
                             </div>
                             <div class="col-md-6">
-                                <input id="txtNationNumber" class="form-control color-yellow" type="text" />
+                                <input id="txtNationNumber" class="form-control color-yellow" maxlength="13" type="text" />
                             </div>
                             <div class="col-md-6">
                                 <input id="txtExtNumber" class="form-control" type="text" />

@@ -710,7 +710,7 @@ function showDonorData() {
                 });
 
                 //### Donation Record
-                $('#divDonateRecord').H2GValue("");
+                $('#divDonateRecord').H2GRemoveAttr("rewardList").H2GValue("");
                 var candelete = true;
                 data.getItems.DonationRecord.sort(H2G.keysrt('DonateNumber', true));
                 $.each((data.getItems.DonationRecord), function (index, e) {
@@ -720,9 +720,9 @@ function showDonorData() {
                     //มี Reward ต้องแสดง
                     if (e.DonateReward != "") {
                         var rewardRec = e.DonateReward.split('##');
-                        $.each((rewardRec), function (index, e) {
-                            if (e != "") {
-                                var rewardInfo = e.split("|");
+                        $.each((rewardRec), function (indexr, er) {
+                            if (er != "") {
+                                var rewardInfo = er.split("|");
                                 // reward_id|reward_desc|donation_reward_id|reward_date
                                 var rewardList = $('#divDonateRecord').H2GAttr("rewardList") || '';
                                 if (rewardList.indexOf("," + rewardInfo[0] + ",") == -1) {
@@ -741,14 +741,17 @@ function showDonorData() {
                                             yearRange: "c-20:c+0",
                                             onSelect: function (selectedDate, objDate) {
                                                 if (selectedDate != '') {
-                                                    $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
+                                                    $(this).closest("div.row").find(".lbl-check-reward[rewardID='"
+                                                        + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
                                                 }
                                             },
                                             onClose: function () {
                                                 if ($(this).H2GValue() == '') {
-                                                    $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", false);
+                                                    $(this).closest("div.row").find(".lbl-check-reward[rewardID='"
+                                                        + $(this).H2GAttr("rewardID") + "'] input").prop("checked", false);
                                                 } else {
-                                                    $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
+                                                    $(this).closest("div.row").find(".lbl-check-reward[rewardID='"
+                                                        + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
                                                 }
                                             },
                                         }).H2GDatebox().prop('readonly', true).H2GValue(rewardInfo[3]);
@@ -762,7 +765,6 @@ function showDonorData() {
                     if (e.DonateFrom == "INTERNAL" && candelete) { candelete = false; }
                     if (candelete) { $(spRecord).find("a.icon").show(); candelete = false; }
                     $('#divDonateRecord').append(spRecord).H2GAttr("lastrecord", data.getItems.Donor.DonateCount);
-
                 });
                 
                 //### Donation Question

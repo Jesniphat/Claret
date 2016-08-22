@@ -1,9 +1,13 @@
-﻿Public Class _Default
-    Inherits System.Web.UI.Page
+﻿Imports H2GEngine
+
+Public Class _Default
+    Inherits UI.Page 'System.Web.UI.Page
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Response.Redirect("login.aspx")
 
+        'Dim strPassword = H2G.MD5("12345")
+        'Response.Write(strPassword)
         '### TEST ###
         'Dim strOldRunning As String = "GDS160000123"
         'Dim intRunningDigit As Int16 = 7

@@ -25,13 +25,14 @@
             font-weight:normal;
         }
     </style>
-    <script src="../resources/javascript/page/registerScript.js?ver=20160129" type="text/javascript"></script>
+    <script src="../resources/javascript/page/registerScript.js?ver=20160131" type="text/javascript"></script>
     <script>
         $(function () {
             lookupControl();
-            $("#txtCardNumber").enterKey(function () { $(this).addExtCard(); }).on("blur", function () {
-                $("#txtCardNumber").addExtCard();
-            }).focus();
+            $("#txtCardNumber").enterKey(function () { $(this).addExtCard(); });
+            //    .on("blur", function () {
+            //    $("#txtCardNumber").addExtCard();
+            //}).focus();
             $("#ddlDefferal").setDropdownList().on('change', function () {
                 if ($(this).H2GValue() == 'ACTIVE') { $("#tbDeferral > thead > tr[status=INACTIVE]").hide(); }
                 else { $("#tbDeferral > thead > tr[status=INACTIVE]").show(); }
@@ -467,7 +468,7 @@
 
             // menu control
             if ($("#data").H2GAttr("lmenu") == "lmenuDonorRegis") {
-                $("#infoTabToday").tabs("option", "disabled", [2]);
+                $("#infoTabToday").tabs("option", "disabled", [1,2]);
                 $(".claret-page-header span").H2GValue("ลงทะเบียนผู้บริจาค");
             } else if ($("#data").H2GAttr("lmenu") == "lmenuInterview") {
                 $("#infoTabToday").tabs("option", "active", [2]);
@@ -1334,7 +1335,7 @@
                                                         <div class="col-md-3"></div>
                                                         <div class="col-md-5">เบอร์มือถือ 1</div>
                                                         <div class="col-md-12">
-                                                            <input id="txtMobile1" type="text" class="form-control required" tabindex="1" />
+                                                            <input id="txtMobile1" type="text" class="form-control required" maxlength="10" tabindex="1" />
                                                         </div>
                                                         <div class="col-md-5" style="padding-left: 5px;">Email</div>
                                                         <div class="col-md-11">
@@ -1345,21 +1346,21 @@
                                                         <div class="col-md-3"></div>
                                                         <div class="col-md-5">เบอร์มือถือ 2</div>
                                                         <div class="col-md-12">
-                                                            <input id="txtMobile2" type="text" class="form-control" tabindex="2" />
+                                                            <input id="txtMobile2" type="text" class="form-control" maxlength="10" tabindex="2" />
                                                         </div>
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-md-3"></div>
                                                         <div class="col-md-5">เบอร์บ้าน</div>
                                                         <div class="col-md-12">
-                                                            <input id="txtHomeTel" type="text" class="form-control" tabindex="2" />
+                                                            <input id="txtHomeTel" type="text" class="form-control" maxlength="10" tabindex="2" />
                                                         </div>
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-md-3"></div>
                                                         <div class="col-md-5">เบอร์ที่ทำงาน</div>
                                                         <div class="col-md-12">
-                                                            <input id="txtTel" type="text" class="form-control" tabindex="2" />
+                                                            <input id="txtTel" type="text" class="form-control" maxlength="10" tabindex="2" />
                                                         </div>
                                                         <div class="col-md-5" style="padding-left: 5px;">เบอร์ต่อ</div>
                                                         <div class="col-md-11">
@@ -1449,7 +1450,7 @@
                                                                         <input type="checkbox" style="margin-right: 10px;" tabindex="3" /></label>
                                                                 </div>
                                                                 <div class="col-md-2"><span>เมื่อ</span></div>
-                                                                <div class="col-md-12" style="padding-left: 8px; padding-right: 14px;">
+                                                                <div class="col-md-12" style="padding-left: 8px; padding-right: 14px; padding-bottom: 2px;">
                                                                     <input type="text" class="txt-reward-date form-control text-center" tabindex="3" donateRewardID="NEW" />
                                                                 </div>
                                                             </div>
@@ -1529,7 +1530,7 @@
                                                             <span>น้ำหนัก (kg)</span>
                                                         </div>
                                                         <div class="col-md-4">
-                                                            <input id="txtWeight" type="text" class="form-control required text-right" />
+                                                            <input id="txtWeight" type="text" class="form-control required text-right" maxlength="3" />
                                                         </div>
                                                         <div class="col-md-2"></div>
                                                         <div class="col-md-4 text-center">
@@ -1542,7 +1543,7 @@
                                                             <span>อัตราชีพจร</span>
                                                         </div>
                                                         <div class="col-md-5 text-right">
-                                                            <input id="txtHeartRate" type="text" class="form-control required text-right" />
+                                                            <input id="txtHeartRate" type="text" class="form-control required text-right" maxlength="3" />
                                                         </div>
                                                     </div>
                                                     <div class="row">
@@ -1550,13 +1551,13 @@
                                                             <span>ความดัน</span>
                                                         </div>
                                                         <div class="col-md-4">
-                                                            <input id="txtPresureMax" type="text" class="form-control required text-right" placeholder="สูงสุด" />
+                                                            <input id="txtPresureMax" type="text" class="form-control required text-right" placeholder="สูงสุด" maxlength="3" />
                                                         </div>
                                                         <div class="col-md-2 text-center">
                                                             <span>/</span>
                                                         </div>
                                                         <div class="col-md-4">
-                                                            <input id="txtPresureMin" type="text" class="form-control required text-right" placeholder="ต่ำสุด" />
+                                                            <input id="txtPresureMin" type="text" class="form-control required text-right" placeholder="ต่ำสุด" maxlength="3" />
                                                         </div>
                                                         <div class="col-md-15 text-right">
                                                             <span>การตรวจหัวใจและปอด</span>

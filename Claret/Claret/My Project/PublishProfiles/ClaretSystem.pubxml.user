@@ -85,10 +85,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/03/2016 10:46:50</publishTime>
     </File>
     <File Include="bin/Claret.dll">
-      <publishTime>08/20/2016 01:32:58</publishTime>
+      <publishTime>08/20/2016 11:50:27</publishTime>
     </File>
     <File Include="bin/Claret.xml">
-      <publishTime>08/20/2016 01:32:58</publishTime>
+      <publishTime>08/20/2016 11:50:27</publishTime>
     </File>
     <File Include="bin/commons-logging.dll">
       <publishTime>01/04/2016 09:31:55</publishTime>
@@ -193,13 +193,13 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>07/26/2012 19:08:06</publishTime>
     </File>
     <File Include="Default.aspx">
-      <publishTime>08/20/2016 01:37:11</publishTime>
+      <publishTime>08/20/2016 04:14:01</publishTime>
     </File>
     <File Include="donor/Collection.aspx">
-      <publishTime>08/19/2016 14:49:30</publishTime>
+      <publishTime>08/20/2016 02:10:41</publishTime>
     </File>
     <File Include="donor/Donate.aspx">
-      <publishTime>08/19/2016 23:20:33</publishTime>
+      <publishTime>08/20/2016 02:10:41</publishTime>
     </File>
     <File Include="donor/historyReport.aspx">
       <publishTime>08/19/2016 23:14:20</publishTime>
@@ -208,7 +208,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/09/2016 13:29:29</publishTime>
     </File>
     <File Include="donor/register.aspx">
-      <publishTime>08/20/2016 01:37:18</publishTime>
+      <publishTime>08/20/2016 04:14:09</publishTime>
     </File>
     <File Include="donor/search.aspx">
       <publishTime>08/20/2016 01:32:13</publishTime>
@@ -310,19 +310,19 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/22/2016 18:24:41</publishTime>
     </File>
     <File Include="Login.aspx">
-      <publishTime>08/20/2016 01:37:18</publishTime>
+      <publishTime>08/20/2016 04:14:01</publishTime>
     </File>
     <File Include="main.aspx">
       <publishTime>06/17/2016 15:34:36</publishTime>
     </File>
     <File Include="MasterPage.Master">
-      <publishTime>08/20/2016 01:37:16</publishTime>
+      <publishTime>08/20/2016 04:14:09</publishTime>
     </File>
     <File Include="mobile/main.aspx">
       <publishTime>07/28/2016 09:53:11</publishTime>
     </File>
     <File Include="mobile/planning.aspx">
-      <publishTime>08/19/2016 23:19:54</publishTime>
+      <publishTime>08/20/2016 02:12:41</publishTime>
     </File>
     <File Include="mobile/planningInfo.aspx">
       <publishTime>08/19/2016 23:20:07</publishTime>
@@ -436,19 +436,19 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/08/2016 15:48:59</publishTime>
     </File>
     <File Include="resources/javascript/page/donateScript.js">
-      <publishTime>08/11/2016 09:29:49</publishTime>
+      <publishTime>08/20/2016 02:10:41</publishTime>
     </File>
     <File Include="resources/javascript/page/donateScriptEdit.js">
-      <publishTime>08/19/2016 14:49:30</publishTime>
+      <publishTime>08/20/2016 02:10:41</publishTime>
     </File>
     <File Include="resources/javascript/page/planning.js">
-      <publishTime>08/19/2016 22:56:50</publishTime>
+      <publishTime>08/20/2016 02:10:41</publishTime>
     </File>
     <File Include="resources/javascript/page/planningInfo.js">
       <publishTime>08/19/2016 14:49:30</publishTime>
     </File>
     <File Include="resources/javascript/page/registerScript.js">
-      <publishTime>08/20/2016 00:49:29</publishTime>
+      <publishTime>08/20/2016 03:49:37</publishTime>
     </File>
     <File Include="resources/jquery-ui/external/jquery/jquery.js">
       <publishTime>06/03/2016 11:44:35</publishTime>
