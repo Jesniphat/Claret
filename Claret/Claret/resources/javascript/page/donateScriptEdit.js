@@ -5,6 +5,7 @@ var getParam = {};
 var labExaminationList = [];
 var labExaminationIdList = [];
 var labExaminationSaveList = [];
+var bagValuesList = [];
 
 var examinationData = [];
 var examinationJoinData = [];
@@ -24,6 +25,8 @@ var dataSave = {};
 
 var site_id = 0;
 var exChangeList = [];
+
+var currentTime = "";
 ////////////////////////////////////////////////////// function ///////////////////////////////////////////////////////////////
 
 function checkParam() {
@@ -157,6 +160,7 @@ function getInitialData() {
                     console.log("Error = ", data.exMessage)
                     deferred.reject("Error");
                 }
+                changeBagValues();
             }
         });
     }
@@ -193,6 +197,7 @@ function getDonateTypeList() {
         url: '../../ajaxAction/masterAction.aspx',
         data: { action: 'donationtype2' },
         defaultSelect: getParam.donateType, //$("#donateType").H2GAttr("selectItem") || $("#data").H2GAttr("collectionpointid"),
+        selectItem: function () { changeBagValues(); },
     }).on('autocompleteselect', function () {
         //$("#txtOuterDonate").focus();
     });
@@ -230,6 +235,7 @@ function getDonateBagTypeList() {
         url: '../../ajaxAction/masterAction.aspx',
         data: { action: 'getdonatebagtypelist' },
         defaultSelect: getParam.donateBagType, //$("#donateType").H2GAttr("selectItem") || $("#data").H2GAttr("collectionpointid"),
+        selectItem: function () { changeBagValues(); },
     }).on('autocompleteselect', function () {
         //$("#txtOuterDonate").focus();
     });
@@ -267,6 +273,7 @@ function getDonateApplyList() {
         url: '../../ajaxAction/masterAction.aspx',
         data: { action: 'getdonateapplylist' },
         defaultSelect: getParam.donateApply, //$("#donateType").H2GAttr("selectItem") || $("#data").H2GAttr("collectionpointid"),
+        selectItem: function () { changeBagValues(); },
     }).on('autocompleteselect', function () {
         //$("#txtOuterDonate").focus();
     });
@@ -522,15 +529,16 @@ function checkValidDonateNum() {
     if ($("#donerNumber").val() == "") {
         $("#donerNumber").focus();
         notiWarning("กรุณากรอกเลขผู้บริจาคก่อน");
-    } else if (getParam.donorID == "0") {
-        //console.log("dddd");
-        //$("#donerNumber").focus();
-        notiWarning("ไม่พบเลขผู้บริจาคนี้");
     }
+    //else if (getParam.donorID == "0") {
+    //    //console.log("dddd");
+    //    //$("#donerNumber").focus();
+    //    notiWarning("ไม่พบเลขผู้บริจาคนี้");
+    //}
 }
 
 function checkSampleNumber() {
-    if (($("#data").attr("donateAction") == "new") && $("#donerNumber").val() != "" && getParam.donorID != "0") {
+  //  if (($("#data").attr("donateAction") == "new") && $("#donerNumber").val() != "") {
         $.ajax({
             url: '../../ajaxAction/donateAction.aspx',
             data: H2G.ajaxData({ action: 'checkSampleNumber', sampleNumber: $("#sampleNumber").val(), donateNumber: $("#donerNumber").val() }).config,
@@ -547,12 +555,21 @@ function checkSampleNumber() {
                     data.getItems = jQuery.parseJSON(data.getItems);
                     if (data.getItems.length == 0) {
                         //$("#sampleNumber").focus();
+                        getParam.donorID = "0";
                         getParam.visitID = "0";
-                        notiWarning("ไม่พบเลข Sample Number นี้");
+                        $("#data").attr("donorid", "0");
+                        $("#data").attr("visitid", "0");
+                        notiWarning("ไม่พบเลขผู้บริจาค และ เลข Sample Number นี้");
+                        $("#donerNumber").val("");
                         $("#sampleNumber").val("");
+                        $("#donerNumber").focus();
                     } else {
+                        getParam.donorID = data.getItems[0].donorId;
                         getParam.visitID = data.getItems[0].visitId;
+                        $("#data").attr("donorid", data.getItems[0].donorId);
                         $("#data").attr("visitid", data.getItems[0].visitId);
+
+                        checkStatusTodo(data.getItems[0].status, data.getItems[0].donorId, data.getItems[0].visitId);
                         //notiSuccess("พบเลข Sample Number นี้");
                     }
                     //$('body').unblock();
@@ -563,6 +580,15 @@ function checkSampleNumber() {
                 }
             }
         });
+   // }
+}
+
+function checkStatusTodo(status, donorId, visitId) {
+    console.log("status = ", status, donorId, visitId);
+    if (status == "WAIT RESULT") {
+        $("#confirmToEditDl").dialog("open");
+    } else {
+        editIt(visitId, donorId)
     }
 }
 
@@ -659,8 +685,8 @@ function saveData() {
         donateApplyId: $("#donateApply").val(),
         prescribedVol: $("#prescribedVol").val(),
         volumnActual: $("#vol").val(),
-        donationTime: $("#data").attr("donatedate") + " " + $("#startDonateDate").val() + ":00",
-        duration: $("#data").attr("donatedate") + " " + $("#donateTimes").val(),
+        donationTime: $("#data").attr("plan_date") + " " + $("#startDonateDate").val() + ":00",
+        duration: $("#data").attr("plan_date") + " " + $("#donateTimes").val(),
         // collection_staff: $("#donateStaff").val(),
         collection_staff: $("#donateStaff").attr("staffid"),
         refuse_reason1_id: problemReason.collectedProblem,
@@ -688,6 +714,9 @@ function saveData() {
                 data.getItems = jQuery.parseJSON(data.getItems);
                // $('body').unblock();
                 notiSuccess("บันทึกข้อมูลสำเร็จ");
+                if ($("#data").attr("donatesubaction") == "a") {
+                    updateDonationNumber();
+                }
                 hl7Generator($("#data").attr("donorid"), $("#data").attr("visitid"), $("#donerNumber").val(), $("#sampleNumber").val());
                 resetData();
                 randerAddLabExamination();
@@ -755,7 +784,7 @@ function getDonationList() {
         success: function (data) {
             if (!data.onError) {
                 data.getItems = jQuery.parseJSON(data.getItems);
-                console.log(data.getItems);
+                //console.log(data.getItems);
                 if (data.getItems.length > 0) {
                     $("tr").remove(".no-transactionDonate");
                     $("tr").remove(".donate-table-rows");
@@ -823,8 +852,26 @@ function goEditIt(visitId, donorId) {
     });
 }
 
+function editIt(visitId, donorId) {
+    resetData()
+    .then(function () {
+        var deferred = $.Deferred();
+        $("#data").attr("donateAction", "edit");
+        $("#data").attr("donatesubaction", "a");
+        $("#data").attr("donorid", donorId);
+        $("#data").attr("visitid", visitId);
+        deferred.resolve("OK");
+        return deferred.promise();
+    })
+    .then(checkParam)
+    .then(getInitialData)
+    .fail(function (err) {
+        console.log(err);
+    });
+}
+
 function clareData() {
-    console.log("clareData");
+    // console.log("clareData");
     resetData();
 
     randerAddLabExamination();
@@ -996,6 +1043,7 @@ function hl7Generator(donorid, visitid, donorno, sample_no) {
                         data.getItems = jQuery.parseJSON(data.getItems);
                         console.log(data.getItems);
                         notiSuccess("บันทึกแฟ้ม HL7 เรียบร้อยแล้ว");
+                        deferred.resolve("ok");
                     } else {
                         console.log("Error = ", data.exMessage);
                         deferred.reject("error = " + data.exMessage);
@@ -1012,5 +1060,143 @@ function hl7Generator(donorid, visitid, donorno, sample_no) {
     .then(hl7Generat)
     .fail(function (err) {
         console.log(err);
+    });
+}
+
+function getBagValues() {
+    var deferred = $.Deferred();
+    $.ajax({
+        url: '../../ajaxAction/donateAction.aspx',
+        data: H2G.ajaxData({
+            action: 'getbagvalues'
+        }).config,
+        type: "POST",
+        dataType: "json",
+        error: function (xhr, s, err) {
+            console.log(s, err);
+            deferred.reject("error = " + err);
+        },
+        success: function (data) {
+            if (!data.onError) {
+                data.getItems = jQuery.parseJSON(data.getItems);
+                bagValuesList = data.getItems;
+                //console.log(bagValuesList);
+                deferred.resolve("ok");
+            } else {
+                console.log("Error = ", data.exMessage);
+                deferred.reject("error = " + data.exMessage);
+            }
+        }
+    });
+    return deferred.promise();
+}
+
+function changeBagValues() {
+    console.log("donortypeId = ", $("#donateType").val());
+    console.log("donorBagId = ", $("#donateBagType").val());
+    console.log("donorToId = ", $("#donateApply").val());
+    var list = [];
+    if ($("#donateType").val() != "" && $("#donateBagType").val() != "" && $("#donateApply").val() != "") {
+        for (var i = 0; i < bagValuesList.length; i++) {
+            if (bagValuesList[i].donation_type_id == $("#donateType").val() && bagValuesList[i].bag_id == $("#donateBagType").val() && bagValuesList[i].donation_to_id == $("#donateApply").val()) {
+                list.push(bagValuesList[i]);
+            }
+        }
+    }
+
+    if ($("#donateType").val() != null && $("#donateBagType").val() != null && $("#donateApply").val() != null) {
+        for (var i = 0; i < bagValuesList.length; i++) {
+            if (bagValuesList[i].donation_type_id == $("#donateType").val() && bagValuesList[i].bag_id == $("#donateBagType").val() && bagValuesList[i].donation_to_id == $("#donateApply").val()) {
+                list.push(bagValuesList[i]);
+            }
+        }
+    }
+    // console.log(list);
+    if (list.length == 0) {
+        $("#prescribedVol").val("0");
+    } else {
+        //console.log("for complete");
+        $("#prescribedVol").val(list[0].volume);
+    }
+}
+
+function checkStartTime() {
+    // console.log("start Time");
+    var getT = function () {
+        var deferred = $.Deferred();
+        $.ajax({
+            url: '../../ajaxAction/donateAction.aspx',
+            data: H2G.ajaxData({ action: 'getcurrenttime' }).config,
+            type: "POST",
+            dataType: "json",
+            error: function (xhr, s, err) {
+                console.log(s, err);
+            },
+            success: function (data) {
+                if (!data.onError) {
+                    data.getItems = jQuery.parseJSON(data.getItems);
+                    // console.log(data.getItems);
+                    currentTime = data.getItems.current;
+                    deferred.resolve("Ok");
+                } else {
+                    console.log("Error = ", data.exMessage);
+                    deferred.reject("Error");
+                }
+            }
+        });
+        return deferred.promise();
+    }
+    
+
+    var ch_it = function () {
+        var deferred = $.Deferred();
+        var keyTime = $("#startDonateDate").val();
+        if (keyTime.length == 5) {
+            var donateTimes = convertDate($("#data").attr("plan_date")) + " " + $("#startDonateDate").val() + ":00";
+            //console.log(currentTime, new Date(currentTime));
+            //console.log(donateTimes, new Date(donateTimes));
+            var ct = new Date(currentTime);
+            var mt = new Date(donateTimes);
+            if (mt > ct) {
+                notiWarning("กรุณากรอกข้อมูลเวลาเกินเวลาปัจจุบัน");
+                $("#startDonateDate").val("");
+            }
+        }
+        deferred.resolve("Ok");
+        return deferred.promise();
+    }
+    
+    if ($("#startDonateDate").val() == "__:__") {
+        notiWarning("กรุณากรอกข้อมูลเวลาไม่ถูกต้อง");
+        return;
+    } else {
+        getT()
+        .then(ch_it)
+    }
+}
+
+var convertDate = function (usDate) {
+    var dateParts = usDate.split(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    return (dateParts[3] - 543) + "-" + dateParts[2] + "-" + dateParts[1];
+}
+
+function updateDonationNumber() {
+    console.log("It a ");
+    $.ajax({
+        url: '../../ajaxAction/donateAction.aspx',
+        data: H2G.ajaxData({ action: 'updatedonationnumber' }).config,
+        type: "POST",
+        dataType: "json",
+        error: function (xhr, s, err) {
+            console.log(s, err);
+        },
+        success: function (data) {
+            if (!data.onError) {
+                data.getItems = jQuery.parseJSON(data.getItems);
+                console.log(data.getItems);
+            } else {
+                console.log("Error = ", data.exMessage);
+            }
+        }
     });
 }

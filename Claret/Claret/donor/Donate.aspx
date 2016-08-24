@@ -10,7 +10,7 @@
             getDonateTypeList();
             getDonateBagTypeList();
             getDonateApplyList();
-            
+
             $("#donateStatus").setDropdownList();
             $("#donateDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().prop('readonly', true).setCalendar({
                 maxDate: "0",
@@ -77,9 +77,9 @@
                     var param = {
                         donateAction: "edit",
                         donatesubaction: "a",
-                        donateType: $("#donateType").val(),
-                        donateBagType: $("#donateBagType").val(),
-                        donateApply: $("#donateApply").val(),
+                        donateType: $("#donateType").val() || "0",
+                        donateBagType: $("#donateBagType").val() || "0",
+                        donateApply: $("#donateApply").val() || "0",
                         donateDate: $("#donateDate").val(),
                         donateStatus: $("#donateStatus").val()
                     };
@@ -90,9 +90,9 @@
                     var param = {
                         donateAction: "edit",
                         donatesubaction: "b",
-                        donateType: $("#donateType").val(),
-                        donateBagType: $("#donateBagType").val(),
-                        donateApply: $("#donateApply").val(),
+                        donateType: $("#donateType").val() || "0",
+                        donateBagType: $("#donateBagType").val() || "0",
+                        donateApply: $("#donateApply").val() || "0",
                         donateDate: $("#donateDate").val(),
                         donateStatus: $("#donateStatus").val()
                     };
@@ -210,17 +210,20 @@
                         <div class="col-md-36">
                             <div class="col-md-4 text-right setPaddingRight">ประเภทการบริจาค</div>
                             <div class="col-md-7">
-                                <select id="donateType">
+                                <select id="donateType" class="selecte-box-custom">
+
                                 </select>
                             </div>
                             <div class="col-md-4 text-right setPaddingRight">ประเภทถุง</div>
                             <div class="col-md-7">
-                                <select id="donateBagType">
+                                <select id="donateBagType" class="selecte-box-custom">
+
                                 </select>
                             </div>
                             <div class="col-md-4 text-right setPaddingRight">การนำไปใช้งาน</div>
                             <div class="col-md-7">
-                                <select id="donateApply">
+                                <select id="donateApply" class="selecte-box-custom">
+
                                 </select>
                             </div>
                             <div class="col-md-3"><input id="btnIssue" type="button" class="btn btn-success btn-block" value="ดำเนินการ" /></div>

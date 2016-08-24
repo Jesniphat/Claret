@@ -44,6 +44,12 @@ Public Class donateAction
                 Call Getsiteidhl7()
             Case "getexchangelist"
                 Call GetexChangeList()
+            Case "getbagvalues"
+                Call GetBagValues()
+            Case "getcurrenttime"
+                Call getCurrentTime()
+            Case "updatedonationnumber"
+                Call updatedonationnumber()
 
         End Select
 
@@ -344,9 +350,9 @@ Public Class donateAction
         Try
             Dim sample_number As String = _REQUEST("sampleNumber")
             Dim donn_number As String = _REQUEST("donateNumber")
-            Dim sql As String = "select d.ID, d.DONOR_NUMBER, dv.ID AS VISIT_ID, dv.SAMPLE_NUMBER 
+            Dim sql As String = "select d.ID, d.DONOR_NUMBER, dv.ID AS VISIT_ID, dv.SAMPLE_NUMBER, dv.STATUS, dv.DONOR_ID 
                                     from DONATION_VISIT dv inner join DONOR d on d.ID = dv.DONOR_ID 
-                                    where dv.STATUS = 'WAIT COLLECTION' AND dv.SAMPLE_NUMBER = '" & sample_number & "' 
+                                    where dv.STATUS IN ('WAIT COLLECTION','WAIT RESULT') AND dv.SAMPLE_NUMBER = '" & sample_number & "' 
                                     AND d.DONOR_NUMBER = '" & donn_number & "'"
 
             Dim dt As DataTable = Cbase.QueryTable(sql)
@@ -354,7 +360,9 @@ Public Class donateAction
             For Each dr As DataRow In dt.Rows
                 Dim Item As New CheckSampleNum
                 Item.visitId = dr("VISIT_ID").ToString
+                Item.donorId = dr("DONOR_ID").ToString
                 Item.sampleNumber = dr("SAMPLE_NUMBER").ToString
+                Item.status = dr("STATUS").ToString
 
                 SampleNumber.Add(Item)
             Next
@@ -551,7 +559,14 @@ Public Class donateAction
 
             If donateApplyId <> "3" And CheckStatus = "WAIT COLLECTION" Then
                 Cbase.Execute("update donor Set donate_number = NVL(donate_number,0) + 1 where id = '" & donerId & "'")
+                'Dim NumTime As String = Cbase.QueryField("SELECT donate_number FROM donor WHERE ID = '" & donerId & "'")
+                'Cbase.Execute("update DONATION_RECORD Set DONATION_NUMBER = '" & NumTime & "' WHERE DONATION_VISIT_ID = '" & visitId & "' AND DONOR_ID = '" & donerId & "' ")
             End If
+
+            'If CheckStatus = "WAIT COLLECTION" Then
+            '    Dim NumTime = Cbase.QueryField("SELECT donate_number FROM donor WHERE ID = '" & donerId & "'")
+            '    Cbase.Execute("update DONATION_RECORD Set DONATION_NUMBER = '" & NumTime & "' WHERE DONATION_VISIT_ID = '" & visitId & "' AND DONOR_ID = '" & donerId & "' ")
+            'End If
 
             Cbase.Execute("delete from DONATION_EXAMINATION where DONATION_VISIT_ID = '" & visitId & "'")
 
@@ -565,6 +580,22 @@ Public Class donateAction
 
             Cbase.Apply()
             JSONResponse.setItems(JSON.Serialize(Of List(Of LabExaminationLists))(labExaminationSaveList))
+            Response.Write(JSONResponse.ToJSON())
+        Catch ex As Exception
+            Cbase.Rollback()
+            Response.Write(New CallbackException(ex).ToJSON())
+        End Try
+    End Sub
+
+    Private Sub updatedonationnumber()
+        Try
+            Dim donerId As String = _REQUEST("donorid")
+            Dim visitId As String = _REQUEST("visitid")
+
+            Dim NumTime = Cbase.QueryField("SELECT donate_number FROM donor WHERE ID = '" & donerId & "'")
+            Cbase.Execute("update DONATION_RECORD Set DONATION_NUMBER = '" & NumTime & "' WHERE DONATION_VISIT_ID = '" & visitId & "' AND DONOR_ID = '" & donerId & "' ")
+            Cbase.Apply()
+            JSONResponse.setItems("{""Num"" : """ & NumTime & """}")
             Response.Write(JSONResponse.ToJSON())
         Catch ex As Exception
             Cbase.Rollback()
@@ -743,7 +774,48 @@ Public Class donateAction
             Response.Write(New CallbackException(ex).ToJSON())
         End Try
     End Sub
+
+    Private Sub GetBagValues()
+        Try
+            Dim Sql As String = "SELECT * FROM donation_bag"
+            Dim donationBagList = New List(Of DonationBagList)
+            Dim dt As DataTable = Cbase.QueryTable(Sql)
+            For Each dr As DataRow In dt.Rows
+                Dim Item As New DonationBagList
+                Item.id = dr("ID").ToString
+                Item.donation_type_id = dr("DONATION_TYPE_ID").ToString
+                Item.bag_id = dr("BAG_ID").ToString
+                Item.donation_to_id = dr("DONATION_TO_ID").ToString
+                Item.volume = dr("VOLUME").ToString
+
+                donationBagList.Add(Item)
+            Next
+
+            JSONResponse.setItems(JSON.Serialize(Of List(Of DonationBagList))(donationBagList))
+            Response.Write(JSONResponse.ToJSON())
+        Catch ex As Exception
+            Response.Write(New CallbackException(ex).ToJSON())
+        End Try
+    End Sub
+
+    Private Sub getCurrentTime()
+        Try
+            Dim Now As String = System.DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")
+            JSONResponse.setItems("{""current"" : """ & Now & """}")
+            Response.Write(JSONResponse.ToJSON())
+        Catch ex As Exception
+            Response.Write(New CallbackException(ex).ToJSON())
+        End Try
+    End Sub
 End Class
+
+Public Structure DonationBagList
+    Public donation_type_id As String
+    Public bag_id As String
+    Public donation_to_id As String
+    Public id As String
+    Public volume As String
+End Structure
 
 Public Structure DonationType
     Public Id As String
@@ -816,6 +888,8 @@ End Structure
 
 Public Structure CheckSampleNum
     Public visitId As String
+    Public donorId As String
+    Public status As String
     Public sampleNumber As String
     Public donation_type_id As String
     Public bag_id As String

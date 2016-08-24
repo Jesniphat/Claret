@@ -9,6 +9,7 @@
             .then(getDonateTypeList)
             .then(getDonateBagTypeList)
             .then(getDonateApplyList)
+            .then(getBagValues)
             .then(getExamination)
             .then(getProblemReason)
             .then(getDonationList)
@@ -82,12 +83,14 @@
                 setIdProblem("collectedProblemReason4");
             });
 
-            $("#donerNumber").blur(checkDonateNum);
+            // $("#donerNumber").blur(checkDonateNum);
             $("#sampleNumber").keydown(checkValidDonateNum);
             $("#sampleNumber").blur(checkSampleNumber);
             $("#btnSave").click(saveData);
             //$("#btnSave").click(saveDatatest);
             $("#btnCancel").click(clareData);
+
+            $("#startDonateDate").blur(checkStartTime);
 
             $.mask.definitions['2'] = '[012]';
             $.mask.definitions['3'] = '[0123456789]';
@@ -96,6 +99,22 @@
             $("#startDonateDate").mask("23:59");
             $("#donateTimes").mask("23:59:59");
 
+            $("#confirmToEditDl").dialog({
+                autoOpen: false,
+                buttons: {
+                    OK: function () {
+                        goEditIt($("#data").attr("visitid"), $("#data").attr("donorid"));
+                        $(this).dialog("close");
+                    },
+                    CANCEL: function () {
+                        clareData();
+                        $(this).dialog("close");
+                    }
+                },
+                title: "Warning"
+            });
+
+            //$("#donateType").change(changeBagValues);
             //$("#testx").click(function () {
             //    hl7Generator('41', '93', '9995900007', '123456789')
             //})
@@ -309,4 +328,6 @@
         </div>
     </div>
     
+
+    <div id="confirmToEditDl" title="">รายการนี้ทำการบริจาคแล้วท่านต้องการแก้ไขข้อมูลเดิมหรือไม่</div>
 </asp:Content>

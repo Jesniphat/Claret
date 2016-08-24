@@ -11,9 +11,9 @@ function linkToCollection() {
         donatesubaction: "a",
         donorID: "0",
         visitID: "0",
-        donateType: $("#donateType").val(),
-        donateBagType: $("#donateBagType").val(),
-        donateApply: $("#donateApply").val(),
+        donateType: $("#donateType").val() || "0",
+        donateBagType: $("#donateBagType").val() || "0",
+        donateApply: $("#donateApply").val() || "0",
         donateDate: $("#donateDate").val(),
         donateStatus: $("#donateStatus").val()
     };
@@ -42,7 +42,7 @@ function donateSearch(newSearch) {
                 , birthday: $("#txtPostBirthday").H2GValue()
                 , bloodgroup: $("#txtPostBloodGroup").H2GValue()
                 , samplenumber: $("#txtPostSample").H2GValue()
-                , reportdate: formatDate(H2G.today(), "dd/MM/yyyy") //$("#txtReportDate").H2GValue()
+                , reportdate: $("#data").H2GAttr("plan_date") // formatDate(H2G.today(), "dd/MM/yyyy") //$("#txtReportDate").H2GValue()
                 , status: $("#donateStatus").val()  // change here
                 , p: $("#tbPostQueue").attr("currentPage") || 1
                 , so: $("#tbPostQueue").attr("sortOrder") || "queue_number"
@@ -105,73 +105,43 @@ function donateSearch(newSearch) {
 }
 
 function getDonateTypeList() {
-    $.ajax({
-        url: '../../ajaxAction/donateAction.aspx',
-        data: H2G.ajaxData({ action: 'getDonateTypeList' }).config,
-        type: "POST",
-        dataType: "json",
-        error: function (xhr, s, err) {
-            console.log(s, err);
-        },
-        success: function (data) {
-            if (!data.onError) {
-                data.getItems = jQuery.parseJSON(data.getItems);
-                $("#donateType").append($("<option value='0'>&nbsp</option>"));
-                for (var i = 0; i < data.getItems.length; i++) {
-                    $("#donateType").append($("<option value='" + data.getItems[i].Id + "'>" + data.getItems[i].Description + "</option>"));
-                }
-                $("#donateType").setDropdownList();
-            } else {
-                console.log("Error = ", data.exMessage)
-            }
-        }
+    var deferred = $.Deferred();
+    $("#donateType").setAutoListValue({
+        url: '../../ajaxAction/masterAction.aspx',
+        data: { action: 'donationtype2' },
+        // defaultSelect: "0", //$("#donateType").H2GAttr("selectItem") || $("#data").H2GAttr("collectionpointid"),
+    }).on('autocompleteselect', function () {
+        //$("#txtOuterDonate").focus();
     });
+
+    deferred.resolve("Ok");
+    return deferred.promise();
 }
 
 function getDonateBagTypeList() {
-    $.ajax({
-        url: '../../ajaxAction/donateAction.aspx',
-        data: H2G.ajaxData({ action: 'getDonateBagTypeList' }).config,
-        type: "POST",
-        dataType: "json",
-        error: function (xhr, s, err) {
-            console.log(s, err);
-        },
-        success: function (data) {
-            if (!data.onError) {
-                data.getItems = jQuery.parseJSON(data.getItems);
-                $("#donateBagType").append($("<option value='0'>&nbsp</option>"));
-                for (var i = 0; i < data.getItems.length; i++) {
-                    $("#donateBagType").append($("<option value='" + data.getItems[i].Id + "'>" + data.getItems[i].Description + "</option>"));
-                }
-                $("#donateBagType").setDropdownList();
-            } else {
-                console.log("Error = ", data.exMessage)
-            }
-        }
+    var deferred = $.Deferred();
+    $("#donateBagType").setAutoListValue({
+        url: '../../ajaxAction/masterAction.aspx',
+        data: { action: 'getdonatebagtypelist' },
+       // defaultSelect: "0", //$("#donateType").H2GAttr("selectItem") || $("#data").H2GAttr("collectionpointid"),
+    }).on('autocompleteselect', function () {
+        //$("#txtOuterDonate").focus();
     });
+
+    deferred.resolve("Ok");
+    return deferred.promise();
 }
 
 function getDonateApplyList() {
-    $.ajax({
-        url: '../../ajaxAction/donateAction.aspx',
-        data: H2G.ajaxData({ action: 'getDonateApplyList' }).config,
-        type: "POST",
-        dataType: "json",
-        error: function (xhr, s, err) {
-            console.log(s, err);
-        },
-        success: function (data) {
-            if (!data.onError) {
-                data.getItems = jQuery.parseJSON(data.getItems);
-                $("#donateApply").append($("<option value='0'>&nbsp</option>"));
-                for (var i = 0; i < data.getItems.length; i++) {
-                    $("#donateApply").append($("<option value='" + data.getItems[i].Id + "'>" + data.getItems[i].Description + "</option>"));
-                }
-                $("#donateApply").setDropdownList();
-            } else {
-                console.log("Error = ", data.exMessage)
-            }
-        }
+    var deferred = $.Deferred();
+    $("#donateApply").setAutoListValue({
+        url: '../../ajaxAction/masterAction.aspx',
+        data: { action: 'getdonateapplylist' },
+       // defaultSelect: "0", //$("#donateType").H2GAttr("selectItem") || $("#data").H2GAttr("collectionpointid"),
+    }).on('autocompleteselect', function () {
+        //$("#txtOuterDonate").focus();
     });
+
+    deferred.resolve("Ok");
+    return deferred.promise();
 }
