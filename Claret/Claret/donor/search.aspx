@@ -12,7 +12,7 @@
                     $(ui.newPanel).find("input:not(input[type=button],input[type=submit],button):visible:first").focus();
                 },
             });
-            $("#txtBirthday").H2GDatebox().prop('readonly', true).setCalendar({
+            $("#txtBirthday").H2GDatebox().setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+0",
@@ -26,7 +26,7 @@
                     enterDatePickerSearch($("#txtBirthday"), "enter");
                 },
             });
-            $("#txtPostBirthday").H2GDatebox().prop('readonly', true).setCalendar({
+            $("#txtPostBirthday").H2GDatebox().setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+0",
@@ -34,8 +34,8 @@
                     $("#txtBloodGroup").focus();
                 },
             });
-            $("#txtName").H2GNamebox(37);
-            $("#txtSurname").H2GNamebox(37);
+            //$("#txtName").H2GNamebox(37);
+            //$("#txtSurname").H2GNamebox(37);
             $("#divCriteria input").enterKey(function () {
                 donorSearch(true);
                 return false;
@@ -50,6 +50,9 @@
             $("#spClear").click(function () {
                 $("#divCriteria input").H2GValue('');
                 $("#txtDonorNumber").focus();
+                $("#tbDonor > tbody").H2GValue($("#tbDonor > thead > tr.no-transaction").clone().show());
+                $("#tbDonor > tbody").closest("table").attr("totalPage", 0)
+                genGridPage($("#tbDonor"), donorSearch);
             });
             $("#btnNewRegis").click(function () {
                 if ($('#txtName').H2GValue() == "") {
@@ -65,7 +68,7 @@
                     notiWarning("กรุณากรอกวันเกิดผู้บริจาค");
                     return false;
                 }
-                validation($('#txtName').H2GValue(), $('#txtSurname').H2GValue(), $('#txtBirthday').H2GValue(), "");
+                validation($('#txtName').H2GValue(), $('#txtSurname').H2GValue(), $('#txtBirthday').H2GValue(), "", true);
             });
             $("#spPostSearch").click(function () {
                 postQueueSearch(true);
@@ -73,6 +76,7 @@
             $("#spPostClear").click(function () {
                 $("#divPostCriteria input").H2GValue('');
                 $("#txtPostQueue").focus();
+                postQueueSearch(true);
             });
             $.extend($.fn, {
                 donorSelect: function () {
@@ -120,7 +124,7 @@
             }
             
         });
-        function validation(name, surname, birthday, donorid) {
+        function validation(name, surname, birthday, donorid, newRegis) {
             $.ajax({
                 url: '../ajaxAction/donorAction.aspx',
                 data: {
@@ -145,27 +149,44 @@
                                 $("#data").removeAttr("donorID").removeAttr("visitID").H2GFill({ donorName: name, donorSurname: surname, birthday: birthday });
                                 $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "register.aspx", method: "post", staffaction: "register" }).submit();
                             } else {
-                                $("#data").removeAttr("donorName").removeAttr("donorSurname").removeAttr("birthday").H2GAttr("donorID", data.getItems.DonorID);
-                                $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "register.aspx", method: "post", staffaction: "register" }).submit();
+                                if (newRegis) {
+                                    H2GOpenPopupBox({
+                                        detail: "ประวัติผู้บริจาคท่านนี้มีอยู่ในระบบแล้ว<br>หากเป็นคนละท่านกัน กรุณาตั้งชื่อให้แตกต่าง",
+                                        confirmFunction: function () { return closePopup(); }
+                                    });
+                                } else {
+                                    $("#data").removeAttr("donorName").removeAttr("donorSurname").removeAttr("birthday").H2GAttr("donorID", data.getItems.DonorID);
+                                    $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "register.aspx", method: "post", staffaction: "register" }).submit();
+                                }
                             }
                         } else if (data.getItems.Duplicate != "") {
                             notiWarning(data.getItems.Duplicate);
                         } else if (data.getItems.AgeCheck != "") {
-                            //notiWarning(data.getItems.AgeCheck);
-                            $("#popupheader").H2GValue("กรุณาตรวจสอบ");
-                            $("#spAgeWarning").H2GValue(data.getItems.AgeCheck);
-                            $("#divAgeContainer").H2GFill({ donorID: data.getItems.DonorID });
-                            $("#divAgeContainer input.btn-success").click(function () {
-                                if ($('#divAgeContainer').H2GAttr("donorID") == "") {
-                                    $("#data").H2GRemoveAttr("donorID,visitID").H2GFill({ donorName: name, donorSurname: surname, birthday: birthday });
-                                    $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "register.aspx", method: "post", staffaction: "register" }).submit();
-                                } else {
-                                    $("#data").H2GRemoveAttr("donorName,donorSurname,birthday").H2GAttr("donorID", $('#divAgeContainer').H2GAttr("donorID"));
-                                    $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "register.aspx", method: "post", staffaction: "register" }).submit();
-                                }
+                            H2GOpenPopupBox({
+                                detail: data.getItems.AgeCheck,
+                                confirmFunction: function () { return closePopup(); }
                             });
-                            $("#divAgeContainer").find("input.btn-block").click(function () { closePopup(); });
-                            openPopup($("#divAgeContainer"));
+                            //$("#popupheader").H2GValue("กรุณาตรวจสอบ");
+                            //$("#spAgeWarning").H2GValue(data.getItems.AgeCheck);
+                            //$("#divAgeContainer").H2GFill({ donorID: data.getItems.DonorID });
+                            //$("#divAgeContainer input.btn-success").click(function () {
+                            //    if ($('#divAgeContainer').H2GAttr("donorID") == "") {
+                            //        $("#data").H2GRemoveAttr("donorID,visitID").H2GFill({ donorName: name, donorSurname: surname, birthday: birthday });
+                            //        $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "register.aspx", method: "post", staffaction: "register" }).submit();
+                            //    } else {
+                            //        if (newRegis) {
+                            //            H2GOpenPopupBox({
+                            //                detail:"ประวัติผู้บริจาคท่านนี้มีอยู่ในระบบแล้ว หากเป็นคนละท่านกัน กรุณาตั้งชื่อให้แตกต่าง",
+                            //                confirmFunction: function () { return closePopup(); }
+                            //            });
+                            //        } else {
+                            //            $("#data").H2GRemoveAttr("donorName,donorSurname,birthday").H2GAttr("donorID", $('#divAgeContainer').H2GAttr("donorID"));
+                            //            $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "register.aspx", method: "post", staffaction: "register" }).submit();
+                            //        }
+                            //    }
+                            //});
+                            //$("#divAgeContainer").find("input.btn-block").click(function () { closePopup(); });
+                            //openPopup($("#divAgeContainer"));
                         }
                     } else {
                         notiWarning(data.exMessage);
@@ -214,6 +235,7 @@
                             $(dataView).H2GValue('');
                             if (!data.onError) {
                                 data.getItems = jQuery.parseJSON(data.getItems);
+                                console.log(data.getItems);
                                 if (data.getItems.SearchList.length > 0) {
                                     if (data.getItems.GoNext == "Y") {
                                         if (data.getItems.Duplicate == "") {
@@ -222,20 +244,21 @@
                                                 $(dataRow).H2GFill({ refID: e.ID, birthday: e.BirthdayFormat }).donorSelect();
                                             });
                                         } else {
-                                            $.each((data.getItems.SearchList), function (index, e) {
-                                                var dataRow = $("#tbDonor > thead > tr.template-data").clone().show();
-                                                $(dataRow).H2GFill({ refID: e.ID, birthday: e.BirthdayFormat });
-                                                $(dataRow).find('.td-donor-number').H2GValue(e.DonorNumber).H2GAttr("title", e.DonorNumber);
-                                                $(dataRow).find('.td-nation-number').H2GValue(e.NationNumber).H2GAttr("title", e.NationNumber);
-                                                $(dataRow).find('.td-ext-number').H2GValue(e.ExternalNumber).H2GAttr("title", e.ExternalNumber);
-                                                $(dataRow).find('.td-name').H2GValue(e.Name).H2GAttr("title", e.Name);
-                                                $(dataRow).find('.td-surname').H2GValue(e.Surname).H2GAttr("title", e.Surname);
-                                                $(dataRow).find('.td-birthday').H2GValue(e.Birthday).H2GAttr("title", e.Birthday);
-                                                $(dataRow).find('.td-blood-group').H2GValue(e.BloodGroup).H2GAttr("title", e.BloodGroup);
-                                                $(dataView).append(dataRow);
-                                            });
-                                            $(dataView).closest("table").attr("totalPage", data.getItems.TotalPage)
-                                            //alert(data.getItems.Duplicate);
+                                            notiWarning(data.getItems.Duplicate);
+                                            //$.each((data.getItems.SearchList), function (index, e) {
+                                            //    var dataRow = $("#tbDonor > thead > tr.template-data").clone().show();
+                                            //    $(dataRow).H2GFill({ refID: e.ID, birthday: e.BirthdayFormat });
+                                            //    $(dataRow).find('.td-donor-number').H2GValue(e.DonorNumber).H2GAttr("title", e.DonorNumber);
+                                            //    $(dataRow).find('.td-nation-number').H2GValue(e.NationNumber).H2GAttr("title", e.NationNumber);
+                                            //    $(dataRow).find('.td-ext-number').H2GValue(e.ExternalNumber).H2GAttr("title", e.ExternalNumber);
+                                            //    $(dataRow).find('.td-name').H2GValue(e.Name).H2GAttr("title", e.Name);
+                                            //    $(dataRow).find('.td-surname').H2GValue(e.Surname).H2GAttr("title", e.Surname);
+                                            //    $(dataRow).find('.td-birthday').H2GValue(e.Birthday).H2GAttr("title", e.Birthday);
+                                            //    $(dataRow).find('.td-blood-group').H2GValue(e.BloodGroup).H2GAttr("title", e.BloodGroup);
+                                            //    $(dataView).append(dataRow);
+                                            //});
+                                            //$(dataView).closest("table").attr("totalPage", data.getItems.TotalPage)
+                                            ////alert(data.getItems.Duplicate);
                                         }
                                     } else {
                                         $.each((data.getItems.SearchList), function (index, e) {

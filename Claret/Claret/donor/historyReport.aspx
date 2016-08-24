@@ -17,7 +17,7 @@
                     $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "register.aspx", method: "post", staffaction: "register" }).submit();
                 },
             });
-            $("#txtReportDate").H2GDatebox().prop('readonly', true).setCalendar({
+            $("#txtReportDate").H2GDatebox().setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-30:c+0",
@@ -26,9 +26,9 @@
                 },
             }).H2GValue(formatDate(H2G.today(), "dd/MM/yyyy"));
             $("#txtQueue").H2GNumberbox();
-            $("#txtName").H2GNamebox(37);
-            $("#txtSurname").H2GNamebox(37);
-            $("#txtBirthday").H2GDatebox().prop('readonly', true).setCalendar({
+            //$("#txtName").H2GNamebox(37);
+            //$("#txtSurname").H2GNamebox(37);
+            $("#txtBirthday").H2GDatebox().setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+0",
@@ -46,12 +46,13 @@
             $("#spClear").click(function () {
                 $("#divInfoCriteria input").H2GValue('');
                 $("#txtQueue").focus();
+                infoSearch(true);
             });
 
             $("#txtPostQueue").H2GNumberbox();
-            $("#txtPostName").H2GNamebox(37);
-            $("#txtPostSurname").H2GNamebox(37);
-            $("#txtPostBirthday").H2GDatebox().prop('readonly', true).setCalendar({
+            //$("#txtPostName").H2GNamebox(37);
+            //$("#txtPostSurname").H2GNamebox(37);
+            $("#txtPostBirthday").H2GDatebox().setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+0",
@@ -69,6 +70,7 @@
             $("#spPostClear").click(function () {
                 $("#divPostCriteria input").H2GValue('');
                 $("#txtPostQueue").focus();
+                postQueueSearch(true);
             });
             
             $("#ddlStatus").setDropdownList();

@@ -12,7 +12,7 @@
             getDonateApplyList();
 
             $("#donateStatus").setDropdownList();
-            $("#donateDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().prop('readonly', true).setCalendar({
+            $("#donateDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
                 maxDate: "0",
                 minDate: new Date(),
                 yearRange: "c-100:c+0",
@@ -23,36 +23,31 @@
             $("#spSearch").click(function () {
                 donateSearch(true);
             });
+            $("#spClear").click(function () {
+                $("#divCriteria input").H2GValue('');
+                $("#txtPostQueue").focus();
+                donateSearch(true);
+            });
             $("#spPostSearch").click(function () {
                 postQueueSearch(true);
             });
             $("#spPostClear").click(function () {
                 $("#divPostCriteria input").H2GValue('');
                 $("#txtQueue").focus();
-
-                donateSearch(true);
                 postQueueSearch(true);
             });
             $("#divPostCriteria input").enterKey(function () {
                 postQueueSearch(true);
                 return false;
             });
-
-            $("#spClear").click(function () {
-                $("#divCriteria input").H2GValue('');
-                $("#txtPostQueue").focus();
-
-                donateSearch(true);
-                postQueueSearch(true);
-            });
             $("#divCriteria input").enterKey(function () {
                 donateSearch(true);
                 return false;
             });
 
-            $("#txtName").H2GNamebox(37);
-            $("#txtSurname").H2GNamebox(37);
-            $("#txtBirthday").H2GDatebox().prop('readonly', true).setCalendar({
+            //$("#txtName").H2GNamebox(37);
+            //$("#txtSurname").H2GNamebox(37);
+            $("#txtBirthday").H2GDatebox().setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+0",

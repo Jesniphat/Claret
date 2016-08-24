@@ -35,7 +35,7 @@
         var HaveDonation = false;
         $(function () {
             //$("#ui-datepicker-div").block();
-            $("#donateDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().prop('readonly', true).setCalendar({
+            $("#donateDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
                 // maxDate: new Date(),
                 //minDate: "-1d",
                 yearRange: "c-100:c+0",
@@ -48,7 +48,7 @@
                 },
             });
 
-            $("#txtStartRemarakDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().prop('readonly', true).setCalendar({
+            $("#txtStartRemarakDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
                 // maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+0",
@@ -58,7 +58,7 @@
                 },
             });
 
-            $("#txtLastRemarakDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().prop('readonly', true).setCalendar({
+            $("#txtLastRemarakDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
                 // maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+0",

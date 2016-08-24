@@ -5,20 +5,20 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title>Login</title>
-    <link href="/resources/css/bootstrap.css?ver=20160131" rel="stylesheet" />
-    <link href="/resources/css/bootflat.css?ver=20160131" rel="stylesheet" />
-    <link href="/resources/css/claret-font-icon.css?ver=20160131" rel="stylesheet" />
-    <link href="/resources/css/jquery.fs.selecter.css?ver=20160131" rel="stylesheet" />
-    <link href="/resources/jquery-ui/jquery-ui.css?ver=20160131" rel="stylesheet" />
-    <link href="/resources/css/custom.css?ver=20160131" rel="stylesheet" />
+    <link href="/resources/css/bootstrap.css?ver=20160201" rel="stylesheet" />
+    <link href="/resources/css/bootflat.css?ver=20160201" rel="stylesheet" />
+    <link href="/resources/css/claret-font-icon.css?ver=20160201" rel="stylesheet" />
+    <link href="/resources/css/jquery.fs.selecter.css?ver=20160201" rel="stylesheet" />
+    <link href="/resources/jquery-ui/jquery-ui.css?ver=20160201" rel="stylesheet" />
+    <link href="/resources/css/custom.css?ver=20160201" rel="stylesheet" />
     <link href="/resources/css/table-excel.css" rel="stylesheet" />
     <link href="/resources/css/bootstrap-select.css" rel="stylesheet" />
     <script src="../resources/jquery/jquery.js" type="text/javascript"></script>
     <script src="../resources/jquery-ui/jquery-ui.js" type="text/javascript"></script>
-    <script src="../resources/javascript/jquery-date.js?ver=20160131" type="text/javascript"></script>
-    <script src="../resources/jquery/bootstrap.js?ver=20160131" type="text/javascript"></script>
+    <script src="../resources/javascript/jquery-date.js?ver=20160201" type="text/javascript"></script>
+    <script src="../resources/jquery/bootstrap.js?ver=20160201" type="text/javascript"></script>
     <script src="../resources/jquery/jquery.fs.selecter.js" type="text/javascript"></script>
-    <script src="../resources/javascript/extension.js?ver=20160131" type="text/javascript"></script>
+    <script src="../resources/javascript/extension.js?ver=20160201" type="text/javascript"></script>
     <script src="../resources/javascript/bootstrap-select.js" type="text/javascript"></script>
     <style>
         .box-Info {
@@ -113,13 +113,13 @@
 
             $("#btnLogin").click(function () { login(); });
 
-            $("#txtUser").enterKey(function () { login(); }).focus();
+            $("#txtUser").focus();//.enterKey(function () { login(); })
             $("#txtPassword").enterKey(function () { login(); });
-            $("#txtDate").H2GDatebox().prop('readonly', true).setCalendar({
+            $("#txtDate").H2GDatebox().setCalendar({
                 maxDate: new Date(),
                 minDate: "-30d",
                 yearRange: "c-10:c+10",
-            }).H2GValue(formatDate(H2G.today(), "dd/MM/yyyy"));
+            }).H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).blur(function () { login(); });;
             
             $(window).resize(function () {
                 setWorkDesk();
@@ -153,6 +153,7 @@
                             $("#data").H2GFill({ staffID: data.getItems.ID, siteID: $("#ddlRegion option:selected").H2GAttr("valueID"), collectionPointID: $("#ddlDepartment option:selected").H2GAttr("valueID"), tmenu: "tmenuDonor", lmenu: "lmenuDonorRegis" });
                             if (data.getItems.PlanID == "0") {
                                 openPopup($("#divPlanContainer"));
+                                $("#btnLogin").prop('disabled', false);
                             } else {
                                 $("#data").H2GFill({ collectionPlanID: data.getItems.PlanID });
                                 $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "donor/search.aspx", method: "post" }).submit();
@@ -160,8 +161,8 @@
                         } else {
                             notiError(data.exMessage);
                             $("#txtUser").focus();
+                            $("#btnLogin").prop('disabled', false);
                         }
-                        $("#btnLogin").prop('disabled', false);
                     }
                 });    //End ajax
             }
@@ -197,6 +198,11 @@
                     notiWarning("กรุณากรอกวันที่");
                     return false;
                 }
+                //else if (formatDate(new Date(getDateFromFormat($("#txtDate").val(), 'dd/MM/yyyy')), 'yyyyMMdd') < formatDate(H2G.today(), 'yyyyMMdd')) {
+                //    $("#txtDate").focus();
+                //    notiWarning("วันที่ต้องไม่น้อยกว่าวันปัจจุบัน");
+                //    return false;
+                //}
             } else {
                 return false;
             }
@@ -257,6 +263,7 @@
                             $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "donor/search.aspx", method: "post" }).submit();
                         }
                     } else {
+                        $("#btnLogin").prop('disabled', false);
                         notiError(data.exMessage);
                     }
                     $("#divPlanTemplete input[type=button]").prop('disabled', false);

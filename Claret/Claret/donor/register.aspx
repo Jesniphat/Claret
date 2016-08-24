@@ -25,7 +25,7 @@
             font-weight:normal;
         }
     </style>
-    <script src="../resources/javascript/page/registerScript.js?ver=20160131" type="text/javascript"></script>
+    <script src="../resources/javascript/page/registerScript.js?ver=20160201" type="text/javascript"></script>
     <script>
         $(function () {
             lookupControl();
@@ -57,7 +57,7 @@
                     $(ui.newPanel).find("input:not(input[type=button],input[type=submit],button):visible:first").focus();
                 },
             });
-            $("#txtBirthDay").H2GDatebox().prop('readonly', true).setCalendar({
+            $("#txtBirthDay").H2GDatebox().setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+70",
@@ -80,7 +80,7 @@
                     }
                 },
             });
-            $("#txtLastDonateDate").H2GDatebox().prop('readonly', true).setCalendar({
+            $("#txtLastDonateDate").H2GDatebox().setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+70",
@@ -96,7 +96,7 @@
                 },
             });
             $("#txtCommentDateForm").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy"));
-            $("#txtCommentDateTo").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().prop('readonly', true).setCalendar({
+            $("#txtCommentDateTo").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
                 maxDate: "+100y",
                 minDate: new Date(),
                 yearRange: "c-50:c+50",
@@ -191,7 +191,7 @@
                     currentDonateNumber: "1",
                     visitDate: formatDate(H2G.today(), "dd-MM-yyyy HH:mm")
                 });
-                $("#infoTab > ul > li > a[href='#todayPane']").H2GValue(formatDate(H2G.today(), "dd NNN yyyy"))
+                $("#infoTab > ul > li > a[href='#todayPane']").H2GValue("2.2) " + formatDate(H2G.today(), "dd NNN yyyy"))
                 $("#spVisitCount").H2GValue("รวมจำนวนการเข้าพบ 0 ครั้ง / บริจาค 0 ครั้ง");
                 donorSelectDDL();
                 lookupTabQuestionaire();
@@ -215,20 +215,33 @@
                             notiWarning("กรุณากรอกเลขบัตรอย่างน้อย " + $(this).H2GAttr("minlength") + " ตัวอักษร");
                             $(this).focus();
                         }
-                    } else {
+                    //} else {
                         //notiWarning("กรุณากรอกเลขบัตร");
                         //$(this).focus();
                     }
                 },
                 deleteExtCard: function (args) {
-                    if (confirm("ต้องการจะลบ " + $(this).closest("div.row").find(".ext-number").H2GValue() + " ใช่หรือไม่?")) {
-                        if ($(this).closest("div.row").H2GAttr("refID") == "NEW") {
-                            $(this).closest("div.row").remove();
-                        } else {
-                            $(this).closest("div.row").hide().H2GAttr("refID", "D#" + $(this).closest("div.row").H2GAttr("refID"));
+                    //if (confirm("ต้องการจะลบ " + $(this).closest("div.row").find(".ext-number").H2GValue() + " ใช่หรือไม่?")) {
+                    //    if ($(this).closest("div.row").H2GAttr("refID") == "NEW") {
+                    //        $(this).closest("div.row").remove();
+                    //    } else {
+                    //        $(this).closest("div.row").hide().H2GAttr("refID", "D#" + $(this).closest("div.row").H2GAttr("refID"));
+                    //    }
+                    //    $("#txtCardNumber").focus();
+                    //}
+                    H2GOpenPopupBox({
+                        header: "ลบรายการ",
+                        detail: "ต้องการจะลบ " + $(this).closest("div.row").find(".ext-number").H2GValue() + " ใช่หรือไม่?",
+                        isAlert: false,
+                        confirmFunction: function () {
+                            if ($("#divCardNumber .row[extID=NEW]").length>0) {
+                                $("#divCardNumber .row[extID=NEW]").remove();
+                            } else {
+                                $("#divCardNumber .row[extID=" + $(this).closest("div.row").find(".ext-number").H2GValue() + "]").hide().H2GAttr("refID", "D#" + $(this).closest("div.row").H2GAttr("refID"));
+                            }
+                            $("#txtCardNumber").focus();
                         }
-                        $("#txtCardNumber").focus();
-                    }
+                    });
                 },
                 addComment: function (args) {
                     if ($("#txtCommentDateTo").H2GValue() != "" && $(this).H2GValue() != "") {
@@ -303,7 +316,7 @@
                                                                 $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
                                                             }
                                                         },
-                                                    }).H2GDatebox().prop('readonly', true);
+                                                    }).H2GDatebox();
                                                     $(rowRecord).append($(rowReward).children());
                                                     $('#divDonateRecord').H2GAttr("rewardList", $('#divDonateRecord').H2GAttr("rewardList") + "," + er.ID + ",");
                                                 }
@@ -1187,10 +1200,10 @@
     <div id="regisTabBox" class="row">
         <div id="infoTab">
             <ul>
-                <li><a href="#historyPane" style="">แฟ้มประวัติ</a></li>
-                <li><a href="#todayPane" style="">12 ก.ย. 2559</a></li>
-                <li id="labPaneTab"><a href="#labPane" style="">ข้อมูล LAB</a></li>
-                <li><a href="#ProductionPane" style="">ข้อมูล PRODUCTION</a></li>
+                <li><a href="#historyPane" style="">1) แฟ้มประวัติ</a></li>
+                <li><a href="#todayPane" style="">2) 12 ก.ย. 2559</a></li>
+                <li id="labPaneTab"><a href="#labPane" style="">3) ข้อมูล LAB</a></li>
+                <li><a href="#ProductionPane" style="">4) ข้อมูล PRODUCTION</a></li>
             </ul>
             <div id="historyPane">
                 <div class="border-box">
@@ -1257,9 +1270,9 @@
                     <div class="col-md-36">
                         <div id="infoTabToday">
                             <ul>
-                                <li><a href="#subHistoryPane" style="">ข้อมูลทั่วไป</a></li>
-                                <li><a href="#synthesis" style="" id="synthesisLink">Synthesis</a></li>
-                                <li><a href="#subInterview" style="">คัดกรอง</a></li>
+                                <li><a href="#subHistoryPane" style="">2.1) ข้อมูลทั่วไป</a></li>
+                                <li><a href="#synthesis" style="" id="synthesisLink">2.2) Synthesis</a></li>
+                                <li><a href="#subInterview" style="">2.3) คัดกรอง</a></li>
                             </ul>
                             <div id="subHistoryPane">
                                 <div class="border-box">
@@ -1335,7 +1348,7 @@
                                                         <div class="col-md-3"></div>
                                                         <div class="col-md-5">เบอร์มือถือ 1</div>
                                                         <div class="col-md-12">
-                                                            <input id="txtMobile1" type="text" class="form-control required" maxlength="10" tabindex="1" />
+                                                            <input id="txtMobile1" type="text" class="form-control" maxlength="10" tabindex="2" />
                                                         </div>
                                                         <div class="col-md-5" style="padding-left: 5px;">Email</div>
                                                         <div class="col-md-11">
@@ -1543,7 +1556,7 @@
                                                             <span>อัตราชีพจร</span>
                                                         </div>
                                                         <div class="col-md-5 text-right">
-                                                            <input id="txtHeartRate" type="text" class="form-control required text-right" maxlength="3" />
+                                                            <input id="txtHeartRate" type="text" class="form-control text-right text-uppercase" maxlength="3" />
                                                         </div>
                                                     </div>
                                                     <div class="row">
@@ -1593,7 +1606,7 @@
                                                             <span>Hb</span>
                                                         </div>
                                                         <div class="col-md-4 text-right">
-                                                            <input id="txtHb" type="text" class="form-control text-center required" />
+                                                            <input id="txtHb" type="text" class="form-control text-center required" maxlength="4" />
                                                         </div>
                                                         <div class="col-md-2 text-center">
                                                             <span>Plt</span>
@@ -2011,9 +2024,9 @@
                 <div class="border-box">
                     <div id="labTab">
                         <ul>
-                            <li><a href="#historicalFile" style="">Historical File</a></li>
-                            <li><a href="#immunohaemtologyFile" id="immunohaemtology-tab" style="">Immunohematology File</a></li>
-                            <li><a href="#exams" id="exams-tab" style="">Exams</a></li>
+                            <li><a href="#historicalFile" style="">3.1) Historical File</a></li>
+                            <li><a href="#immunohaemtologyFile" id="immunohaemtology-tab" style="">3.2) Immunohematology File</a></li>
+                            <li><a href="#exams" id="exams-tab" style="">3.3) Exams</a></li>
                         </ul>
                         <div id="historicalFile">
                             <div class="border-box">
@@ -2313,17 +2326,25 @@
                 <div class="popheader row" style="padding: 5px 0px;">
                     <div class="popupheader col-md-33">ทำการสแกนบาร์โค้ด</div>
                     <div class="col-md-3 text-center" style="float:right;">
-                        <a class="icon"><span class="glyphicon glyphicon-remove" aria-hidden="true" title="close" onclick="$('#btnSave').prop('disabled', false); return closePopup();"></span></a>
+                        <%--<a class="icon"><span class="glyphicon glyphicon-remove" aria-hidden="true" title="close" onclick="$('#btnSave').prop('disabled', false); return closePopup();"></span></a>--%>
                     </div>
                 </div>
                 <div class="popupbody" style="width:300px;">
                     <div class="row">
                         <div class="col-md-10"><span>รหัสผู้บริจาค</span></div>
-                        <div class="col-md-26"><input id="txtScanDonorNumber" type="text" class="form-control required" /></div>
+                        <div class="col-md-26"><input id="txtScanDonorNumber" type="text" class="form-control required" maxlength="10" /></div>
                     </div>
                     <div class="row">
                         <div class="col-md-10"><span>Sample No</span></div>
-                        <div class="col-md-26"><input id="txtScanSampleNumber" type="text" class="form-control required" /></div>
+                        <div class="col-md-26"><input id="txtScanSampleNumber" type="text" class="form-control required" maxlength="11" /></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-24 text-right">
+                            <input type="button" value="ตกลง" class="btn btn-block btn-success" onclick="return checkKeySample($('#txtScanSampleNumber'));" />
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <input type="button" value="ยกเลิก" class="btn btn-block" onclick="return closePopup();" />
+                        </div>
                     </div>
                 </div>
                 <div class="popfooter" style="text-align: right;">

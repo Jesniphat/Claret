@@ -51,17 +51,15 @@ Public Class donorAction
     Private Sub saveDonor()
         Dim DonorItem As DonorItem = JSON.Deserialize(Of DonorItem)(_REQUEST("md"))
         If String.IsNullOrEmpty(DonorItem.ID) Then
-            DonorItem.DonorNumber = Me.getRunningNumber("DONORID", DonorItem.AssociationID)
+            DonorItem.DonorNumber = getRunningNumber("DONORID", DonorItem.AssociationID)
             DonorItem.ID = Cbase.QueryField(H2G.nextVal("DONOR"))
             DonorItem.VisitNumber = Cbase.QueryField("select nvl(max(visit_number),0)+1 from donation_visit where donor_id = " & DonorItem.ID & " ")
             Cbase.Execute("SQL::donor/InsertMasterDonor", DonorItem.WithCollection(DonorItem))
-
         Else
             If H2G.Convert(Of Boolean)(DonorItem.notOnlyDonor) Then
                 DonorItem.VisitNumber = Cbase.QueryField("select nvl(max(visit_number),0)+1 from donation_visit where donor_id = " & DonorItem.ID & " ")
             End If
             Cbase.Execute("SQL::donor/UpdateMasterDonor", DonorItem.WithCollection(DonorItem))
-
         End If
 
         '### donation visit
@@ -334,8 +332,8 @@ Public Class donorAction
         '### RecordItem
         DonorMainItem.DonationRecord = New List(Of DonationRecordItem)
         For Each dRow As DataRow In Cbase.QueryTable("
-                        select dr.id as record_id, DR.DONATION_FROM, DR.DONATION_DATE, DR.DONATION_NUMBER
-                        , to_char(DR.DONATION_DATE, 'DD MON YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as DONATION_DATE_TEXT 
+                        select dr.id as record_id, DR.DONATION_FROM, nvl(DR.DONATION_DATE,sysdate) as DONATION_DATE, DR.DONATION_NUMBER
+                        , to_char(nvl(DR.DONATION_DATE,sysdate), 'DD MON YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as DONATION_DATE_TEXT 
                         from donation_record dr 
                         where DR.DONOR_ID = :id order by DR.DONATION_NUMBER ", param).Rows
             Dim drItem As New DonationRecordItem

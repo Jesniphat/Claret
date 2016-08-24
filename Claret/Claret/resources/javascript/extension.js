@@ -98,6 +98,7 @@ $.extend($.fn, {
         var config = {
             defaultSelect: "",
         };
+        $.extend(config, setting);
         var dclass = "";
         if ($(this).attr("class") != undefined) {
             dclass = $(this).attr("class");
@@ -136,7 +137,7 @@ $.extend($.fn, {
             timeStamp.Check("added " + data.length + " items of " + config.data.action);
 
             $(self).setDropdownList().selecter("update");
-            if (config.defaultSelect != "") { $(self).val(config.defaultSelect).change(); }
+            if (config.defaultSelect != "") { $(self).H2GValue(config.defaultSelect); }
             if (config.enable) { $(self).H2GEnable(); } else { $(self).H2GDisable(); }
             timeStamp.Stop("stop success of " + config.data.action);
         }
@@ -188,17 +189,14 @@ $.extend($.fn, {
             if (config.tempData) { $(self).data("data-ddl", data); }
 
             $(self).html('');
-            //$.each((data), function (index, e) {
-            //    $("<option>", {}).H2GFill(e).appendTo(self);
-            //});
             for (i = 0; i < data.length; i++) {
                 $("<option>", {}).H2GFill(data[i]).appendTo(self);
             }
             timeStamp.Check("added " + data.length + " items of " + config.data.action);
-            $(self).H2GValue(config.defaultSelect).combobox({
+            $(self).combobox({
                 select: config.selectItem,
-            });
-            $(self).parent().find("span").find("input").val($(self).find(":selected").text());
+            }).H2GValue(config.defaultSelect);
+            //$(self).parent().find("span").find("input").val($(self).find(":selected").text());
             if (config.enable) { $(self).H2GEnable(); } else { $(self).H2GDisable(); }
             timeStamp.Stop("stop success of " + config.data.action);
         }
@@ -250,33 +248,33 @@ $.extend($.fn, {
             onEnterKey: function () { },
         };
         $.extend(config, setting);
-        $(this).bind("keydown", function (e) {
-            if (e.which == 13) {
-                $(this).datepicker("hide");
-                config.onEnterKey();
-                e.preventDefault();
-                return false;
-            }
-        }).datepicker({
-            numberOfMonths: config.month,
-            maxDate: config.maxDate,
-            minDate: config.minDate,
-            dateFormat: config.format,
-            constrainInput: true,
-            changeMonth: config.changeMonth,
-            changeYear: config.changeYear,
-            showButtonPanel: config.showButtonPanel,
-            yearOffSet: 543,
-            monthNames: ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถนายน",
-            	"กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤษจิกายน", "ธันวาคม"], 
-            monthNamesShort: ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."], 
-            dayNames: ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"], 
-            dayNamesShort: ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."], 
-            dayNamesMin: ["อ", "จ", "อ", "พ", "พ", "ศ", "ส"], 
-            yearRange: config.yearRange,
-            onSelect: config.onSelect,
-            onClose: config.onClose,
-        });
+        //$(this).bind("keydown", function (e) {
+        //    if (e.which == 13) {
+        //        $(this).datepicker("hide");
+        //        config.onEnterKey();
+        //        e.preventDefault();
+        //        return false;
+        //    }
+        //}).datepicker({
+        //    numberOfMonths: config.month,
+        //    maxDate: config.maxDate,
+        //    minDate: config.minDate,
+        //    dateFormat: config.format,
+        //    constrainInput: true,
+        //    changeMonth: config.changeMonth,
+        //    changeYear: config.changeYear,
+        //    showButtonPanel: config.showButtonPanel,
+        //    yearOffSet: 543,
+        //    monthNames: ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถนายน",
+        //    	"กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤษจิกายน", "ธันวาคม"], 
+        //    monthNamesShort: ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."], 
+        //    dayNames: ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"], 
+        //    dayNamesShort: ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."], 
+        //    dayNamesMin: ["อ", "จ", "อ", "พ", "พ", "ศ", "ส"], 
+        //    yearRange: config.yearRange,
+        //    onSelect: config.onSelect,
+        //    onClose: config.onClose,
+        //});
         return this;
     },
     toggleSlide: function (setting) {
@@ -310,8 +308,13 @@ $.extend($.fn, {
                     }
                     break;
                 case 'SELECT':
-                    if (typeof (value) == 'number') $(this).prop('selectedIndex', value); else $(this).val(value);
-                    $(this).change();
+                    if ($(this).H2GAttr("combobox") == "Y") {
+                        $(this).combobox("setvalue", value)
+                    } else {
+                        //if (typeof (value) == 'number') $(this).prop('selectedIndex', value); else $(this).val(value);
+                        $(this).val(value);
+                        $(this).change();
+                    }
                     break;
                 case 'OPTION':
                     $(this).val(value);
@@ -431,29 +434,48 @@ $.extend($.fn, {
         });
         return this;
     },
-    H2GDatebox: function (pattern,focusOutFun) {
+    H2GDatebox: function (setting) {
         // Can't use date below 01-01-1900
+        var config = {
+            pattern: "dd/MM/yyyy",
+            allowPastDate: true,
+            allowFutureDate: true,
+            lockDate: formatDate(H2G.today(), "dd/MM/yyyy"),
+            focusOut: function () { },
+        };
+        $.extend(config, setting);
+
         $(this).data('error', false);
-        if (typeof (pattern) === 'undefined') pattern = "dd/MM/yyyy";
+        if (typeof (config.pattern) === 'undefined') config.pattern = "dd/MM/yyyy";
         $(this).attr('maxlength', '10').css({ 'text-align': 'center' });
         $(this).keypress(function (e) {
             var keyCode = e.keyCode || e.which;
             var OtherKey = ((e.ctrlKey && keyCode != 86) || e.altKey || keyCode == 8 || keyCode == 9 || keyCode == 46);
-            var DateKey = (keyCode >= 48 && keyCode <= 57) || String.fromCharCode(keyCode) === '-';// || (e.keyCode>=96 && e.keyCode<=105); // (Number in Keyboard) || (Numpad)
-            if (!DateKey && !OtherKey) { return false; } //else { if ($(this).MBOSValue() === "") { $(this).css('color', _TXTCOLOR).val(''); } }
+            var DateKey = (keyCode >= 48 && keyCode <= 57) || String.fromCharCode(keyCode) === '-';
+            if (!DateKey && !OtherKey) { return false; } 
         });
         $(this).focusout(function (e) {
             if ($(this).H2GValue() !== "") {
                 $(this).val($(this).val().replace(/\W+/g, ''));
                 $(this).next().remove();
-                if (isDate($(this).val(), pattern.replace(/\W+/g, ''))) {
-                    var isValue = new Date(getDateFromFormat($(this).val(), pattern.replace(/\W+/g, '')));
-                    $(this).val(formatDate(isValue, pattern));
+                if (isDate($(this).val(), config.pattern.replace(/\W+/g, ''))) {
+                    //// ตรวจสอบวันที่ห้ามมากหรือห้ามน้อยกว่าวันปัจจุบัน
+                    if (!config.allowPastDate && formatDate(new Date(getDateFromFormat($(this).val(), config.pattern.replace(/\W+/g, ''))),'yyyyMMdd') < formatDate(new Date(getDateFromFormat(config.lockDate.replace(/\W+/g, ''), config.pattern.replace(/\W+/g, ''))),'yyyyMMdd')) {
+                        $(this).focus();
+                        notiWarning("วันที่ต้องไม่น้อยกว่าวันปัจจุบัน");
+                    }
+                    if (!config.allowFutureDate && formatDate(new Date(getDateFromFormat($(this).val(), config.pattern.replace(/\W+/g, ''))), 'yyyyMMdd') > formatDate(new Date(getDateFromFormat(config.lockDate.replace(/\W+/g, ''), config.pattern.replace(/\W+/g, ''))), 'yyyyMMdd')) {
+                        $(this).focus();
+                        notiWarning("วันที่ต้องไม่มากกว่าวันปัจจุบัน");
+                    }
+
+                    var isValue = new Date(getDateFromFormat($(this).val(), config.pattern.replace(/\W+/g, '')));
+                    $(this).val(formatDate(isValue, config.pattern));
                 } else if ($.trim($(this).val()) !== "") {
                     $(this).focus();
                     notiWarning("วันที่ไม่ถูกต้องกรุณาตรวจสอบ");
                 }
-                if (focusOutFun != undefined) { focusOutFun(); }
+                config.focusOut();
             }
         });
 
@@ -466,10 +488,17 @@ $.extend($.fn, {
     },
     enterKey: function (fnc) {
         return this.each(function () {
-            $(this).keypress(function (ev) {
+            //$(this).keypress(function (ev) {
+            //    var keycode = (ev.keyCode ? ev.keyCode : ev.which);
+            //    if (keycode == '13') {
+            //        fnc.call(this, ev);
+            //    }
+            //})
+            $(this).keydown(function (ev) {
                 var keycode = (ev.keyCode ? ev.keyCode : ev.which);
-                if (keycode == '13') {
+                if (keycode == '9') {
                     fnc.call(this, ev);
+                    ev.preventDefault();
                 }
             })
         })
@@ -526,14 +555,16 @@ $.extend($.fn, {
                 $(this).focus();
                 break;
             case 'SELECT':
-                if ($(this).H2GAttr("combobox") == undefined) {
-                    $(this).selecter("disable");
+                if ($(this).H2GAttr("combobox") == "Y") {
+                    $(this).closest("div").find("input").focus();
+                } else if ($(this).hasClass("selecter-element")) {
+                    $(this).closest("div").focus();
                 } else {
-                    $(this).combobox("disable");
+                    $(this).focus();
                 }
                 break;
             default:
-                $(this).prop('disabled', true);
+                $(this).focus();
                 break;
         }
         return this;
@@ -578,6 +609,39 @@ function showNoti(value, type) {
             }, 3000);
         });
     }
+}
+function H2GOpenPopupBox(setting) {
+    var config = {
+        header: "กรุณาตรวจสอบ",
+        detail: "",
+        container: $("#divAlertContainer"),
+        confirmFunction: function () { return closePopup(); },
+        cancelFunction: function () { return closePopup(); },
+        isAlert: true,
+    };
+    $.extend(config, setting);
+    $(config.container).find("#popupheader").H2GValue(config.header);
+    $(config.container).find("#spWarning").H2GValue(config.detail);
+    if (config.isAlert) {
+        $(config.container).find("input.btn-success").bind("click", function () { config.confirmFunction() }).closest("div").removeClass("col-md-offset-24").addClass("col-md-offset-30");
+        $(config.container).find("input.btn-cancel").closest("div").hide()
+    } else {
+        $(config.container).find("input.btn-success").bind("click", function () { config.confirmFunction() }).closest("div").removeClass("col-md-offset-30").addClass("col-md-offset-24");
+        $(config.container).find("input.btn-cancel").closest("div").show()
+    }
+    if ($("#divFrame").is(":visible")) {
+        $("#" + $("#divContent").H2GAttr("containerID")).append($("#divContent").children());
+    }
+    $('html').css("overflow-y", "hidden");
+    $("#divFrame").css({ height: $(window).height(), width: $(window).width() }).fadeIn();
+    $("#divBG").css({ height: $(document).height(), width: $(document).width() }).fadeIn();
+    $("#divContent").append($(config.container).children()).H2GFill({ containerID: $(config.container).H2GAttr("id") });
+    setWorkDesk();
+}
+function H2GClosePopupBox() {
+    $("#divFrame").fadeOut();
+    $("#divBG").fadeOut();
+    $("#" + $("#divContent").H2GAttr("containerID")).append($("#divContent").children());
 }
 
 //### Paging 

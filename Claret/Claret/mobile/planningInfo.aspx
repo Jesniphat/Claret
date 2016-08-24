@@ -15,7 +15,7 @@
                 //$("#txtRegion").focus());
             });
 
-            $("#txtPlanDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().prop('readonly', true).setCalendar({
+            $("#txtPlanDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
                 // maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+0",

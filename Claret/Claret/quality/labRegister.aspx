@@ -18,7 +18,7 @@
             $("#txtHospital").focus().enterKey(function () { $("#ddlHospital").val($("#txtHospital").val().toUpperCase()).change(); });
             $("#txtDepartment").enterKey(function () { $("#ddlDepartment").val($("#txtDepartment").val().toUpperCase()).change(); });
             $("#txtLab").enterKey(function () { $("#ddlLab").val($("#txtLab").val().toUpperCase()).change(); });
-            $("#txtDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().prop('readonly', true).setCalendar({
+            $("#txtDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+0",
@@ -161,7 +161,7 @@
                 },
             });
 
-            $("#dateList").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().prop('readonly', true).setCalendar({
+            $("#dateList").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
                 // maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+0",
