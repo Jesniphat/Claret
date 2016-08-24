@@ -50,6 +50,8 @@ Public Class donateAction
                 Call getCurrentTime()
             Case "updatedonationnumber"
                 Call updatedonationnumber()
+            Case "canceldonate"
+                Call canceldonate()
 
         End Select
 
@@ -804,6 +806,49 @@ Public Class donateAction
             JSONResponse.setItems("{""current"" : """ & Now & """}")
             Response.Write(JSONResponse.ToJSON())
         Catch ex As Exception
+            Response.Write(New CallbackException(ex).ToJSON())
+        End Try
+    End Sub
+
+    Private Sub canceldonate()
+        Try
+            Dim donorid As String = _REQUEST("donor_id")
+            Dim visitid As String = _REQUEST("visit_id")
+            Dim status As String = _REQUEST("status")
+            Dim cutnumber As String = _REQUEST("cutnumber")
+            Dim staffid As String = _REQUEST("staff_id")
+
+            Dim sample_number As String = ""
+            Dim donor_number As String = ""
+
+            Dim sql As String = "SELECT DV.ID, DV.DONOR_ID, DV.SAMPLE_NUMBER, D.DONOR_NUMBER  
+                                 FROM DONATION_VISIT DV LEFT JOIN DONOR D ON DV.DONOR_ID = D.ID 
+                                 WHERE DV.ID = '" & visitid & "' AND DV.DONOR_ID = '" & donorid & "'"
+            Dim dt As DataTable = Cbase.QueryTable(sql)
+            For Each dr As DataRow In dt.Rows
+                sample_number = dr("SAMPLE_NUMBER").ToString
+                donor_number = dr("DONOR_NUMBER").ToString
+            Next
+
+            Dim cancel As String = "UPDATE DONATION_VISIT SET STATUS = 'CANCEL' WHERE ID = '" & visitid & "' AND DONOR_ID = '" & donorid & "' " &
+                                   "AND STATUS = '" & status & "' "
+            Cbase.Execute(cancel)
+
+            Dim DonateTimes = Cbase.QueryField("SELECT NVL(DONATE_NUMBER,0) AS DN FROM DONOR WHERE ID = '" & donorid & "' ")
+            If DonateTimes > 0 And cutnumber = "yes" Then
+                Cbase.Execute("update donor Set donate_number = NVL(donate_number,0) - 1 where id = '" & donorid & "'")
+                Cbase.Execute("update DONATION_RECORD Set DONATION_NUMBER = NVL(DONATION_NUMBER,0) - 1 WHERE DONATION_VISIT_ID = '" & visitid & "' AND DONOR_ID = '" & donorid & "' ")
+            End If
+
+            Dim logId As String = Cbase.QueryField(H2G.nextVal("LOG_HISTORY"))
+            Dim insert As String = "INSERT INTO LOG_HISTORY (ID, DONOR_ID, VISIT_ID, SAMPLE_NUMBER, DONOR_NUMBER, STATUS, CREATE_DATE, CREATE_STAFF)
+                                    VALUES ('" & logId & "', '" & donorid & "', '" & visitid & "', '" & sample_number & "', '" & donor_number & "', '" & status & "', SYSDATE, '" & staffid & "')"
+            Cbase.Execute(insert)
+            Cbase.Apply()
+            JSONResponse.setItems("{""LogId"" : """ & logId & """}")
+            Response.Write(JSONResponse.ToJSON())
+        Catch ex As Exception
+            Cbase.Rollback()
             Response.Write(New CallbackException(ex).ToJSON())
         End Try
     End Sub

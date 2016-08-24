@@ -1,6 +1,7 @@
 ﻿console.log("Donate Script")
 ///////////////////////////////////////////////////////////////////// Variable  ///////////////////////////////////////////////////////
-
+var cancelDonorId = "";
+var cancelVisitId = "";
 
 ///////////////////////////////////////////////////////////////////// Function  //////////////////////////////////////////////////////
 
@@ -144,4 +145,62 @@ function getDonateApplyList() {
 
     deferred.resolve("Ok");
     return deferred.promise();
+}
+
+function cancelDonateWaitCollection(donorId, visitId) {
+    var param = {
+        action: "canceldonate",
+        donor_id: donorId,
+        visit_id: visitId,
+        status: "WAIT COLLECTION",
+        staff_id: $("#data").attr("staffid"),
+        cutnumber: "no"
+    }
+    $.ajax({
+        url: '../../ajaxAction/donateAction.aspx',
+        data: H2G.ajaxData(param).config,
+        type: "POST",
+        dataType: "json",
+        error: function (xhr, s, err) {
+            console.log(s, err);
+        },
+        success: function (data) {
+            if (!data.onError) {
+                data.getItems = jQuery.parseJSON(data.getItems);
+                console.log(data.getItems);
+                donateSearch(false);
+            } else {
+                console.log("Error = ", data.exMessage);
+            }
+        }
+    });
+}
+
+function cancelDonateWaitResult(donorId, visitId) {
+    var param = {
+        action: "canceldonate",
+        donor_id: donorId,
+        visit_id: visitId,
+        status: "WAIT RESULT",
+        staff_id: $("#data").attr("staffid"),
+        cutnumber: "yes"
+    }
+    $.ajax({
+        url: '../../ajaxAction/donateAction.aspx',
+        data: H2G.ajaxData(param).config,
+        type: "POST",
+        dataType: "json",
+        error: function (xhr, s, err) {
+            console.log(s, err);
+        },
+        success: function (data) {
+            if (!data.onError) {
+                data.getItems = jQuery.parseJSON(data.getItems);
+                console.log(data.getItems);
+                postQueueSearch(false);
+            } else {
+                console.log("Error = ", data.exMessage);
+            }
+        }
+    });
 }

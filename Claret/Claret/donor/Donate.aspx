@@ -11,6 +11,36 @@
             getDonateBagTypeList();
             getDonateApplyList();
 
+            $("#confirmCancelDonateWaitCallection").dialog({
+                autoOpen: false,
+                buttons: {
+                    OK: function () {
+                        cancelDonateWaitCollection(cancelDonorId, cancelVisitId);
+                        $(this).dialog("close");
+                    },
+                    CANCEL: function () {
+                        // clareData();
+                        $(this).dialog("close");
+                    }
+                },
+                title: "Warning"
+            });
+
+            $("#confirmCancelDonateWaitResult").dialog({
+                autoOpen: false,
+                buttons: {
+                    OK: function () {
+                        cancelDonateWaitResult(cancelDonorId, cancelVisitId);
+                        $(this).dialog("close");
+                    },
+                    CANCEL: function () {
+                        // clareData();
+                        $(this).dialog("close");
+                    }
+                },
+                title: "Warning"
+            });
+
             $("#donateStatus").setDropdownList();
             $("#donateDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
                 maxDate: "0",
@@ -96,6 +126,20 @@
                     //$("#data").H2GFill({ donorID: $(this).closest("tr").H2GAttr("donorID"), visitID: $(this).closest("tr").H2GAttr("refID") });
                     //$('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "register.aspx", method: "post", staffaction: "register" }).submit();
                 },
+                queueSelectCancel: function () {
+                    console.log("Cancel = ", $(this).closest("tr").H2GAttr("donorID"), " = ", $(this).closest("tr").H2GAttr("refID"));
+                    cancelDonorId = $(this).closest("tr").H2GAttr("donorID");
+                    cancelVisitId = $(this).closest("tr").H2GAttr("refID");
+                    // cancelDonateWaitCollection($(this).closest("tr").H2GAttr("donorID"), $(this).closest("tr").H2GAttr("refID"));
+                    $("#confirmCancelDonateWaitCallection").dialog("open");
+                },
+                postQueueSelectCancel: function () {
+                    console.log("Cancel WaitResult = ", $(this).closest("tr").H2GAttr("donorID"), " = ", $(this).closest("tr").H2GAttr("refID"));
+                    cancelDonorId = $(this).closest("tr").H2GAttr("donorID");
+                    cancelVisitId = $(this).closest("tr").H2GAttr("refID");
+                    // cancelDonateWaitResult($(this).closest("tr").H2GAttr("donorID"), $(this).closest("tr").H2GAttr("refID"));
+                    $("#confirmCancelDonateWaitResult").dialog("open");
+                }
             });
         })
         function postQueueSearch(newSearch) {
@@ -342,7 +386,7 @@
                                                 </th>
                                                 <th class="col-md-4"><button sortOrder="SAMPLE_NUMBER">Sample No.</button>
                                                 </th>
-                                                <th class="col-md-6"><button>หมายเหตุ</button>
+                                                <th class="col-md-5"><button>หมายเหตุ</button>
                                                 </th>
                                                 <th class="col-md-4" colspan="2"><button>ลงทะเบียน</button>
                                                 </th>
@@ -352,7 +396,7 @@
                                                 </th>
                                                 <th class="col-md-4" colspan="2"><button>Lab</button>
                                                 </th>
-                                                <th class="col-md-1"></th>
+                                                <th class="col-md-2"></th>
                                             </tr>
                                             <tr class="no-transaction" style="display:none;"><td align="center" colspan="13">No transaction</td></tr>
                                             <tr class="more-loading" style="display:none;"><td align="center" colspan="13">Loading detail...</td></tr>
@@ -381,8 +425,9 @@
                                                 </td>
                                                 <td class="td-lab-time col-md-2 text-center" style="background-color: #E5E0EC;">
                                                 </td>
-                                                <td class="col-md-1">
+                                                <td class="col-md-2">
                                                     <div>
+                                                        <a class="icon"><span class="glyphicon glyphicon-remove" aria-hidden="true" onclick="return $(this).queueSelectCancel();"></span></a>
                                                         <a class="icon"><span class="glyphicon glyphicon-arrow-right" aria-hidden="true" onclick="return $(this).queueSelect();"></span></a>
                                                     </div>
                                                 </td>
@@ -505,7 +550,7 @@
                                             </th>
                                             <th class="col-md-4"><button sortOrder="SAMPLE_NUMBER">Sample No.</button>
                                             </th>
-                                            <th class="col-md-6"><button>หมายเหตุ</button>
+                                            <th class="col-md-5"><button>หมายเหตุ</button>
                                             </th>
                                             <th class="col-md-4" colspan="2"><button>ลงทะเบียน</button>
                                             </th>
@@ -515,7 +560,7 @@
                                             </th>
                                             <th class="col-md-4" colspan="2"><button>Lab</button>
                                             </th>
-                                            <th class="col-md-1"></th>
+                                            <th class="col-md-2"></th>
                                         </tr>
                                         <tr class="no-transaction" style="display:none;"><td align="center" colspan="13">ไม่พบข้อมูล</td></tr>
                                         <tr class="more-loading" style="display:none;"><td align="center" colspan="13">Loading detail...</td></tr>
@@ -547,8 +592,9 @@
                                             </td>
                                             <td class="td-lab-time col-md-2 text-center" style="background-color: #E5E0EC;">
                                             </td>
-                                            <td class="col-md-1">
+                                            <td class="col-md-2">
                                                 <div>
+                                                    <a class="icon"><span class="glyphicon glyphicon-remove" aria-hidden="true" onclick="return $(this).postQueueSelectCancel();"></span></a>
                                                     <a class="icon"><span class="glyphicon glyphicon-arrow-right" aria-hidden="true" onclick="return $(this).postQueueSelect();"></span></a>
                                                 </div>
                                             </td>
@@ -573,4 +619,7 @@
             </div>
         </div>
     </div>
+
+    <div id="confirmCancelDonateWaitCallection" title="">ต้องการยกเลิกรายการบริจาคนี้ใช่หรือไม่</div>
+    <div id="confirmCancelDonateWaitResult" title="">ต้องการยกเลิกรายการบริจาคนี้ใช่หรือไม่</div>
 </asp:Content>
