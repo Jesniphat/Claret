@@ -41,6 +41,7 @@ Public Class donorAction
             Case "checkvisited" : checkVisited()
             Case "stickerprint" : StrickerPrint()
             Case "checksamplenumber" : checkSampleNumber()
+            Case "checkextcardnumber" : checkExtCardNumber()
             Case Else
                 Dim exMsg As String = IIf(String.IsNullOrEmpty(_REQUEST("action")), "", _REQUEST("action"))
                 Throw New Exception("Not found action [" & exMsg & "].", New Exception("Please check your action name"))
@@ -261,6 +262,7 @@ Public Class donorAction
 
         If String.IsNullOrEmpty(_REQUEST("receipthospitalid")) Then
             param.Add(":visit_id", DbType.Int64, _REQUEST("visit_id"))
+            param.Add(":plan_id", DbType.Int64, H2G.Login.PlanID)
             sqlMain = "SQL::donor\SelectMasterDonorVisit"
             For Each dRow As DataRow In Cbase.QueryTable(sqlMain, param).Rows
                 DonorMainItem.Donor = DTransaction.WithItems(New DTransaction, dRow)
@@ -819,7 +821,7 @@ Public Class donorAction
         If Not String.IsNullOrEmpty(_REQUEST("surname")) Then param.Add("#SURNAME", " and (UPPER(dn.surname) like UPPER('" & _REQUEST("surname") & "') or UPPER(dn.surname_e) like UPPER('" & _REQUEST("surname") & "')) ")
         If Not String.IsNullOrEmpty(_REQUEST("birthday")) Then param.Add("#BIRTHDAY", "and to_char(dn.birthday, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("birthday") & "' ")
         If Not String.IsNullOrEmpty(_REQUEST("bloodgroup")) Then param.Add("#BLOOD_GROUP", " and UPPER(rg.description) like UPPER('" & _REQUEST("bloodgroup") & "') ")
-        If Not String.IsNullOrEmpty(_REQUEST("samplenumber")) Then param.Add("#BLOOD_GROUP", " and UPPER(rg.description) like UPPER('" & _REQUEST("bloodgroup") & "') ")
+        If Not String.IsNullOrEmpty(_REQUEST("samplenumber")) Then param.Add("#SAMPLE_NUMBER", " and UPPER(DV.SAMPLE_NUMBER) like UPPER('" & _REQUEST("samplenumber") & "') ")
 
         If Not String.IsNullOrEmpty(_REQUEST("reportdate")) Then
             param.Add("#REPORT_DATE", "and to_char(nvl(dv.VISIT_DATE,dv.CREATE_DATE), 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("reportdate") & "' ")
@@ -1108,7 +1110,8 @@ Public Class donorAction
         Dim sql As String = "select nvl(dv.queue_number,0) as visit_count, dor.id, dor.Name, dor.Surname 
                             , to_char(VISIT_DATE, 'HH24,MI') as visit_time
                             from donor dor
-                            left join donation_visit dv on DV.donor_id = dor.id and to_char(dv.visit_date,'dd/MM/yyyy') = '" & H2G.Login.PlanDate & "'
+                            left join donation_visit dv on DV.donor_id = dor.id 
+                                and to_char(dv.visit_date,'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') = '" & H2G.Login.PlanDate & "'
                             where rownum = 1 /*#ID*/ /*#NAME*/ /*#SURNAME*/ /*#BIRTHDAY*/ 
                             order by queue_number desc "
 
@@ -1144,6 +1147,10 @@ Public Class donorAction
         End If
         Dim age As Integer = H2G.calAge(H2G.BE2AC(H2G.Convert(Of DateTime)(_REQUEST("birthday"))))
         If age < minAge OrElse age > maxAge Then strAgeCheck = "ผู้บริจาคมีอายุ " & age & " ปี ไม่อยู่ในเกณฑ์อายุ " & minAge & "-" & maxAge & " ปี กรุณาตรวจสอบ"
+
+        If (strAgeCheck = "" And strReturnID = "") Then
+            If age > 55 Then strAgeCheck = "ผู้บริจาคมีอายุ " & age & " ปี ไม่อยู่ในเกณฑ์อายุ " & minAge & "-" & maxAge & " ปี กรุณาตรวจสอบ"
+        End If
 
         JSONResponse.setItems("{""Duplicate"" : """ & strReturn & """, ""DonorID"" : """ & strReturnID & """, ""AgeCheck"":""" & strAgeCheck & """ }")
 
@@ -1216,23 +1223,23 @@ Public Class donorAction
             strSet = "[{" & """Point_de_collecte"":""" & dRow("collection_point_code").ToString() & """," _
                     & """Date"":""" & dateNow.ToString("dd MMMM yyyy") & """," _
                     & """Heure"":""" & dateNow.ToString("HH") & "h" & dateNow.ToString("mm") & """," _
-                    & """Numero Donneur"":""" & dRow("donor_number").ToString() & """," _
+                    & """Numero_Donneur"":""" & dRow("donor_number").ToString() & """," _
                     & """Sexe"":""" & dRow("title").ToString() & """," _
                     & """Nom"":""" & dRow("name").ToString() & """," _
-                    & """Nom Marital"":""" & """," _
-                    & """Date de Naissance"":""" & dRow("birthday").ToString() & """," _
+                    & """Nom_Marital"":""" & """," _
+                    & """Date_de_Naissance"":""" & dRow("birthday").ToString() & """," _
                     & """Prénom"":""" & dRow("surname").ToString() & """," _
                     & """Adresse"":""" & dRow("total_address").ToString() & """," _
-                    & """Code Postal"":""" & dRow("zipcode").ToString() & """," _
+                    & """Code_Postal"":""" & dRow("zipcode").ToString() & """," _
                     & """Ville"":""" & """," _
-                    & """Code Routage"":""" & """," _
+                    & """Code_Routage"":""" & """," _
                     & """Région"":""" & """," _
                     & """Département"":""" & """," _
-                    & """Communauté Urbaine"":""" & """," _
-                    & """Téléphone Domicile"":""" & """," _
-                    & """Téléphone Bureau"":""" & """," _
+                    & """Communauté_Urbaine"":""" & """," _
+                    & """Téléphone_Domicile"":""" & """," _
+                    & """Téléphone_Bureau"":""" & """," _
                     & """Poste"":""" & """," _
-                    & """Groupe Sanguin"":""" & dRow("rh_group").ToString() & """," _
+                    & """Groupe_Sanguin"":""" & dRow("rh_group").ToString() & """," _
                     & """Phénotype"":""" & """," _
                     & """Médecin_traitant"":""" & """," _
                     & """Secrétaire"":""Dhanakoses, Preawnet" & """," _
@@ -1249,59 +1256,59 @@ Public Class donorAction
                     & """Date_dernier_don"":""" & """," _
                     & """Type_dernier_don"":""Whole blood, CPD-A1 TB-450" & """," _
                     & """TA_dernier_don"":""" & """," _
-                    & """Numero Donneur code 128"":""" & dRow("donor_number").ToString() & """," _
-                    & """Histo dons 1"":""" & """," _
-                    & """Histo dons 2"":""" & """," _
-                    & """Histo dons 3"":""" & """," _
-                    & """Histo dons 4"":""" & """," _
-                    & """Histo dons 5"":""" & """," _
-                    & """Histo dons 6"":""" & """," _
-                    & """Histo dons 7"":""" & """," _
-                    & """Histo dons 8"":""" & """," _
-                    & """Histo dons 9"":""" & """," _
-                    & """Histo dons 10"":""" & """," _
-                    & """Code Pays Naiss"":""" & """," _
-                    & """Nom Pays Naiss"":""" & """," _
-                    & """Code Depart Naiss"":""" & """," _
-                    & """Nom Depart Naiss"":""" & """," _
-                    & """Ville Naiss"":""TEST" & """," _
-                    & """Nom Pere"":""Preawnet" & """," _
-                    & """Nom Mere"":""Dhanakoses" & """," _
-                    & """Code Genre"":""" & dRow("gender").ToString() & """," _
-                    & """Nom Genre"":""" & dRow("full_gender").ToString() & """," _
-                    & """Adresse Compl"":""" & dRow("address").ToString() & """," _
-                    & """Identifiant 1"":""1101400167938" & """," _
-                    & """Identifiant 2"":""901070904" & """," _
-                    & """Cplt Code 0"":""" & """," _
-                    & """Cplt Nom Code 0"":""" & """," _
-                    & """Cplt Code 1"":""" & """," _
-                    & """Cplt Nom Code 1"":""" & """," _
-                    & """Cplt Code 2"":""" & """," _
-                    & """Cplt Nom Code 2"":""" & """," _
-                    & """Cplt Code 3"":""" & """," _
-                    & """Cplt Nom Code 3"":""" & """," _
-                    & """Cplt Code 4"":""" & """," _
-                    & """Cplt Nom Code 4"":""" & """," _
-                    & """Cplt Code 5"":""" & """," _
-                    & """Cplt Nom Code 5"":""" & """," _
-                    & """Cplt Code 6"":""" & """," _
-                    & """Cplt Nom Code 6"":""" & """," _
-                    & """Cplt Code 7"":""" & """," _
-                    & """Cplt Nom Code 7"":""" & """," _
-                    & """Cplt Code 8"":""" & """," _
-                    & """Cplt Nom Code 8"":""" & """," _
-                    & """Cplt Code 9"":""" & """," _
-                    & """Cplt Nom Code 9"":""" & """," _
-                    & """Cplt Valeur 0"":""" & """," _
-                    & """Cplt Valeur 1"":""" & """," _
-                    & """Cplt Valeur 2"":""" & """," _
-                    & """Cplt Valeur 3"":""" & """," _
-                    & """Cplt Valeur 4"":""" & """," _
-                    & """Cplt Valeur 5"":""" & """," _
-                    & """Cplt Valeur 6"":""" & """," _
-                    & """Cplt Valeur 7"":""" & """," _
-                    & """Cplt Valeur 8"":""" & """," _
-                    & """Cplt Valeur 9"":""" & """," _
+                    & """Numero_Donneur_code_128"":""" & dRow("donor_number").ToString() & """," _
+                    & """Histo_dons_1"":""" & """," _
+                    & """Histo_dons_2"":""" & """," _
+                    & """Histo_dons_3"":""" & """," _
+                    & """Histo_dons_4"":""" & """," _
+                    & """Histo_dons_5"":""" & """," _
+                    & """Histo_dons_6"":""" & """," _
+                    & """Histo_dons_7"":""" & """," _
+                    & """Histo_dons_8"":""" & """," _
+                    & """Histo_dons_9"":""" & """," _
+                    & """Histo_dons_10"":""" & """," _
+                    & """Code_Pays_Naiss"":""" & """," _
+                    & """Nom_Pays_Naiss"":""" & """," _
+                    & """Code_Depart_Naiss"":""" & """," _
+                    & """Nom_Depart_Naiss"":""" & """," _
+                    & """Ville_Naiss"":""TEST" & """," _
+                    & """Nom_Pere"":""Preawnet" & """," _
+                    & """Nom_Mere"":""Dhanakoses" & """," _
+                    & """Code_Genre"":""" & dRow("gender").ToString() & """," _
+                    & """Nom_Genre"":""" & dRow("full_gender").ToString() & """," _
+                    & """Adresse_Compl"":""" & dRow("address").ToString() & """," _
+                    & """Identifiant_1"":""1101400167938" & """," _
+                    & """Identifiant_2"":""901070904" & """," _
+                    & """Cplt_Code_0"":""" & """," _
+                    & """Cplt_Nom_Code 0"":""" & """," _
+                    & """Cplt_Code_1"":""" & """," _
+                    & """Cplt_Nom_Code 1"":""" & """," _
+                    & """Cplt_Code_2"":""" & """," _
+                    & """Cplt_Nom_Code 2"":""" & """," _
+                    & """Cplt_Code_3"":""" & """," _
+                    & """Cplt_Nom_Code 3"":""" & """," _
+                    & """Cplt_Code_4"":""" & """," _
+                    & """Cplt_Nom_Code 4"":""" & """," _
+                    & """Cplt_Code_5"":""" & """," _
+                    & """Cplt_Nom_Code 5"":""" & """," _
+                    & """Cplt_Code_6"":""" & """," _
+                    & """Cplt_Nom_Code 6"":""" & """," _
+                    & """Cplt_Code_7"":""" & """," _
+                    & """Cplt_Nom_Code 7"":""" & """," _
+                    & """Cplt_Code_8"":""" & """," _
+                    & """Cplt_Nom_Code 8"":""" & """," _
+                    & """Cplt_Code_9"":""" & """," _
+                    & """Cplt_Nom_Code 9"":""" & """," _
+                    & """Cplt_Valeur_0"":""" & """," _
+                    & """Cplt_Valeur_1"":""" & """," _
+                    & """Cplt_Valeur_2"":""" & """," _
+                    & """Cplt_Valeur_3"":""" & """," _
+                    & """Cplt_Valeur_4"":""" & """," _
+                    & """Cplt_Valeur_5"":""" & """," _
+                    & """Cplt_Valeur_6"":""" & """," _
+                    & """Cplt_Valeur_7"":""" & """," _
+                    & """Cplt_Valeur_8"":""" & """," _
+                    & """Cplt_Valeur_9"":""" & """," _
                     & """AGD"":""" & dRow("terminal_blood").ToString() & """," _
                     & """DATED"":""" & dRow("donation_date").ToString() & """," _
                     & """GR"":""" & dRow("blood_group").ToString() & """," _
@@ -1310,8 +1317,14 @@ Public Class donorAction
                     & """TITLE"":""" & dRow("title").ToString() & """," _
                     & """TITRE"":""" & dRow("title").ToString() & """}]"
         Next
-        JSONResponse.exTitle = "create set"
-        JSONResponse.exMessage = strSet
+        Dim mailResponse As New H2G.OBJResponse
+        mailResponse = H2G.GenMailMerge("DONOR_CARD", strSet)
+
+        If mailResponse.FileName = "ERROR" Then
+            Throw New Exception("ระบบมีปัญหาไม่สามารถพิมพ์สติ๊กเกอร์ได้")
+        End If
+
+        JSONResponse.setItems("{""printstatus"" : ""success""}")
     End Sub
 
     Private Sub checkSampleNumber()
@@ -1321,6 +1334,22 @@ Public Class donorAction
                              select sample_number from donation_hospital where sample_number <> '" & sampleNumber & "'"
         Dim ResultData As String = Cbase.QueryField(sql, "")
         JSONResponse.setItems("{""samplenumber"" : """ & ResultData & """}")
+    End Sub
+
+    Private Sub checkExtCardNumber()
+        Dim donorExternalID As String = IIf(_REQUEST("donor_external_id") = "NEW", "", _REQUEST("donor_external_id"))
+        Dim sql As String = "select dor.name || ' ' || dor.surname as name, ec.description, dex.id
+                            from donor dor 
+                            inner join donor_external_card dex on dex.donor_id = dor.id
+                            inner join external_card ec on ec.id = dex.external_card_id
+                            where DEX.card_number = '" & _REQUEST("nation_number") & "' and dex.external_card_id = '" & _REQUEST("external_id") & "'
+                            and dex.id <> '" & donorExternalID & "' "
+        Dim ResultData As String = ""
+        Dim dt As DataTable = Cbase.QueryTable(sql)
+        For Each dRow As DataRow In dt.Rows
+            ResultData = dRow("description").ToString() & " หมายเลข " & _REQUEST("nation_number") & " ถูกใช้ไปแล้ว โดยคุณ " & dRow("name").ToString()
+        Next
+        JSONResponse.setItems("{""name"" : """ & ResultData & """}")
     End Sub
 
 End Class

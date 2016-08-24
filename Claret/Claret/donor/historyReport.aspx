@@ -17,7 +17,7 @@
                     $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "register.aspx", method: "post", staffaction: "register" }).submit();
                 },
             });
-            $("#txtReportDate").H2GDatebox().setCalendar({
+            $("#txtReportDate").blur(function () { infoSearch(true); }).H2GDatebox({ allowFutureDate: false }).setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-30:c+0",
@@ -28,7 +28,7 @@
             $("#txtQueue").H2GNumberbox();
             //$("#txtName").H2GNamebox(37);
             //$("#txtSurname").H2GNamebox(37);
-            $("#txtBirthday").H2GDatebox().setCalendar({
+            $("#txtBirthday").H2GDatebox({ allowFutureDate: false }).setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+0",
@@ -36,23 +36,27 @@
                     $("#txtBloodGroup").focus();
                 },
             });
-            $("#divInfoCriteria input").enterKey(function () {
-                infoSearch(true);
-                return false;
+            $("#divInfoCriteria input.mandatory").blur(function () {
+                if ($(this).H2GValue() != "") {
+                    infoSearch(true);
+                    return false;
+                }
             });
             $("#spSearch").click(function () {
                 infoSearch(true);
-            });
+            }).enterKey(function () { infoSearch(true); return false; });
             $("#spClear").click(function () {
                 $("#divInfoCriteria input").H2GValue('');
                 $("#txtQueue").focus();
                 infoSearch(true);
             });
 
+            $("#ddlBloodGroup").setAutoList();
+            $("#ddlPostBloodGroup").setAutoList();
             $("#txtPostQueue").H2GNumberbox();
             //$("#txtPostName").H2GNamebox(37);
             //$("#txtPostSurname").H2GNamebox(37);
-            $("#txtPostBirthday").H2GDatebox().setCalendar({
+            $("#txtPostBirthday").H2GDatebox({ allowFutureDate: false }).setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+0",
@@ -60,20 +64,22 @@
                     $("#txtPostBloodGroup").focus();
                 },
             });
-            $("#divPostCriteria input").enterKey(function () {
-                postQueueSearch(true);
-                return false;
+            $("#divPostCriteria input.mandatory").blur(function () {
+                if ($(this).H2GValue() != "") {
+                    postQueueSearch(true);
+                    return false;
+                }
             });
             $("#spPostSearch").click(function () {
                 postQueueSearch(true);
-            });
+            }).enterKey(function () { postQueueSearch(true); return false; });
             $("#spPostClear").click(function () {
                 $("#divPostCriteria input").H2GValue('');
                 $("#txtPostQueue").focus();
                 postQueueSearch(true);
             });
             
-            $("#ddlStatus").setDropdownList();
+            $("#ddlStatus").setAutoList({ selectItem: function () { infoSearch(true); }, }).H2GValue("ALL");
 
             $("#searchTab").tabs({
                 active: 0,
@@ -95,28 +101,22 @@
                 $("#txtReportDate").H2GValue($("#data").H2GAttr("plan_date"));
                 $(".claret-page-header span").H2GValue("คัดกรอง");
                 $(".collection-page-header").show();
-                $("#ddlDonationType").setDropdownListValue({
+                $("#ddlDonationType").setAutoListValue({
                     url: '../../ajaxAction/masterAction.aspx',
                     data: { action: 'donationtype' },
                     defaultSelect: $("#data").H2GAttr("donationTypeID"),
-                }).on('change', function () {
-                    $("#ddlBag").closest("div").focus();
                 });
-                $("#ddlBag").setDropdownListValue({
+                $("#ddlBag").setAutoListValue({
                     url: '../../ajaxAction/masterAction.aspx',
                     data: { action: 'bag' },
                     defaultSelect: $("#data").H2GAttr("bagID"),
-                }).on('change', function () {
-                    $("#ddlDonationTo").closest("div").focus();
                 });
-                $("#ddlDonationTo").setDropdownListValue({
+                $("#ddlDonationTo").setAutoListValue({
                     url: '../../ajaxAction/masterAction.aspx',
                     data: { action: 'donationto' },
                     defaultSelect: $("#data").H2GAttr("donationToID"),
-                }).on('change', function () {
-                    $("#txtPostQueue").focus();
                 });
-                $("#ddlStatus").H2GValue("WAIT INTERVIEW").change().H2GDisable();
+                $("#ddlStatus").H2GDisable();
                 $("#txtReportDate").H2GDisable();
                 $("#ddlDonationType").closest("div").focus();
                 $("#liSearch > a").H2GValue("คัดกรอง");
@@ -142,10 +142,10 @@
                         , name: $("#txtName").H2GValue()
                         , surname: $("#txtSurname").H2GValue()
                         , birthday: $("#txtBirthday").H2GValue()
-                        , bloodgroup: $("#txtBloodGroup").H2GValue()
+                        , bloodgroup: $("#ddlBloodGroup").H2GValue()
                         , samplenumber: $("#txtSample").H2GValue()
                         , reportdate: $("#txtReportDate").H2GValue()
-                        , status: $("#ddlStatus").H2GValue()
+                        , status: $("#ddlStatus").H2GValue() == "ALL" ? "" : $("#ddlStatus").H2GValue()
                         , p: $("#tbInfo").attr("currentPage") || 1
                         , so: $("#tbInfo").attr("sortOrder") || "queue_number"
                         , sd: $("#tbInfo").attr("sortDirection") || "desc"
@@ -223,10 +223,10 @@
                         , name: $("#txtPostName").H2GValue()
                         , surname: $("#txtPostSurname").H2GValue()
                         , birthday: $("#txtPostBirthday").H2GValue()
-                        , bloodgroup: $("#txtPostBloodGroup").H2GValue()
+                        , bloodgroup: $("#ddlPostBloodGroup").H2GValue()
                         , samplenumber: $("#txtPostSample").H2GValue()
                         , reportdate: $("#data").H2GAttr("plan_date") //formatDate(H2G.today(), "dd/MM/yyyy") //$("#txtReportDate").H2GValue()
-                        , status: "WAIT COLLECTION"
+                        , status: ""
                         , receipthospitalid: $("#data").H2GAttr("receiptHospitalID")
                         , p: $("#tbPostQueue").attr("currentPage") || 1
                         , so: $("#tbPostQueue").attr("sortOrder") || "queue_number"
@@ -317,24 +317,24 @@
                                 <div class="col-md-4 text-right">
                                     <span>ประเภทการบริจาค</span>
                                 </div>                                                        
-                                <div class="col-md-7">
-                                    <select id="ddlDonationType" class="text-left" style="width:100%;">
+                                <div class="col-md-8">
+                                    <select id="ddlDonationType" class="text-left" style="width:250px;">
                                         <option value="0">Loading...</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3 text-right">
                                     <span>ประเภทถุง</span>
                                 </div>                                                        
-                                <div class="col-md-7">
-                                    <select id="ddlBag" class="text-left" style="width:100%;">
+                                <div class="col-md-8">
+                                    <select id="ddlBag" class="text-left" style="width:250px;">
                                         <option value="0">Loading...</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4 text-right">
                                     <span>การนำไปใช้งาน</span>
                                 </div>                                                        
-                                <div class="col-md-7">
-                                    <select id="ddlDonationTo" class="text-left" style="width:100%;">
+                                <div class="col-md-8">
+                                    <select id="ddlDonationTo" class="text-left" style="width:250px;">
                                         <option value="0">Loading...</option>
                                     </select>
                                 </div>
@@ -354,13 +354,13 @@
                                     <span>สถานะ</span>
                                 </div>
                                 <div class="col-md-5">
-                                    <select id="ddlStatus">
-                                        <option value="" selected="selected">ALL</option>
-                                        <option>WAIT INTERVIEW</option>
-                                        <option>WAIT COLLECTION</option>
-                                        <option>WAIT RESULT</option>
-                                        <option>FINISH</option>
-                                        <option>CANCEL</option>
+                                    <select id="ddlStatus" style="width:210px;">
+                                        <option value="ALL" selected="selected">ALL</option>
+                                        <option value="WAIT INTERVIEW">WAIT INTERVIEW</option>
+                                        <option value="WAIT COLLECTION">WAIT COLLECTION</option>
+                                        <option value="WAIT RESULT">WAIT RESULT</option>
+                                        <option value="FINISH">FINISH</option>
+                                        <option value="CANCEL">CANCEL</option>
                                     </select>
                                 </div>
                             </div>
@@ -421,14 +421,30 @@
                                         <input id="txtBirthday" class="form-control text-center" type="text" />
                                     </div>
                                     <div class="col-md-3">
-                                        <input id="txtBloodGroup" class="form-control text-center" type="text" />
+                                        <select id="ddlBloodGroup" style="width:90px;">
+                                            <option>A</option>
+                                            <option>A-</option>
+                                            <option>A+</option>
+                                            <option>AB</option>
+                                            <option>AB-</option>
+                                            <option>AB+</option>
+                                            <option>B</option>
+                                            <option>B-</option>
+                                            <option>B+</option>
+                                            <option>O</option>
+                                            <option>O-</option>
+                                            <option>O+</option>
+                                        </select>
                                     </div>
                                     <div class="col-md-3">
                                         <input id="txtSample" class="form-control" type="text" />
                                     </div>
                                     <div class="col-md-2 text-center">
-                                        <a title="ลบข้อมูลที่กรอก"><span id="spClear" class="glyphicon glyphicon-remove"></span></a>
-                                        <a title="ค้นหา"><span id="spSearch" class="glyphicon glyphicon-search"></span></a>
+                                        <button id="spClear" class="btn btn-icon" onclick="return false;" style="padding: 0;" tabindex="-1">
+                                            <i class="glyphicon glyphicon-remove" style="vertical-align: text-top;"></i>
+                                        </button><button id="spSearch" class="btn btn-icon" onclick="return false;" style="padding: 0;">
+                                            <i class="glyphicon glyphicon-search" style="vertical-align: text-top;"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -588,14 +604,30 @@
                                 <input id="txtPostBirthday" class="form-control text-center" type="text" />
                             </div>
                             <div class="col-md-3">
-                                <input id="txtPostBloodGroup" class="form-control text-center" type="text" />
+                                <select id="ddlPostBloodGroup" style="width:90px;">
+                                    <option>A</option>
+                                    <option>A-</option>
+                                    <option>A+</option>
+                                    <option>AB</option>
+                                    <option>AB-</option>
+                                    <option>AB+</option>
+                                    <option>B</option>
+                                    <option>B-</option>
+                                    <option>B+</option>
+                                    <option>O</option>
+                                    <option>O-</option>
+                                    <option>O+</option>
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <input id="txtPostSample" class="form-control" type="text" />
                             </div>
                             <div class="col-md-2 text-center">
-                                <a title="ลบข้อมูลที่กรอก"><span id="spPostClear" class="glyphicon glyphicon-remove"></span></a>
-                                <a title="ค้นหา"><span id="spPostSearch" class="glyphicon glyphicon-search"></span></a>
+                                <button id="spPostClear" class="btn btn-icon" onclick="return false;" style="padding: 0;" tabindex="-1">
+                                    <i class="glyphicon glyphicon-remove" style="vertical-align: text-top;"></i>
+                                </button><button id="spPostSearch" class="btn btn-icon" onclick="return false;" style="padding: 0;">
+                                    <i class="glyphicon glyphicon-search" style="vertical-align: text-top;"></i>
+                                </button>
                             </div>
                         </div>
                     </div>

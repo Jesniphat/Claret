@@ -4,7 +4,7 @@
     //$("#txtDonorSurName").H2GNamebox();
     $("#txtDonorNameEng").H2GDisable();//.H2GNamebox()
     $("#txtDonorSurNameEng").H2GDisable();//.H2GNamebox()
-    $("#ddlVisit").setDropdownList();
+    $("#ddlVisit").setAutoList({ selectItem: function () { $(this).changeQuestLanguage(); }, }).H2GValue("ACTIVE");
     $("#togDeferal").toggleSlide();
     $("#togVisitInfo").toggleSlide();
     $("#txtStmRegisDate").setCalendar().H2GDatebox();
@@ -20,10 +20,10 @@
     $("#immunohaemtology-tab").click(setImmunohaemtologyFile);
 
     //### Tab คัดกรอง
-    $("#ddlQuestLanguage").setDropdownList();
-    $("#ddlDeferralType").setDropdownList();
-    $("#ddlITVResult").setDropdownList();
-    $("#ddlHbTest").setDropdownList();
+    $("#ddlQuestLanguage").setAutoList({ selectItem: function () { $(this).changeQuestLanguage(); }, }).H2GValue("English");
+    $("#ddlDeferralType").setAutoList();
+    $("#ddlITVResult").setAutoList();
+    $("#ddlHbTest").setAutoList();
     $("#txtWeight").H2GNumberbox();
     $("#txtHeartRate").H2GNumberbox();
     $("#txtPresureMin").H2GNumberbox();
@@ -32,15 +32,16 @@
     $("#txtHeartLung").H2GEnglishbox();
     $("#txtHb").H2GNumberbox();
 
-    $("#txtDefDateTo").H2GDatebox().setCalendar({
+    $("#txtDefDateTo").H2GDatebox({ allowPastDate: false }).setCalendar({
         maxDate: "+100y",
         minDate: new Date(),
         yearRange: "c50:c+50",
         onSelect: function (selectedDate, objDate) { $("#txtDefRemarks").H2GFocus(); },
     });
+    $("#txtMobile1").blur(function () { $(this).checkPhoneNumber(); });
 }
 function donorSelectDDL() {
-    if ($("#ddlTitleName option").length > 1) { $("#ddlTitleName").H2GValue($("#ddlTitleName").H2GAttr("selectItem")).change(); } else {
+    if ($("#ddlTitleName option").length > 1) { $("#ddlTitleName").H2GValue($("#ddlTitleName").H2GAttr("selectItem")); } else {
         $("#ddlTitleName").setAutoListValue({
             url: '../../ajaxAction/masterAction.aspx',
             data: { action: 'titlename', gender: $("#rbtM").is(':checked') == true ? "M" : "F" },
@@ -49,7 +50,7 @@ function donorSelectDDL() {
             $("#txtDonorName").H2GFocus();
         });
     }
-    if ($("#ddlCountry option").length > 1) { $("#ddlCountry").H2GValue($("#ddlCountry").H2GAttr("selectItem")).change(); } else {
+    if ($("#ddlCountry option").length > 1) { $("#ddlCountry").H2GValue($("#ddlCountry").H2GAttr("selectItem")); } else {
         $("#ddlCountry").setAutoListValue({
             url: '../../ajaxAction/masterAction.aspx',
             data: { action: 'country' },
@@ -58,7 +59,7 @@ function donorSelectDDL() {
             $("#txtMobile1").H2GFocus();
         });
     }
-    if ($("#ddlOccupation option").length > 1) { $("#ddlOccupation").H2GValue($("#ddlOccupation").H2GAttr("selectItem")).change(); } else {
+    if ($("#ddlOccupation option").length > 1) { $("#ddlOccupation").H2GValue($("#ddlOccupation").H2GAttr("selectItem")); } else {
         $("#ddlOccupation").setAutoListValue({
             url: '../../ajaxAction/masterAction.aspx',
             data: { action: 'occupation' },
@@ -67,7 +68,7 @@ function donorSelectDDL() {
             $("#ddlNationality").closest("div").H2GFocus();
         });
     }
-    if ($("#ddlNationality option").length > 1) { $("#ddlNationality").H2GValue($("#ddlNationality").H2GAttr("selectItem")).change(); } else {
+    if ($("#ddlNationality option").length > 1) { $("#ddlNationality").H2GValue($("#ddlNationality").H2GAttr("selectItem")); } else {
         $("#ddlNationality").setAutoListValue({
             url: '../../ajaxAction/masterAction.aspx',
             data: { action: 'nationality' },
@@ -76,32 +77,26 @@ function donorSelectDDL() {
             $("#ddlRace").closest("div").H2GFocus();
         });
     }
-    if ($("#ddlRace option").length > 1) { $("#ddlRace").H2GValue($("#ddlRace").H2GAttr("selectItem")).change(); } else {
+    if ($("#ddlRace option").length > 1) { $("#ddlRace").H2GValue($("#ddlRace").H2GAttr("selectItem")); } else {
         $("#ddlRace").setAutoListValue({
             url: '../../ajaxAction/masterAction.aspx',
             data: { action: 'nationality' },
             defaultSelect: $("#ddlRace").H2GAttr("selectItem") || "1",
-        }).on('autocompleteselect', function () {
-            $("#txtAddress").H2GFocus();
         });
     }
-    if ($("#ddlAssociation option").length > 1) { $("#ddlAssociation").H2GValue($("#ddlAssociation").H2GAttr("selectItem")).change().H2GDisable(); } else {
+    if ($("#ddlAssociation option").length > 1) { $("#ddlAssociation").H2GValue($("#ddlAssociation").H2GAttr("selectItem")).H2GDisable(); } else {
         $("#ddlAssociation").setAutoListValue({
             url: '../../ajaxAction/masterAction.aspx',
             data: { action: 'association' },
             defaultSelect: $("#ddlAssociation").H2GAttr("selectItem"),
             enable: ($("#ddlAssociation").H2GAttr("selectItem") == "" || $("#ddlAssociation").H2GAttr("selectItem") == undefined) ? true : false,
-        }).on('autocompleteselect', function () {
-            $("#txtOuterDonate").H2GFocus();
         });
     }
-    if ($("#ddlCollectionPoint option").length > 1) { $("#ddlCollectionPoint").H2GValue($("#ddlCollectionPoint").H2GAttr("selectItem")).change(); } else {
+    if ($("#ddlCollectionPoint option").length > 1) { $("#ddlCollectionPoint").H2GValue($("#ddlCollectionPoint").H2GAttr("selectItem")); } else {
         $("#ddlCollectionPoint").setAutoListValue({
             url: '../../ajaxAction/masterAction.aspx',
             data: { action: 'forcollection', siteID: $("#spRegisNumber").H2GAttr("siteID") || $("#data").H2GAttr("siteID") },
             defaultSelect: $("#ddlCollectionPoint").H2GAttr("selectItem") || $("#data").H2GAttr("collectionpointid"),
-        }).on('autocompleteselect', function () {
-            //$("#txtOuterDonate").H2GFocus();
         });
     }
 }
@@ -113,9 +108,14 @@ function checkBeforSave() {
         if (ageWarning == "") {
             preSaveDonor();
         } else {
-            $("#popupheader").H2GValue("กรุณาตรวจสอบ");
-            $("#spAgeWarning").H2GValue(ageWarning);
-            openPopup($("#divAgeContainer"));
+            //$("#popupheader").H2GValue("กรุณาตรวจสอบ");
+            //$("#spAgeWarning").H2GValue(ageWarning);
+            //openPopup($("#divAgeContainer"));
+            H2GOpenPopupBox({
+                header: "กรุณาตรวจสอบ",
+                detail: ageWarning,
+                confirmFunction: function () { $('#btnSave').prop('disabled', false); }
+            });
         }
     } else {
         $("#btnSave").prop("disabled", false);
@@ -133,14 +133,6 @@ function preSaveDonor() {
                 $("#divContent").find("#txtScanSampleNumber").H2GFocus();
             }
         });
-        //    .on("blur", function () {
-        //    if ($("#divContent").find("#txtScanDonorNumber").H2GValue() != $("#spRegisNumber").H2GValue()) {
-        //        notiWarning("รหัสผู้บริจาคไม่ถูกต้อง กรุณาตรวจสอบ");
-        //        $("#divContent").find("#txtScanDonorNumber").H2GValue("").H2GFocus();
-        //    }
-        //});
-        //$("#divContent").find("#txtScanSampleNumber").enterKey(function () { checkKeySample($(this)); });
-        //$("#divContent").find("input.btn-success").enterKey(function () { checkKeySample($(this)); });
         $("#spRegisNumber").H2GAttr("backToSearch", "Y");
     } else {
         $("#spRegisNumber").H2GRemoveAttr("backToSearch");
@@ -409,7 +401,7 @@ function validation() {
         $("#txtCardNumber").H2GFocus();
         notiWarning("กรุณากรอกข้อมูลบัตรผู้บริจาคอย่างน้อย 1 ใบ");
         return false;
-    } else if ($('#ddlTitleName').H2GValue() == null) {
+    } else if ($('#ddlTitleName').H2GValue() == "") {
         $("#ddlTitleName").closest("div").find("input").H2GFocus();
         notiWarning("กรุณาเลือกคำนำหน้าชื่อผู้บริจาค");
         return false;
@@ -433,11 +425,11 @@ function validation() {
         $("#txtBirthday").H2GFocus();
         notiWarning("กรุณากรอกวันเกิดผู้บริจาค");
         return false;
-    } else if ($('#ddlOccupation').H2GValue() == null) {
+    } else if ($('#ddlOccupation').H2GValue() == "") {
         $("#ddlOccupation").closest("div").find("input").H2GFocus();
         notiWarning("กรุณาเลือกอาชีพผู้บริจาค");
         return false;
-    } else if ($('#ddlNationality').H2GValue() == null) {
+    } else if ($('#ddlNationality').H2GValue() == "") {
         $("#ddlNationality").closest("div").find("input").H2GFocus();
         notiWarning("กรุณาเลือกสัญชาติผู้บริจาค");
         return false;
@@ -466,7 +458,7 @@ function validation() {
         $("#txtZipcode").H2GFocus();
         notiWarning("กรุณากรอกรหัสไปรษณีย์ผู้บริจาค");
         return false;
-    } else if ($('#ddlCountry').H2GValue() == null) {
+    } else if ($('#ddlCountry').H2GValue() == "") {
         $("#infoTabToday").tabs("option", "active", [0]);
         $("#ddlCountry").closest("div").find("input").H2GFocus();
         notiWarning("กรุณาเลือกประเทศผู้บริจาค");
@@ -481,7 +473,7 @@ function validation() {
         $("#txtEmail").H2GFocus();
         notiWarning("กรุณากรอกอีเมลให้ถูกต้อง");
         return false;
-    } else if ($('#ddlAssociation').H2GValue() == null) {
+    } else if ($('#ddlAssociation').H2GValue() == "") {
         $("#infoTabToday").tabs("option", "active", [0]);
         $("#ddlAssociation").closest("div").find("input").H2GFocus();
         notiWarning("กรุณากรอกรหัสเชื่อมโยงโรงพยาบาลในเครือ");
@@ -683,7 +675,7 @@ function showDonorData() {
                     var spExtCard = $("#divCardNumberTemp").children().clone();
                     $(spExtCard).H2GFill({ refID: e.ID, donorID: e.DonorID, extID: e.ExternalCardID, cardNumber: e.CardNumber }).find(".ext-number").H2GValue(e.CardName + " : " + e.CardNumber);
                     $('#divCardNumber').append(spExtCard);
-                    if (e.ExternalCardID == "3") { $('#txtCardNumber').H2GValue(e.CardNumber) }
+                    //if (e.ExternalCardID == "3") { $('#txtCardNumber').H2GValue(e.CardNumber) }
                 });
 
                 //### Deferral
@@ -763,7 +755,7 @@ function showDonorData() {
                                                         + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
                                                 }
                                             },
-                                        }).H2GDatebox().H2GValue(rewardInfo[3]);
+                                        }).H2GDatebox({ allowFutureDate: false }).H2GValue(rewardInfo[3]);
                                     }
                                     $(spRecord).append($(rowReward).children());
                                     $('#divDonateRecord').H2GAttr("rewardList", rewardList + "," + rewardInfo[0] + ",")
@@ -800,9 +792,15 @@ function showDonorData() {
                         $.each((preset), function (indexs, es) {
                             $("<option>", { value: es, text: es }).appendTo(selectPreset);
                         });
-                        $(selectPreset).setDropdownList().H2GValue(e.Answer).change().on('change', function () {
+                        //$(selectPreset).setDropdownList().H2GValue(e.Answer).change().on('change', function () {
+                        //    //ให้เอาคำตอบไปหาคำถามต่อไป
+                        //    selectNextQuestion($(this).closest("tr").H2GAttr("questID"), $(this).H2GValue());
+                        //});
+                        $(selectPreset).setAutoList({
                             //ให้เอาคำตอบไปหาคำถามต่อไป
-                            selectNextQuestion($(this).closest("tr").H2GAttr("questID"), $(this).H2GValue());
+                            selectItem: function () {
+                                selectNextQuestion($(this).closest("tr").H2GAttr("questID"), $(this).H2GValue());
+                            }
                         });
                     } else {
                         $(dataRow).find(".td-answer input").show().H2GValue(e.Answer);
@@ -835,6 +833,9 @@ function showDonorData() {
                     
                     $(dataRow).find('.td-description').append(er.Desc).H2GAttr("title", er.Desc);
                     $(dataRow).find('.td-enddate').append('วันที่สิ้นสุด ' + formatDate(new Date(getDateFromFormat(er.EndDate, 'dd/mm/yyyy')), "dd NNN yyyy")).H2GAttr("title", 'วันที่สิ้นสุด ' + formatDate(new Date(getDateFromFormat(er.EndDate, 'dd/mm/yyyy')), "dd NNN yyyy"));
+                    if (er.QuestionID != "") {
+                        $(dataRow).find('.glyphicon-remove').closest("a").hide();
+                    }
                     $("#tbDefInterview > tbody").append(dataRow);
                 });
 
@@ -853,6 +854,9 @@ function showDonorData() {
                         questID: e.question_id,
                     });
                     $(dataRow).find('.td-exam').append(e.examination_code + ' : ' + e.examination_desc).H2GAttr("title", e.examination_code + ' : ' + e.examination_desc);
+                    if (er.question_id != "") {
+                        $(dataRow).find('.glyphicon-remove').closest("a").hide();
+                    }
                     $("#tbExam > tbody").append(dataRow);
                 });
                 

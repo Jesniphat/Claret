@@ -5,20 +5,20 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title>Login</title>
-    <link href="/resources/css/bootstrap.css?ver=20160201" rel="stylesheet" />
-    <link href="/resources/css/bootflat.css?ver=20160201" rel="stylesheet" />
-    <link href="/resources/css/claret-font-icon.css?ver=20160201" rel="stylesheet" />
-    <link href="/resources/css/jquery.fs.selecter.css?ver=20160201" rel="stylesheet" />
-    <link href="/resources/jquery-ui/jquery-ui.css?ver=20160201" rel="stylesheet" />
-    <link href="/resources/css/custom.css?ver=20160201" rel="stylesheet" />
+    <link href="/resources/css/bootstrap.css?ver=20160203" rel="stylesheet" />
+    <link href="/resources/css/bootflat.css?ver=20160203" rel="stylesheet" />
+    <link href="/resources/css/claret-font-icon.css?ver=20160203" rel="stylesheet" />
+    <link href="/resources/css/jquery.fs.selecter.css?ver=20160203" rel="stylesheet" />
+    <link href="/resources/jquery-ui/jquery-ui.css?ver=20160203" rel="stylesheet" />
+    <link href="/resources/css/custom.css?ver=20160203" rel="stylesheet" />
     <link href="/resources/css/table-excel.css" rel="stylesheet" />
     <link href="/resources/css/bootstrap-select.css" rel="stylesheet" />
     <script src="../resources/jquery/jquery.js" type="text/javascript"></script>
     <script src="../resources/jquery-ui/jquery-ui.js" type="text/javascript"></script>
-    <script src="../resources/javascript/jquery-date.js?ver=20160201" type="text/javascript"></script>
-    <script src="../resources/jquery/bootstrap.js?ver=20160201" type="text/javascript"></script>
+    <script src="../resources/javascript/jquery-date.js?ver=20160203" type="text/javascript"></script>
+    <script src="../resources/jquery/bootstrap.js?ver=20160203" type="text/javascript"></script>
     <script src="../resources/jquery/jquery.fs.selecter.js" type="text/javascript"></script>
-    <script src="../resources/javascript/extension.js?ver=20160201" type="text/javascript"></script>
+    <script src="../resources/javascript/extension.js?ver=20160203" type="text/javascript"></script>
     <script src="../resources/javascript/bootstrap-select.js" type="text/javascript"></script>
     <style>
         .box-Info {
@@ -295,7 +295,7 @@
                         <span>ชื่อผู้ใช้งาน</span>
                     </div>
                     <div class="col-md-24">
-                        <input id="txtUser" type="text" class="form-control required" placeholder="ชื่อผู้ใช้งาน" />
+                        <input id="txtUser" type="text" class="form-control required" placeholder="ชื่อผู้ใช้งาน" autocomplete="off" />
                     </div>
                 </div>
                 <div class="row">
@@ -311,7 +311,7 @@
                         <span>ภาค</span>
                     </div>
                     <div class="col-md-6" style="text-align:right;padding-right: 0;">
-                        <input id="txtRegion" type="text" class="form-control required" placeholder="ภาค" />
+                        <input id="txtRegion" type="text" class="form-control required" placeholder="ภาค" autocomplete="off" />
                     </div>
                     <div class="col-md-18" style="padding-left: 5px;">
                         <select id="ddlRegion" class="required text-left" style="width:100%;" tabindex="-1">
@@ -324,7 +324,7 @@
                         <span>หน่วยงาน</span>
                     </div>
                     <div class="col-md-6" style="text-align:right;padding-right: 0;">
-                        <input id="txtDepartment" type="text" class="form-control required" placeholder="หน่วยงาน" />
+                        <input id="txtDepartment" type="text" class="form-control required" placeholder="หน่วยงาน" autocomplete="off" />
                     </div>
                     <div class="col-md-18" style="padding-left: 5px;">
                         <select id="ddlDepartment" class="required text-left" style="width:100%;" tabindex="-1">

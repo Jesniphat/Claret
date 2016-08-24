@@ -1,6 +1,7 @@
 ﻿Imports System.IO
 Imports Microsoft.Office.Interop
 Imports Newtonsoft.Json
+Imports System.Net
 
 Partial Public Class H2G
     'Inherits UI.Page
@@ -33,36 +34,36 @@ Partial Public Class H2G
 
             Dim sTemplateFileName As String = _Name & ".doc"
 
-            'Dim moApp As New Word.Application()
+            Dim moApp As New Word.Application()
             Dim sDocFileName As String = ""
-            'If IsNothing(moApp) = False Then
-            '    moApp.Visible = False
+            If IsNothing(moApp) = False Then
+                moApp.Visible = False
 
-            '    For Each row As DataRow In dttable.Rows
-            '        moApp.Documents.Open(System.IO.Path.Combine(_PathDes, sTemplateFileName))
-            '        sDocFileName = _Name & ".pdf"
-            '        Dim intCount As Integer = 0
+                For Each row As DataRow In dttable.Rows
+                    moApp.Documents.Open(System.IO.Path.Combine(_PathDes, sTemplateFileName))
+                    sDocFileName = _Name & ".pdf"
+                    Dim intCount As Integer = 0
 
-            '        For Each MergeField As Word.MailMergeField In moApp.ActiveDocument.MailMerge.Fields
-            '            MergeField.Select()
-            '            Dim _ColumnName As String = moApp.Selection.Range.Text
-            '            If _ColumnName IsNot Nothing Then
-            '                _ColumnName = _ColumnName.Replace("«", "")
-            '                _ColumnName = _ColumnName.Replace("»", "")
+                    For Each MergeField As Word.MailMergeField In moApp.ActiveDocument.MailMerge.Fields
+                        MergeField.Select()
+                        Dim _ColumnName As String = moApp.Selection.Range.Text
+                        If _ColumnName IsNot Nothing Then
+                            _ColumnName = _ColumnName.Replace("«", "")
+                            _ColumnName = _ColumnName.Replace("»", "")
 
-            '                If row.Table.Columns.Contains(_ColumnName) Then
-            '                    moApp.Selection.TypeText(row(_ColumnName).ToString())
-            '                End If
-            '            End If
-            '            'intCount += 1
-            '        Next
+                            If row.Table.Columns.Contains(_ColumnName) Then
+                                moApp.Selection.TypeText(row(_ColumnName).ToString())
+                            End If
+                        End If
+                        'intCount += 1
+                    Next
 
-            '        moApp.ActiveDocument.SaveAs(System.IO.Path.Combine(_PathDes, sDocFileName), Word.WdSaveFormat.wdFormatPDF)
-            '        moApp.Documents.Close(Word.WdSaveOptions.wdDoNotSaveChanges)
-            '    Next
-            '    moApp.Quit(False)
-            'End If
-            'moApp = Nothing
+                    moApp.ActiveDocument.SaveAs(System.IO.Path.Combine(_PathDes, sDocFileName), Word.WdSaveFormat.wdFormatPDF)
+                    moApp.Documents.Close(Word.WdSaveOptions.wdDoNotSaveChanges)
+                Next
+                moApp.Quit(False)
+            End If
+            moApp = Nothing
             dttable.Dispose()
             dttable = Nothing
             File.Delete(_PathDes & _Name & ".doc")
@@ -71,7 +72,7 @@ Partial Public Class H2G
 
             'HttpRequest
             If _AutoPrint = "Y" Then
-                'http://localhost:9091/print?path=C:\mailmerge\tmp\20164219010809_707.doc
+                RequestHttpServiceExpedia(_Result.FileName) ' "http://localhost:9091/print?path=C:\mailmerge\tmp\20164219010809_707.doc"
             End If
 
         Else
@@ -79,14 +80,43 @@ Partial Public Class H2G
             _Result.Print = "N"
         End If
         '
-
         Return _Result
 
     End Function
 
-End Class
+    Private Shared Function RequestHttpServiceExpedia(ByVal sEndpoint As String) As String
+        sEndpoint = "http://localhost:9091/print?path=" & sEndpoint
+        Dim sUri As Uri = New Uri(sEndpoint)
+        Dim responseFromServer As String = ""
+        Dim request As HttpWebRequest = HttpWebRequest.Create(sUri)
+        Try
+            request.Method = "GET"
+            request.ContentType = "application/json; charset=utf-8"
+            'request.Headers.Add("Accept-Encoding", "gzip, deflate")
+            request.KeepAlive = True
+            request.Timeout = 20000
 
-Public Structure OBJResponse
-    Public FileName As String
-    Public Print As String
-End Structure
+            'If action = "Booking_RQ" Then Throw New Exception("Operation time out.")
+
+            Dim response As HttpWebResponse
+            response = CType(request.GetResponse, HttpWebResponse)
+            Dim stream As Stream
+            stream = response.GetResponseStream()
+
+            Dim sr As System.IO.StreamReader = New System.IO.StreamReader(stream)
+            responseFromServer = sr.ReadToEnd
+            sr.Close()
+            stream.Close()
+            response.Close()
+        Catch ex As Exception
+            Throw ex
+        End Try
+        Return responseFromServer
+    End Function
+
+
+    Public Structure OBJResponse
+        Public FileName As String
+        Public Print As String
+    End Structure
+End Class

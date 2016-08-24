@@ -17,7 +17,7 @@ FROM (
 						left join staff st on st.id = dv.create_staff
                         where dv.receipt_hospital_id = :receipt_hospital_id /*#STATUS*/
                         /*#QUEUE_NUMBER*/ /*#DONOR_NUMBER*/ /*#NATION_NUMBER*/ /*#NAME*/ /*#SURNAME*/ 
-                        /*#BIRTHDAY*/ /*#BLOOD_GROUP*/ 
+                        /*#BIRTHDAY*/ /*#BLOOD_GROUP*/ /*#SAMPLE_NUMBER*/ 
 					) dn
             ORDER BY dn./*#SORT_ORDER*/ /*#SORT_DIRECTION*/
             ) dn

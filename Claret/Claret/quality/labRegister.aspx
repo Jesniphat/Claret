@@ -18,14 +18,15 @@
             $("#txtHospital").focus().enterKey(function () { $("#ddlHospital").val($("#txtHospital").val().toUpperCase()).change(); });
             $("#txtDepartment").enterKey(function () { $("#ddlDepartment").val($("#txtDepartment").val().toUpperCase()).change(); });
             $("#txtLab").enterKey(function () { $("#ddlLab").val($("#txtLab").val().toUpperCase()).change(); });
-            $("#txtDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
-                maxDate: new Date(),
-                minDate: "-100y",
-                yearRange: "c-100:c+0",
-                onSelect: function (selectedDate, objDate) {
-                    $("#txtHospital").focus();
-                },
-            });
+            $("#txtDate").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox();
+            //    .setCalendar({
+            //    maxDate: new Date(),
+            //    minDate: "-100y",
+            //    yearRange: "c-100:c+0",
+            //    onSelect: function (selectedDate, objDate) {
+            //        $("#txtHospital").focus();
+            //    },
+            //});
 
             $("#ddlHospital").on("change", function () {
                 $("#txtHospital").H2GValue($("#ddlHospital").H2GValue());
@@ -161,15 +162,16 @@
                 },
             });
 
-            $("#dateList").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
-                // maxDate: new Date(),
-                minDate: "-100y",
-                yearRange: "c-100:c+0",
-                onSelect: function (selectedDate, objDate) {
-                    // $("#txtHospital").focus();
-                    getDornorHospitalList(selectedDate);
-                },
-            });
+            $("#dateList").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().enterKey(function () { getDornorHospitalList($("#dateList").H2GValue()) });
+            //    .setCalendar({
+            //    // maxDate: new Date(),
+            //    minDate: "-100y",
+            //    yearRange: "c-100:c+0",
+            //    onSelect: function (selectedDate, objDate) {
+            //        // $("#txtHospital").focus();
+            //        getDornorHospitalList(selectedDate);
+            //    },
+            //});
             
             var hospitalListDate = $("#dateList").val();
             getDornorHospitalList(hospitalListDate);
@@ -264,7 +266,12 @@
                 $("#ddlDonationTo").closest("div").focus();
                 notiWarning("กรุณากรอกประเภทการบริจาค");
                 return false;
+            } else if ($("#tbExam > tbody > tr[class=template-data]").length == 0) {
+                $("#txtExamCode").H2GFocus();
+                notiWarning("กรุณากรอกข้อมูล LAB EXAMINATION อย่างน้อย 1 ข้อ");
+                return false;
             }
+            
             return true;
         }
         function getDornorHospitalList(hospitalListDate) {
@@ -449,7 +456,7 @@
     </div>
     <div class="row" style="margin-top:5px;">
         <div class="col-md-36" style="text-align:center;">
-            รายการวันที่ <input type="text" id="dateList" value="" class="form-control required text-center" style="width:143px; display:inline;" />
+            รายการทำงานของวันที่ <input type="text" id="dateList" value="" class="form-control required text-center" style="width:143px; display:inline;" />
         </div>
     </div>
     <div class="row" style="margin-top:5px; margin-bottom: 50px;">

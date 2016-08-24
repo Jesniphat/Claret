@@ -135,12 +135,12 @@ Public Class qualityAction
     Private Sub getDornorHospitalList()
         Dim HospitalList As New List(Of getDornorHospitalListData)
 
-        Dim sql As String = "select r.id, h.name, count(d.id) donor_amount, to_char(r.create_date,'hh24:mi') regis_time, r.register_staff staff, r.create_date
+        Dim sql As String = "select r.id, trim(h.code) || ' : ' || h.name as name, count(d.id) donor_amount, to_char(r.create_date,'hh24:mi') regis_time, r.register_staff staff, r.create_date
                             from receipt_hospital r
                             inner join hospital h on r.hospital_id = h.id
                             left join donation_hospital d on r.id = d.receipt_hospital_id 
                             where to_char(r.create_date, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("whereDate") & "'
-                            group by r.id, h.name, r.create_date, r.register_staff"
+                            group by r.id, h.name, r.create_date, r.register_staff, h.code"
         Dim dt As DataTable = Cbase.QueryTable(sql)
         For Each dr As DataRow In dt.Rows
             Dim Item As New getDornorHospitalListData

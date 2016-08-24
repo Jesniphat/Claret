@@ -181,7 +181,7 @@ Namespace DataItem
                 param.Add(":site_id", DbType.Int64, IIf(String.IsNullOrEmpty(.SiteID), Nothing, .SiteID))
                 param.Add(":comment", DbType.String, .Comment)
                 param.Add(":visit_number", DbType.Int64, .VisitNumber)
-                param.Add(":hb", DbType.Int64, .HB)
+                param.Add(":hb", DbType.Decimal, .HB)
                 param.Add(":plt", DbType.Int64, .PLT)
                 param.Add(":hb_test", DbType.String, .HBTest)
                 param.Add(":heart_lung", DbType.String, .HeartLung)

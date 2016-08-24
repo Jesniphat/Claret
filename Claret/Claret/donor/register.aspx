@@ -25,18 +25,20 @@
             font-weight:normal;
         }
     </style>
-    <script src="../resources/javascript/page/registerScript.js?ver=20160201" type="text/javascript"></script>
+    <script src="../resources/javascript/page/registerScript.js?ver=20160203" type="text/javascript"></script>
     <script>
         $(function () {
             lookupControl();
-            $("#txtCardNumber").enterKey(function () { $(this).addExtCard(); });
+            $("#txtCardNumber").blur(function () { $(this).addExtCard(); });
             //    .on("blur", function () {
             //    $("#txtCardNumber").addExtCard();
             //}).focus();
-            $("#ddlDefferal").setDropdownList().on('change', function () {
-                if ($(this).H2GValue() == 'ACTIVE') { $("#tbDeferral > thead > tr[status=INACTIVE]").hide(); }
-                else { $("#tbDeferral > thead > tr[status=INACTIVE]").show(); }
-            });
+            $("#ddlDefferal").setAutoList({
+                selectItem: function () {
+                    if ($(this).H2GValue() == 'ACTIVE') { $("#tbDeferral > thead > tr[status=INACTIVE]").hide(); }
+                    else { $("#tbDeferral > thead > tr[status=INACTIVE]").show(); }
+                },
+            }).H2GValue("ACTIVE");
             $("#infoTab").tabs({
                 active: 1,
                 activate: function (event, ui) {
@@ -57,30 +59,22 @@
                     $(ui.newPanel).find("input:not(input[type=button],input[type=submit],button):visible:first").focus();
                 },
             });
-            $("#txtBirthDay").H2GDatebox().setCalendar({
-                maxDate: new Date(),
-                minDate: "-100y",
-                yearRange: "c-100:c+70",
-                onSelect: function (selectedDate, objDate) {
-                    if (selectedDate != '') { $("#txtAge").H2GValue(H2G.calAge(selectedDate) + ' ปี'); } else { $("#txtAge").H2GValue(''); }
-                    $("#ddlOccupation").closest("div").focus();
-                },
-                onClose: function () {
-                    var pattern = 'dd/MM/yyyy';
-                    if ($(this).H2GValue() != '') {
-                        $(this).H2GValue($(this).H2GValue().replace(/\W+/g, ''));
-                        $(this).next().remove();
-                        if (isDate($(this).H2GValue(), pattern.replace(/\W+/g, ''))) {
-                            var isValue = new Date(getDateFromFormat($(this).H2GValue(), pattern.replace(/\W+/g, '')));
-                            $(this).H2GValue(formatDate(isValue, pattern));
-                        }
-                        $("#txtAge").H2GValue(H2G.calAge($(this).H2GValue()) + ' ปี');
-                    } else {
-                        $("#txtAge").H2GValue('');
+            $("#txtBirthDay").H2GDatebox({ allowFutureDate: false }).blur(function () {
+                console.log($(this).H2GValue());
+                var pattern = 'dd/MM/yyyy';
+                if ($(this).H2GValue() != '') {
+                    $(this).H2GValue($(this).H2GValue().replace(/\W+/g, ''));
+                    $(this).next().remove();
+                    if (isDate($(this).H2GValue(), pattern.replace(/\W+/g, ''))) {
+                        var isValue = new Date(getDateFromFormat($(this).H2GValue(), pattern.replace(/\W+/g, '')));
+                        $(this).H2GValue(formatDate(isValue, pattern));
                     }
-                },
+                    $("#txtAge").H2GValue(H2G.calAge($(this).H2GValue()) + ' ปี');
+                } else {
+                    $("#txtAge").H2GValue('');
+                }
             });
-            $("#txtLastDonateDate").H2GDatebox().setCalendar({
+            $("#txtLastDonateDate").H2GDatebox({ allowFutureDate: false }).setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+70",
@@ -96,13 +90,13 @@
                 },
             });
             $("#txtCommentDateForm").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy"));
-            $("#txtCommentDateTo").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox().setCalendar({
+            $("#txtCommentDateTo").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy")).H2GDatebox({ allowPastDate: false }).setCalendar({
                 maxDate: "+100y",
                 minDate: new Date(),
                 yearRange: "c-50:c+50",
                 onSelect: function (selectedDate, objDate) { $("#txtDonorComment").focus(); },
             });
-            $("#txtDonorComment").enterKey(function () { $(this).addComment(); });
+            $("#txtDonorComment").blur(function () { $(this).addComment(); });
             $("#togCardNumber").click(function () {
                 if (parseInt($("#divCardNumber").H2GAttr("min-height")) < parseInt($("#divCardNumber").height())) {
                     $("#divCardNumber").css({ height: 30 });
@@ -118,7 +112,7 @@
                 defaultSelect: '3',
                 selectItem: function () {
                     var cardNumber = $('#divCardNumber div[extID="' + $("#ddlExtCard").H2GValue() + '"]').H2GAttr('cardNumber');
-                    $("#txtCardNumber").H2GValue(cardNumber || '').H2GFill({ maxlength: $("#ddlExtCard option:selected").H2GAttr("maxLength"), minlength:  $("#ddlExtCard option:selected").H2GAttr("minLength")});
+                    $("#txtCardNumber").H2GValue(cardNumber || '').H2GFill({ maxlen: $("#ddlExtCard option:selected").H2GAttr("maxLength"), minlen:  $("#ddlExtCard option:selected").H2GAttr("minLength")});
                 },
             });
             $("#ddlExtCard").on('autocompleteselect', function () {
@@ -134,8 +128,10 @@
                 checkBeforSave();                
             });
             $("#btnSaveOnlyDonor").click(function () {
-                if (validation()) {
-                    saveDonorInfo(false);
+                if (true) {
+                    if (validation()) {
+                        saveDonorInfo(false);
+                    }
                 }
             });
             $("#btnCancel").click(function () {
@@ -185,13 +181,13 @@
                 $("#txtDonorSurName").H2GValue($("#data").H2GAttr("donorSurname") || "");
                 $("#txtBirthDay").H2GValue($("#data").H2GAttr("birthday") || "");
                 $("#txtAge").H2GValue(H2G.calAge($("#data").H2GAttr("birthday") || "") + ' ปี');
-                $("#spVisitInfo").H2GValue("วันที่ลงทะเบียน " + formatDate(H2G.today(), "dd NNN yyyy HH:mm") + " เข้าพบครั้งแรก กำลังดำเนินการบริจาคครั้งที่ 1").H2GFill({
-                    visitDateText: formatDate(H2G.today(), "dd NNN yyyy HH:mm"),
+                $("#spVisitInfo").H2GValue("วันที่ลงทะเบียน " + formatDate(new Date(getDateFromFormat($("#data").H2GAttr("plan_date"), "dd/mm/yyyy")), "dd NNN yyyy HH:mm") + " เข้าพบครั้งแรก กำลังดำเนินการบริจาคครั้งที่ 1").H2GFill({
+                    visitDateText: formatDate(new Date(getDateFromFormat($("#data").H2GAttr("plan_date"), "dd/mm/yyyy")), "dd NNN yyyy HH:mm"),
                     lastVisitDateText: "",
                     currentDonateNumber: "1",
-                    visitDate: formatDate(H2G.today(), "dd-MM-yyyy HH:mm")
+                    visitDate: formatDate(new Date(getDateFromFormat($("#data").H2GAttr("plan_date"), "dd/mm/yyyy")), "dd-MM-yyyy HH:mm")
                 });
-                $("#infoTab > ul > li > a[href='#todayPane']").H2GValue("2.2) " + formatDate(H2G.today(), "dd NNN yyyy"))
+                $("#infoTab > ul > li > a[href='#todayPane']").H2GValue("2.2) " + formatDate(new Date(getDateFromFormat($("#data").H2GAttr("plan_date"), "dd/mm/yyyy")), "dd NNN yyyy"))
                 $("#spVisitCount").H2GValue("รวมจำนวนการเข้าพบ 0 ครั้ง / บริจาค 0 ครั้ง");
                 donorSelectDDL();
                 lookupTabQuestionaire();
@@ -200,44 +196,77 @@
 
             $.extend($.fn, {
                 addExtCard: function (args) {
-                    if ($(this).H2GValue() != "") {
-                        if (checkMinLength($(this))) {
-                            var extCard = $('#divCardNumber div[extID="' + $("#ddlExtCard").H2GValue() + '"]');
-                            if (extCard.length > 0) {
-                                $(extCard).H2GFill({ cardNumber: $(this).H2GValue() }).find(".ext-number").H2GValue($("#ddlExtCard :selected").text() + " : " + $(this).H2GValue()).H2GAttr("cardNumber", $(this).H2GValue());
+                    var self = this;
+                    if ($(self).H2GValue() != "") {
+                        if (checkMaxLength($(self))) {
+                            if (checkMinLength($(self))) {
+                                if (checkNationOnlyNumber($(self))) {
+                                    $.ajax({
+                                        url: '../ajaxAction/donorAction.aspx', data: {
+                                            action: 'checkextcardnumber',
+                                            nation_number: $(self).H2GValue(),
+                                            external_id: $("#ddlExtCard").H2GValue(),
+                                            donor_external_id: $('#divCardNumber div[extID="' + $("#ddlExtCard").H2GValue() + '"]').H2GAttr("refID")
+                                        }
+                                        , type: "POST", dataType: "json",
+                                        error: function (xhr, s, err) { console.log(s, err); },
+                                        success: function (data) {
+                                            if (!data.onError) {
+                                                data.getItems = jQuery.parseJSON(data.getItems);
+                                                if (data.getItems.name == "") {
+                                                    var extCard = $('#divCardNumber div[extID="' + $("#ddlExtCard").H2GValue() + '"]');
+                                                    if (extCard.length > 0) {
+                                                        $(extCard).show().H2GFill({
+                                                            cardNumber: $(self).H2GValue(),
+                                                            refID: $(extCard).H2GAttr("refID").replace("D#", "")
+                                                        }).find(".ext-number").H2GValue($("#ddlExtCard :selected").text() + " : "
+                                                            + $(self).H2GValue()).H2GAttr("cardNumber", $(self).H2GValue());
+                                                    } else {
+                                                        var spExtCard = $("#divCardNumberTemp").children().clone();
+                                                        $(spExtCard).H2GFill({
+                                                            extID: $("#ddlExtCard").H2GValue(),
+                                                            cardNumber: $(self).H2GValue()
+                                                        }).find(".ext-number").H2GValue($("#ddlExtCard :selected").text() + " : " + $(self).H2GValue());
+                                                        $('#divCardNumber').append(spExtCard);
+                                                    }
+                                                    $(self).H2GValue('');
+                                                    $("#rbtM").focus();
+                                                } else {
+                                                    notiWarning(data.getItems.name);
+                                                    $(self).focus();
+                                                }
+                                            } else { notiError(data.exMessage); }
+                                        }
+                                    });    //End ajax
+                                } else {
+                                    notiWarning("เลขบัตรไม่ถูกต้องกรุณาตรวจสอบ");
+                                    $(self).focus();
+                                }
                             } else {
-                                var spExtCard = $("#divCardNumberTemp").children().clone();
-                                $(spExtCard).H2GFill({ extID: $("#ddlExtCard").H2GValue(), cardNumber: $(this).H2GValue() }).find(".ext-number").H2GValue($("#ddlExtCard :selected").text() + " : " + $(this).H2GValue());
-                                $('#divCardNumber').append(spExtCard);
+                                notiWarning("กรุณากรอกเลขบัตรอย่างน้อย " + $(self).H2GAttr("minlen") + " ตัวอักษร");
+                                $(self).focus();
                             }
-                            $(this).H2GValue('');
                         } else {
-                            notiWarning("กรุณากรอกเลขบัตรอย่างน้อย " + $(this).H2GAttr("minlength") + " ตัวอักษร");
-                            $(this).focus();
+                            notiWarning("กรุณากรอกเลขบัตรไม่เกิน " + $(self).H2GAttr("minlen") + " ตัวอักษร");
+                            $(self).focus();
                         }
-                    //} else {
-                        //notiWarning("กรุณากรอกเลขบัตร");
-                        //$(this).focus();
+                    } else {
+                        $("#rbtM").focus();
                     }
                 },
                 deleteExtCard: function (args) {
-                    //if (confirm("ต้องการจะลบ " + $(this).closest("div.row").find(".ext-number").H2GValue() + " ใช่หรือไม่?")) {
-                    //    if ($(this).closest("div.row").H2GAttr("refID") == "NEW") {
-                    //        $(this).closest("div.row").remove();
-                    //    } else {
-                    //        $(this).closest("div.row").hide().H2GAttr("refID", "D#" + $(this).closest("div.row").H2GAttr("refID"));
-                    //    }
-                    //    $("#txtCardNumber").focus();
-                    //}
+                    var extID = $(this).closest("div.row").H2GAttr("extID");
+                    var refID = $(this).closest("div.row").H2GAttr("refID");
                     H2GOpenPopupBox({
                         header: "ลบรายการ",
                         detail: "ต้องการจะลบ " + $(this).closest("div.row").find(".ext-number").H2GValue() + " ใช่หรือไม่?",
                         isAlert: false,
                         confirmFunction: function () {
-                            if ($("#divCardNumber .row[extID=NEW]").length>0) {
-                                $("#divCardNumber .row[extID=NEW]").remove();
+                            console.log("confirmFunction", $(this), $("#divCardNumber .row[refID=NEW][extID=" + extID + "]"));
+                            if ($("#divCardNumber .row[refID=NEW][extID=" + extID + "]").length > 0) {
+                                $("#divCardNumber .row[refID=NEW][extID=" + extID + "]").remove();
                             } else {
-                                $("#divCardNumber .row[extID=" + $(this).closest("div.row").find(".ext-number").H2GValue() + "]").hide().H2GAttr("refID", "D#" + $(this).closest("div.row").H2GAttr("refID"));
+                                $("#divCardNumber .row[refID=" + refID + "]").hide().H2GFill({ refID: "D#" + refID, cardNumber: "" });
                             }
                             $("#txtCardNumber").focus();
                         }
@@ -316,7 +345,7 @@
                                                                 $(this).closest("div.row").find(".lbl-check-reward[rewardID='" + $(this).H2GAttr("rewardID") + "'] input").prop("checked", true);
                                                             }
                                                         },
-                                                    }).H2GDatebox();
+                                                    }).H2GDatebox({ allowFutureDate: false });
                                                     $(rowRecord).append($(rowReward).children());
                                                     $('#divDonateRecord').H2GAttr("rewardList", $('#divDonateRecord').H2GAttr("rewardList") + "," + er.ID + ",");
                                                 }
@@ -469,6 +498,34 @@
                         }
                     });
                 },
+                stickerPrint: function () {
+                    $("#btnSticker").H2GDisable();
+                    $.ajax({
+                        url: '../ajaxAction/donorAction.aspx', data: { action: 'stickerprint', donor_id: $("#data").H2GAttr("donorid") }, type: "POST", dataType: "json",
+                        error: function (xhr, s, err) { console.log(s, err); $("#btnSticker").H2GEnable(); },
+                        success: function (data) {
+                            if (!data.onError) {
+                            } else { notiError(data.exMessage); }
+                            $("#btnSticker").H2GEnable();
+                        }
+                    });    //End ajax
+                },
+                checkPhoneNumber: function () {
+                    var self = this;
+                    if ($(self).H2GValue() != "") {
+                        if (checkMaxLength($(self))) {
+                            if (checkMinLength($(self))) {
+
+                            } else {
+                                notiWarning("กรุณากรอกหมายเลขโทรศัพท์ 10 หลัก");
+                                $(self).focus();
+                            }
+                        } else {
+                            notiWarning("กรุณากรอกหมายเลขโทรศัพท์ 10 หลัก");
+                            $(self).focus();
+                        }
+                    }
+                },
             });
 
             //### extend
@@ -497,7 +554,7 @@
                 $(".mandatory-interview").hide();
             }
 
-            $("#btnSticker").click(stickerPrint)
+            $("#btnSticker").click(function () { $(this).stickerPrint(); })
 
 
             //$.ajax({
@@ -517,17 +574,30 @@
 
         });
         function checkMinLength(xobj) {
-            if ($(xobj).H2GAttr("minlength") == "") {
+            if ($(xobj).H2GAttr("minlen") == "") {
                 return true;
-            } else if (parseInt($(xobj).H2GAttr("minlength")) > $(xobj).H2GValue().length) {
+            } else if (parseInt($(xobj).H2GAttr("minlen")) > $(xobj).H2GValue().length) {
                 return false;
             } 
             return true;
         }
+        function checkMaxLength(xobj) {
+            if ($(xobj).H2GAttr("maxlen") == "") {
+                return true;
+            } else if (parseInt($(xobj).H2GAttr("maxlen")) < $(xobj).H2GValue().length) {
+                return false;
+            } 
+            return true;
+        }
+        function checkNationOnlyNumber(xobj) {
+            if ($("#ddlExtCard").H2GValue() == '3') {
+                if (isNaN($(xobj).H2GValue())) {
+                    return false;
+                } 
+            }
+            return true;
+        }
         function lookupTabQuestionaire() {
-            $("#ddlQuestLanguage").on("change", function () {
-                $(this).changeQuestLanguage();
-            })
             $("#txtExamCode").enterKey(function () { getExamination($(this).H2GValue()); });
             $("#ddlExam").setAutoListValue({
                 url: '../ajaxAction/masterAction.aspx', data: { action: 'examination' },
@@ -544,32 +614,33 @@
             }
 
             if ($("#ddlITVDonationType option").length > 1) { $("#ddlITVDonationType").H2GValue($("#ddlITVDonationType").H2GAttr("selectItem")).change(); } else {
-                $("#ddlITVDonationType").setDropdownListValue({
+                $("#ddlITVDonationType").setAutoListValue({
                     url: '../../ajaxAction/masterAction.aspx',
                     data: { action: 'donationtype' },
                     defaultSelect: $("#ddlITVDonationType").H2GAttr("selectItem"),
                     tempData: true,
-                }).on('change', function () {
-                    //$("#ddlITVBag").closest("div").focus();
-                    setDeferralData($("#ddlITVDonationType option:selected").H2GAttr("valueID"));
+                    selectItem: function () {
+                        setDeferralData($("#ddlITVDonationType option:selected").H2GAttr("valueID"));
+                    },
                 });
             }
             if ($("#ddlITVBag option").length > 1) { $("#ddlITVBag").H2GValue($("#ddlITVBag").H2GAttr("selectItem")).change(); } else {
-                $("#ddlITVBag").setDropdownListValue({
+                $("#ddlITVBag").setAutoListValue({
                     url: '../../ajaxAction/masterAction.aspx',
                     data: { action: 'bag' },
                     defaultSelect: $("#ddlITVBag").H2GAttr("selectItem"),
-                }).on('change', function () {
-                    //$("#ddlITVDonationTo").closest("div").focus();
+                    tempData: true,
+                    selectItem: function () {
+                        //setDeferralData($("#ddlITVDonationType option:selected").H2GAttr("valueID"));
+                    },
                 });
             }
             if ($("#ddlITVDonationTo option").length > 1) { $("#ddlITVDonationTo").H2GValue($("#ddlITVDonationTo").H2GAttr("selectItem")).change(); } else {
-                $("#ddlITVDonationTo").setDropdownListValue({
+                $("#ddlITVDonationTo").setAutoListValue({
                     url: '../../ajaxAction/masterAction.aspx',
                     data: { action: 'donationto' },
+                    tempData: true,
                     defaultSelect: $("#ddlITVDonationTo").H2GAttr("selectItem"),
-                }).on('change', function () {
-                    //$("#txtDefCode").focus();
                 });
             }
             
@@ -682,6 +753,7 @@
                                                 questID: questID
                                             });
                                             $(dataRow).find('.td-exam').append(e.Code + ' : ' + e.Description).H2GAttr("title", e.Code + ' : ' + e.Description);
+                                            if (questID != "") { $(dataRow).find('.glyphicon-remove').closest("a").hide(); }
                                             $(dataView).append(dataRow);
                                         }
                                     } else {
@@ -696,6 +768,7 @@
                                             questID: questID
                                         });
                                         $(dataRow).find('.td-exam').append(e.Code + ' : ' + e.Description).H2GAttr("title", e.Code + ' : ' + e.Description);
+                                        if (questID != "") { $(dataRow).find('.glyphicon-remove').closest("a").hide(); }
                                         $(dataView).append(dataRow);
                                     }
                                 });
@@ -789,10 +862,16 @@
                                 $.each((preset), function (indexs, es) {
                                     $("<option>", { value: es, text: es }).appendTo(selectPreset);
                                 });
-                                $(selectPreset).setDropdownList().on('change', function () {
+                                $(selectPreset).setAutoList({
                                     //ให้เอาคำตอบไปหาคำถามต่อไป
-                                    selectNextQuestion($(this).closest("tr").H2GAttr("questID"), $(this).H2GValue());
+                                    selectItem: function () {
+                                        selectNextQuestion($(this).closest("tr").H2GAttr("questID"), $(this).H2GValue());
+                                    }
                                 });
+                                //$(selectPreset).setDropdownList().H2GValue(e.Answer).change().on('change', function () {
+                                //    //ให้เอาคำตอบไปหาคำถามต่อไป
+                                //    selectNextQuestion($(this).closest("tr").H2GAttr("questID"), $(this).H2GValue());
+                                //});
                             } else {
                                 $(dataRow).find(".td-answer input").show();
                                 if (er.AnswerType == "DATE") {
@@ -870,6 +949,7 @@
 
                                 $(dataRow).find('.td-description').append(er.desc).H2GAttr("title", er.desc);
                                 $(dataRow).find('.td-enddate').append('วันที่สิ้นสุด ' + formatDate(new Date(getDateFromFormat(duration, 'dd/mm/yyyy')), "dd NNN yyyy")).H2GAttr("title", 'วันที่สิ้นสุด ' + formatDate(new Date(getDateFromFormat(duration, 'dd/mm/yyyy')), "dd NNN yyyy"));
+                                $(dataRow).find('.glyphicon-remove').closest("a").hide();
                                 $("#tbDefInterview > tbody").append(dataRow);
                             }
                         });
@@ -909,7 +989,34 @@
                 }
             });
         }
-        
+
+        function setBagData(donationTypeID) {
+            var dataObj = [];
+            var dataAll = $("#ddlITVBag").data("data-ddl");
+            var create = 0;
+            if (dataAll != undefined) {
+                $.each((dataAll), function (index, e) {
+                    if (donationTypeID == e.donationID) {
+                        dataObj[create] = e;
+                        create++;
+                    }
+                });
+            }
+            if ($("#ddlITVDeferral").next().length > 0) { $("#ddlITVDeferral").combobox("destroy"); }
+            $("#ddlITVDeferral").setAutoListValue({
+                dataObject: dataObj,
+                selectItem: function () {
+                    $("#txtDefCode").H2GValue($("#ddlITVDeferral").H2GValue());
+                    $("#ddlDeferralType").H2GValue($("#ddlITVDeferral option:selected").H2GAttr("deferralType")).change()
+                    var duration = $("#ddlITVDeferral option:selected").H2GAttr("duration");
+                    $("#txtDuration").H2GValue(duration);
+
+                    if (duration == "") { $("#txtDefDateTo").H2GValue("31/12/2899"); }
+                    else { $("#txtDefDateTo").H2GValue(formatDate(H2G.addDays(H2G.today(), duration), "dd/MM/yyyy")); }
+
+                },
+            });
+        }
     </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="cphMaster" runat="server">
@@ -945,7 +1052,7 @@
                 </select>
             </div>
             <div class="col-md-7">
-                <input id="txtCardNumber" type="text" class="form-control" tabindex="1" minlength="13" maxlength="13" />
+                <input id="txtCardNumber" type="text" class="form-control" tabindex="1" minlen="13" maxlen="13" />
             </div>
             <div class="col-md-2">
                 <button id="spInsertExtCard" class="btn btn-icon" onclick="return false;" tabindex="-1">
@@ -1070,7 +1177,7 @@
                     <span>Defferal/Permanence</span>
                 </div>
                 <div class="col-md-3">
-                    <select id="ddlDefferal">
+                    <select id="ddlDefferal" style="width:200px;">
                         <option value="ACTIVE">ACTIVE</option>
                         <option value="ALL">ALL</option>
                     </select>
@@ -1348,7 +1455,7 @@
                                                         <div class="col-md-3"></div>
                                                         <div class="col-md-5">เบอร์มือถือ 1</div>
                                                         <div class="col-md-12">
-                                                            <input id="txtMobile1" type="text" class="form-control" maxlength="10" tabindex="2" />
+                                                            <input id="txtMobile1" type="text" class="form-control" maxlen="10" minlen="10" tabindex="2" />
                                                         </div>
                                                         <div class="col-md-5" style="padding-left: 5px;">Email</div>
                                                         <div class="col-md-11">
@@ -1359,21 +1466,21 @@
                                                         <div class="col-md-3"></div>
                                                         <div class="col-md-5">เบอร์มือถือ 2</div>
                                                         <div class="col-md-12">
-                                                            <input id="txtMobile2" type="text" class="form-control" maxlength="10" tabindex="2" />
+                                                            <input id="txtMobile2" type="text" class="form-control" maxlen="10" minlen="10" tabindex="2" />
                                                         </div>
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-md-3"></div>
                                                         <div class="col-md-5">เบอร์บ้าน</div>
                                                         <div class="col-md-12">
-                                                            <input id="txtHomeTel" type="text" class="form-control" maxlength="10" tabindex="2" />
+                                                            <input id="txtHomeTel" type="text" class="form-control" maxlen="10" minlen="10" tabindex="2" />
                                                         </div>
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-md-3"></div>
                                                         <div class="col-md-5">เบอร์ที่ทำงาน</div>
                                                         <div class="col-md-12">
-                                                            <input id="txtTel" type="text" class="form-control" maxlength="10" tabindex="2" />
+                                                            <input id="txtTel" type="text" class="form-control" maxlen="10" minlen="10" tabindex="2" />
                                                         </div>
                                                         <div class="col-md-5" style="padding-left: 5px;">เบอร์ต่อ</div>
                                                         <div class="col-md-11">
@@ -1436,7 +1543,7 @@
                                                             <span id="spVisitCount">รวมจำนวนการเข้าพบ 0 ครั้ง / บริจาค 0 ครั้ง</span>
                                                         </div>
                                                         <div class="col-md-10">
-                                                            <select id="ddlVisit">
+                                                            <select id="ddlVisit" style="width:135px;">
                                                                 <option value="แสดงทั้งหมด">แสดงทั้งหมด</option>
                                                                 <option value="แสดงค้างรับ">แสดงค้างรับ</option>
                                                             </select>
@@ -1485,10 +1592,10 @@
                                                         Questionnaire NBC
                                                     </div>
                                                     <div class="col-md-14 text-right">
-                                                        วันที่ดำเนินการ 12 พ.ค. 2559 10:15
+                                                        
                                                     </div>
                                                     <div class="col-md-6 col-md-offset-1" style="padding-right: 5px; padding-left: 9px;">
-                                                        <select id="ddlQuestLanguage">
+                                                        <select id="ddlQuestLanguage" style="width:98px;">
                                                             <option value="English">English</option>
                                                             <option value="Thai">Thai</option>
                                                         </select>
@@ -1512,7 +1619,7 @@
                                                                 </td>
                                                                 <td class="td-answer col-md-6">
                                                                     <input type="text" class="form-control" style="display:none;" />
-                                                                    <select class="ddl-answer" style="display:none; width:100%;">
+                                                                    <select class="ddl-answer" style="display:none; width:98px;" placeholder="กรุณากรอก">
                                                                     </select>
                                                                 </td>
                                                             </tr>
@@ -1576,7 +1683,7 @@
                                                             <span>การตรวจหัวใจและปอด</span>
                                                         </div>
                                                         <div class="col-md-5 text-right">
-                                                            <input id="txtHeartLung" type="text" class="form-control" />
+                                                            <input id="txtHeartLung" type="text" class="form-control text-uppercase" />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1594,9 +1701,8 @@
                                                         <div class="col-md-11 text-right">
                                                             <span>Hb Test</span>
                                                         </div>
-                                                        <div class="col-md-4 text-right">
-                                                            <select id="ddlHbTest" class="required text-center" style="width:100%;">
-                                                                <option value="">&nbsp</option>
+                                                        <div class="col-md-6">
+                                                            <select id="ddlHbTest" class="required text-center" style="width:75px;">
                                                                 <option value="N">N</option>
                                                                 <option value="P">P</option>
                                                                 <option value="Y">Y</option>
@@ -1605,13 +1711,13 @@
                                                         <div class="col-md-2 text-center">
                                                             <span>Hb</span>
                                                         </div>
-                                                        <div class="col-md-4 text-right">
+                                                        <div class="col-md-6 text-right">
                                                             <input id="txtHb" type="text" class="form-control text-center required" maxlength="4" />
                                                         </div>
                                                         <div class="col-md-2 text-center">
                                                             <span>Plt</span>
                                                         </div>
-                                                        <div class="col-md-4 text-right">
+                                                        <div class="col-md-6 text-right">
                                                             <input id="txtPlt" type="text" class="form-control" />
                                                         </div>
                                                     </div>
@@ -1628,7 +1734,7 @@
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-md-16 col-md-offset-11">
-                                                            <select id="ddlITVResult" class="required" style="width:100%;">
+                                                            <select id="ddlITVResult" class="required" style="width:200px;" placeholder="กรุณาเลือก">
                                                                 <option value="">กรุณาเลือก</option>
                                                                 <option value="DONATION">DONATION</option>
                                                                 <option value="SAMPLE">SAMPLE</option>
@@ -1652,7 +1758,7 @@
                                                             <span>ประเภทการบริจาค</span>
                                                         </div>                                                        
                                                         <div class="col-md-25">
-                                                            <select id="ddlITVDonationType" class="text-left" style="width:100%;">
+                                                            <select id="ddlITVDonationType" class="text-left" style="width:318px;" placeholder="กรุณาเลือก">
                                                                 <option value="0">Loading...</option>
                                                             </select>
                                                         </div>
@@ -1662,7 +1768,7 @@
                                                             <span>ประเภทถุง</span>
                                                         </div>                                                        
                                                         <div class="col-md-25">
-                                                            <select id="ddlITVBag" class="text-left" style="width:100%;">
+                                                            <select id="ddlITVBag" class="text-left" style="width:318px;" placeholder="กรุณาเลือก">
                                                                 <option value="0">Loading...</option>
                                                             </select>
                                                         </div>
@@ -1672,7 +1778,7 @@
                                                             <span>การนำไปใช้งาน</span>
                                                         </div>                                                        
                                                         <div class="col-md-25">
-                                                            <select id="ddlITVDonationTo" class="text-left" style="width:100%;">
+                                                            <select id="ddlITVDonationTo" class="text-left" style="width:318px;" placeholder="กรุณาเลือก">
                                                                 <option value="0">Loading...</option>
                                                             </select>
                                                         </div>
@@ -1703,7 +1809,7 @@
                                                             <span>ประเภท</span>
                                                         </div>
                                                         <div class="col-md-11">
-                                                            <select id="ddlDeferralType">
+                                                            <select id="ddlDeferralType" style="width:198px;">
                                                                 <option value="DEFINITIVE">DEFINITIVE</option>
                                                                 <option value="UNDETERMINATED">UNDETERMINATED</option>
                                                                 <option value="TEMPORARY">TEMPORARY</option>
@@ -2312,7 +2418,7 @@
         </div>
         <div class="col-md-21"></div>
         <div class="col-md-3">
-            <input id="btnCancel" type="button" class="btn btn-block" value="ย้อนกลับ" tabindex="-1" />
+            <input id="btnCancel" type="button" class="btn btn-block" value="ย้อนกลับ" tabindex="-1" style="display:none;" />
         </div>
         <div class="col-md-3">
             <input id="btnSave" type="button" class="btn btn-success btn-block" value="บันทึก" tabindex="1" />
@@ -2324,10 +2430,7 @@
         <div id="divBarcodeTemplete" style="display: inline-block;">
             <div class="newouterborder" style="background-color: #F4F4F4;">
                 <div class="popheader row" style="padding: 5px 0px;">
-                    <div class="popupheader col-md-33">ทำการสแกนบาร์โค้ด</div>
-                    <div class="col-md-3 text-center" style="float:right;">
-                        <%--<a class="icon"><span class="glyphicon glyphicon-remove" aria-hidden="true" title="close" onclick="$('#btnSave').prop('disabled', false); return closePopup();"></span></a>--%>
-                    </div>
+                    <div class="popupheader col-md-36">ทำการสแกนบาร์โค้ด</div>
                 </div>
                 <div class="popupbody" style="width:300px;">
                     <div class="row">
@@ -2340,10 +2443,10 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 col-md-offset-24 text-right">
-                            <input type="button" value="ตกลง" class="btn btn-block btn-success" onclick="return checkKeySample($('#txtScanSampleNumber'));" />
+                            <input type="button" value="ตกลง" class="btn btn-block btn-success" onclick="return checkKeySample($('#txtScanSampleNumber'));" onkeypress="$(this).enterKey( checkKeySample($('#txtScanSampleNumber')) );" />
                         </div>
                         <div class="col-md-6 text-right">
-                            <input type="button" value="ยกเลิก" class="btn btn-block" onclick="return closePopup();" />
+                            <input type="button" value="ยกเลิก" class="btn btn-block" onclick="$('#btnSave').prop('disabled', false); return closePopup();" />
                         </div>
                     </div>
                 </div>
@@ -2356,10 +2459,7 @@
             <div id="divAgeTemplete" style="display: inline-block;">
                 <div class="newouterborder" style="background-color: #F4F4F4;">
                     <div class="popheader row text-left" style="padding: 5px 0px;">
-                        <div id="popupheader" class="popupheader col-md-33">กรุณาตรวจสอบ</div>
-                        <div class="col-md-3 text-center" style="float:right;">
-                            <a class="icon"><span class="glyphicon glyphicon-remove" aria-hidden="true" title="close" onclick="$('#btnSave').prop('disabled', false); return closePopup(); "></span></a>
-                        </div>
+                        <div id="popupheader" class="popupheader col-md-36">กรุณาตรวจสอบ</div>
                     </div>
                     <div class="popupbody text-left" style="width:300px;">
                         <div class="row">

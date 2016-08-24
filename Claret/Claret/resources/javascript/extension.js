@@ -168,6 +168,17 @@ $.extend($.fn, {
         
         return this;
     },
+    setAutoList: function (setting) {
+        var config = {
+            defaultSelect: "",
+            selectItem: function () { },
+        };
+        $.extend(config, setting);
+        $(this).combobox({
+            select: config.selectItem,
+        }).H2GValue(config.defaultSelect);
+        return this;
+    },
     setAutoListValue: function (setting) {
         var self = this;
         var config = {
@@ -336,7 +347,10 @@ $.extend($.fn, {
                         result = $(this).val();
                     }
                     break;
-                case 'SELECT': result = $(this).val(); break;
+                case 'SELECT':
+                    result = $(this).val();
+                    if (result == null) { result = ''; }
+                    break;
                 case 'TEXTAREA': result = $.trim($(this).val()); break;
                 default: result = $(this).html(); break;
             }
@@ -503,6 +517,18 @@ $.extend($.fn, {
             })
         })
     },
+    tabKey: function (fnc, enableTab) {
+        enableTab = enableTab || false
+        return this.each(function () {
+            $(this).keydown(function (ev) {
+                var keycode = (ev.keyCode ? ev.keyCode : ev.which);
+                if (keycode == '9') {
+                    fnc.call(this, ev);
+                    if (!enableTab) { ev.preventDefault(); }
+                }
+            })
+        })
+    },
     hasScrollBar: function() {
         return this.get(0).scrollHeight > this.height();
     },
@@ -615,19 +641,28 @@ function H2GOpenPopupBox(setting) {
         header: "กรุณาตรวจสอบ",
         detail: "",
         container: $("#divAlertContainer"),
-        confirmFunction: function () { return closePopup(); },
-        cancelFunction: function () { return closePopup(); },
+        confirmFunction: function () { },
+        cancelFunction: function () { },
         isAlert: true,
     };
     $.extend(config, setting);
     $(config.container).find("#popupheader").H2GValue(config.header);
     $(config.container).find("#spWarning").H2GValue(config.detail);
     if (config.isAlert) {
-        $(config.container).find("input.btn-success").bind("click", function () { config.confirmFunction() }).closest("div").removeClass("col-md-offset-24").addClass("col-md-offset-30");
+        $(config.container).find("input.btn-success").unbind("click")
+            .bind("click", function () { config.confirmFunction(); return H2GClosePopupBox(); })
+            .closest("div")
+            .removeClass("col-md-offset-24")
+            .addClass("col-md-offset-30");
         $(config.container).find("input.btn-cancel").closest("div").hide()
     } else {
-        $(config.container).find("input.btn-success").bind("click", function () { config.confirmFunction() }).closest("div").removeClass("col-md-offset-30").addClass("col-md-offset-24");
-        $(config.container).find("input.btn-cancel").closest("div").show()
+        $(config.container).find("input.btn-success").unbind("click")
+            .bind("click", function () { config.confirmFunction(); return H2GClosePopupBox(); })
+            .closest("div")
+            .removeClass("col-md-offset-30")
+            .addClass("col-md-offset-24");
+        $(config.container).find("input.btn-cancel").unbind("click")
+            .bind("click", function () { config.cancelFunction(); return H2GClosePopupBox(); }).closest("div").show()
     }
     if ($("#divFrame").is(":visible")) {
         $("#" + $("#divContent").H2GAttr("containerID")).append($("#divContent").children());

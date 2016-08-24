@@ -11,6 +11,9 @@
             getDonateBagTypeList();
             getDonateApplyList();
 
+            $("#ddlBloodGroup").setAutoList();
+            $("#ddlPostBloodGroup").setAutoList();
+
             $("#confirmCancelDonateWaitCallection").dialog({
                 autoOpen: false,
                 buttons: {
@@ -159,7 +162,7 @@
                         , name: $("#txtName").H2GValue()
                         , surname: $("#txtSurname").H2GValue()
                         , birthday: $("#txtBirthday").H2GValue()
-                        , bloodgroup: $("#txtBloodGroup").H2GValue()
+                        , bloodgroup: $("#ddlBloodGroup").H2GValue()
                         , samplenumber: $("#txtSample").H2GValue()
                         , reportdate: $("#data").H2GAttr("plan_date") //formatDate(H2G.today(), "dd/MM/yyyy") //$("#txtReportDate").H2GValue()
                         , status: "WAIT RESULT"
@@ -350,7 +353,20 @@
                                     <input id="txtPostBirthday" class="form-control text-center" type="text" tabindex="6" />
                                 </div>
                                 <div class="col-md-3">
-                                    <input id="txtPostBloodGroup" class="form-control text-center" type="text" tabindex="7" />
+                                    <select id="ddlPostBloodGroup" style="width:90px;" tabindex="7">
+                                        <option>A</option>
+                                        <option>A-</option>
+                                        <option>A+</option>
+                                        <option>AB</option>
+                                        <option>AB-</option>
+                                        <option>AB+</option>
+                                        <option>B</option>
+                                        <option>B-</option>
+                                        <option>B+</option>
+                                        <option>O</option>
+                                        <option>O-</option>
+                                        <option>O+</option>
+                                    </select>
                                 </div>
                                 <div class="col-md-3">
                                     <input id="txtPostSample" class="form-control text-center" type="text" tabindex="8" />
@@ -516,7 +532,20 @@
                                 <input id="txtBirthday" class="form-control text-center" type="text" />
                             </div>
                             <div class="col-md-3">
-                                <input id="txtBloodGroup" class="form-control text-center" type="text" />
+                                <select id="ddlBloodGroup" style="width:90px;" tabindex="7">
+                                    <option>A</option>
+                                    <option>A-</option>
+                                    <option>A+</option>
+                                    <option>AB</option>
+                                    <option>AB-</option>
+                                    <option>AB+</option>
+                                    <option>B</option>
+                                    <option>B-</option>
+                                    <option>B+</option>
+                                    <option>O</option>
+                                    <option>O-</option>
+                                    <option>O+</option>
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <input id="txtSample" class="form-control" type="text" />

@@ -41,7 +41,7 @@ function donateSearch(newSearch) {
                 , name: $("#txtPostName").H2GValue()
                 , surname: $("#txtPostSurname").H2GValue()
                 , birthday: $("#txtPostBirthday").H2GValue()
-                , bloodgroup: $("#txtPostBloodGroup").H2GValue()
+                , bloodgroup: $("#ddlPostBloodGroup").H2GValue()
                 , samplenumber: $("#txtPostSample").H2GValue()
                 , reportdate: $("#data").H2GAttr("plan_date") // formatDate(H2G.today(), "dd/MM/yyyy") //$("#txtReportDate").H2GValue()
                 , status: $("#donateStatus").val()  // change here

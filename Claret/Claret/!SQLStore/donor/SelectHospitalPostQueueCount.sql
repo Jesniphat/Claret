@@ -5,5 +5,5 @@ left join donor_external_card dexc on dexc.donor_id = dn.id and dexc.external_ca
 left join external_card ec on ec.id = dexc.external_card_id
 left join rh_group rg on rg.id = dn.rh_group_id
 where dv.receipt_hospital_id = :receipt_hospital_id /*#STATUS*/
-/*#QUEUE_NUMBER*/ /*#DONOR_NUMBER*/ /*#NATION_NUMBER*/ /*#NAME*/ /*#SURNAME*/ 
+/*#QUEUE_NUMBER*/ /*#DONOR_NUMBER*/ /*#NATION_NUMBER*/ /*#NAME*/ /*#SURNAME*/ /*#SAMPLE_NUMBER*/
 /*#BIRTHDAY*/ /*#BLOOD_GROUP*/  ) dn

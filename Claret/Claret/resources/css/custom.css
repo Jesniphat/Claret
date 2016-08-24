@@ -195,6 +195,9 @@ table.table-bordered-excel > thead > tr > th > button {
 table.table-bordered-excel > thead > tr > th > button > i {
     font-size: 8px;
 }
+.custom-combobox {
+    position: relative;
+}
 .custom-combobox .custom-combobox {
     position: relative;
     display: inline-block;

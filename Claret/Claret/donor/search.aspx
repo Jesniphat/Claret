@@ -12,7 +12,7 @@
                     $(ui.newPanel).find("input:not(input[type=button],input[type=submit],button):visible:first").focus();
                 },
             });
-            $("#txtBirthday").H2GDatebox().setCalendar({
+            $("#txtBirthday").H2GDatebox({ allowFutureDate:false }).setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+0",
@@ -26,7 +26,7 @@
                     enterDatePickerSearch($("#txtBirthday"), "enter");
                 },
             });
-            $("#txtPostBirthday").H2GDatebox().setCalendar({
+            $("#txtPostBirthday").H2GDatebox({ allowFutureDate: false }).setCalendar({
                 maxDate: new Date(),
                 minDate: "-100y",
                 yearRange: "c-100:c+0",
@@ -34,19 +34,33 @@
                     $("#txtBloodGroup").focus();
                 },
             });
+            $("#ddlBloodGroup").setAutoList();
+            $("#ddlPostBloodGroup").setAutoList();
             //$("#txtName").H2GNamebox(37);
             //$("#txtSurname").H2GNamebox(37);
-            $("#divCriteria input").enterKey(function () {
-                donorSearch(true);
-                return false;
-            });
-            $("#divPostCriteria input").enterKey(function () {
-                postQueueSearch(true);
-                return false;
-            });
+            $("#divCriteria input.mandatory").tabKey(function () {
+                if ($(this).H2GValue() != "") {
+                    donorSearch(true);
+                    return false;
+                } 
+                //else {
+                //    console.log("else case");
+                //    $(this).next().focus();
+                //}
+            }, true);
+            $("#divPostCriteria input.mandatory").tabKey(function () {
+                if ($(this).H2GValue() != "") {
+                    postQueueSearch(true);
+                    return false;
+                } 
+                //else {
+                //    console.log("else case");
+                //    $(this).next().focus();
+                //}
+            }, true);
             $("#spSearch").click(function () {
                 donorSearch(true);
-            });
+            }).enterKey(function () { donorSearch(true); return false; });
             $("#spClear").click(function () {
                 $("#divCriteria input").H2GValue('');
                 $("#txtDonorNumber").focus();
@@ -72,7 +86,7 @@
             });
             $("#spPostSearch").click(function () {
                 postQueueSearch(true);
-            });
+            }).enterKey(function () { postQueueSearch(true); return false; });
             $("#spPostClear").click(function () {
                 $("#divPostCriteria input").H2GValue('');
                 $("#txtPostQueue").focus();
@@ -219,7 +233,7 @@
                             , name: $("#txtName").H2GValue()
                             , surname: $("#txtSurname").H2GValue()
                             , birthday: $("#txtBirthday").H2GValue()
-                            , bloodgroup: $("#txtBloodGroup").H2GValue()
+                            , bloodgroup: $("#ddlBloodGroup").H2GValue()
                             , p: $("#tbDonor").attr("currentPage") || 1
                             , so: $("#tbDonor").attr("sortOrder") || "donor_number"
                             , sd: $("#tbDonor").attr("sortDirection") || "desc"
@@ -311,10 +325,10 @@
                         , name: $("#txtPostName").H2GValue()
                         , surname: $("#txtPostSurname").H2GValue()
                         , birthday: $("#txtPostBirthday").H2GValue()
-                        , bloodgroup: $("#txtPostBloodGroup").H2GValue()
+                        , bloodgroup: $("#ddlPostBloodGroup").H2GValue()
                         , samplenumber: $("#txtPostSample").H2GValue()
                         , reportdate: $("#data").H2GAttr("plan_date") //formatDate(H2G.today(), "dd/MM/yyyy") //$("#txtReportDate").H2GValue()
-                        , status: $("#data").H2GAttr("receiptHospitalID") ? "WAIT RESULT" : "WAIT INTERVIEW"
+                        , status: ""//$("#data").H2GAttr("receiptHospitalID") ? "WAIT RESULT" : "WAIT INTERVIEW"
                         , receipthospitalid: $("#data").H2GAttr("receiptHospitalID")
                         , p: $("#tbPostQueue").attr("currentPage") || 1
                         , so: $("#tbPostQueue").attr("sortOrder") || "queue_number"
@@ -435,10 +449,10 @@
                             </div>
                         </div>
                         <div class="row" style="padding-left: 15px;">
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <span>เลขประจำตัวผู้บริจาค</span>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <span>เลขประจำตัวประชาชน</span>
                             </div>
                             <div class="col-md-6">
@@ -453,7 +467,7 @@
                             <div class="col-md-3">
                                 <span>วันเกิด</span>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-5">
                                 <span>กรุ๊ปเลือด</span>
                             </div>
                         </div>
@@ -463,11 +477,11 @@
                             </div>
                         </div>
                         <div id="divCriteria" class="row" style="padding-top: 3px; padding-bottom: 3px; padding-left:15px;">
-                            <div class="col-md-6">
-                                <input id="txtDonorNumber" class="form-control color-yellow" maxlength="10" type="text" />
+                            <div class="col-md-5">
+                                <input id="txtDonorNumber" class="form-control color-yellow mandatory" maxlength="10" type="text" />
                             </div>
-                            <div class="col-md-6">
-                                <input id="txtNationNumber" class="form-control color-yellow" maxlength="13" type="text" />
+                            <div class="col-md-5">
+                                <input id="txtNationNumber" class="form-control color-yellow mandatory" maxlength="13" type="text" />
                             </div>
                             <div class="col-md-6">
                                 <input id="txtExtNumber" class="form-control" type="text" />
@@ -482,13 +496,27 @@
                                 <input id="txtBirthday" class="form-control text-center" type="text" />
                             </div>
                             <div class="col-md-3">
-                                <div class="col-md-16">
-                                    <input id="txtBloodGroup" class="form-control text-center" type="text" />
-                                </div>
-                                <div class="col-md-20">
-                                    <a title="ลบข้อมูลที่กรอก"><span id="spClear" class="glyphicon glyphicon-remove"></span></a>
-                                    <a title="ค้นหา"><span id="spSearch" class="glyphicon glyphicon-search"></span></a>
-                                </div>
+                                <select id="ddlBloodGroup" style="width:90px;">
+                                    <option>A</option>
+                                    <option>A-</option>
+                                    <option>A+</option>
+                                    <option>AB</option>
+                                    <option>AB-</option>
+                                    <option>AB+</option>
+                                    <option>B</option>
+                                    <option>B-</option>
+                                    <option>B+</option>
+                                    <option>O</option>
+                                    <option>O-</option>
+                                    <option>O+</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <button id="spClear" class="btn btn-icon" onclick="return false;" style="padding: 0;" tabindex="-1">
+                                    <i class="glyphicon glyphicon-remove" style="vertical-align: text-top;"></i>
+                                </button><button id="spSearch" class="btn btn-icon" onclick="return false;" style="padding: 0;">
+                                    <i class="glyphicon glyphicon-search" style="vertical-align: text-top;"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -509,23 +537,24 @@
                                 <table id="tbDonor" class="table table-hover table-striped table-dis-input" totalPage="1" currentPage="1" sortDirection="desc" sortOrder="donor_number">
                                     <thead>
                                         <tr>
-                                            <th style="width: 16.66666667%;"><button sortOrder="donor_number">เลขประจำตัวผู้บริจาค<i class="glyphicon glyphicon-triangle-bottom"></i></button>
+                                            <th class="col-md-5"><button sortOrder="donor_number">เลขประจำตัวผู้บริจาค<i class="glyphicon glyphicon-triangle-bottom"></i></button>
                                             </th>
-                                            <th style="width: 16.66666667%;"><button sortOrder="nation_number">เลขประจำตัวประชาชน</button>
+                                            <th class="col-md-5"><button sortOrder="nation_number">เลขประจำตัวประชาชน</button>
                                             </th>
-                                            <th style="width: 16.66666667%;"><button sortOrder="external_number">เลขประจำตัวอ้างอิง</button>
+                                            <th class="col-md-6"><button sortOrder="external_number">เลขประจำตัวอ้างอิง</button>
                                             </th>
-                                            <th style="width: 16.66666667%;"><button sortOrder="name">ชื่อ</button>
+                                            <th class="col-md-6"><button sortOrder="name">ชื่อ</button>
                                             </th>
-                                            <th style="width: 16.66666667%;"><button sortOrder="surname">นามสกุล</button>
+                                            <th class="col-md-6"><button sortOrder="surname">นามสกุล</button>
                                             </th>
-                                            <th style="width: 8.33333333%;"><button sortOrder="birthday">วันเกิด</button>
+                                            <th class="col-md-3"><button sortOrder="birthday">วันเกิด</button>
                                             </th>
-                                            <th style="width: 8.33333333%;"><button sortOrder="blood_group">กรุ๊ปเลือด</button>
+                                            <th class="col-md-3"><button sortOrder="blood_group">กรุ๊ปเลือด</button>
                                             </th>
+                                            <th class="col-md-2"></th>
                                         </tr>
-                                        <tr class="no-transaction" style="display:none;"><td align="center" colspan="7">ไม่พบข้อมูล</td></tr>
-                                        <tr class="more-loading" style="display:none;"><td align="center" colspan="7">Loading detail...</td></tr>
+                                        <tr class="no-transaction" style="display:none;"><td align="center" colspan="8">ไม่พบข้อมูล</td></tr>
+                                        <tr class="more-loading" style="display:none;"><td align="center" colspan="8">Loading detail...</td></tr>
                                         <tr class="template-data" style="display:none;" refID="NEW">
                                             <td class="td-donor-number">
                                             </td>
@@ -540,21 +569,24 @@
                                             <td>
                                                 <input type="text" class="td-surname" readonly />
                                             </td>
-                                            <td class="td-birthday">
+                                            <td>
+                                                <input type="text"  class="td-birthday" readonly />
                                             </td>
                                             <td class="td-blood-group">
-                                                <div class="text-right" style="padding-left: 2px; display: inline-table; float: right;">
+                                            </td>
+                                            <td>
+                                                <div class="text-center" style="padding-left: 2px;">
                                                     <a class="icon"><span class="glyphicon glyphicon-arrow-right" aria-hidden="true" onclick="return $(this).donorSelect();"></span></a>
                                                 </div>
                                             </td>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr class="no-transaction"><td align="center" colspan="7">ไม่พบข้อมูล</td></tr>
+                                        <tr class="no-transaction"><td align="center" colspan="8">ไม่พบข้อมูล</td></tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <td align="right" colspan="7">
+                                            <td align="right" colspan="8">
                                                 <div class="page">
                                                 </div>
                                             </td>
@@ -624,13 +656,13 @@
                         </div>
                         <div id="divPostCriteria" class="row" style="padding-top: 3px; padding-bottom: 3px; padding-left:15px;">
                             <div class="col-md-2">
-                                <input id="txtPostQueue" class="form-control color-yellow" type="text" />
+                                <input id="txtPostQueue" class="form-control color-yellow mandatory" type="text" />
                             </div>
                             <div class="col-md-6">
-                                <input id="txtPostDonorNumber" class="form-control color-yellow" type="text" />
+                                <input id="txtPostDonorNumber" class="form-control color-yellow mandatory" type="text" />
                             </div>
                             <div class="col-md-6">
-                                <input id="txtPostNationNumber" class="form-control color-yellow" type="text" />
+                                <input id="txtPostNationNumber" class="form-control color-yellow mandatory" type="text" />
                             </div>
                             <div class="col-md-6">
                                 <input id="txtPostName" class="form-control" type="text" />
@@ -642,14 +674,30 @@
                                 <input id="txtPostBirthday" class="form-control text-center" type="text" />
                             </div>
                             <div class="col-md-3">
-                                <input id="txtPostBloodGroup" class="form-control text-center" type="text" />
+                                <select id="ddlPostBloodGroup" style="width:90px;">
+                                    <option>A</option>
+                                    <option>A-</option>
+                                    <option>A+</option>
+                                    <option>AB</option>
+                                    <option>AB-</option>
+                                    <option>AB+</option>
+                                    <option>B</option>
+                                    <option>B-</option>
+                                    <option>B+</option>
+                                    <option>O</option>
+                                    <option>O-</option>
+                                    <option>O+</option>
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <input id="txtPostSample" class="form-control" type="text" />
                             </div>
                             <div class="col-md-2 text-center">
-                                <a title="ลบข้อมูลที่กรอก"><span id="spPostClear" class="glyphicon glyphicon-remove"></span></a>
-                                <a title="ค้นหา"><span id="spPostSearch" class="glyphicon glyphicon-search"></span></a>
+                                <button id="spPostClear" class="btn btn-icon" onclick="return false;" style="padding: 0;" tabindex="-1">
+                                    <i class="glyphicon glyphicon-remove" style="vertical-align: text-top;"></i>
+                                </button><button id="spPostSearch" class="btn btn-icon" onclick="return false;" style="padding: 0;">
+                                    <i class="glyphicon glyphicon-search" style="vertical-align: text-top;"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
