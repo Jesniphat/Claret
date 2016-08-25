@@ -6,8 +6,6 @@ update donor set
 , Surname_E = :Surname_E
 , Title_ID = :Title_ID
 , Address = :Address
-, Sub_District = :Sub_District
-, District = :District
 , Province = :Province
 , Zipcode = :Zipcode
 , Country_ID = :Country_ID

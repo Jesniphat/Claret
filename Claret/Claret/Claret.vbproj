@@ -191,6 +191,7 @@
     <Content Include="image\icon\take-out-blood-48x48.png" />
     <Content Include="image\icon\user-32x32.png" />
     <Content Include="image\logo\NBC-logo.png" />
+    <Content Include="image\Warning.png" />
     <Content Include="Login.aspx" />
     <Content Include="main.aspx" />
     <Content Include="mobile\planning.aspx" />

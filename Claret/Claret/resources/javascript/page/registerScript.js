@@ -191,10 +191,10 @@ function saveDonorInfo(notOnlyDonor) {
         NameE: $("#txtDonorNameEng").H2GValue(),
         SurnameE: $("#txtDonorSurNameEng").H2GValue(),
         Birthday: $("#txtBirthDay").H2GValue(),
-        TitleID: $("#ddlTitleName").H2GValue(),
+        TitleID: $("#ddlTitleName").H2GValue()||"",
         Address: $("#txtAddress").H2GValue(),
-        SubDistrict: $("#txtSubDistrict").H2GValue(),
-        District: $("#txtDistrict").H2GValue(),
+        SubDistrict: "", //$("#txtSubDistrict").H2GValue(),
+        District: "",//$("#txtDistrict").H2GValue(),
         Province: $("#txtProvince").H2GValue(),
         Zipcode: $("#txtZipcode").H2GValue(),
         CountryID: $("#ddlCountry").H2GValue(),
@@ -397,11 +397,7 @@ function getReward(xobj) {
     return reward;
 }
 function validation() {
-    if ($('#divCardNumber > div').length == 0) {
-        $("#txtCardNumber").H2GFocus();
-        notiWarning("กรุณากรอกข้อมูลบัตรผู้บริจาคอย่างน้อย 1 ใบ");
-        return false;
-    } else if ($('#ddlTitleName').H2GValue() == "") {
+    if ($('#ddlTitleName').H2GValue() == "") {
         $("#ddlTitleName").closest("div").find("input").H2GFocus();
         notiWarning("กรุณาเลือกคำนำหน้าชื่อผู้บริจาค");
         return false;
@@ -433,32 +429,38 @@ function validation() {
         $("#ddlNationality").closest("div").find("input").H2GFocus();
         notiWarning("กรุณาเลือกสัญชาติผู้บริจาค");
         return false;
-    } else if ($('#txtAddress').H2GValue() == "") {
-        $("#infoTabToday").tabs("option", "active", [0]);
-        $("#txtAddress").H2GFocus();
-        notiWarning("กรุณากรอกที่อยู่ผู้บริจาค");
-        return false;
-    } else if ($('#txtSubDistrict').H2GValue() == "") {
-        $("#infoTabToday").tabs("option", "active", [0]);
-        $("#txtSubDistrict").H2GFocus();
-        notiWarning("กรุณากรอกแขวง/ตำบลผู้บริจาค");
-        return false;
-    } else if ($('#txtDistrict').H2GValue() == "") {
-        $("#infoTabToday").tabs("option", "active", [0]);
-        $("#txtDistrict").H2GFocus();
-        notiWarning("กรุณากรอกเขต/อำเภอผู้บริจาค");
-        return false;
-    } else if ($('#txtProvince').H2GValue() == "") {
-        $("#infoTabToday").tabs("option", "active", [0]);
-        $("#txtProvince").H2GFocus();
-        notiWarning("กรุณากรอกจังหวัดผู้บริจาค");
-        return false;
-    } else if ($('#txtZipcode').H2GValue() == "") {
-        $("#infoTabToday").tabs("option", "active", [0]);
-        $("#txtZipcode").H2GFocus();
-        notiWarning("กรุณากรอกรหัสไปรษณีย์ผู้บริจาค");
-        return false;
-    } else if ($('#ddlCountry').H2GValue() == "") {
+    }
+    //else if ($('#txtAddress').H2GValue() == "") {
+    //    //$("#infoTabToday").tabs("option", "active", [0]);
+    //    //$("#txtAddress").H2GFocus();
+    //    //notiWarning("กรุณากรอกที่อยู่ผู้บริจาค");
+    //    //return false;
+    //}
+    //else if ($('#txtSubDistrict').H2GValue() == "") {
+    //    //$("#infoTabToday").tabs("option", "active", [0]);
+    //    //$("#txtSubDistrict").H2GFocus();
+    //    //notiWarning("กรุณากรอกแขวง/ตำบลผู้บริจาค");
+    //    //return false;
+    //}
+    //else if ($('#txtDistrict').H2GValue() == "") {
+    //    //$("#infoTabToday").tabs("option", "active", [0]);
+    //    //$("#txtDistrict").H2GFocus();
+    //    //notiWarning("กรุณากรอกเขต/อำเภอผู้บริจาค");
+    //    //return false;
+    //}
+    //else if ($('#txtProvince').H2GValue() == "") {
+    //    //$("#infoTabToday").tabs("option", "active", [0]);
+    //    //$("#txtProvince").H2GFocus();
+    //    //notiWarning("กรุณากรอกจังหวัดผู้บริจาค");
+    //    //return false;
+    //}
+    //else if ($('#txtZipcode').H2GValue() == "") {
+    //    //$("#infoTabToday").tabs("option", "active", [0]);
+    //    //$("#txtZipcode").H2GFocus();
+    //    //notiWarning("กรุณากรอกรหัสไปรษณีย์ผู้บริจาค");
+    //    return false;
+    //}
+    else if ($('#ddlCountry').H2GValue() == "") {
         $("#infoTabToday").tabs("option", "active", [0]);
         $("#ddlCountry").closest("div").find("input").H2GFocus();
         notiWarning("กรุณาเลือกประเทศผู้บริจาค");
@@ -1416,4 +1418,23 @@ function stickerPrint() {
             }
         }
     });
+}
+
+function check(e, value) {
+    //Check Charater
+    var unicode = e.charCode ? e.charCode : e.keyCode;
+    if (value.indexOf(".") != -1) if (unicode == 46) return false;
+    if (unicode != 8) if ((unicode < 48 || unicode > 57) && unicode != 46) return false;
+}
+function checkLength() {
+    var fieldLength = document.getElementById('txtZipcode').value.length;
+    //Suppose u want 4 number of character
+    if (fieldLength <= 5) {
+        return true;
+    }
+    else {
+        var str = document.getElementById('txtZipcode').value;
+        str = str.substring(0, str.length - 1);
+        document.getElementById('txtZipcode').value = str;
+    }
 }

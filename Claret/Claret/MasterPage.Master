@@ -34,7 +34,7 @@
             position: relative;
             min-height: 1px;
             float: left;
-            width: 14%;
+            width: 8%;
             /*min-width: 191px;*/
         }
         #mstContent {
@@ -329,7 +329,7 @@
                             <img src="../image/icon/user-32x32.png" style="margin-top: 5px;" />
                             <span id="spUserName" runat="server" style="vertical-align: bottom;">ชื่อผู้ใช้งาน : Sittichai Habya(Nippon Sysit)</span>
                             <span style="border-left: solid 1px black; padding: 0; vertical-align: text-top;">&nbsp;</span>
-                            <span id="spCollectionPoint" runat="server" style="vertical-align: bottom;"></span>
+                            <b><span id="spCollectionPoint" runat="server" style="vertical-align: bottom;"></span></b>
                         </div>
                         <div class="col-md-6 text-right" style="margin-top: 5px;padding-right: 8px;">
                             <span style="border-left: solid 1px black; padding: 0;">&nbsp;</span>

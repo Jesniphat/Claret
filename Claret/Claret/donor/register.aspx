@@ -555,7 +555,16 @@
             }
 
             $("#btnSticker").click(function () { $(this).stickerPrint(); })
-
+            $("#txtZipcode").keydown(function (e) {
+                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
+                    (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                    (e.keyCode >= 35 && e.keyCode <= 40)) {
+                    return;
+                }
+                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                    e.preventDefault();
+                }
+            });
 
             //$.ajax({
             //    url: 'http://localhost:9091/print?path=C:\mailmerge\tmp\20164219010809_707.doc', data: { action: 'checksamplenumber' }, type: "POST", dataType: "json",
@@ -1408,10 +1417,10 @@
                                                         <div class="col-md-3"></div>
                                                         <div class="col-md-5">ที่อยู่</div>
                                                         <div class="col-md-28">
-                                                            <textarea id="txtAddress" class="form-control required" style="height:58px;" tabindex="1"></textarea>
+                                                            <textarea id="txtAddress" class="form-control" style="height:58px;" tabindex="1"></textarea>
                                                         </div>
                                                     </div>
-                                                    <div class="row">
+                                                    <%--<div class="row">
                                                         <div class="col-md-3"></div>
                                                         <div class="col-md-5">แขวง/ตำบล</div>
                                                         <div class="col-md-12">
@@ -1421,23 +1430,23 @@
                                                         <div class="col-md-11">
                                                             <input id="txtDistrict" type="text" class="form-control required" tabindex="1" />
                                                         </div>
-                                                    </div>
+                                                    </div>--%>
                                                     <div class="row">
                                                         <div class="col-md-3"></div>
                                                         <div class="col-md-5">จังหวัด</div>
                                                         <div class="col-md-12">
-                                                            <input id="txtProvince" type="text" class="form-control required" tabindex="1" />
+                                                            <input id="txtProvince" type="text" class="form-control" tabindex="1" />
                                                         </div>
                                                         <div class="col-md-5" style="padding-left: 5px;">รหัสไปรษณีย์</div>
                                                         <div class="col-md-11">
-                                                            <input id="txtZipcode" type="text" class="form-control required" tabindex="1" />
+                                                            <input id="txtZipcode" type="number" class="form-control" tabindex="1" onInput="checkLength()" />
                                                         </div>
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-md-3"></div>
                                                         <div class="col-md-5"><span>ประเทศ</span></div>
                                                         <div class="col-md-12">
-                                                            <select id="ddlCountry" class="required" style="width: 185px;" placeholder="กรุณาเลือก" tabindex="1">
+                                                            <select id="ddlCountry" class="required1" style="width: 185px;" placeholder="กรุณาเลือก" tabindex="1">
                                                                 <option value="0">Loading...</option>
                                                             </select>
                                                         </div>
@@ -1551,7 +1560,7 @@
                                                     </div>
                                                     <div class="row" style="margin-left: 15px;">
                                                         <div class="col-md-36">
-                                                            <div id="divDonateRecord" style="overflow-x: hidden; overflow-y: scroll; height: 249px;" donateNumberExt="0" donateNumber="0" rewardList="">
+                                                            <div id="divDonateRecord" style="overflow-x: hidden; overflow-y: scroll; height: 217px;" donateNumberExt="0" donateNumber="0" rewardList="">
                                                             </div>
                                                             <div id="divDonateRecordTemp" style="display:none;">
                                                                 <div refID="NEW" class="row outpadding">

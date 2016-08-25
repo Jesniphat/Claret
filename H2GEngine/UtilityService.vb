@@ -26,7 +26,7 @@ Partial Public Class H2G
             '_Data = "[{" + """Numero Donneur"":""1869900078" + """," + """fname"":""ประทีป" + """," + """lname"":""อยู่สถิตย์" + """}" + "" + "]"
             '_Data = "[{""Point_de_collecte"":""0A0000"",""Date"":""18 August 2016"",""Heure"":""13h27"",""Numero_Donneur"":""9995900003"",""Sexe"":""นาย"",""Nom"":""สิทธิชัย"",""Nom_Marital"":"""",""Date_de_Naissance"":""27/01/1985"",""Prénom"":""แหบยา"",""Adresse"":""59/5 sdfsf ปากเพรียว เมือง สระบุรี"",""Code_Postal"":""18000"",""Ville"":"""",""Code_Routage"":"""",""Région"":"""",""Département"":"""",""Communauté_Urbaine"":"""",""Téléphone_Domicile"":"""",""Téléphone_Bureau"":"""",""Poste"":"""",""Groupe_Sanguin"":""O Rh+"",""Phénotype"":"""",""Médecin_traitant"":"""",""Secrétaire"":""Dhanakoses, Preawnet"",""Profession"":""เอกชน"",""Catégorie"":"""",""Entreprise"":"""",""Poids"":""60"",""Taille"":"""",""Libelle_collecte"":""COLLECTION_POINT_TEST"",""CIDS"":"" "",""Total_dons"":""4"",""Current_dons"":""5"",""Dons_ext"":"""",""Date_dernier_don"":"""",""Type_dernier_don"":""Whole blood, CPD-A1 TB-450"",""TA_dernier_don"":"""",""Numero_Donneur_code_128"":""9995900003"",""Histo_dons_1"":"""",""Histo_dons_2"":"""",""Histo_dons_3"":"""",""Histo_dons_4"":"""",""Histo_dons_5"":"""",""Histo dons 6"":"""",""Histo dons 7"":"""",""Histo dons 8"":"""",""Histo dons 9"":"""",""Histo dons 10"":"""",""Code_Pays_Naiss"":"""",""Nom_Pays_Naiss"":"""",""Code_Depart_Naiss"":"""",""Nom_Depart_Naiss"":"""",""Ville_Naiss"":""TEST"",""Nom_Pere"":""Preawnet"",""Nom_Mere"":""Dhanakoses"",""Code_Genre"":""M"",""Nom_Genre"":""Male"",""Adresse_Compl"":""59/5 sdfsf"",""Identifiant_1"":""1101400167938"",""Identifiant_2"":""901070904"",""Cplt_Code_0"":"""",""Cplt_Nom_Code_0"":"""",""Cplt_Code_1"":"""",""Cplt_Nom_Code_1"":"""",""Cplt_Code_2"":"""",""Cplt_Nom_Code_2"":"""",""Cplt_Code_3"":"""",""Cplt_Nom_Code_3"":"""",""Cplt_Code_4"":"""",""Cplt_Nom_Code_4"":"""",""Cplt_Code_5"":"""",""Cplt_Nom_Code_5"":"""",""Cplt_Code_6"":"""",""Cplt_Nom_Code_6"":"""",""Cplt_Code_7"":"""",""Cplt_Nom_Code_7"":"""",""Cplt Code 8"":"""",""Cplt Nom Code 8"":"""",""Cplt Code 9"":"""",""Cplt Nom Code 9"":"""",""Cplt Valeur 0"":"""",""Cplt Valeur 1"":"""",""Cplt Valeur 2"":"""",""Cplt Valeur 3"":"""",""Cplt Valeur 4"":"""",""Cplt Valeur 5"":"""",""Cplt Valeur 6"":"""",""Cplt Valeur 7"":"""",""Cplt Valeur 8"":"""",""Cplt Valeur 9"":"""",""AGD"":"" Rh+"",""DATED"":""05/05/2016"",""GR"":""O"",""IM"":"" "",""NOTES"":"" "",""TITLE"":""นาย"",""TITRE"":""นาย""}]"
 
-            Dim dttable As DataTable = JsonConvert.DeserializeObject(Of DataTable)(_Data)
+            'Dim dttable As DataTable = JsonConvert.DeserializeObject(Of DataTable)(_Data)
 
             Dim _Name As String = Now().ToString("yyyymmddHHMMsss") & "_" & CInt(Math.Ceiling(Rnd() * 1000)) + 1
 
@@ -34,40 +34,40 @@ Partial Public Class H2G
 
             Dim sTemplateFileName As String = _Name & ".doc"
 
-            Dim moApp As New Word.Application()
-            Dim sDocFileName As String = ""
-            If IsNothing(moApp) = False Then
-                moApp.Visible = False
+            'Dim moApp As New Word.Application()
+            'Dim sDocFileName As String = ""
+            'If IsNothing(moApp) = False Then
+            '    moApp.Visible = False
 
-                For Each row As DataRow In dttable.Rows
-                    moApp.Documents.Open(System.IO.Path.Combine(_PathDes, sTemplateFileName))
-                    sDocFileName = _Name & ".pdf"
-                    Dim intCount As Integer = 0
+            '    For Each row As DataRow In dttable.Rows
+            '        moApp.Documents.Open(System.IO.Path.Combine(_PathDes, sTemplateFileName))
+            '        sDocFileName = _Name & ".pdf"
+            '        Dim intCount As Integer = 0
 
-                    For Each MergeField As Word.MailMergeField In moApp.ActiveDocument.MailMerge.Fields
-                        MergeField.Select()
-                        Dim _ColumnName As String = moApp.Selection.Range.Text
-                        If _ColumnName IsNot Nothing Then
-                            _ColumnName = _ColumnName.Replace("«", "")
-                            _ColumnName = _ColumnName.Replace("»", "")
+            '        For Each MergeField As Word.MailMergeField In moApp.ActiveDocument.MailMerge.Fields
+            '            MergeField.Select()
+            '            Dim _ColumnName As String = moApp.Selection.Range.Text
+            '            If _ColumnName IsNot Nothing Then
+            '                _ColumnName = _ColumnName.Replace("«", "")
+            '                _ColumnName = _ColumnName.Replace("»", "")
 
-                            If row.Table.Columns.Contains(_ColumnName) Then
-                                moApp.Selection.TypeText(row(_ColumnName).ToString())
-                            End If
-                        End If
-                        'intCount += 1
-                    Next
+            '                If row.Table.Columns.Contains(_ColumnName) Then
+            '                    moApp.Selection.TypeText(row(_ColumnName).ToString())
+            '                End If
+            '            End If
+            '            'intCount += 1
+            '        Next
 
-                    moApp.ActiveDocument.SaveAs(System.IO.Path.Combine(_PathDes, sDocFileName), Word.WdSaveFormat.wdFormatPDF)
-                    moApp.Documents.Close(Word.WdSaveOptions.wdDoNotSaveChanges)
-                Next
-                moApp.Quit(False)
-            End If
-            moApp = Nothing
-            dttable.Dispose()
-            dttable = Nothing
+            '        moApp.ActiveDocument.SaveAs(System.IO.Path.Combine(_PathDes, sDocFileName), Word.WdSaveFormat.wdFormatPDF)
+            '        moApp.Documents.Close(Word.WdSaveOptions.wdDoNotSaveChanges)
+            '    Next
+            '    moApp.Quit(False)
+            'End If
+            'moApp = Nothing
+            'dttable.Dispose()
+            'dttable = Nothing
             File.Delete(_PathDes & _Name & ".doc")
-            _Result.FileName = _PathClient & sDocFileName
+            '_Result.FileName = _PathClient & sDocFileName
             _Result.Print = _AutoPrint
 
             'HttpRequest
