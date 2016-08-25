@@ -29,6 +29,10 @@
     <script>
         $(function () {
             lookupControl();
+            if ($("#data").attr("lmenu") == "lmenuEditDonorRegis") {
+                $("#btnSticker").css("display", "none");
+                $("#btnSaveOnlyDonor").css("display", "none");
+            }
             $("#txtCardNumber").blur(function () { $(this).addExtCard(); });
             //    .on("blur", function () {
             //    $("#txtCardNumber").addExtCard();
@@ -96,7 +100,7 @@
                 yearRange: "c-50:c+50",
                 onSelect: function (selectedDate, objDate) { $("#txtDonorComment").focus(); },
             });
-            $("#txtDonorComment").blur(function () { $(this).addComment(); });
+            //$("#txtDonorComment").blur(function () { $(this).addComment(); });
             $("#togCardNumber").click(function () {
                 if (parseInt($("#divCardNumber").H2GAttr("min-height")) < parseInt($("#divCardNumber").height())) {
                     $("#divCardNumber").css({ height: 30 });
@@ -125,14 +129,23 @@
             $("#txtDefDateFrom").H2GValue(formatDate(H2G.today(), "dd/MM/yyyy"));
             
             $("#btnSave").click(function () {
-                checkBeforSave();                
-            });
-            $("#btnSaveOnlyDonor").click(function () {
-                if (true) {
+                gotoRegister = true;
+                if ($("#data").attr("lmenu") == "lmenuEditDonorRegis") {
                     if (validation()) {
                         saveDonorInfo(false);
                     }
+                } else {
+                    checkBeforSave(); 
                 }
+                               
+            });
+            $("#btnSaveOnlyDonor").click(function () {
+                //if (true) {
+                //    if (validation()) {
+                //        saveDonorInfo(false);
+                //    }
+                //}
+                checkBeforSave();
             });
             $("#btnCancel").click(function () {
                 cancelRegis(this);
@@ -247,13 +260,21 @@
                     }
                 },
                 deleteComment: function (args) {
-                    if (confirm("ต้องการจะลบความเห็น" + $(this).closest("div.row").find(".dc-datecomment").H2GValue() + "ใช่หรือไม่?")) {
-                        if ($(this).closest("div.row").H2GAttr("refID") == "NEW") {
-                            $(this).closest("div.row").remove();
-                        } else {
-                            $(this).closest("div.row").hide().H2GAttr("refID", "D#" + $(this).closest("div.row").H2GAttr("refID"));
-                        }
-                    }
+                    var self = $(this);
+                    H2GOpenPopupBox({
+                        header: "กรุณาตรวจสอบ",
+                        detail: "ต้องการจะลบความเห็น" + " " + $(this).closest("div.row").find(".dc-datecomment").H2GValue() + " " + "ใช่หรือไม่?",
+                        isAlert: false,
+                        confirmFunction: function () {
+                            //addExtCardMain($(self));
+                            self.closest("div.row").remove();
+                        },
+                        cancelFunction: function () {
+                            //$(self).H2GValue("");
+                            //self.closest("div.row").hide().H2GAttr("refID", "D#" + $(this).closest("div.row").H2GAttr("refID"));
+                            return;
+                        },
+                    });
                 },
                 addDonateRecord: function (args) {
                     if ($("#txtOuterDonate").H2GValue() != "" && $("#txtLastDonateDate").H2GValue() != "") {
@@ -498,7 +519,7 @@
             });
 
             // menu control
-            if ($("#data").H2GAttr("lmenu") == "lmenuDonorRegis") {
+            if ($("#data").H2GAttr("lmenu") == "lmenuDonorRegis" || $("#data").H2GAttr("lmenu") == "lmenuEditDonorRegis") {
                 $("#infoTabToday").tabs("option", "disabled", [1,2]);
                 $(".claret-page-header span").H2GValue("ลงทะเบียนผู้บริจาค");
             } else if ($("#data").H2GAttr("lmenu") == "lmenuInterview") {
@@ -1462,7 +1483,7 @@
                                                         </div>
                                                         <div class="col-md-5" style="padding-left: 5px;">รหัสไปรษณีย์</div>
                                                         <div class="col-md-11">
-                                                            <input id="txtZipcode" type="number" class="form-control" tabindex="1" onInput="checkLength()" />
+                                                            <input id="txtZipcode" type="text" class="form-control" tabindex="1" onInput="checkLength()" />
                                                         </div>
                                                     </div>
                                                     <div class="row">
@@ -2446,14 +2467,14 @@
             <input id="btnSticker" type="button" class="btn btn-primary btn-block" value="พิมพ์สติ๊กเกอร์" tabindex="-1" />
         </div>
         <div class="col-md-3">
-            <input id="btnSaveOnlyDonor" type="button" class="btn btn-success btn-block" value="บันทึกประวัติ" tabindex="-1" />
+            <input id="btnSaveOnlyDonor" type="button" class="btn btn-success btn-block" value="บันทึก" tabindex="-1" />
         </div>
-        <div class="col-md-21"></div>
+        <div class="col-md-19"></div>
         <div class="col-md-3">
             <input id="btnCancel" type="button" class="btn btn-block" value="ย้อนกลับ" tabindex="-1" style="display:none;" />
         </div>
-        <div class="col-md-3">
-            <input id="btnSave" type="button" class="btn btn-success btn-block" value="บันทึก" tabindex="1" />
+        <div class="col-md-5">
+            <input id="btnSave" type="button" class="btn btn-success btn-block" value="บันทึกและกลับสู่เมนูหลัก" tabindex="1" />
         </div>
     </div>
     <div style="display: none;">

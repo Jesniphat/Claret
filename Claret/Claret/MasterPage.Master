@@ -345,6 +345,9 @@
                     <div id="lmenuDonorRegis" targeturl="../donor/search.aspx" class="col-md-36">
                         <span>ลงทะเบียนผู้บริจาค</span>
                     </div>
+                    <div id="lmenuEditDonorRegis" targeturl="../donor/search.aspx" class="col-md-36">
+                        <span>แก้ไขผู้บริจาค</span>
+                    </div>
                     <div id="lmenuInterview" targeturl="../donor/historyReport.aspx" class="col-md-36">
                         <span>คัดกรอง</span>
                     </div>

@@ -1,4 +1,5 @@
-﻿function lookupControl() {
+﻿var gotoRegister = false;
+function lookupControl() {
     $("#txtCardNumber").H2GFocus();
     //$("#txtDonorName").H2GNamebox();
     //$("#txtDonorSurName").H2GNamebox();
@@ -291,7 +292,7 @@ function saveDonorInfo(notOnlyDonor) {
     var DonorDeferralItem = [];
     var DonationExamination = [];
     // ถ้าไม่ใช่ลงทะเบียนให้เก็บ Questionnaire, Deferral และ Examination
-    if ($("#data").H2GAttr("lmenu") != "lmenuDonorRegis") {
+    if ($("#data").H2GAttr("lmenu") != "lmenuDonorRegis" && $("#data").H2GAttr("lmenu") != "lmenuEditDonorRegis") {
         create = 0;
         $('#tbQuestionnaire > tbody > tr').each(function (i, e) {
             DonorQuestionItem[create] = {
@@ -363,7 +364,7 @@ function saveDonorInfo(notOnlyDonor) {
                 $("#data").H2GAttr("donorID", data.getItems.ID);
                 $("#spRegisNumber").H2GAttr("visitID", data.getItems.VisitID)
                 notiSuccess("บันทึกสำเร็จ");
-                if ($("#spRegisNumber").H2GAttr("backToSearch") == "Y") {
+                if ($("#spRegisNumber").H2GAttr("backToSearch") == "Y" || gotoRegister == true ) {
                     cancelRegis(this);
                 } else {
                     showDonorData();
@@ -374,6 +375,7 @@ function saveDonorInfo(notOnlyDonor) {
         }
     });    //End ajax
 }
+
 function checkGetStatusForDonation() {
     var thisMenu = $("#data").H2GAttr("lmenu");
     var thisStatus = $("#spStatus").H2GValue();

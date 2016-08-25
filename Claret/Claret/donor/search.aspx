@@ -94,10 +94,10 @@
             });
             $.extend($.fn, {
                 donorSelect: function () {
-                    validation("", "", $(this).closest("tr").H2GAttr("birthday"), $(this).closest("tr").H2GAttr("refID"));
+                    validation("", "", $(this).closest("tr").H2GAttr("birthday"), $(this).closest("tr").H2GAttr("refID"), false);
                 },
                 queueSelect: function () {
-                    $("#data").H2GFill({ donorID: $(this).closest("tr").H2GAttr("donorID"), visitID: $(this).closest("tr").H2GAttr("refID")});
+                    $("#data").H2GFill({ donorID: $(this).closest("tr").H2GAttr("donorID"), visitID: $(this).closest("tr").H2GAttr("refID") });
                     $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "register.aspx", method: "post", staffaction: "register" }).submit();
                 },
                 backToLabRegis: function () {
@@ -137,6 +137,10 @@
                 postQueueSearch(true);
             }
             
+            if ($("#data").attr("lmenu") == "lmenuEditDonorRegis") {
+                $("#content-three").css("display", "none");
+                $("#searchTab").tabs("option", "disabled", [1]);
+            }
         });
         function validation(name, surname, birthday, donorid, newRegis) {
             $.ajax({
@@ -158,7 +162,7 @@
                     if (!data.onError) {
                         data.getItems = jQuery.parseJSON(data.getItems);
                         console.log(data.getItems);
-                        if (data.getItems.Duplicate == "" && data.getItems.AgeCheck == "") {
+                        if ((data.getItems.Duplicate == "" && data.getItems.AgeCheck == "") || $("#data").attr("lmenu") == "lmenuEditDonorRegis") {
                             if (data.getItems.DonorID == "") {
                                 $("#data").removeAttr("donorID").removeAttr("visitID").H2GFill({ donorName: name, donorSurname: surname, birthday: birthday });
                                 $('<form>').append(H2G.postedData($("#data"))).H2GFill({ action: "register.aspx", method: "post", staffaction: "register" }).submit();
