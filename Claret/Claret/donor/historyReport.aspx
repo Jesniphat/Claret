@@ -36,12 +36,12 @@
                     $("#txtBloodGroup").focus();
                 },
             });
-            $("#divInfoCriteria input.mandatory").blur(function () {
+            $("#divInfoCriteria input.mandatory").tabKey(function () {
                 if ($(this).H2GValue() != "") {
                     infoSearch(true);
                     return false;
                 }
-            });
+            }, true);
             $("#spSearch").click(function () {
                 infoSearch(true);
             }).enterKey(function () { infoSearch(true); return false; });
@@ -64,12 +64,12 @@
                     $("#txtPostBloodGroup").focus();
                 },
             });
-            $("#divPostCriteria input.mandatory").blur(function () {
+            $("#divPostCriteria input.mandatory").tabKey(function () {
                 if ($(this).H2GValue() != "") {
                     postQueueSearch(true);
                     return false;
                 }
-            });
+            }, true);
             $("#spPostSearch").click(function () {
                 postQueueSearch(true);
             }).enterKey(function () { postQueueSearch(true); return false; });
@@ -403,13 +403,13 @@
                                 </div>
                                 <div id="divInfoCriteria" class="row" style="padding-top: 3px; padding-bottom: 3px; padding-left:15px;">
                                     <div class="col-md-2">
-                                        <input id="txtQueue" class="form-control color-yellow" type="text" />
+                                        <input id="txtQueue" class="form-control color-yellow mandatory" type="text" />
                                     </div>
                                     <div class="col-md-6">
-                                        <input id="txtDonorNumber" class="form-control color-yellow" type="text" />
+                                        <input id="txtDonorNumber" class="form-control color-yellow mandatory" type="text" />
                                     </div>
                                     <div class="col-md-6">
-                                        <input id="txtNationNumber" class="form-control color-yellow" type="text" />
+                                        <input id="txtNationNumber" class="form-control color-yellow mandatory" type="text" />
                                     </div>
                                     <div class="col-md-6">
                                         <input id="txtName" class="form-control" type="text" />
@@ -586,13 +586,13 @@
                         </div>
                         <div id="divPostCriteria" class="row" style="padding-top: 3px; padding-bottom: 3px; padding-left:15px;">
                             <div class="col-md-2">
-                                <input id="txtPostQueue" class="form-control color-yellow" type="text" />
+                                <input id="txtPostQueue" class="form-control color-yellow mandatory" type="text" />
                             </div>
                             <div class="col-md-6">
-                                <input id="txtPostDonorNumber" class="form-control color-yellow" type="text" />
+                                <input id="txtPostDonorNumber" class="form-control color-yellow mandatory" type="text" />
                             </div>
                             <div class="col-md-6">
-                                <input id="txtPostNationNumber" class="form-control color-yellow" type="text" />
+                                <input id="txtPostNationNumber" class="form-control color-yellow mandatory" type="text" />
                             </div>
                             <div class="col-md-6">
                                 <input id="txtPostName" class="form-control" type="text" />

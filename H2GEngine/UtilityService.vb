@@ -70,11 +70,15 @@ Partial Public Class H2G
             '_Result.FileName = _PathClient & sDocFileName
             _Result.Print = _AutoPrint
 
-            'HttpRequest
-            If _AutoPrint = "Y" Then
-                RequestHttpServiceExpedia(_Result.FileName) ' "http://localhost:9091/print?path=C:\mailmerge\tmp\20164219010809_707.doc"
-            End If
-
+            ''HttpRequest
+            'If _AutoPrint = "Y" Then
+            '    Dim strReturn As String = ""
+            '    strReturn = RequestHttpService(_Result.FileName) ' "http://localhost:9091/print?path=C:\mailmerge\tmp\20164219010809_707.doc"
+            '    Dim resMail As HttpMailResponse = JSON.Deserialize(Of HttpMailResponse)(strReturn)
+            '    If Not (resMail.success = "true") Then
+            '        _Result.FileName = strReturn
+            '    End If
+            'End If
         Else
             _Result.FileName = "ERROR"
             _Result.Print = "N"
@@ -84,7 +88,7 @@ Partial Public Class H2G
 
     End Function
 
-    Private Shared Function RequestHttpServiceExpedia(ByVal sEndpoint As String) As String
+    Public Shared Function RequestHttpService(ByVal sEndpoint As String) As String
         sEndpoint = "http://localhost:9091/print?path=" & sEndpoint
         Dim sUri As Uri = New Uri(sEndpoint)
         Dim responseFromServer As String = ""
@@ -114,9 +118,9 @@ Partial Public Class H2G
         Return responseFromServer
     End Function
 
-
     Public Structure OBJResponse
         Public FileName As String
         Public Print As String
     End Structure
+
 End Class

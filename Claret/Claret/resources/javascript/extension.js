@@ -123,7 +123,7 @@ $.extend($.fn, {
         };
         $.extend(config, setting);
 
-        var timeStamp = new Performance(config.data.action);
+        //var timeStamp = new Performance(config.data.action);
         var compile = function (data) {
             if (config.tempData) { $(self).data("data-ddl", data); }
 
@@ -134,15 +134,15 @@ $.extend($.fn, {
             for (i = 0; i < data.length; i++) {
                 $("<option>", {}).H2GFill(data[i]).appendTo(self);
             }
-            timeStamp.Check("added " + data.length + " items of " + config.data.action);
+            //timeStamp.Check("added " + data.length + " items of " + config.data.action);
 
             $(self).setDropdownList().selecter("update");
             if (config.defaultSelect != "") { $(self).H2GValue(config.defaultSelect); }
             if (config.enable) { $(self).H2GEnable(); } else { $(self).H2GDisable(); }
-            timeStamp.Stop("stop success of " + config.data.action);
+            //timeStamp.Stop("stop success of " + config.data.action);
         }
 
-        timeStamp.Start("start of " + config.data.action);
+        //timeStamp.Start("start of " + config.data.action);
         if (config.dataObject.length == 0) {
             $.ajax({
                 url: config.url,
@@ -151,15 +151,18 @@ $.extend($.fn, {
                 dataType: config.dataType,
                 error: function (xhr, s, err) {
                     console.log(s, err);
-                    timeStamp.Stop("stop error of " + config.data.action);
+                    //timeStamp.Stop("stop error of " + config.data.action);
                 },
                 success: function (data) {
-                    timeStamp.Check("received response of " + config.data.action);
+                    //timeStamp.Check("received response of " + config.data.action);
                     if (!data.onError) {
                         data.getItems = jQuery.parseJSON(data.getItems);
                         if (config.tempData) { $(self).data("data-ddl", data.getItems); }
                         compile(data.getItems);
-                    } else { $(self).setDropdownList().selecter("update"); timeStamp.Stop("stop onError of " + config.data.action); }                    
+                    } else {
+                        $(self).setDropdownList().selecter("update");
+                        //timeStamp.Stop("stop onError of " + config.data.action);
+                    }
                 }
             });    //End ajax
         } else {
@@ -195,7 +198,7 @@ $.extend($.fn, {
         };
         $.extend(config, setting);
 
-        var timeStamp = new Performance(config.data.action);
+        //var timeStamp = new Performance(config.data.action);
         var compile = function (data) {
             if (config.tempData) { $(self).data("data-ddl", data); }
 
@@ -203,16 +206,16 @@ $.extend($.fn, {
             for (i = 0; i < data.length; i++) {
                 $("<option>", {}).H2GFill(data[i]).appendTo(self);
             }
-            timeStamp.Check("added " + data.length + " items of " + config.data.action);
+            //timeStamp.Check("added " + data.length + " items of " + config.data.action);
             $(self).combobox({
                 select: config.selectItem,
             }).H2GValue(config.defaultSelect);
             //$(self).parent().find("span").find("input").val($(self).find(":selected").text());
             if (config.enable) { $(self).H2GEnable(); } else { $(self).H2GDisable(); }
-            timeStamp.Stop("stop success of " + config.data.action);
+            //timeStamp.Stop("stop success of " + config.data.action);
         }
 
-        timeStamp.Start("start of " + config.data.action);
+        //timeStamp.Start("start of " + config.data.action);
         if (config.url != "") {
             $.ajax({
                 url: config.url,
@@ -221,10 +224,10 @@ $.extend($.fn, {
                 dataType: config.dataType,
                 error: function (xhr, s, err) {
                     console.log(s, err);
-                    timeStamp.Stop("stop error of " + config.data.action);
+                    //timeStamp.Stop("stop error of " + config.data.action);
                 },
                 success: function (data) {
-                    timeStamp.Check("received response of " + config.data.action);
+                    //timeStamp.Check("received response of " + config.data.action);
                     if (!data.onError) {
                         data.getItems = jQuery.parseJSON(data.getItems);
                         if (config.tempData) { $(self).data("data-ddl", data.getItems); }
@@ -234,7 +237,7 @@ $.extend($.fn, {
                             select: config.selectItem,
                             placeholder: config.placeholder,
                         });
-                        timeStamp.Stop("stop onError of " + config.data.action);
+                        //timeStamp.Stop("stop onError of " + config.data.action);
                     }
                 }
             });    //End ajax

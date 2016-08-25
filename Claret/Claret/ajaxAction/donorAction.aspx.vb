@@ -1,6 +1,8 @@
 ﻿Imports H2GEngine
 Imports H2GEngine.DataItem
 Imports System.Threading
+Imports System.Net
+
 Public Class donorAction
     Inherits UI.Page 'System.Web.UI.Page
     Dim JSONResponse As New CallbackException()
@@ -210,7 +212,8 @@ Public Class donorAction
                 ElseIf item.ID.ToUpper().Contains("D#") Then
                     Cbase.Execute("delete from donation_questionnaire where id = '" & item.ID.Replace("D#", "") & "' ")
                 Else
-
+                    'Update case
+                    Cbase.Execute("update donation_questionnaire set answer = '" & item.Answer & "' where id = '" & item.ID & "' ")
                 End If
             Next
         End If
@@ -1324,13 +1327,21 @@ Public Class donorAction
                     & """TITRE"":""" & dRow("title").ToString() & """}]"
         Next
         Dim mailResponse As New H2G.OBJResponse
-        mailResponse = H2G.GenMailMerge("DONOR_CARD", strSet)
+        mailResponse = H2G.GenMailMerge("DONOR_BARCODE", strSet)
+        If mailResponse.Print = "Y" Then
+            Dim strReturn As String = ""
+            strReturn = H2G.RequestHttpService(mailResponse.FileName) ' "http://localhost:9091/print?path=C:\mailmerge\tmp\20164219010809_707.doc"
+            Dim resMail As HttpMailResponse = JSON.Deserialize(Of HttpMailResponse)(strReturn)
+            If Not (resMail.success = "true") Then
+                mailResponse.FileName = strReturn
+            End If
+        End If
 
         If mailResponse.FileName = "ERROR" Then
             Throw New Exception("ระบบมีปัญหาไม่สามารถพิมพ์สติ๊กเกอร์ได้")
         End If
 
-        JSONResponse.setItems("{""printstatus"" : ""success""}")
+        JSONResponse.setItems("{""printstatus"" : ""success"",""filename"":""" & mailResponse.FileName.Replace("\", "") & """}")
     End Sub
 
     Private Sub checkSampleNumber()
@@ -1343,13 +1354,20 @@ Public Class donorAction
     End Sub
 
     Private Sub checkExtCardNumber()
+        Dim donorExtCriteria As String = ""
         Dim donorExternalID As String = IIf(_REQUEST("donor_external_id") = "NEW", "", _REQUEST("donor_external_id"))
+
+        If Not String.IsNullOrEmpty(_REQUEST("donor_external_id")) Then
+            If _REQUEST("donor_external_id") <> "NEW" Then
+                donorExtCriteria = " and dex.id <> '" & donorExternalID & "' "
+            End If
+        End If
+
         Dim sql As String = "select dor.name || ' ' || dor.surname as name, ec.description, dex.id
                             from donor dor 
                             inner join donor_external_card dex on dex.donor_id = dor.id
                             inner join external_card ec on ec.id = dex.external_card_id
-                            where DEX.card_number = '" & _REQUEST("nation_number") & "' and dex.external_card_id = '" & _REQUEST("external_id") & "'
-                            and dex.id <> '" & donorExternalID & "' "
+                            where DEX.card_number = '" & _REQUEST("nation_number") & "' and dex.external_card_id = '" & _REQUEST("external_id") & "' " & donorExtCriteria
         Dim ResultData As String = ""
         Dim dt As DataTable = Cbase.QueryTable(sql)
         For Each dRow As DataRow In dt.Rows
@@ -1358,6 +1376,9 @@ Public Class donorAction
         JSONResponse.setItems("{""name"" : """ & ResultData & """}")
     End Sub
 
+    Public Structure HttpMailResponse
+        Public success As String
+    End Structure
 End Class
 
 Public Structure DonorMainItem

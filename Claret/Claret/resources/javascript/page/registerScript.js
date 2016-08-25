@@ -353,7 +353,7 @@ function saveDonorInfo(notOnlyDonor) {
         dataType: "json",
         error: function (xhr, s, err) {
             console.log(s, err);
-            notiError("บันทึกไม่สำเร็จ");
+            notiError("บันทึกไม่สำเร็จ : " + err);
             $("#btnSave").prop("disabled", false);
             $("#btnSaveOnlyDonor").prop("disabled", false);
         },
@@ -368,7 +368,7 @@ function saveDonorInfo(notOnlyDonor) {
                 } else {
                     showDonorData();
                 }
-            } else { notiError("บันทึกไม่สำเร็จ"); }
+            } else { notiError("บันทึกไม่สำเร็จ : " + data.exMessage); }
             $("#btnSave").prop("disabled", false);
             $("#btnSaveOnlyDonor").prop("disabled", false);
         }
@@ -543,15 +543,30 @@ function interviewValidation() {
             $("#ddlITVResult").closest("div").H2GFocus();
             notiWarning("กรุณาเลือกผลการตรวจคัดกรอง");
             return true;
+        } else if ($('#ddlITVDonationType').H2GValue() == "") {
+            $("#infoTabToday").tabs("option", "active", [2]);
+            $("#ddlITVDonationType").closest("div").H2GFocus();
+            notiWarning("กรุณาเลือกประเภทการบริจาค");
+            return true;
+        } else if ($('#ddlITVBag').H2GValue() == "") {
+            $("#infoTabToday").tabs("option", "active", [2]);
+            $("#ddlITVBag").closest("div").H2GFocus();
+            notiWarning("กรุณาเลือกประเภทถุง");
+            return true;
+        } else if ($('#ddlITVDonationTo').H2GValue() == "") {
+            $("#infoTabToday").tabs("option", "active", [2]);
+            $("#ddlITVDonationTo").closest("div").H2GFocus();
+            notiWarning("กรุณาเลือกการนำไปใช้งาน");
+            return true;
         }
     }
     return false;
 }
 function notAllAnswer() {
-    var quest = $("#tbQuestionnaire > tbody > tr");
+    var quest = $("#tbQuestionnaire > tbody > tr:visible");
     var notanswer = false;
     $.each((quest), function (index, e) {
-        if ($(e).find("input").H2GValue() == "" && ($(e).find("select").H2GValue() == "" || $(e).find("select").H2GValue() == null)) {
+        if ($(e).find("input").H2GValue() == "" && ($(e).find("select").H2GValue() == "")) {
             notanswer = true;
             return false; // brake loop
         }
@@ -668,8 +683,8 @@ function showDonorData() {
                 $("#ddlITVDonationType").H2GAttr("selectItem", data.getItems.Donor.DonationTypeID);
                 $("#ddlITVBag").H2GAttr("selectItem", data.getItems.Donor.BagID);
                 $("#ddlITVDonationTo").H2GAttr("selectItem", data.getItems.Donor.DonationToID);
-                $("#ddlHbTest").val(data.getItems.Donor.HBTest).change();
-                $("#ddlITVResult").val(data.getItems.Donor.InterviewStatus).change();
+                $("#ddlHbTest").H2GValue(data.getItems.Donor.HBTest);
+                $("#ddlITVResult").H2GValue(data.getItems.Donor.InterviewStatus);
                 
                 //### External Card
                 $('#divCardNumber').H2GValue("");
@@ -803,7 +818,7 @@ function showDonorData() {
                             selectItem: function () {
                                 selectNextQuestion($(this).closest("tr").H2GAttr("questID"), $(this).H2GValue());
                             }
-                        });
+                        }).H2GValue(e.Answer);
                     } else {
                         $(dataRow).find(".td-answer input").show().H2GValue(e.Answer);
                         if (e.AnswerType == "DATE") {
@@ -856,7 +871,7 @@ function showDonorData() {
                         questID: e.question_id,
                     });
                     $(dataRow).find('.td-exam').append(e.examination_code + ' : ' + e.examination_desc).H2GAttr("title", e.examination_code + ' : ' + e.examination_desc);
-                    if (er.question_id != "") {
+                    if (e.question_id != "") {
                         $(dataRow).find('.glyphicon-remove').closest("a").hide();
                     }
                     $("#tbExam > tbody").append(dataRow);

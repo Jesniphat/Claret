@@ -25,7 +25,7 @@
             font-weight:normal;
         }
     </style>
-    <script src="../resources/javascript/page/registerScript.js?ver=20160203" type="text/javascript"></script>
+    <script src="../resources/javascript/page/registerScript.js?ver=20160205" type="text/javascript"></script>
     <script>
         $(function () {
             lookupControl();
@@ -198,60 +198,19 @@
                 addExtCard: function (args) {
                     var self = this;
                     if ($(self).H2GValue() != "") {
-                        if (checkMaxLength($(self))) {
-                            if (checkMinLength($(self))) {
-                                if (checkNationOnlyNumber($(self))) {
-                                    $.ajax({
-                                        url: '../ajaxAction/donorAction.aspx', data: {
-                                            action: 'checkextcardnumber',
-                                            nation_number: $(self).H2GValue(),
-                                            external_id: $("#ddlExtCard").H2GValue(),
-                                            donor_external_id: $('#divCardNumber div[extID="' + $("#ddlExtCard").H2GValue() + '"]').H2GAttr("refID")
-                                        }
-                                        , type: "POST", dataType: "json",
-                                        error: function (xhr, s, err) { console.log(s, err); },
-                                        success: function (data) {
-                                            if (!data.onError) {
-                                                data.getItems = jQuery.parseJSON(data.getItems);
-                                                if (data.getItems.name == "") {
-                                                    var extCard = $('#divCardNumber div[extID="' + $("#ddlExtCard").H2GValue() + '"]');
-                                                    if (extCard.length > 0) {
-                                                        $(extCard).show().H2GFill({
-                                                            cardNumber: $(self).H2GValue(),
-                                                            refID: $(extCard).H2GAttr("refID").replace("D#", "")
-                                                        }).find(".ext-number").H2GValue($("#ddlExtCard :selected").text() + " : "
-                                                            + $(self).H2GValue()).H2GAttr("cardNumber", $(self).H2GValue());
-                                                    } else {
-                                                        var spExtCard = $("#divCardNumberTemp").children().clone();
-                                                        $(spExtCard).H2GFill({
-                                                            extID: $("#ddlExtCard").H2GValue(),
-                                                            cardNumber: $(self).H2GValue()
-                                                        }).find(".ext-number").H2GValue($("#ddlExtCard :selected").text() + " : " + $(self).H2GValue());
-                                                        $('#divCardNumber').append(spExtCard);
-                                                    }
-                                                    $(self).H2GValue('');
-                                                    $("#rbtM").focus();
-                                                } else {
-                                                    notiWarning(data.getItems.name);
-                                                    $(self).focus();
-                                                }
-                                            } else { notiError(data.exMessage); }
-                                        }
-                                    });    //End ajax
-                                } else {
-                                    notiWarning("เลขบัตรไม่ถูกต้องกรุณาตรวจสอบ");
-                                    $(self).focus();
-                                }
-                            } else {
-                                notiWarning("กรุณากรอกเลขบัตรอย่างน้อย " + $(self).H2GAttr("minlen") + " ตัวอักษร");
-                                $(self).focus();
-                            }
+                        if (isUpdateExtNumber(self)) {
+                            H2GOpenPopupBox({
+                                header: "กรุณาตรวจสอบ",
+                                detail: "คุณต้องการจะแก้ไขเลขที่บัตร " + $("#ddlExtCard option:selected").text() + " ใช่หรือไม่",
+                                isAlert: false,
+                                confirmFunction: function () { addExtCardMain($(self)); },
+                                cancelFunction: function () { $(self).H2GValue(""); },
+                            });
                         } else {
-                            notiWarning("กรุณากรอกเลขบัตรไม่เกิน " + $(self).H2GAttr("minlen") + " ตัวอักษร");
-                            $(self).focus();
+                            addExtCardMain(self);
                         }
                     } else {
-                        $("#rbtM").focus();
+                        //$("#rbtM").focus();
                     }
                 },
                 deleteExtCard: function (args) {
@@ -457,11 +416,11 @@
                             defRemarks: $("#txtDefRemarks").H2GValue(),
                         });
                         $(dataRow).find('.td-description').append($("#ddlITVDeferral option:selected").H2GAttr("desc")).H2GAttr("title", $("#ddlITVDeferral option:selected").H2GAttr("desc"));                        
-                        $(dataRow).find('.td-enddate').append('วันที่สิ้นสุด ' + formatDate(new Date(getDateFromFormat($('#txtDefDateTo').val(), 'dd/mm/yyyy')), "dd NNN yyyy")).H2GAttr("title", 'วันที่สิ้นสุด ' + formatDate(new Date(getDateFromFormat($('#txtDefDateTo').val(), 'dd/mm/yyyy')), "dd NNN yyyy"));
+                        $(dataRow).find('.td-enddate').append('วันที่สิ้นสุด ' + formatDate(new Date(getDateFromFormat($('#txtDefDateTo').H2GValue(), 'dd/mm/yyyy')), "dd NNN yyyy")).H2GAttr("title", 'วันที่สิ้นสุด ' + formatDate(new Date(getDateFromFormat($('#txtDefDateTo').H2GValue(), 'dd/mm/yyyy')), "dd NNN yyyy"));
                         $("#tbDefInterview > tbody").append(dataRow);
                         
                         $("#txtDefCode").H2GValue("");
-                        $("#ddlITVDeferral").closest("div").find("input").val("");
+                        $("#ddlITVDeferral").closest("div").find("input").H2GValue("");
                         $("#txtDuration").H2GValue("");
                         $("#txtDefDateTo").H2GValue("");
                         $("#txtDefRemarks").H2GValue("");
@@ -505,6 +464,8 @@
                         error: function (xhr, s, err) { console.log(s, err); $("#btnSticker").H2GEnable(); },
                         success: function (data) {
                             if (!data.onError) {
+                                data.getItems = jQuery.parseJSON(data.getItems);
+                                console.log(data);
                             } else { notiError(data.exMessage); }
                             $("#btnSticker").H2GEnable();
                         }
@@ -555,6 +516,7 @@
             }
 
             $("#btnSticker").click(function () { $(this).stickerPrint(); })
+
             $("#txtZipcode").keydown(function (e) {
                 if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
                     (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
@@ -605,6 +567,14 @@
                 } 
             }
             return true;
+        }
+        function isUpdateExtNumber(xobj) {
+            if ($('#divCardNumber div[extID="' + $("#ddlExtCard").H2GValue() + '"]') != undefined) {
+                if ($(xobj).H2GValue() != $('#divCardNumber div[extID="' + $("#ddlExtCard").H2GValue() + '"]').H2GAttr("cardNumber")) {
+                    return true;
+                }
+            }
+            return false;
         }
         function lookupTabQuestionaire() {
             $("#txtExamCode").enterKey(function () { getExamination($(this).H2GValue()); });
@@ -697,7 +667,7 @@
             });
             
             $("#txtDefCode").enterKey(function () {
-                $("#ddlITVDeferral").combobox("setvalue", $("#txtDefCode").val().toUpperCase()).change();
+                $("#ddlITVDeferral").combobox("setvalue", $("#txtDefCode").H2GValue().toUpperCase()).change();
                 if ($("#ddlITVDeferral").H2GValue() == null) {
                     $("#txtDuration").H2GValue("");
                     $("#txtDefDateTo").H2GValue("");
@@ -783,7 +753,7 @@
                                 });
 
                                 $("#txtExamCode").H2GValue("");
-                                $("#ddlExam").closest("div").find("input").val("");
+                                $("#ddlExam").closest("div").find("input").H2GValue("");
                                 if (notiReject != "") { notiWarning(notiReject.substring(0, notiReject.length - 2) + " มีการเพิ่มไปแล้ว") }
                                 if (notiInject != "") { notiWarning(notiInject.substring(0, notiInject.length - 2) + " ถูกแทนที่ด้วยกลุ่ม " + data.getItems[0].GroupCode) }
                             } else {
@@ -960,6 +930,7 @@
                                 $(dataRow).find('.td-enddate').append('วันที่สิ้นสุด ' + formatDate(new Date(getDateFromFormat(duration, 'dd/mm/yyyy')), "dd NNN yyyy")).H2GAttr("title", 'วันที่สิ้นสุด ' + formatDate(new Date(getDateFromFormat(duration, 'dd/mm/yyyy')), "dd NNN yyyy"));
                                 $(dataRow).find('.glyphicon-remove').closest("a").hide();
                                 $("#tbDefInterview > tbody").append(dataRow);
+                                return false;
                             }
                         });
                     });
@@ -998,7 +969,59 @@
                 }
             });
         }
-
+        function addExtCardMain(self) {
+            if (checkMaxLength($(self))) {
+                if (checkMinLength($(self))) {
+                    if (checkNationOnlyNumber($(self))) {
+                        $.ajax({
+                            url: '../ajaxAction/donorAction.aspx', data: {
+                                action: 'checkextcardnumber',
+                                nation_number: $(self).H2GValue(),
+                                external_id: $("#ddlExtCard").H2GValue(),
+                                donor_external_id: $('#divCardNumber div[extID="' + $("#ddlExtCard").H2GValue() + '"]').H2GAttr("refID")
+                            }
+                            , type: "POST", dataType: "json",
+                            error: function (xhr, s, err) { console.log(s, err); },
+                            success: function (data) {
+                                if (!data.onError) {
+                                    data.getItems = jQuery.parseJSON(data.getItems);
+                                    if (data.getItems.name == "") {
+                                        var extCard = $('#divCardNumber div[extID="' + $("#ddlExtCard").H2GValue() + '"]');
+                                        if (extCard.length > 0) {
+                                            $(extCard).show().H2GFill({
+                                                cardNumber: $(self).H2GValue(),
+                                                refID: $(extCard).H2GAttr("refID").replace("D#", "")
+                                            }).find(".ext-number").H2GValue($("#ddlExtCard :selected").text() + " : "
+                                                + $(self).H2GValue()).H2GAttr("cardNumber", $(self).H2GValue());
+                                        } else {
+                                            var spExtCard = $("#divCardNumberTemp").children().clone();
+                                            $(spExtCard).H2GFill({
+                                                extID: $("#ddlExtCard").H2GValue(),
+                                                cardNumber: $(self).H2GValue()
+                                            }).find(".ext-number").H2GValue($("#ddlExtCard :selected").text() + " : " + $(self).H2GValue());
+                                            $('#divCardNumber').append(spExtCard);
+                                        }
+                                        $(self).H2GValue('');
+                                    } else {
+                                        notiWarning(data.getItems.name);
+                                        $(self).focus();
+                                    }
+                                } else { notiError(data.exMessage); }
+                            }
+                        });    //End ajax
+                    } else {
+                        notiWarning("เลขบัตรไม่ถูกต้องกรุณาตรวจสอบ");
+                        $(self).focus();
+                    }
+                } else {
+                    notiWarning("กรุณากรอกเลขบัตรอย่างน้อย " + $(self).H2GAttr("minlen") + " ตัวอักษร");
+                    $(self).focus();
+                }
+            } else {
+                notiWarning("กรุณากรอกเลขบัตรไม่เกิน " + $(self).H2GAttr("minlen") + " ตัวอักษร");
+                $(self).focus();
+            }
+        }
         function setBagData(donationTypeID) {
             var dataObj = [];
             var dataAll = $("#ddlITVBag").data("data-ddl");
@@ -1767,7 +1790,7 @@
                                                             <span>ประเภทการบริจาค</span>
                                                         </div>                                                        
                                                         <div class="col-md-25">
-                                                            <select id="ddlITVDonationType" class="text-left" style="width:318px;" placeholder="กรุณาเลือก">
+                                                            <select id="ddlITVDonationType" class="text-left required" style="width:318px;" placeholder="กรุณาเลือก">
                                                                 <option value="0">Loading...</option>
                                                             </select>
                                                         </div>
@@ -1777,7 +1800,7 @@
                                                             <span>ประเภทถุง</span>
                                                         </div>                                                        
                                                         <div class="col-md-25">
-                                                            <select id="ddlITVBag" class="text-left" style="width:318px;" placeholder="กรุณาเลือก">
+                                                            <select id="ddlITVBag" class="text-left required" style="width:318px;" placeholder="กรุณาเลือก">
                                                                 <option value="0">Loading...</option>
                                                             </select>
                                                         </div>
@@ -1787,7 +1810,7 @@
                                                             <span>การนำไปใช้งาน</span>
                                                         </div>                                                        
                                                         <div class="col-md-25">
-                                                            <select id="ddlITVDonationTo" class="text-left" style="width:318px;" placeholder="กรุณาเลือก">
+                                                            <select id="ddlITVDonationTo" class="text-left required" style="width:318px;" placeholder="กรุณาเลือก">
                                                                 <option value="0">Loading...</option>
                                                             </select>
                                                         </div>
