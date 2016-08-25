@@ -5,16 +5,16 @@ function lookupControl() {
     //$("#txtDonorSurName").H2GNamebox();
     $("#txtDonorNameEng").H2GDisable();//.H2GNamebox()
     $("#txtDonorSurNameEng").H2GDisable();//.H2GNamebox()
-    $("#ddlVisit").setAutoList({ selectItem: function () { $(this).changeQuestLanguage(); }, }).H2GValue("ACTIVE");
+    $("#ddlVisit").hide();//.setAutoList().H2GValue("ACTIVE");
     $("#togDeferal").toggleSlide();
     $("#togVisitInfo").toggleSlide();
     $("#txtStmRegisDate").setCalendar().H2GDatebox();
     $("#txtOuterDonate").H2GNumberbox();
-    //$("#txtMobile1").H2GPhonebox();
-    //$("#txtMobile2").H2GPhonebox();
-    //$("#txtHomeTel").H2GPhonebox();
-    //$("#txtTel").H2GPhonebox();
-    //$("#txtTelExt").H2GPhonebox();
+    $("#txtMobile1").H2GPhonebox().blur(function () { $(this).checkPhoneNumber(); });
+    $("#txtMobile2").H2GPhonebox().blur(function () { $(this).checkPhoneNumber(); });
+    $("#txtHomeTel").H2GPhonebox().blur(function () { $(this).checkPhoneNumber(); });
+    $("#txtTel").H2GPhonebox().blur(function () { $(this).checkPhoneNumber(); });
+    $("#txtTelExt").H2GPhonebox().blur(function () { $(this).checkPhoneNumber(); });
 
     $("#labPaneTab").click(setHistoricalFileDatas);
     $("#exams-tab").click(setExamsDatas);
@@ -39,7 +39,6 @@ function lookupControl() {
         yearRange: "c50:c+50",
         onSelect: function (selectedDate, objDate) { $("#txtDefRemarks").H2GFocus(); },
     });
-    $("#txtMobile1").blur(function () { $(this).checkPhoneNumber(); });
 }
 function donorSelectDDL() {
     if ($("#ddlTitleName option").length > 1) { $("#ddlTitleName").H2GValue($("#ddlTitleName").H2GAttr("selectItem")); } else {
@@ -51,54 +50,39 @@ function donorSelectDDL() {
             $("#txtDonorName").H2GFocus();
         });
     }
-    if ($("#ddlCountry option").length > 1) { $("#ddlCountry").H2GValue($("#ddlCountry").H2GAttr("selectItem")); } else {
-        $("#ddlCountry").setAutoListValue({
-            url: '../../ajaxAction/masterAction.aspx',
-            data: { action: 'country' },
-            defaultSelect: $("#ddlCountry").H2GAttr("selectItem") || "64",
-        }).on('autocompleteselect', function () {
-            $("#txtMobile1").H2GFocus();
-        });
-    }
-    if ($("#ddlOccupation option").length > 1) { $("#ddlOccupation").H2GValue($("#ddlOccupation").H2GAttr("selectItem")); } else {
-        $("#ddlOccupation").setAutoListValue({
-            url: '../../ajaxAction/masterAction.aspx',
-            data: { action: 'occupation' },
-            defaultSelect: $("#ddlOccupation").H2GAttr("selectItem") || "1",
-        }).on('autocompleteselect', function () {
-            $("#ddlNationality").closest("div").H2GFocus();
-        });
-    }
-    if ($("#ddlNationality option").length > 1) { $("#ddlNationality").H2GValue($("#ddlNationality").H2GAttr("selectItem")); } else {
-        $("#ddlNationality").setAutoListValue({
-            url: '../../ajaxAction/masterAction.aspx',
-            data: { action: 'nationality' },
-            defaultSelect: $("#ddlNationality").H2GAttr("selectItem") || "1",
-        }).on('autocompleteselect', function () {
-            $("#ddlRace").closest("div").H2GFocus();
-        });
-    }
-    if ($("#ddlRace option").length > 1) { $("#ddlRace").H2GValue($("#ddlRace").H2GAttr("selectItem")); } else {
-        $("#ddlRace").setAutoListValue({
-            url: '../../ajaxAction/masterAction.aspx',
-            data: { action: 'nationality' },
-            defaultSelect: $("#ddlRace").H2GAttr("selectItem") || "1",
-        });
-    }
-    if ($("#ddlAssociation option").length > 1) { $("#ddlAssociation").H2GValue($("#ddlAssociation").H2GAttr("selectItem")).H2GDisable(); } else {
-        $("#ddlAssociation").setAutoListValue({
-            url: '../../ajaxAction/masterAction.aspx',
-            data: { action: 'association' },
-            defaultSelect: $("#ddlAssociation").H2GAttr("selectItem"),
-            enable: ($("#ddlAssociation").H2GAttr("selectItem") == "" || $("#ddlAssociation").H2GAttr("selectItem") == undefined) ? true : false,
-        });
-    }
-    if ($("#ddlCollectionPoint option").length > 1) { $("#ddlCollectionPoint").H2GValue($("#ddlCollectionPoint").H2GAttr("selectItem")); } else {
-        $("#ddlCollectionPoint").setAutoListValue({
-            url: '../../ajaxAction/masterAction.aspx',
-            data: { action: 'forcollection', siteID: $("#spRegisNumber").H2GAttr("siteID") || $("#data").H2GAttr("siteID") },
-            defaultSelect: $("#ddlCollectionPoint").H2GAttr("selectItem") || $("#data").H2GAttr("collectionpointid"),
-        });
+
+    if ($("#ddlCollectionPoint option").length > 1) {
+        $("#ddlCountry").H2GValue($("#ddlCountry").H2GAttr("selectItem"));
+        $("#ddlOccupation").H2GValue($("#ddlOccupation").H2GAttr("selectItem"));
+        $("#ddlNationality").H2GValue($("#ddlNationality").H2GAttr("selectItem"));
+        $("#ddlRace").H2GValue($("#ddlRace").H2GAttr("selectItem"));
+        $("#ddlCollectionPoint").H2GValue($("#ddlCollectionPoint").H2GAttr("selectItem")); 
+        $("#ddlAssociation").H2GValue($("#ddlAssociation").H2GAttr("selectItem")).H2GDisable();
+    } else {
+        $.ajax({
+            url: '../ajaxAction/masterAction.aspx', data: { action: 'registercontent' }, type: "POST", dataType: "json",
+            error: function (xhr, s, err) { console.log(s, err); },
+            success: function (data) {
+                if (!data.onError) {
+                    data.getItems = jQuery.parseJSON(data.getItems);
+                    $("#ddlCountry").setAutoListValue({ dataObject: data.getItems.CountryList, defaultSelect: $("#ddlCountry").H2GAttr("selectItem") || "64", });
+                    $("#ddlOccupation").setAutoListValue({ dataObject: data.getItems.OccupationList, defaultSelect: $("#ddlOccupation").H2GAttr("selectItem") || "1", });
+                    $("#ddlNationality").setAutoListValue({ dataObject: data.getItems.NationList, defaultSelect: $("#ddlNationality").H2GAttr("selectItem") || "1", });
+                    $("#ddlRace").setAutoListValue({ dataObject: data.getItems.NationList, defaultSelect: $("#ddlRace").H2GAttr("selectItem") || "1", });
+                    $("#ddlCollectionPoint").setAutoListValue({ dataObject: data.getItems.CollectionList, defaultSelect: $("#ddlCollectionPoint").H2GAttr("selectItem") || $("#data").H2GAttr("collectionpointid"), });
+                    $("#ddlAssociation").setAutoListValue({
+                        dataObject: data.getItems.AssoList, defaultSelect: $("#ddlAssociation").H2GAttr("selectItem"),
+                        enable: ($("#ddlAssociation").H2GAttr("selectItem") == "" || $("#ddlAssociation").H2GAttr("selectItem") == undefined) ? true : false,
+                    });
+                    $("#ddlExtAsso").setAutoListValue({
+                        dataObject: data.getItems.AssoList,
+                        selectItem: function () {
+                            $("#txtOuterDonate").addDonateRecord();
+                        },
+                    });
+                } else { notiError(data.exMessage); }
+            }
+        });    //End ajax
     }
 }
 function checkBeforSave() {
@@ -282,11 +266,12 @@ function saveDonorInfo(notOnlyDonor) {
             DonateDate: $(e).H2GAttr('donatedate'),
             DonateNumber: $(e).H2GAttr('donatenumber'),
             DonateFrom: $(e).H2GAttr('donatefrom'),
+            AssociationID: $(e).H2GAttr('associationID'),
             DonateReward: getReward(e),
         };
         create++;
     });
-    DonorRecord.sort(H2G.keysrt('ID'));
+    DonorRecord.sort(H2G.keysrt('DonateNumber'));
 
     var DonorQuestionItem = [];
     var DonorDeferralItem = [];
@@ -335,45 +320,93 @@ function saveDonorInfo(notOnlyDonor) {
             create++;
         });
     }
-    $.ajax({
-        url: '../../ajaxAction/donorAction.aspx',
-        data: H2G.ajaxData({
-            action: 'savedonor',
-            md: JSON.stringify(MasterDonor),
-            dv: JSON.stringify(DonorVisit),
-            dec: JSON.stringify(DonorExtCard),
-            dc: JSON.stringify(DonorComment),
-            dr: JSON.stringify(DonorRecord),
-            dh: JSON.stringify(DonorHospital),
-            dq: JSON.stringify(DonorQuestionItem),
-            dd: JSON.stringify(DonorDeferralItem),
-            de: JSON.stringify(DonationExamination),
-            receipthospitalid: $("#data").H2GAttr("receiptHospitalID"),
-        }).config,
-        type: "POST",
-        dataType: "json",
-        error: function (xhr, s, err) {
-            console.log(s, err);
-            notiError("บันทึกไม่สำเร็จ : " + err);
-            $("#btnSave").prop("disabled", false);
-            $("#btnSaveOnlyDonor").prop("disabled", false);
-        },
-        success: function (data) {
-            data.getItems = jQuery.parseJSON(data.getItems);
-            if (!data.onError) {
-                $("#data").H2GAttr("donorID", data.getItems.ID);
-                $("#spRegisNumber").H2GAttr("visitID", data.getItems.VisitID)
-                notiSuccess("บันทึกสำเร็จ");
-                if ($("#spRegisNumber").H2GAttr("backToSearch") == "Y" || gotoRegister == true ) {
-                    cancelRegis(this);
-                } else {
-                    showDonorData();
-                }
-            } else { notiError("บันทึกไม่สำเร็จ : " + data.exMessage); }
-            $("#btnSave").prop("disabled", false);
-            $("#btnSaveOnlyDonor").prop("disabled", false);
-        }
-    });    //End ajax
+//<<<<<<< HEAD
+
+    if ($("#btnSave").H2GAttr("wStatus") != "working") {
+        $.ajax({
+            url: '../../ajaxAction/donorAction.aspx',
+            data: H2G.ajaxData({
+                action: 'savedonor',
+                md: JSON.stringify(MasterDonor),
+                dv: JSON.stringify(DonorVisit),
+                dec: JSON.stringify(DonorExtCard),
+                dc: JSON.stringify(DonorComment),
+                dr: JSON.stringify(DonorRecord),
+                dh: JSON.stringify(DonorHospital),
+                dq: JSON.stringify(DonorQuestionItem),
+                dd: JSON.stringify(DonorDeferralItem),
+                de: JSON.stringify(DonationExamination),
+                receipthospitalid: $("#data").H2GAttr("receiptHospitalID"),
+            }).config,
+            type: "POST",
+            dataType: "json",
+            beforeSend: $("#btnSave").H2GAttr("wStatus", "working"),
+            error: function (xhr, s, err) {
+                console.log(s, err);
+                notiError("บันทึกไม่สำเร็จ : " + err);
+                $("#btnSave").H2GAttr("wStatus", "error"),
+                $("#btnSave").prop("disabled", false);
+                $("#btnSaveOnlyDonor").prop("disabled", false);
+            },
+            success: function (data) {
+                data.getItems = jQuery.parseJSON(data.getItems);
+                if (!data.onError) {
+                    $("#data").H2GAttr("donorID", data.getItems.ID);
+                    $("#spRegisNumber").H2GAttr("visitID", data.getItems.VisitID)
+                    notiSuccess("บันทึกสำเร็จ");
+                    if ($("#spRegisNumber").H2GAttr("backToSearch") == "Y" || gotoRegister == true) {
+                        cancelRegis(this);
+                    } else {
+                        showDonorData();
+                    }
+                } else { notiError("บันทึกไม่สำเร็จ : " + data.exMessage); }
+                $("#btnSave").H2GAttr("wStatus", "done"),
+                $("#btnSave").prop("disabled", false);
+                $("#btnSaveOnlyDonor").prop("disabled", false);
+            }
+        });    //End ajax
+
+        //$.ajax({
+        //    url: '../../ajaxAction/donorAction.aspx',
+        //    data: H2G.ajaxData({
+        //        action: 'savedonor',
+        //        md: JSON.stringify(MasterDonor),
+        //        dv: JSON.stringify(DonorVisit),
+        //        dec: JSON.stringify(DonorExtCard),
+        //        dc: JSON.stringify(DonorComment),
+        //        dr: JSON.stringify(DonorRecord),
+        //        dh: JSON.stringify(DonorHospital),
+        //        dq: JSON.stringify(DonorQuestionItem),
+        //        dd: JSON.stringify(DonorDeferralItem),
+        //        de: JSON.stringify(DonationExamination),
+        //        receipthospitalid: $("#data").H2GAttr("receiptHospitalID"),
+        //    }).config,
+        //    type: "POST",
+        //    dataType: "json",
+        //    error: function (xhr, s, err) {
+        //        console.log(s, err);
+        //        notiError("บันทึกไม่สำเร็จ : " + err);
+        //        $("#btnSave").prop("disabled", false);
+        //        $("#btnSaveOnlyDonor").prop("disabled", false);
+        //    },
+        //    success: function (data) {
+        //        data.getItems = jQuery.parseJSON(data.getItems);
+        //        if (!data.onError) {
+        //            $("#data").H2GAttr("donorID", data.getItems.ID);
+        //            $("#spRegisNumber").H2GAttr("visitID", data.getItems.VisitID)
+        //            notiSuccess("บันทึกสำเร็จ");
+        //            if ($("#spRegisNumber").H2GAttr("backToSearch") == "Y" || gotoRegister == true ) {
+        //                cancelRegis(this);
+        //            } else {
+        //                showDonorData();
+        //            }
+        //        } else { notiError("บันทึกไม่สำเร็จ : " + data.exMessage); }
+        //        $("#btnSave").prop("disabled", false);
+        //        $("#btnSaveOnlyDonor").prop("disabled", false);
+        //    }
+        //});    //End ajax
+
+    }
 }
 
 function checkGetStatusForDonation() {
@@ -730,7 +763,7 @@ function showDonorData() {
                 });
 
                 //### Donation Record
-                $('#divDonateRecord').H2GRemoveAttr("rewardList").H2GValue("");
+                $('#divDonateRecord').H2GFill({ rewardList: "" }).H2GValue("");
                 var candelete = true;
                 data.getItems.DonationRecord.sort(H2G.keysrt('DonateNumber', true));
                 $.each((data.getItems.DonationRecord), function (index, e) {

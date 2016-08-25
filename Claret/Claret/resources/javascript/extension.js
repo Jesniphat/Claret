@@ -210,7 +210,6 @@ $.extend($.fn, {
             $(self).combobox({
                 select: config.selectItem,
             }).H2GValue(config.defaultSelect);
-            //$(self).parent().find("span").find("input").val($(self).find(":selected").text());
             if (config.enable) { $(self).H2GEnable(); } else { $(self).H2GDisable(); }
             //timeStamp.Stop("stop success of " + config.data.action);
         }
@@ -409,8 +408,9 @@ $.extend($.fn, {
         $(this).keypress(function (e) {
             var keyCode = e.keyCode || e.which;
             var ValueNullKey = ($.trim($(this).val()) === $(this).attr('pretext')) || ($.trim($(this).val()) === "");
-            var OtherKey = ((e.ctrlKey && keyCode != 86) || e.ctrlKey || e.altKey || keyCode == 8 || keyCode == 45 || keyCode == 35 || keyCode == 13);
-            var NumKey = (keyCode >= 48 && keyCode <= 57);// || (e.keyCode>=96 && e.keyCode<=105); // (Number in Keyboard) || (Numpad)
+            var OtherKey = ((e.ctrlKey && keyCode != 86) || e.ctrlKey || e.altKey || keyCode == 8 || keyCode == 45 || keyCode == 35 || keyCode == 13 || (keyCode >= 40
+                 && keyCode <= 43));
+            var NumKey = (keyCode >= 47 && keyCode <= 57);// || (e.keyCode>=96 && e.keyCode<=105); // (Number in Keyboard) || (Numpad)
             if (!NumKey && !OtherKey) { return false; } else { if (ValueNullKey) $(this).val(''); }
         });
 

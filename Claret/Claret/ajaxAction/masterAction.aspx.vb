@@ -24,12 +24,12 @@ Public Class masterAction
         Select Case _REQUEST("action")
             Case "site" : JSONResponse.setItems(Of List(Of KeyCodeIDItem))(Me.getSite())
             Case "collection" : JSONResponse.setItems(Of List(Of KeyCodeIDItem))(Me.getCollection())
-            Case "country" : getCountry()
+            Case "country" : JSONResponse.setItems(Of List(Of KeyCodeItem))(Me.getCountry())
             Case "externalcard" : getExternalCard()
-            Case "titlename" : getTitleName()
-            Case "occupation" : getOccupation()
-            Case "nationality" : getNationality()
-            Case "association" : getAssociation()
+            Case "titlename" : JSONResponse.setItems(Of List(Of KeyCodeItem))(getTitleName())
+            Case "occupation" : JSONResponse.setItems(Of List(Of KeyCodeItem))(getOccupation())
+            Case "nationality" : JSONResponse.setItems(Of List(Of KeyCodeItem))(getNationality())
+            Case "association" : JSONResponse.setItems(Of List(Of KeyCodeIDItem))(getAssociation())
             Case "hospital" : getHospital()
             Case "department" : getDepartment()
             Case "lab" : getLab()
@@ -42,10 +42,11 @@ Public Class masterAction
             Case "donationtype2" : getDonationType2()
             Case "bag" : getBag()
             Case "questionnaire" : getQuestionnaire()
-            Case "forcollection" : getForCollection()
+            Case "forcollection" : JSONResponse.setItems(Of List(Of KeyCodeIDItem))(getForCollection())
             Case "getdonatebagtypelist" : GetDonateBagTypeList()
             Case "getdonateapplylist" : GetDonateApplyList()
             Case "logincontent" : JSONResponse.setItems(Of LoginContent)(Me.getLoginContent())
+            Case "registercontent" : JSONResponse.setItems(Of RegisterContent)(Me.getRegisterContent())
             Case Else
                 Dim exMsg As String = IIf(String.IsNullOrEmpty(_REQUEST("action")), "", _REQUEST("action"))
                 Throw New Exception("Not found action [" & exMsg & "].", New Exception("Please check your action name"))
@@ -56,11 +57,20 @@ Public Class masterAction
 
     Private Function getLoginContent() As LoginContent
         Dim LoginContent As New LoginContent
-        LoginContent.SiteList = Me.getSite()
-        LoginContent.CollectionList = Me.getCollection()
+        LoginContent.SiteList = getSite()
+        LoginContent.CollectionList = getCollection()
         Return LoginContent
     End Function
-
+    Private Function getRegisterContent() As RegisterContent
+        Dim regCon As New RegisterContent
+        regCon.AssoList = getAssociation()
+        regCon.CollectionList = getForCollection()
+        regCon.CountryList = getCountry()
+        regCon.NationList = getNationality()
+        regCon.OccupationList = getOccupation()
+        regCon.TitleList = getTitleName()
+        Return regCon
+    End Function
     Private Function getSite() As List(Of KeyCodeIDItem)
         Dim countryList As New List(Of KeyCodeIDItem)
         Dim CountryItem As KeyCodeIDItem
@@ -91,7 +101,7 @@ Public Class masterAction
         'JSONResponse.setItems(Of List(Of KeyCodeIDItem))(countryList)
         Return countryList
     End Function
-    Private Sub getCountry()
+    Private Function getCountry() As List(Of KeyCodeItem)
         Dim countryList As New List(Of KeyCodeItem)
         Dim CountryItem As KeyCodeItem
         If Not String.IsNullOrEmpty(_REQUEST("countryid")) Then param.Add("#id", "and id = '" & _REQUEST("countryid") & "'")
@@ -105,8 +115,9 @@ Public Class masterAction
             CountryItem.text = dr("description").ToString()
             countryList.Add(CountryItem)
         Next
-        JSONResponse.setItems(Of List(Of KeyCodeItem))(countryList)
-    End Sub
+        'JSONResponse.setItems(Of List(Of KeyCodeItem))(countryList)
+        Return countryList
+    End Function
     Private Sub getExternalCard()
         Dim DataList As New List(Of ExternalCardItem)
         Dim DataItem As ExternalCardItem
@@ -124,7 +135,7 @@ Public Class masterAction
         Next
         JSONResponse.setItems(Of List(Of ExternalCardItem))(DataList)
     End Sub
-    Private Sub getTitleName()
+    Private Function getTitleName() As List(Of KeyCodeItem)
         Dim DataList As New List(Of KeyCodeItem)
         Dim DataItem As KeyCodeItem
         Dim sql As String = "select id, hiig_code, title_m as title_name from title where title_m is not null order by title_m"
@@ -137,9 +148,10 @@ Public Class masterAction
             DataItem.text = dr("title_name").ToString()
             DataList.Add(DataItem)
         Next
-        JSONResponse.setItems(Of List(Of KeyCodeItem))(DataList)
-    End Sub
-    Private Sub getOccupation()
+        'JSONResponse.setItems(Of List(Of KeyCodeItem))(DataList)
+        Return DataList
+    End Function
+    Private Function getOccupation() As List(Of KeyCodeItem)
         Dim DataList As New List(Of KeyCodeItem)
         Dim DataItem As KeyCodeItem
         Dim sql As String = "select id, hiig_code, description from occupation order by description"
@@ -151,9 +163,10 @@ Public Class masterAction
             DataItem.text = dr("description").ToString()
             DataList.Add(DataItem)
         Next
-        JSONResponse.setItems(Of List(Of KeyCodeItem))(DataList)
-    End Sub
-    Private Sub getNationality()
+        'JSONResponse.setItems(Of List(Of KeyCodeItem))(DataList)
+        Return DataList
+    End Function
+    Private Function getNationality() As List(Of KeyCodeItem)
         Dim DataList As New List(Of KeyCodeItem)
         Dim DataItem As KeyCodeItem
         Dim sql As String = "select id, description from nationality order by description"
@@ -169,17 +182,19 @@ Public Class masterAction
         Else
             Throw New Exception("No data found.", New Exception("Nationality has no record"))
         End If
-        JSONResponse.setItems(Of List(Of KeyCodeItem))(DataList)
-    End Sub
-    Private Sub getAssociation()
-        Dim DataList As New List(Of KeyCodeItem)
-        Dim DataItem As KeyCodeItem
+        'JSONResponse.setItems(Of List(Of KeyCodeItem))(DataList)
+        Return DataList
+    End Function
+    Private Function getAssociation() As List(Of KeyCodeIDItem)
+        Dim DataList As New List(Of KeyCodeIDItem)
+        Dim DataItem As KeyCodeIDItem
         Dim sql As String = "select id, code, code || ' ' || name as name from association where name is not null order by name"
         Dim dt As DataTable = Cbase.QueryTable(sql)
 
         If dt.Rows.Count > 0 Then
             For Each dr As DataRow In dt.Rows()
-                DataItem = New KeyCodeItem
+                DataItem = New KeyCodeIDItem
+                DataItem.valueID = dr("code").ToString()
                 DataItem.value = dr("id").ToString()
                 DataItem.text = dr("name").ToString()
                 DataList.Add(DataItem)
@@ -187,8 +202,9 @@ Public Class masterAction
         Else
             Throw New Exception("No data found.", New Exception("Association has no record"))
         End If
-        JSONResponse.setItems(Of List(Of KeyCodeItem))(DataList)
-    End Sub
+        'JSONResponse.setItems(Of List(Of KeyCodeItem))(DataList)
+        Return DataList
+    End Function
     Private Sub getHospital()
         Dim DataList As New List(Of LabHospitalItem)
         Dim DataItem As LabHospitalItem
@@ -533,7 +549,7 @@ Public Class masterAction
         JSONResponse.setItems(Of QuestionnaireItem)(QuestionnaireItem)
 
     End Sub
-    Private Sub getForCollection()
+    Private Function getForCollection() As List(Of KeyCodeIDItem)
         Dim countryList As New List(Of KeyCodeIDItem)
         Dim CountryItem As KeyCodeIDItem
 
@@ -548,8 +564,9 @@ Public Class masterAction
             CountryItem.text = dr("name").ToString()
             countryList.Add(CountryItem)
         Next
-        JSONResponse.setItems(Of List(Of KeyCodeIDItem))(countryList)
-    End Sub
+        'JSONResponse.setItems(Of List(Of KeyCodeIDItem))(countryList)
+        Return countryList
+    End Function
 End Class
 
 Public Structure KeyCodeItem
@@ -629,4 +646,13 @@ Public Structure DonationtypeListItem
     Public valueID As String
     Public minAge As String
     Public maxAge As String
+End Structure
+
+Public Structure RegisterContent
+    Public AssoList As List(Of KeyCodeIDItem)
+    Public TitleList As List(Of KeyCodeItem)
+    Public CollectionList As List(Of KeyCodeIDItem)
+    Public CountryList As List(Of KeyCodeItem)
+    Public OccupationList As List(Of KeyCodeItem)
+    Public NationList As List(Of KeyCodeItem)
 End Structure

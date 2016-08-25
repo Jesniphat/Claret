@@ -279,7 +279,7 @@
             <div class="row" style="background-color:gray; padding:10px 0px; background: url(../../image/bg/bg-header-bar.png) repeat-x;">
                 <div class="col-md-36">
                     <img src="image/icon/blood-donation-24x24.png" style="margin-top: -10px;" />
-                    <span>&nbsp;ระบบบริจาคโลหิต</span>
+                    <span>&nbsp;Claret</span>
                 </div>
             </div>
         </div>

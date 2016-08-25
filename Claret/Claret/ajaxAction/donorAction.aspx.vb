@@ -44,6 +44,7 @@ Public Class donorAction
             Case "stickerprint" : StrickerPrint()
             Case "checksamplenumber" : checkSampleNumber()
             Case "checkextcardnumber" : checkExtCardNumber()
+            Case "checkinsertreward" : checkInsertExtReward()
             Case Else
                 Dim exMsg As String = IIf(String.IsNullOrEmpty(_REQUEST("action")), "", _REQUEST("action"))
                 Throw New Exception("Not found action [" & exMsg & "].", New Exception("Please check your action name"))
@@ -1376,6 +1377,66 @@ Public Class donorAction
         JSONResponse.setItems("{""name"" : """ & ResultData & """}")
     End Sub
 
+    Private Sub checkInsertExtReward()
+        Dim DRWRItem As New DonateRecordWithRewardItem
+        Dim ResultData As String = ""
+        DRWRItem.msg = ResultData
+        sqlMain = "select id from donation_record where donation_number = '" & _REQUEST("donation_number") & "' and donor_id = '" & _REQUEST("donor_id") & "' "
+        ResultData = Cbase.QueryField(sqlMain, "")
+        If ResultData <> "" Then
+            'reward ซ้ำ
+            DRWRItem.msg = "การบริจาคครั้งที่ " & _REQUEST("donation_number") & " มีอยู่ในระบบอยู่แล้ว กรุณาตรวจสอบ"
+        End If
+
+        If ResultData = "" Then
+            Dim rewardList As String = ""
+            If Not String.IsNullOrEmpty(_REQUEST("reward_list")) Then rewardList = " and RW.id not in (" & _REQUEST("reward_list").Substring(1, _REQUEST("reward_list").Length - 2).Replace(",,", ",") & ") "
+            '
+            sqlMain = "select wmsys.wm_concat(donation_number) as donation_number from (
+	                    select rw.donation_number as donation_number 
+	                    from reward rw
+	                    where rw.donation_number < '" & _REQUEST("donation_number") & "' and reward_type = 'NORMAL'
+	                    and rw.id not in (select reward_id from donation_reward dw where dw.donor_id = '" & _REQUEST("donor_id") & "')
+                        {0}
+	                    ORDER BY rw.donation_number
+                    ) dn "
+            ResultData = Cbase.QueryField(String.Format(sqlMain, rewardList), "")
+
+            If ResultData <> "" Then
+                'reward ซ้ำ
+                DRWRItem.msg = "ไม่สามารถบันทึกการบริจาคครั้งที่ " & _REQUEST("donation_number") & " ได้เนื่องจากยังไม่ได้บันทึกการรับริจาคครั้งที่ " & ResultData
+            End If
+        End If
+
+        If ResultData = "" Then
+            DRWRItem.DonationDate = H2G.BE2AC(H2G.Convert(Of DateTime)(_REQUEST("donatedate"))).ToString("dd/MM/yyyy")
+            DRWRItem.DonationNumber = _REQUEST("donation_number")
+            DRWRItem.DonationFrom = "EXTERNAL"
+            DRWRItem.DonationRewardList = New List(Of RewardItem)
+
+            '### Reward record
+            Dim sql As String = ""
+            Dim RewardItem As RewardItem
+            sql = "select id, donation_number, start_date, end_date, description from reward 
+                                where donation_number = " & DRWRItem.DonationNumber & " 
+                                or (start_date <= to_date('" & DRWRItem.DonationDate & "','dd/mm/yyyy') 
+                                and end_date >= to_date('" & DRWRItem.DonationDate & "','dd/mm/yyyy'))"
+
+            For Each dRow As DataRow In Cbase.QueryTable(sql).Rows
+                RewardItem = New RewardItem
+                RewardItem.ID = dRow("id").ToString
+                RewardItem.Description = dRow("description").ToString
+                RewardItem.DonationNumber = dRow("donation_number").ToString
+                DRWRItem.DonationRewardList.Add(RewardItem)
+            Next
+
+        End If
+
+        JSONResponse.setItems(Of DonateRecordWithRewardItem)(DRWRItem)
+    End Sub
+
+
+
     Public Structure HttpMailResponse
         Public success As String
     End Structure
@@ -1442,6 +1503,7 @@ Public Structure DonateRecordWithRewardItem
     Public DonationDateText As String
     Public DonationNumber As String
     Public DonationFrom As String
+    Public msg As String
     Public DonationRewardList As List(Of RewardItem)
 
 End Structure
@@ -1460,6 +1522,7 @@ Public Structure DonationRecordItem
     Public DonateNumber As String
     Public DonateFrom As String
     Public DonateReward As String
+    Public AssociationID As String
 
 End Structure
 
