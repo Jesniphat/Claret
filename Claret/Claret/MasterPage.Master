@@ -34,7 +34,7 @@
             position: relative;
             min-height: 1px;
             float: left;
-            width: 8%;
+            width: 12%;
             /*min-width: 191px;*/
         }
         #mstContent {
@@ -268,9 +268,9 @@
         <input id="data" runat="server" style="display: none;" tmenu="" lmenu="" amenu="" />
         <div id="topBar" style="min-width: 1280px;">
             <div class="row" style="background-color: gray; background: url(../../image/bg/bg-header-bar.png) repeat-x;">
-                <div class="col-md-5" style="padding: 8px 0px;">
+                <div class="col-md-5" style="padding: 8px 0px; width:12%">
                     <img src="../image/icon/blood-24x24.png" style="margin-top: -10px;" />
-                    <span style="padding:0;">Claret : ระบบบริจาคโลหิต</span>
+                    <span style="padding:0;">&nbsp;ระบบบริจาคโลหิต</span>
                 </div>
                 <div id="topMenu" class="col-md-7">
                     <div class="row">

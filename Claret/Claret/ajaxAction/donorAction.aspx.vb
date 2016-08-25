@@ -495,19 +495,17 @@ Public Class donorAction
         If Not String.IsNullOrEmpty(_REQUEST("birthday")) Then param.Add("#BIRTHDAY", "and to_char(dn.birthday, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("birthday") & "' ")
         If Not String.IsNullOrEmpty(_REQUEST("bloodgroup")) Then param.Add("#BLOOD_GROUP", " and UPPER(rg.description) like UPPER('" & _REQUEST("bloodgroup") & "') ")
 
-        Dim sql1 As String = "select dn.id, dn.donor_number, ec.id as ext_id, dexc.card_number as nation_number, '' as external_number
+        Dim sql1 As String = "select dn.id, dn.donor_number, dexc.external_card_id as ext_id, dexc.card_number as nation_number, '' as external_number
                                         , dn.name, dn.surname, rg.description as blood_group, dn.birthday
                                         from donor dn 
-                                        inner join donor_external_card dexc on dexc.donor_id = dn.id 
-                                        inner join external_card ec on ec.id = dexc.external_card_id and ec.id = 3 
+                                        left join donor_external_card dexc on dexc.donor_id = dn.id and dexc.external_card_id = 3 
                                         left join rh_group rg on rg.id = dn.rh_group_id
                                         where 1=1 /*#DONOR_NUMBER*/ /*#NATION_NUMBER*/ /*#NAME*/ /*#SURNAME*/ /*#BIRTHDAY*/ /*#BLOOD_GROUP*/ "
 
-        Dim sql2 As String = "select dn.id, dn.donor_number, ec.id as ext_id, '' as nation_number, dexc.card_number as external_number
+        Dim sql2 As String = "select dn.id, dn.donor_number, dexc.external_card_id as ext_id, '' as nation_number, dexc.card_number as external_number
                                         , dn.name, dn.surname, rg.description as blood_group, dn.birthday
                                         from donor dn 
-                                        inner join donor_external_card dexc on dexc.donor_id = dn.id 
-                                        inner join external_card ec on ec.id = dexc.external_card_id and ec.id <> 3 
+                                        left join donor_external_card dexc on dexc.donor_id = dn.id and dexc.external_card_id <> 3 
                                         left join rh_group rg on rg.id = dn.rh_group_id
                                         where 1=1 /*#DONOR_NUMBER*/ /*#EXT_NUMBER*/ /*#NAME*/ /*#SURNAME*/ /*#BIRTHDAY*/ /*#BLOOD_GROUP*/ "
 
@@ -532,21 +530,29 @@ Public Class donorAction
         Dim sqlTotal As String = "SELECT count(id) from ( {0} {1} {2} ) dn"
 
 
-        If (Not String.IsNullOrEmpty(_REQUEST("nationnumber")) And Not String.IsNullOrEmpty(_REQUEST("extnumber"))) Then
-            sqlRecord = String.Format(sqlRecord, sql1, sql, sql2)
-            sqlTotal = String.Format(sqlTotal, sql1, sql, sql2)
-        ElseIf (Not String.IsNullOrEmpty(_REQUEST("nationnumber"))) Then
+        'If (Not String.IsNullOrEmpty(_REQUEST("nationnumber")) And Not String.IsNullOrEmpty(_REQUEST("extnumber"))) Then
+        '    sqlRecord = String.Format(sqlRecord, sql1, sql, sql2)
+        '    sqlTotal = String.Format(sqlTotal, sql1, sql, sql2)
+        'ElseIf (Not String.IsNullOrEmpty(_REQUEST("nationnumber"))) Then
+        '    sqlRecord = String.Format(sqlRecord, sql1, "", "")
+        '    sqlTotal = String.Format(sqlTotal, sql1, "", "")
+        'ElseIf (Not String.IsNullOrEmpty(_REQUEST("extnumber"))) Then
+        '    sqlRecord = String.Format(sqlRecord, sql2, "", "")
+        '    sqlTotal = String.Format(sqlTotal, sql2, "", "")
+        '    'ElseIf (Not String.IsNullOrEmpty(_REQUEST("donornumber"))) Then
+        '    '    sqlRecord = String.Format(sqlRecord, sql1, sql, sql2)
+        '    '    sqlTotal = String.Format(sqlTotal, sql1, sql, sql2)
+        'Else
+        '    sqlRecord = String.Format(sqlRecord, sql1, sql, sql2)
+        '    sqlTotal = String.Format(sqlTotal, sql1, sql, sql2)
+        'End If
+
+        If _REQUEST("extnumber") = "" Then
             sqlRecord = String.Format(sqlRecord, sql1, "", "")
             sqlTotal = String.Format(sqlTotal, sql1, "", "")
-        ElseIf (Not String.IsNullOrEmpty(_REQUEST("extnumber"))) Then
+        Else
             sqlRecord = String.Format(sqlRecord, sql2, "", "")
             sqlTotal = String.Format(sqlTotal, sql2, "", "")
-            'ElseIf (Not String.IsNullOrEmpty(_REQUEST("donornumber"))) Then
-            '    sqlRecord = String.Format(sqlRecord, sql1, sql, sql2)
-            '    sqlTotal = String.Format(sqlTotal, sql1, sql, sql2)
-        Else
-            sqlRecord = String.Format(sqlRecord, sql1, sql, sql2)
-            sqlTotal = String.Format(sqlTotal, sql1, sql, sql2)
         End If
 
         param.Add(":start_row", DbType.String, (intItemPerPage * _REQUEST("p")) - (intItemPerPage - 1))
