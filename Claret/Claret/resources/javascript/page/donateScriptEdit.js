@@ -762,10 +762,14 @@ function resetData() {
     $("#data").attr("donorid", "0");
     $("#data").attr("visitid", "0");
     $("#data").attr("donatetype", "0");
+    $("#donateType").combobox("setvalue", "0");
     $("#data").attr("donatebagtype", "0");
+    $("#donateBagType").combobox("setvalue", "0");
     $("#data").attr("donateapply", "0");
+    $("#donateApply").combobox("setvalue", "0");
     // $("#data").attr("donatedate", "");
     $("#data").attr("donatestatus", "WAIT COLLECTION");
+    $("#donerNumber").focus();
 
     getDonationList();
     deferred.resolve("OK");

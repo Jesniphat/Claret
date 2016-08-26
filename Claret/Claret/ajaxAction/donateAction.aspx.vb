@@ -182,7 +182,7 @@ Public Class donateAction
                                                         , DV.SAMPLE_NUMBER, DV.COMMENT_TEXT, to_char(nvl(DV.VISIT_DATE,dv.create_date),'HH24,MI') as regis_time
                                                         , st.code as regis_staff, to_char(dv.Interview_DATE,'HH24,MI') as Interview_time, dv.Interview_STAFF AS Interview_STAFF_REAL
                                                         , st2.code AS Interview_STAFF 
-                                                        , to_char(nvl(dr.donation_time, nvl(dr.donation_time, sysdate)), 'HH24,MI', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as collection_time, st3.code as collection_staff, '' as lab_time, '' as lab_staff 
+                                                        , to_char(dr.donation_time, 'HH24,MI', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as collection_time, st3.code as collection_staff, '' as lab_time, '' as lab_staff 
                                                         from DONATION_VISIT dv
                                                         inner join donor dn on DN.id = DV.DONOR_ID
                                                         left join donor_external_card dexc on dexc.donor_id = dn.id and dexc.external_card_id = 3 
