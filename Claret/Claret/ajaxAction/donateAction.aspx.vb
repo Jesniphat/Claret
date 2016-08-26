@@ -182,7 +182,7 @@ Public Class donateAction
                                                         , DV.SAMPLE_NUMBER, DV.COMMENT_TEXT, to_char(nvl(DV.VISIT_DATE,dv.create_date),'HH24,MI') as regis_time
                                                         , st.code as regis_staff, to_char(dv.Interview_DATE,'HH24,MI') as Interview_time, dv.Interview_STAFF AS Interview_STAFF_REAL
                                                         , st2.code AS Interview_STAFF 
-                                                        , '' as collection_time, '' as collection_staff, '' as lab_time, '' as lab_staff
+                                                        , to_char(nvl(dr.donation_time, nvl(dr.donation_time, sysdate)), 'HH24,MI', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI') as collection_time, st3.code as collection_staff, '' as lab_time, '' as lab_staff 
                                                         from DONATION_VISIT dv
                                                         inner join donor dn on DN.id = DV.DONOR_ID
                                                         left join donor_external_card dexc on dexc.donor_id = dn.id and dexc.external_card_id = 3 
@@ -190,6 +190,8 @@ Public Class donateAction
                                                         left join rh_group rg on rg.id = dn.rh_group_id
                                                         left join staff st on st.id = dv.create_staff
                                                         left join staff st2 on st2.id = dv.Interview_STAFF
+                                                        LEFT JOIN DONATION_RECORD DR ON DN.ID = DR.DONOR_ID AND DV.ID = DR.DONATION_VISIT_ID
+                                                        left join staff st3 on st3.id = dr.create_staff
                                                         where 1=1 /*#REPORT_DATE*/ /*#STATUS*/
                                                         /*#QUEUE_NUMBER*/ /*#DONOR_NUMBER*/ /*#NATION_NUMBER*/ /*#NAME*/ /*#SURNAME*/ 
                                                         /*#BIRTHDAY*/ /*#BLOOD_GROUP*/ /*#SAMPLE_NUMBER*/ 
@@ -615,8 +617,8 @@ Public Class donateAction
                                 DT.DESCRIPTION AS TYPE_DES,G.DESCRIPTION AS BAG_DES, DTT.DESCRIPTION AS APPLY_DES 
                                 FROM DONOR D INNER JOIN DONATION_VISIT DV ON D.ID = DV.DONOR_ID 
                                 LEFT JOIN DONATION_RECORD DR ON D.ID = DR.DONOR_ID AND DV.ID = DR.DONATION_VISIT_ID
-                                INNER JOIN DONATION_TYPE DT ON DV.DONATION_TYPE_ID = DT.ID
-                                INNER JOIN BAG G ON DV.BAG_ID = G.ID INNER JOIN Donation_To DTT ON DV.DONATION_TO_ID = DTT.ID
+                                LEFT JOIN DONATION_TYPE DT ON DV.DONATION_TYPE_ID = DT.ID
+                                LEFT JOIN BAG G ON DV.BAG_ID = G.ID LEFT JOIN Donation_To DTT ON DV.DONATION_TO_ID = DTT.ID
                                 WHERE DV.STATUS IN ('WAIT RESULT')  AND DV.UPDATE_DATE  IS NOT NULL AND to_char(nvl(DV.VISIT_DATE,DV.CREATE_DATE), 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("visit_date") & "' 
                                 ORDER BY DV.UPDATE_DATE DESC "
             Dim dt As DataTable = Cbase.QueryTable(sql)

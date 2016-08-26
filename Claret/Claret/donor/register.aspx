@@ -74,6 +74,11 @@
                         $(this).H2GValue(formatDate(isValue, pattern));
                     }
                     $("#txtAge").H2GValue(H2G.calAge($(this).H2GValue()) + ' ปี');
+                    if (H2G.calAge($(this).H2GValue()) > 59) {
+                        $("#txtAge").css("font-weight", "bold");
+                    } else {
+                        $("#txtAge").css("font-weight", "normal");
+                    }
                 } else {
                     $("#txtAge").H2GValue('');
                 }

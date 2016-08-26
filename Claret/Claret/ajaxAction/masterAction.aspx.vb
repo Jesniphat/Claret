@@ -315,7 +315,8 @@ Public Class masterAction
     Private Sub getDonationto()
         Dim DataList As New List(Of KeyCodeIDItem)
         Dim DataItem As KeyCodeIDItem
-        Dim sql As String = "select id, description from DONATION_TO where used_module like '%H,%' order by description "
+        'Dim sql As String = "select id, description from DONATION_TO where used_module like '%H,%' order by description "
+        Dim sql As String = "select * from Donation_To where used_module like '%D,%'"
         Dim dt As DataTable = Cbase.QueryTable(sql)
 
         If dt.Rows.Count > 0 Then

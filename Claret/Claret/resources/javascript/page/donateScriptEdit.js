@@ -43,11 +43,12 @@ function checkParam() {
     }
     console.log(getParam);
     deferred.resolve("Ok");
-    if ($("#data").attr("donateAction") == "new") {
-        $("#donerNumber").focus();
-    } else if ($("#data").attr("donateAction") == "edit") {
-        $("#donateType").focus();
-    }
+    $("#donerNumber").focus();
+    //if ($("#data").attr("donateAction") == "new") {
+    //    $("#donerNumber").focus();
+    //} else if ($("#data").attr("donateAction") == "edit") {
+    //    $("#donateType").focus();
+    //}
     return deferred.promise();
 }
 
@@ -739,8 +740,8 @@ function resetData() {
     $("#vol").val("");
     $("#startDonateDate").val("");
     $("#donateTimes").val("");
-    $("#donateStaff").val("");
-    $("#donateStaff").attr("staffid", "0");
+    $("#donateStaff").val($("#spUserName").text());
+    $("#donateStaff").attr("staffid", $("#data").attr("staffid"));
 
     $("#donerNumber").val("");
     $("#sampleNumber").val("");
@@ -795,14 +796,14 @@ function getDonationList() {
                 }
                 for (var i = 0; i < data.getItems.length; i++) {
                     var rows = "<tr class='donate-table-rows'>" +
-                                    "<td class='col-md-5'><input value = '" + data.getItems[i].sample_number + "' /></td>" +
-                                    "<td class='col-md-5'><input value = '" + data.getItems[i].dornor_number + "' /></td>" +
-                                    "<td class='col-md-5'><input value = '" + data.getItems[i].type_des + "' /></td>" +
-                                    "<td class='col-md-5'><input value = '" + data.getItems[i].bag_des + "' /></td>" +
-                                    "<td class='col-md-5'><input value = '" + data.getItems[i].apply_des + "' /></td>" +
-                                    "<td class='col-md-3'><input value = '" + data.getItems[i].volume_actual + "' /></td>" +
-                                    "<td class='col-md-3'><input value = '" + data.getItems[i].donation_time + "' /></td>" +
-                                    "<td class='col-md-3'><input value = '" + data.getItems[i].duration + "' /></td>" +
+                                    "<td class='col-md-5'><input value = '" + data.getItems[i].sample_number + "' readonly /></td>" +
+                                    "<td class='col-md-5'><input value = '" + data.getItems[i].dornor_number + "' readonly /></td>" +
+                                    "<td class='col-md-5'><input value = '" + data.getItems[i].type_des + "' readonly /></td>" +
+                                    "<td class='col-md-5'><input value = '" + data.getItems[i].bag_des + "' readonly /></td>" +
+                                    "<td class='col-md-5'><input value = '" + data.getItems[i].apply_des + "' readonly /></td>" +
+                                    "<td class='col-md-3'><input value = '" + data.getItems[i].volume_actual + "' readonly /></td>" +
+                                    "<td class='col-md-3'><input value = '" + data.getItems[i].donation_time + "' readonly /></td>" +
+                                    "<td class='col-md-3'><input value = '" + data.getItems[i].duration + "' readonly /></td>" +
                                     "<td class='col-md-3'>" +
                                         "<button class='btn btn-icon' onclick='goEditIt(" + data.getItems[i].visit_id + ", " + data.getItems[i].donor_id + ");'>" +
                                             "<i class='glyphicon glyphicon-circle-arrow-up'></i>" +
@@ -1199,4 +1200,17 @@ function updateDonationNumber() {
             }
         }
     });
+}
+
+function checkLength() {
+    var fieldLength = document.getElementById('vol').value.length;
+    //Suppose u want 4 number of character
+    if (fieldLength <= 3) {
+        return true;
+    }
+    else {
+        var str = document.getElementById('vol').value;
+        str = str.substring(0, str.length - 1);
+        document.getElementById('vol').value = str;
+    }
 }

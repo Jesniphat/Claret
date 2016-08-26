@@ -118,6 +118,17 @@
             //$("#testx").click(function () {
             //    hl7Generator('41', '93', '9995900007', '123456789')
             //})
+            $("#vol").keydown(function (e) {
+                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
+                    (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                    (e.keyCode >= 35 && e.keyCode <= 40)) {
+                    return;
+                }
+                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                    e.preventDefault();
+                }
+            });
+
         });
         
     </script>
@@ -176,9 +187,9 @@
             <div class="border-box">
                 <div class="row">
                     <div class="col-md-8 text-left">Prescribed Volumn</div>
-                    <div class="col-md-9 text-left"><input class="col-md-9 form-control" id="prescribedVol" type="text" value="" readonly/></div>
+                    <div class="col-md-9 text-left"><input class="col-md-9 form-control" id="prescribedVol" type="text" value="" readonly disabled/></div>
                     <div class="col-md-8 text-left">Volumn</div>
-                    <div class="col-md-9 text-left"><input class="col-md-9 form-control required" id="vol" type="text" value="" tabindex="6" /></div>
+                    <div class="col-md-9 text-left"><input class="col-md-9 form-control required" id="vol" type="text" value="" tabindex="6" onInput="checkLength()" /></div>
                 </div>
                 <div class="row">
                     <div class="col-md-8 text-left">เวลาที่เริ่มบริจาค</div>
@@ -188,7 +199,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-8 text-left">ผู้เจาะเก็บ</div>
-                    <div class="col-md-15 text-left"><input class="col-md-15 form-control required" id="donateStaff" staffid="0" type="text" value="" tabindex="9"/></div>
+                    <div class="col-md-15 text-left"><input class="col-md-15 form-control" id="donateStaff" staffid="0" type="text" value="" tabindex="9" readonly disabled/></div>
                 </div>
             </div>
         </div>
