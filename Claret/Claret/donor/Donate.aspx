@@ -369,7 +369,7 @@
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <input id="txtPostSample" class="form-control text-center" type="text" tabindex="8" />
+                                    <input id="txtPostSample" class="form-control text-center color-yellow" type="text" tabindex="8" />
                                 </div>
                                 <div class="col-md-2">
                                     <div class="col-md-36">
@@ -548,7 +548,7 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <input id="txtSample" class="form-control" type="text" />
+                                <input id="txtSample" class="form-control color-yellow" type="text" />
                             </div>
                             <div class="col-md-2 text-center">
                                 <a title="ลบข้อมูลที่กรอก"><span id="spPostClear" class="glyphicon glyphicon-remove"></span></a>

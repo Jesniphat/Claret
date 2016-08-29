@@ -27,6 +27,7 @@ var site_id = 0;
 var exChangeList = [];
 
 var currentTime = "";
+var focusStart = true;
 ////////////////////////////////////////////////////// function ///////////////////////////////////////////////////////////////
 
 function checkParam() {
@@ -589,6 +590,7 @@ function checkStatusTodo(status, donorId, visitId) {
     if (status == "WAIT RESULT") {
         $("#confirmToEditDl").dialog("open");
     } else {
+        focusStart = false;
         editIt(visitId, donorId)
     }
 }
@@ -732,6 +734,7 @@ function saveData() {
 }
 
 function resetData() {
+    console.log("reset");
     var deferred = $.Deferred();
     $("#donateType").val("0");
     $("#donateBagType").val("0");
@@ -770,7 +773,7 @@ function resetData() {
     // $("#data").attr("donatedate", "");
     $("#data").attr("donatestatus", "WAIT COLLECTION");
     $("#donerNumber").focus();
-
+    
     getDonationList();
     deferred.resolve("OK");
     return deferred.promise();

@@ -159,11 +159,17 @@ Public Class donateAction
                     PostQueueItem.GoNext = "Y"
                 End If
             End If
+            If Not String.IsNullOrEmpty(_REQUEST("samplenumber")) Then
+                param.Add("#SAMPLE_NUMBER", " and UPPER(dv.SAMPLE_NUMBER) like UPPER('" & _REQUEST("samplenumber") & "') ")
+                If Not _REQUEST("samplenumber").ToString.Contains("%") Then
+                    PostQueueItem.GoNext = "Y"
+                End If
+            End If
             If Not String.IsNullOrEmpty(_REQUEST("name")) Then param.Add("#NAME", " and (UPPER(dn.name) like UPPER('" & _REQUEST("name") & "') or UPPER(dn.name_e) like UPPER('" & _REQUEST("name") & "')) ")
             If Not String.IsNullOrEmpty(_REQUEST("surname")) Then param.Add("#SURNAME", " and (UPPER(dn.surname) like UPPER('" & _REQUEST("surname") & "') or UPPER(dn.surname_e) like UPPER('" & _REQUEST("surname") & "')) ")
             If Not String.IsNullOrEmpty(_REQUEST("birthday")) Then param.Add("#BIRTHDAY", "and to_char(dn.birthday, 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("birthday") & "' ")
             If Not String.IsNullOrEmpty(_REQUEST("bloodgroup")) Then param.Add("#BLOOD_GROUP", " and UPPER(rg.description) like UPPER('" & _REQUEST("bloodgroup") & "') ")
-            If Not String.IsNullOrEmpty(_REQUEST("samplenumber")) Then param.Add("#SAMPLE_NUMBER", " and UPPER(dv.SAMPLE_NUMBER) like UPPER('" & _REQUEST("samplenumber") & "') ")
+            'If Not String.IsNullOrEmpty(_REQUEST("samplenumber")) Then param.Add("#SAMPLE_NUMBER", " and UPPER(dv.SAMPLE_NUMBER) like UPPER('" & _REQUEST("samplenumber") & "') ")
             'If Not String.IsNullOrEmpty(_REQUEST("reportdate")) Then param.Add("#REPORT_DATE", " and nvl(dv.VISIT_DATE,dv.CREATE_DATE) between to_date('" & _REQUEST("reportdate").Replace("/", "") & "','ddMMyyyy') and to_date('" & _REQUEST("reportdate").Replace("/", "") & "','ddMMyyyy')+1 ")
 
             If Not String.IsNullOrEmpty(_REQUEST("reportdate")) Then param.Add("#REPORT_DATE", "and to_char(nvl(dv.VISIT_DATE,dv.CREATE_DATE), 'DD/MM/YYYY', 'NLS_CALENDAR=''THAI BUDDHA'' NLS_DATE_LANGUAGE=THAI')='" & _REQUEST("reportdate") & "' ")

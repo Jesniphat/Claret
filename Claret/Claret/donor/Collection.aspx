@@ -159,7 +159,7 @@
                 <div class="row">
                     <div class="col-md-8 text-left">ประเภทการบริจาค</div>
                     <div class="col-md-14" style="padding-left:9px; max-width:232px; width:100%;">
-                        <select id="donateType" class="required selecte-box-custom" tabindex="3">
+                        <select id="donateType" class="required selecte-box-custom" tabindex="-1">
                             
                         </select>
                     </div>
@@ -168,7 +168,7 @@
                 <div class="row">
                     <div class="col-md-8 text-left">ประเภทถุง</div>
                     <div class="col-md-14" style="padding-left:9px; max-width:232px; width:100%;">
-                        <select id="donateBagType" class="required selecte-box-custom" tabindex="4">
+                        <select id="donateBagType" class="required selecte-box-custom" tabindex="-1">
                             
                         </select>
                     </div>
@@ -176,7 +176,7 @@
                 <div class="row">
                     <div class="col-md-8 text-left">ประเภทการใช้งาน</div>
                     <div class="col-md-14" style="padding-left:9px; max-width:232px; width:100%;">
-                        <select id="donateApply" class="required selecte-box-custom" tabindex="5">
+                        <select id="donateApply" class="required selecte-box-custom" tabindex="-1">
                             
                         </select>
                     </div>
@@ -189,17 +189,17 @@
                     <div class="col-md-8 text-left">Prescribed Volumn</div>
                     <div class="col-md-9 text-left"><input class="col-md-9 form-control" id="prescribedVol" type="text" value="" readonly disabled/></div>
                     <div class="col-md-8 text-left">Volumn</div>
-                    <div class="col-md-9 text-left"><input class="col-md-9 form-control required" id="vol" type="text" value="" tabindex="6" onInput="checkLength()" /></div>
+                    <div class="col-md-9 text-left"><input class="col-md-9 form-control required" id="vol" type="text" value="" tabindex="3" onInput="checkLength()" /></div>
                 </div>
                 <div class="row">
                     <div class="col-md-8 text-left">เวลาที่เริ่มบริจาค</div>
-                    <div class="col-md-9 text-left"><input class="col-md-9 form-control required" id="startDonateDate" type="text" value="" tabindex="7" /></div>
+                    <div class="col-md-9 text-left"><input class="col-md-9 form-control required" id="startDonateDate" type="text" value="" tabindex="4" /></div>
                     <div class="col-md-8 text-left">ระยะเวลาที่บริจาค</div>
-                    <div class="col-md-9 text-left"><input class="col-md-9 form-control required" id="donateTimes" type="text" value="" tabindex="8"/></div>
+                    <div class="col-md-9 text-left"><input class="col-md-9 form-control required" id="donateTimes" type="text" value="" tabindex="5"/></div>
                 </div>
                 <div class="row">
                     <div class="col-md-8 text-left">ผู้เจาะเก็บ</div>
-                    <div class="col-md-15 text-left"><input class="col-md-15 form-control" id="donateStaff" staffid="0" type="text" value="" tabindex="9" readonly disabled/></div>
+                    <div class="col-md-15 text-left"><input class="col-md-15 form-control" id="donateStaff" staffid="0" type="text" value="" tabindex="6" readonly disabled/></div>
                 </div>
             </div>
         </div>
@@ -214,9 +214,9 @@
                     <table class="table table-bordered" style="margin-bottom:5px;">
                         <tbody>
                             <tr>
-                                <td class="col-md-34"><input class="form-control" id="labExamination" style="border:none;" value="" tabindex="10" /></td>
+                                <td class="col-md-34"><input class="form-control" id="labExamination" style="border:none;" value="" tabindex="7" /></td>
                                 <td class="col-md-1" style="border:1px solid #ffffff;">
-                                    <button id="addLabExamination" class="btn btn-icon" onclick="return false;" tabindex="11">
+                                    <button id="addLabExamination" class="btn btn-icon" onclick="return false;" tabindex="8">
                                         <i class="glyphicon glyphicon-circle-arrow-down"></i>
                                     </button>
                                 </td>
@@ -250,7 +250,7 @@
                                         <option value="0">ทดสอบ...</option>
                                         <option value="1">ทดสอบ2...</option>
                                     </select>--%>
-                                    <input class="form-control" id="collectedProblem" value="" tabindex="12" />
+                                    <input class="form-control" id="collectedProblem" value="" tabindex="9" />
                                 </td>
                             </tr>
                         </tbody>
@@ -265,10 +265,10 @@
                         <tbody>
                             <tr>
                                 <td class="col-md-17" style="border:1px solid #ffffff; padding: 0px;">
-                                    <input class="form-control" id="collectedProblemReason1" value="" tabindex="13" />
+                                    <input class="form-control" id="collectedProblemReason1" value="" tabindex="10" />
                                 </td>
                                 <td class="col-md-17" style="border:1px solid #ffffff; padding: 0px;">
-                                    <input class="form-control" id="collectedProblemReason2" value="" tabindex="14" />
+                                    <input class="form-control" id="collectedProblemReason2" value="" tabindex="11" />
                                 </td>
                             </tr>
                         </tbody>
@@ -283,10 +283,10 @@
                         <tbody>
                             <tr>
                                 <td class="col-md-17" style="border:1px solid #ffffff; padding: 0px;">
-                                    <input class="form-control" id="collectedProblemReason3" value="" tabindex="15" />
+                                    <input class="form-control" id="collectedProblemReason3" value="" tabindex="12" />
                                 </td>
                                 <td class="col-md-17" style="border:1px solid #ffffff; padding: 0px;">
-                                    <input class="form-control" id="collectedProblemReason4" value="" tabindex="16" />
+                                    <input class="form-control" id="collectedProblemReason4" value="" tabindex="13" />
                                 </td>
                             </tr>
                         </tbody>
@@ -306,8 +306,8 @@
     <div class="row" style="margin-top:10px;">
         <div class="col-md-36">
             <div class="col-md-30">&nbsp;</div>
-            <div class="col-md-3"><input id="btnCancel" type="button" class="btn btn-block" value="ยกเลิก" tabindex="17" /></div>
-            <div class="col-md-3"><input id="btnSave" type="button" class="btn btn-success btn-block" value="บันทึก" tabindex="18" /></div>
+            <div class="col-md-3"><input id="btnCancel" type="button" class="btn btn-block" value="ยกเลิก" tabindex="14" /></div>
+            <div class="col-md-3"><input id="btnSave" type="button" class="btn btn-success btn-block" value="บันทึก" tabindex="15" /></div>
         </div>
     </div>
     <div class="row" style="margin-top:20px;">
